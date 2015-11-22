@@ -90,7 +90,7 @@ abc:set_value(30)
 assert(30 == abc:get_value())
 ```
 
-#### Registering class instance
+#### Registering object instance
 
 ```c++
 state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -102,4 +102,12 @@ state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 	ABC abc(43);
 	state["abc"] = &abc;
 	state("assert(43 == abc:get_value())")
+```
+
+#### Registering function
+```c++
+void c_free_standing_function(int v){std::cout <<"c_free_standing_function called:" << v << std::endl}
+state["fun"] = kaguya::function(&c_free_standing_function);
+state["fun"](54); 
+state("fun(22)");
 ```
