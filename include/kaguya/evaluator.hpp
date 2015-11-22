@@ -166,7 +166,7 @@ namespace kaguya
 				{
 					res_->results.push_back(LuaRef(state_, StackTop()));
 				}
-				lua_settop(state_, res_->stack_top_);
+				lua_settop(state_, res_->reset_stack_top_);
 			}
 		}
 
@@ -176,7 +176,7 @@ namespace kaguya
 		{
 			res_ = standard::shared_ptr<eval>(new eval());
 			res_->arg_num_ = argnum;
-			res_->stack_top_ = stacktop;
+			res_->reset_stack_top_ = stacktop;
 			res_->owner = this;
 			res_->invoked = false;
 		}
@@ -187,7 +187,7 @@ namespace kaguya
 
 		struct eval
 		{
-			int stack_top_;
+			int reset_stack_top_;
 			size_t arg_num_;
 			std::vector<LuaRef> results;
 			bool invoked;

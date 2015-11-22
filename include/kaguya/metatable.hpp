@@ -72,8 +72,8 @@ namespace kaguya
 #include "gen/add_constructor.inl"
 
 		//variadic argment constructor(receive const std::vector<LuaRef>&)
-		template<>ClassMetatable& addConstructor(types::type_tag<variadic_arg_type>* )
-//		ClassMetatable& addConstructorVariadicArg()
+//		template<>ClassMetatable& addConstructor(types::type_tag<variadic_arg_type>* )
+		ClassMetatable& addConstructorVariadicArg()
 		{
 			functor_type fun(new kaguya::nativefunction::variadic_constructor_caller<class_type>());
 			function_map_["new"].push_back(fun);
