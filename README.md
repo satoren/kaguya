@@ -3,6 +3,8 @@ C++ binding to Lua
 
 Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
+[![Build Status](https://travis-ci.org/satoren/kaguya.svg?branch=master)](https://travis-ci.org/satoren/kaguya)
+
 ## Requirements
 - Lua 5.2 or 5.3(recommended)
 - C++03 compiler + boost library or C++11 compiler. see kaguya/config.hpp
