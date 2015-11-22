@@ -217,12 +217,18 @@ namespace selector_test
 		bool member_function_test(kaguya::State& state)
 		{
 			state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
+				.addMember("setBar", &Foo::setBar)
 				, false);
 			Foo foo;
 			kaguya::Selector lfoo = state["Foo"];
 			lfoo["bar"] = kaguya::function(&Foo::setBar);
 			lfoo["bar"](&foo, "bar");
 			if (foo.bar != "bar") { return false; }
+
+			state["foo"] = &foo;
+			state("foo:setBar(\"test\")");
+			if (foo.bar != "test") { return false; }
+
 #if __cplusplus >= 201104L
 			lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
 			if (!state("Foo.bar(\"test\")")) { return false; }
@@ -307,6 +313,7 @@ bool execute_test(const test_function_map_t& testmap)
 			return false;
 		}
 	}
+
 	return true;
 }
 

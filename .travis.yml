@@ -1,0 +1,12 @@
+sudo: false
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+addons:
+  apt:
+    packages:
+    - liblua5.2-dev
+script:
+  - mkdir build && cd build && cmake ../ && make && ./test_runner
