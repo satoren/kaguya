@@ -31,7 +31,7 @@ namespace kaguya
 				return standard::tuple<T1>(r[0].get<T1>());
 			}
 			error_handler_.handle(0, "no result");
-			return T();
+			return standard::tuple<T1>();
 		}
 
 		template<typename T>
@@ -55,7 +55,7 @@ namespace kaguya
 		//  }
 		//}
 		template<typename T>
-		operator T*()const {
+		operator T*() {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
 			if (res_ && !res_->results.empty())
