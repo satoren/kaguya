@@ -257,7 +257,7 @@ namespace selector_test
 		{
 			state["Vari"].setClass(kaguya::ClassMetatable<VariFoo>()
 				.addConstructor()
-				.addConstructor<kaguya::variadic_arg_type>()
+				.addConstructorVariadicArg()
 				.addMember("variadicfun", &VariFoo::variadic_arg_func)
 				);
 			state("var = Vari.new()");
