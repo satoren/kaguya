@@ -306,7 +306,7 @@ namespace kaguya
 			luaL_setmetatable(l, metatable_name<const T>().c_str());
 			return 1;
 		}
-//#include "kaguya/gen/push_tuple.inl"
+#include "kaguya/gen/push_tuple.inl"
 
 
 #include "kaguya/gen/constructor.inl"

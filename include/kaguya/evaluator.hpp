@@ -4,12 +4,13 @@
 #include "kaguya/lua_ref.hpp"
 #include "kaguya/error_handler.hpp"
 
+
 namespace kaguya
 {
 	struct Evaluator
 	{
 		template<typename T>
-		T get()
+		T get()const
 		{
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
@@ -20,25 +21,12 @@ namespace kaguya
 			error_handler_.handle(0, "no result");
 			return T();
 		}
-		template<typename T1>
-		standard::tuple<T1> getTuple()
-		{
-			evaluate(1);
-			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.size() >= 1)
-			{
-				const std::vector<LuaRef>& r = res_->results;
-				return standard::tuple<T1>(r[0].get<T1>());
-			}
-			error_handler_.handle(0, "no result");
-			return standard::tuple<T1>();
-		}
 
 		template<typename T>
-		operator T() {
+		operator T()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<T>();
 			}
@@ -55,10 +43,10 @@ namespace kaguya
 		//  }
 		//}
 		template<typename T>
-		operator T*() {
+		operator T*()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<T*>();
 			}
@@ -66,29 +54,29 @@ namespace kaguya
 			return 0;
 		}
 
-		operator bool() {
+		operator bool()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<bool>();
 			}
 			error_handler_.handle(0, "no result");
 			return false;
 		}
-		operator float() {
+		operator float()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<float>();
 			}
 			error_handler_.handle(0, "no result");
 			return (0);
 		}
-		operator double() {
+		operator double()const {
 			evaluate(1);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<double>();
 			}
@@ -96,20 +84,20 @@ namespace kaguya
 			return (0);
 		}
 
-		operator int() {
+		operator int()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<int>();
 			}
 			error_handler_.handle(0, "no result");
 			return 0;
 		}
-		operator int64_t() {
+		operator int64_t()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<int64_t>();
 			}
@@ -117,30 +105,30 @@ namespace kaguya
 			return 0;
 		}
 
-		operator std::string() {
+		operator std::string()const {
 			evaluate(1);
 			utils::ScopedSavedStack save(state_);
-			if (res_ && !res_->results.empty())
+			if (!res_->results.empty())
 			{
 				return res_->results.back().get<std::string>();
 			}
 			return "";
 		}
-		bool operator == (bool v) { return get<bool>() == v; }
-		bool operator == (const std::string& v) { return get<std::string>() == v; }
-		bool operator == (const char* v) { return get<std::string>() == v; }
-		bool operator == (float v) { return get<float>() == v; }
-		bool operator == (double v) { return get<double>() == v; }
-		bool operator == (int v) { return get<int>() == v; }
-		bool operator == (int64_t v) { return get<int64_t>() == v; }
+		bool operator == (bool v)const { return get<bool>() == v; }
+		bool operator == (const std::string& v)const { return get<std::string>() == v; }
+		bool operator == (const char* v)const { return get<std::string>() == v; }
+		bool operator == (float v)const { return get<float>() == v; }
+		bool operator == (double v)const { return get<double>() == v; }
+		bool operator == (int v)const { return get<int>() == v; }
+		bool operator == (int64_t v)const { return get<int64_t>() == v; }
 
 		template<typename T>
-		bool operator == (const T* v)
+		bool operator == (const T* v)const
 		{
 			return get<T>() == v;
 		}
 		template<typename T>
-		bool operator != (const T& v)
+		bool operator != (const T& v)const
 		{
 			return !((*this) == v);
 		}
@@ -149,12 +137,16 @@ namespace kaguya
 		{
 			evaluate(0);
 		}
-	private:
 
-
-		void evaluate(int resultnum)
+		const std::vector<LuaRef>& get_result(int result_count)const
 		{
-			if (res_ && res_->owner == this && !res_->invoked)
+			evaluate(result_count);
+			return res_->results;
+		}
+	private:
+		void evaluate(int resultnum)const
+		{
+			if (res_->owner == this && !res_->invoked)
 			{
 				res_->invoked = true;
 				int result = lua_pcall(state_, res_->arg_num_, resultnum, 0);
@@ -166,6 +158,8 @@ namespace kaguya
 				{
 					res_->results.push_back(LuaRef(state_, StackTop()));
 				}
+				std::reverse(res_->results.begin(), res_->results.end());
+
 				lua_settop(state_, res_->reset_stack_top_);
 			}
 		}
@@ -201,3 +195,5 @@ namespace kaguya
 		standard::shared_ptr<eval> res_;
 	};
 }
+
+#include "kaguya/ref_tuple.hpp"

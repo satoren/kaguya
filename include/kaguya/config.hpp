@@ -35,6 +35,7 @@ namespace kaguya
 		using boost::function;
 		using boost::tuple;
 		using boost::shared_ptr;
+		using boost::get;
 
 		std::string to_string(int v)
 		{
@@ -48,6 +49,7 @@ namespace kaguya
 		using std::tuple;
 		using std::shared_ptr;
 		using std::to_string;
+		using std::get;
 #endif
 	}
 

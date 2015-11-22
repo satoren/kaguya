@@ -1,106 +1,106 @@
 //generated header by push_tuple_generator.py
 template<>
-int push(lua_State* l,standard::tuple<>& v)
+int push(lua_State* l,const standard::tuple<>& v)
 {
   int count =0;
   return count;
 }
 template<typename T1>
-int push(lua_State* l,standard::tuple<T1>& v)
+int push(lua_State* l,const standard::tuple<T1>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
+  count += push(l,standard::get<0>(v));
   return count;
 }
 template<typename T1,typename T2>
-int push(lua_State* l,standard::tuple<T1,T2>& v)
+int push(lua_State* l,const standard::tuple<T1,T2>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3>
-int push(lua_State* l,standard::tuple<T1,T2,T3>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3,typename T4>
-int push(lua_State* l,standard::tuple<T1,T2,T3,T4>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3,T4>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
-  count += push(l,v.get<3>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
+  count += push(l,standard::get<3>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-int push(lua_State* l,standard::tuple<T1,T2,T3,T4,T5>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3,T4,T5>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
-  count += push(l,v.get<3>());
-  count += push(l,v.get<4>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
+  count += push(l,standard::get<3>(v));
+  count += push(l,standard::get<4>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-int push(lua_State* l,standard::tuple<T1,T2,T3,T4,T5,T6>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3,T4,T5,T6>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
-  count += push(l,v.get<3>());
-  count += push(l,v.get<4>());
-  count += push(l,v.get<5>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
+  count += push(l,standard::get<3>(v));
+  count += push(l,standard::get<4>(v));
+  count += push(l,standard::get<5>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-int push(lua_State* l,standard::tuple<T1,T2,T3,T4,T5,T6,T7>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3,T4,T5,T6,T7>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
-  count += push(l,v.get<3>());
-  count += push(l,v.get<4>());
-  count += push(l,v.get<5>());
-  count += push(l,v.get<6>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
+  count += push(l,standard::get<3>(v));
+  count += push(l,standard::get<4>(v));
+  count += push(l,standard::get<5>(v));
+  count += push(l,standard::get<6>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-int push(lua_State* l,standard::tuple<T1,T2,T3,T4,T5,T6,T7,T8>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3,T4,T5,T6,T7,T8>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
-  count += push(l,v.get<3>());
-  count += push(l,v.get<4>());
-  count += push(l,v.get<5>());
-  count += push(l,v.get<6>());
-  count += push(l,v.get<7>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
+  count += push(l,standard::get<3>(v));
+  count += push(l,standard::get<4>(v));
+  count += push(l,standard::get<5>(v));
+  count += push(l,standard::get<6>(v));
+  count += push(l,standard::get<7>(v));
   return count;
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-int push(lua_State* l,standard::tuple<T1,T2,T3,T4,T5,T6,T7,T8,T9>& v)
+int push(lua_State* l,const standard::tuple<T1,T2,T3,T4,T5,T6,T7,T8,T9>& v)
 {
   int count =0;
-  count += push(l,v.get<0>());
-  count += push(l,v.get<1>());
-  count += push(l,v.get<2>());
-  count += push(l,v.get<3>());
-  count += push(l,v.get<4>());
-  count += push(l,v.get<5>());
-  count += push(l,v.get<6>());
-  count += push(l,v.get<7>());
-  count += push(l,v.get<8>());
+  count += push(l,standard::get<0>(v));
+  count += push(l,standard::get<1>(v));
+  count += push(l,standard::get<2>(v));
+  count += push(l,standard::get<3>(v));
+  count += push(l,standard::get<4>(v));
+  count += push(l,standard::get<5>(v));
+  count += push(l,standard::get<6>(v));
+  count += push(l,standard::get<7>(v));
+  count += push(l,standard::get<8>(v));
   return count;
 }

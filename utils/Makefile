@@ -1,4 +1,4 @@
-all: gen_native_fun gen_add_constructor_function gen_constructor gen_push_tuple gen_evaluator_function
+all: gen_native_fun gen_add_constructor_function gen_constructor gen_push_tuple gen_evaluator_function gen_ref_tuple
 
 gen_native_fun: function_generator.py
 	python function_generator.py > ../include/kaguya/gen/native_function.inl
@@ -14,6 +14,9 @@ gen_push_tuple: push_tuple_generator.py
 
 gen_evaluator_function: evaluator_function_generator.py
 	python evaluator_function_generator.py > ../include/kaguya/gen/evaluator_function.inl
+
+gen_ref_tuple: ref_tuple_generator.py
+	python ref_tuple_generator.py > ../include/kaguya/gen/ref_tuple.inl
 
 
 clean:

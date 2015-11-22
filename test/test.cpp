@@ -272,6 +272,27 @@ namespace selector_test
 			bool res2 = ptr && ptr->args[0].get<std::string>() == "abc";
 			return res1 && res2;
 		}
+
+
+
+		kaguya::standard::tuple<int, std::string> tuplefun()
+		{
+			return kaguya::standard::tuple<int, std::string>(12, "23");
+		}
+
+		bool multi_return_function_test(kaguya::State& state)
+		{
+			state("multresfun =function() return 1,2,4,8,16 end");
+			int a,b,c,d,e;
+			kaguya::tie(a,b,c,d,e) = state["multresfun"]();
+			if(!(a == 1 && b == 2 && c == 4 && d == 8 && e == 16)){return false; }
+
+			state["multresfun"] = kaguya::function(tuplefun);
+
+			state("a,b = multresfun()");
+			return state("assert(a == 12  and b == \"23\")");
+		}
+
 	}
 }
 
@@ -343,7 +364,10 @@ int main()
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);
 		ADD_TEST(selector_test::t_03_function::member_function_test);
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
+		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
 		
+		
+
 		test_result = execute_test(testmap);
 	}
 	return test_result ? 0 : -1;

@@ -19,13 +19,13 @@ def generate_fun_args(out,arg_num):
 
 def generate_push_tuple(out,arg_num):
 	generate_template(out,arg_num)
-	out.write("int push(lua_State* l,standard::tuple<")
+	out.write("int push(lua_State* l,const standard::tuple<")
 	generate_args(out,arg_num,"T")
 	out.write(">& v)\n")
 	out.write("{\n")
 	out.write("  int count =0;\n")
 	for i in range (arg_num):
-		out.write("  count += push(l,v.get<"+str(i)+">());\n")
+		out.write("  count += push(l,standard::get<"+str(i)+">(v));\n")
 	out.write("  return count;\n")
 	out.write("}\n")
 
