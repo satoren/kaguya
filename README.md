@@ -90,7 +90,7 @@ abc:set_value(30)
 assert(30 == abc:get_value())
 ```
 
-#### Registering class instance to Lua
+#### Registering class instance
 
 ```c++
 state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
