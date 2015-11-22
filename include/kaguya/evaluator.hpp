@@ -18,7 +18,7 @@ namespace kaguya
 				return res_->results.back().get<T>();
 			}
 			error_handler_.handle(0, "no result");
-			return T();
+			return T;
 		}
 		template<typename T1>
 		standard::tuple<T1> getTuple()
