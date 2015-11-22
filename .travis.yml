@@ -8,5 +8,6 @@ addons:
   apt:
     packages:
     - liblua5.2-dev
+    - libboost-dev
 script:
   - mkdir build && cd build && cmake ../ && make && ./test_runner
