@@ -3,7 +3,7 @@ project(Kaguya)
 
 if(NOT LUA_INCLUDE_DIRS)
   find_package(PkgConfig)
-  pkg_search_module(LUA REQUIRED lua5.3)
+  pkg_search_module(LUA lua5.3)
   if(NOT LUA_INCLUDE_DIRS)
   pkg_search_module(LUA REQUIRED lua5.2)
   endif()
