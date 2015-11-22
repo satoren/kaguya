@@ -16,10 +16,11 @@ namespace kaguya
 	{
 		lua_State *state_;
 		bool created_;
-		State(const State&);
 
 		ErrorHandler error_handler_;
 
+		//non copyable
+		State(const State&);
 		State& operator =(const State&);
 
 		static void stderror_out(int status, const char* message)
@@ -58,6 +59,31 @@ namespace kaguya
 			utils::ScopedSavedStack save(state_);
 			luaL_openlibs(state_);
 		}
+
+		bool loadFile(const std::string& str)
+		{
+			return loadFile(str.c_str());
+		}
+		bool loadFile(const char* file)
+		{
+			utils::ScopedSavedStack save(state_);
+
+			int status = luaL_loadfile(state_, file);
+
+			if (status)
+			{
+				error_handler_.handle(status, state_);
+				return false;
+			}
+			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
+			if (status)
+			{
+				error_handler_.handle(status, state_);
+				return false;
+			}
+			return true;
+		}
+
 		bool dostring(const char* str)
 		{
 			utils::ScopedSavedStack save(state_);

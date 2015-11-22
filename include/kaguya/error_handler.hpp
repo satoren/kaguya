@@ -10,7 +10,7 @@ namespace kaguya
 
 	const char* get_error_message(lua_State *state)
 	{
-		return luaL_checklstring(state, -1, 0);
+		return lua_tostring(state, -1);
 	}
 	struct ErrorHandler
 	{
