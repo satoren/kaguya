@@ -36,7 +36,7 @@ namespace kaguya
 		template<typename T>
 		inline bool strict_check_type(lua_State* l, int index, type_tag<T*> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return lua_type(l, index) == LUA_TLIGHTUSERDATA || luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
 		}
 
 		inline bool strict_check_type(lua_State* l, int index, type_tag<bool> tag)
@@ -54,11 +54,19 @@ namespace kaguya
 		}
 
 		inline bool strict_check_type(lua_State* l, int index, type_tag<short> tag)
-		{
+		{//need check range?
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
 		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned short> tag)
-		{
+		{//need check range?
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strict_check_type(lua_State* l, int index, type_tag<signed char> tag)
+		{//need check range?
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned char> tag)
+		{//need check range?
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
 		inline bool strict_check_type(lua_State* l, int index, type_tag<int> tag)
@@ -113,7 +121,7 @@ namespace kaguya
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<T*> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return lua_type(l, index) == LUA_TLIGHTUSERDATA || lua_topointer(l, index) == 0 || luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
 		}
 
 		inline bool check_type(lua_State* l, int index, type_tag<bool> tag)
@@ -143,6 +151,22 @@ namespace kaguya
 			return check_type(l, index, type_tag<int64_t>());
 		}
 		inline bool check_type(lua_State* l, int index, type_tag<int> tag)
+		{
+			return check_type(l, index, type_tag<int64_t>());
+		}
+		inline bool check_type(lua_State* l, int index, type_tag<unsigned short> tag)
+		{
+			return check_type(l, index, type_tag<int64_t>());
+		}
+		inline bool check_type(lua_State* l, int index, type_tag<short> tag)
+		{
+			return check_type(l, index, type_tag<int64_t>());
+		}
+		inline bool check_type(lua_State* l, int index, type_tag<unsigned char> tag)
+		{
+			return check_type(l, index, type_tag<int64_t>());
+		}
+		inline bool check_type(lua_State* l, int index, type_tag<signed char> tag)
 		{
 			return check_type(l, index, type_tag<int64_t>());
 		}
@@ -182,7 +206,14 @@ namespace kaguya
 		template<typename T>
 		inline T* get(lua_State* l, int index, type_tag<T*> tag = type_tag<T*>())
 		{
-			return (T*)luaL_testudata(l, index, metatable_name<T>().c_str());
+			if (lua_type(l, index) == LUA_TLIGHTUSERDATA)
+			{
+				return (T*)lua_topointer(l, index);
+			}
+			else
+			{
+				return (T*)luaL_testudata(l, index, metatable_name<T>().c_str());
+			}
 		}
 
 		inline bool get(lua_State* l, int index, type_tag<bool> tag = type_tag<bool>())
@@ -214,6 +245,22 @@ namespace kaguya
 		inline int get(lua_State* l, int index, type_tag<int> tag = type_tag<int>())
 		{
 			return int(get(l, index, type_tag<int64_t>()));
+		}
+		inline unsigned int get(lua_State* l, int index, type_tag<unsigned short> tag = type_tag<unsigned short>())
+		{
+			return (unsigned short)(get(l, index, type_tag<int64_t>()));
+		}
+		inline int get(lua_State* l, int index, type_tag<short> tag = type_tag<short>())
+		{
+			return short(get(l, index, type_tag<int64_t>()));
+		}
+		inline unsigned int get(lua_State* l, int index, type_tag<unsigned char> tag = type_tag<unsigned char>())
+		{
+			return (unsigned char)(get(l, index, type_tag<int64_t>()));
+		}
+		inline int get(lua_State* l, int index, type_tag<signed char> tag = type_tag<signed char>())
+		{
+			return(signed char)(get(l, index, type_tag<int64_t>()));
 		}
 
 		inline const char* get(lua_State* l, int index, type_tag<const char*> tag = type_tag<const char*>())
@@ -283,6 +330,14 @@ namespace kaguya
 		{
 			return push(l, int(v));
 		}
+		inline int push(lua_State* l, signed char v)
+		{
+			return push(l, int(v));
+		}
+		inline int push(lua_State* l, unsigned char v)
+		{
+			return push(l, int(v));
+		}
 		inline int push(lua_State* l, const char* v)
 		{
 			lua_pushstring(l, v);
@@ -324,21 +379,21 @@ namespace kaguya
 		inline int push(lua_State* l, T& v)
 		{
 			lua_pushlightuserdata(l, &v);
-			luaL_setmetatable(l, metatable_name<T>().c_str());
+//			luaL_setmetatable(l, metatable_name<T>().c_str());
 			return 1;
 		}
 		template<typename T>
 		inline int push(lua_State* l, T* v)
 		{
 			lua_pushlightuserdata(l, v);
-			luaL_setmetatable(l, metatable_name<T>().c_str());
+//			luaL_setmetatable(l, metatable_name<T>().c_str());
 			return 1;
 		}
 		template<typename T>
 		inline int push(lua_State* l, const T* v)
 		{
 			lua_pushlightuserdata(l, v);
-			luaL_setmetatable(l, metatable_name<const T>().c_str());
+//			luaL_setmetatable(l, metatable_name<const T>().c_str());
 			return 1;
 		}
 #include "kaguya/gen/push_tuple.inl"

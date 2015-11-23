@@ -1220,10 +1220,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1253,10 +1262,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1286,10 +1304,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1320,10 +1347,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1354,10 +1390,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1389,10 +1434,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1424,10 +1478,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1460,10 +1523,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1496,10 +1568,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1533,10 +1614,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1570,10 +1660,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1608,10 +1707,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1646,10 +1754,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1685,10 +1802,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1724,10 +1850,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1764,10 +1899,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1804,10 +1948,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1845,10 +1998,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1886,10 +2048,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1928,10 +2099,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1970,10 +2150,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2003,10 +2192,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2036,10 +2234,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2070,10 +2277,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2104,10 +2320,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2139,10 +2364,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2174,10 +2408,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2210,10 +2453,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2246,10 +2498,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2283,10 +2544,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2320,10 +2590,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2358,10 +2637,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2396,10 +2684,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2435,10 +2732,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2474,10 +2780,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2514,10 +2829,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2554,10 +2878,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2595,10 +2928,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2636,10 +2978,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2678,10 +3029,19 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state){
-    T1* ptr = (T1*)luaL_testudata(state, 1, types::metatable_name<T1>().c_str());
-    if(!ptr) ptr = ((standard::shared_ptr<T1>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<T1> >().c_str()))->get();//fallback to shared_ptr<T>
-    return ptr;
+  T1* getPtr(lua_State *state) {
+    if (types::check_type(state, 1, types::type_tag<T1*>()))
+    {
+      return types::get(state, 1, types::type_tag<T1*>());
+   }
+   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
+    {
+      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
+      if (shared_ptr) {
+        return shared_ptr->get();
+      }
+    }
+    return 0;
   }
   virtual int invoke(lua_State *state)
   {

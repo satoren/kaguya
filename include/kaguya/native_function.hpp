@@ -107,9 +107,19 @@ namespace kaguya
 				return true;
 			}
 			ClassType* getPtr(lua_State *state) {
-				ClassType* ptr = (ClassType*)luaL_testudata(state, 1, types::metatable_name<ClassType>().c_str());
-				if (!ptr) ptr = ((standard::shared_ptr<ClassType>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<ClassType> >().c_str()))->get();//fallback to shared_ptr<T>
-				return ptr;
+				if (types::check_type(state, 1, types::type_tag<ClassType*>()))
+				{
+					return types::get(state, 1, types::type_tag<ClassType*>());
+				}
+
+				if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<ClassType>*>()))
+				{
+					standard::shared_ptr<ClassType>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<ClassType>*>());
+					if (shared_ptr) {
+						return shared_ptr->get();
+					}
+				}
+				return 0;
 			}
 			virtual int invoke(lua_State *state)
 			{
