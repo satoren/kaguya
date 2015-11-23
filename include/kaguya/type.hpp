@@ -209,7 +209,7 @@ namespace kaguya
 		}
 		inline unsigned int get(lua_State* l, int index, type_tag<unsigned int> tag = type_tag<unsigned int>())
 		{
-			return unsigned int(get(l, index, type_tag<int64_t>()));
+			return (unsigned int)(get(l, index, type_tag<int64_t>()));
 		}
 		inline int get(lua_State* l, int index, type_tag<int> tag = type_tag<int>())
 		{

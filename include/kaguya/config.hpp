@@ -17,9 +17,10 @@ extern "C" {
 
 
 #if KAGUYA_USE_BOOST
-#include "boost/function.hpp"
-#include "boost/tuple/tuple.hpp"
-#include "boost/shared_ptr.hpp"
+#include <boost/function.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/move/move.hpp>
 #else
 #include <functional>
 #include <tuple>
