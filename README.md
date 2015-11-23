@@ -94,17 +94,6 @@ assert(30 == abc:get_value())
 
 #### Registering object instance
 
-```c++
-state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
-	.addConstructor()
-	.addConstructor<int>()
-	.addMember("get_value", &ABC::value)
-	.addMember("set_value", &ABC::setValue)
-	);
-	ABC abc(43);
-	state["abc"] = &abc;
-	state("assert(43 == abc:get_value())")
-```
 
 #### Registering function
 ```c++
