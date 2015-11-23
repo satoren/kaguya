@@ -90,7 +90,7 @@ def standard_function(out,arg_num):
 	out.write('    Ret r = func_(')
 	args(out,arg_num,'t')
 	out.write(');\n')
-	out.write('    return types::push(state,static_cast<Ret>(r));\n')
+	out.write('    return types::push(state,standard::forward<Ret>(r));\n')
 	out.write('  }\n')
 	out.write('};\n')
 
@@ -179,7 +179,7 @@ def tepmlate_function(out,arg_num):
 	out.write('    Ret r = func_(')
 	args(out,arg_num,'t')
 	out.write(');\n')
-	out.write('    return types::push(state,static_cast<Ret>(r));\n')
+	out.write('    return types::push(state,standard::forward<Ret>(r));\n')
 	out.write('  }\n')
 	out.write('};\n')
 
@@ -275,7 +275,7 @@ def tepmlate_mem_function(out,arg_num,funattr):
 	out.write('    Ret r = (ptr->*func_)(')
 	args(out,arg_num,'t',1)
 	out.write(');\n')
-	out.write('    return types::push(state,static_cast<Ret>(r));\n')
+	out.write('    return types::push(state,standard::forward<Ret>(r));\n')
 	out.write('  }\n')
 	out.write('};\n')
 

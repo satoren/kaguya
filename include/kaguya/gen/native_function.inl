@@ -16,7 +16,7 @@ struct function_caller0:baseInvoker{
   virtual int invoke(lua_State *state)
   {
     Ret r = func_();
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret>
@@ -43,7 +43,7 @@ struct function_caller1:baseInvoker{
   {
     T1 t1 = types::get(state,1,types::type_tag<T1>());
     Ret r = func_(t1);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1>
@@ -71,7 +71,7 @@ struct function_caller2:baseInvoker{
     T1 t1 = types::get(state,1,types::type_tag<T1>());
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     Ret r = func_(t1,t2);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -100,7 +100,7 @@ struct function_caller3:baseInvoker{
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     Ret r = func_(t1,t2,t3);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
@@ -130,7 +130,7 @@ struct function_caller4:baseInvoker{
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     Ret r = func_(t1,t2,t3,t4);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -161,7 +161,7 @@ struct function_caller5:baseInvoker{
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     Ret r = func_(t1,t2,t3,t4,t5);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
@@ -193,7 +193,7 @@ struct function_caller6:baseInvoker{
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -226,7 +226,7 @@ struct function_caller7:baseInvoker{
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
@@ -260,7 +260,7 @@ struct function_caller8:baseInvoker{
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -295,7 +295,7 @@ struct function_caller9:baseInvoker{
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
@@ -624,7 +624,7 @@ struct caller0:baseInvoker{
   virtual int invoke(lua_State *state)
   {
     Ret r = func_();
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret>
@@ -651,7 +651,7 @@ struct caller1:baseInvoker{
   {
     T1 t1 = types::get(state,1,types::type_tag<T1>());
     Ret r = func_(t1);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1>
@@ -679,7 +679,7 @@ struct caller2:baseInvoker{
     T1 t1 = types::get(state,1,types::type_tag<T1>());
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     Ret r = func_(t1,t2);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -708,7 +708,7 @@ struct caller3:baseInvoker{
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     Ret r = func_(t1,t2,t3);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
@@ -738,7 +738,7 @@ struct caller4:baseInvoker{
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     Ret r = func_(t1,t2,t3,t4);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -769,7 +769,7 @@ struct caller5:baseInvoker{
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     Ret r = func_(t1,t2,t3,t4,t5);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
@@ -801,7 +801,7 @@ struct caller6:baseInvoker{
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -834,7 +834,7 @@ struct caller7:baseInvoker{
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
@@ -868,7 +868,7 @@ struct caller8:baseInvoker{
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -903,7 +903,7 @@ struct caller9:baseInvoker{
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
@@ -1229,7 +1229,7 @@ if(getPtr(state) == 0){return false;}
   {
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)();
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1>
@@ -1262,7 +1262,7 @@ if(getPtr(state) == 0){return false;}
   {
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)();
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1>
@@ -1296,7 +1296,7 @@ if(getPtr(state) == 0){return false;}
     T2 t2 = types::get(state,2,types::type_tag<T2>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)();
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -1330,7 +1330,7 @@ if(getPtr(state) == 0){return false;}
     T2 t2 = types::get(state,2,types::type_tag<T2>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)();
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -1365,7 +1365,7 @@ if(getPtr(state) == 0){return false;}
     T3 t3 = types::get(state,3,types::type_tag<T3>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
@@ -1400,7 +1400,7 @@ if(getPtr(state) == 0){return false;}
     T3 t3 = types::get(state,3,types::type_tag<T3>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
@@ -1436,7 +1436,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -1472,7 +1472,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -1509,7 +1509,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
@@ -1546,7 +1546,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
@@ -1584,7 +1584,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -1622,7 +1622,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -1661,7 +1661,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
@@ -1700,7 +1700,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
@@ -1740,7 +1740,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -1780,7 +1780,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -1821,7 +1821,7 @@ if(getPtr(state) == 0){return false;}
     T9 t9 = types::get(state,9,types::type_tag<T9>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
@@ -1862,7 +1862,7 @@ if(getPtr(state) == 0){return false;}
     T9 t9 = types::get(state,9,types::type_tag<T9>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
@@ -1904,7 +1904,7 @@ if(getPtr(state) == 0){return false;}
     T10 t10 = types::get(state,10,types::type_tag<T10>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
@@ -1946,7 +1946,7 @@ if(getPtr(state) == 0){return false;}
     T10 t10 = types::get(state,10,types::type_tag<T10>());
   T1* ptr = getPtr(state);
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,static_cast<Ret>(r));
+    return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>

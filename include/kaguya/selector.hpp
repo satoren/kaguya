@@ -18,15 +18,20 @@ namespace kaguya
 		template<typename T>
 		void setClass(const ClassMetatable<T>& reg, bool auto_reg_shared_ptr = true)
 		{
-			set_class_internal<T>(reg);
+			set_meta_table(reg);
 
 			if (auto_reg_shared_ptr)
 			{
 				//auto register shared_ptr<T> type
 				ClassMetatable<standard::shared_ptr<T> > sreg;
 				sreg.setMembers(reg.members());
-				(*this)["shared_ptr"].set_class_internal(sreg);
+				(*this)["shared_ptr"].set_meta_table(sreg);
 			}
+		}
+
+		void setMetatable(const Metatable& reg)
+		{
+			set_meta_table(reg);
 		}
 
 		template<typename T>
@@ -88,6 +93,11 @@ namespace kaguya
 			return types::get(state_, -1, types::type_tag<double>());
 		}
 
+		operator unsigned int()const {
+			utils::ScopedSavedStack save(state_);
+			getTable();
+			return types::get(state_, -1, types::type_tag<unsigned int>());
+		}
 		operator int()const {
 			utils::ScopedSavedStack save(state_);
 			getTable();
@@ -156,9 +166,7 @@ namespace kaguya
 		}
 	private:
 
-
-		template<typename T>
-		void set_class_internal(const ClassMetatable<T>& reg)
+		void set_meta_table(const Metatable& reg)
 		{
 			utils::ScopedSavedStack save(state_);
 			setupPath();
@@ -179,7 +187,7 @@ namespace kaguya
 			utils::ScopedSavedStack save(state_);
 			setupPath();
 			key_.push();
-			types::push(state_, static_cast<T>(v));
+			types::push(state_, standard::forward<T>(v));
 			lua_settable(state_, -3);
 			lua_pop(state_, 1);
 		}

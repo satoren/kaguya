@@ -68,7 +68,8 @@ namespace kaguya
 					return lua_error(l);
 				}
 			}
-			lua_pushliteral(l, "no matching function");
+			std::string message = "argment not matched:" + utils::argment_types(l);
+			lua_pushstring(l, message.c_str());
 			return lua_error(l);
 		}
 
@@ -94,13 +95,48 @@ namespace kaguya
 		}
 
 #include "kaguya/gen/native_function.inl"
+
+		template<typename MemType, typename ClassType>
+		struct mem_data_invoker :baseInvoker {
+			typedef MemType ClassType::*data_type;
+			data_type data_;
+			mem_data_invoker(data_type data) :data_(data) {}
+			virtual bool checktype(lua_State *state, bool strictcheck) {
+				if (lua_gettop(state) != 1 && lua_gettop(state) != 2) { return false; }
+				if (getPtr(state) == 0) { return false; }
+				return true;
+			}
+			ClassType* getPtr(lua_State *state) {
+				ClassType* ptr = (ClassType*)luaL_testudata(state, 1, types::metatable_name<ClassType>().c_str());
+				if (!ptr) ptr = ((standard::shared_ptr<ClassType>*)luaL_testudata(state, 1, types::metatable_name<standard::shared_ptr<ClassType> >().c_str()))->get();//fallback to shared_ptr<T>
+				return ptr;
+			}
+			virtual int invoke(lua_State *state)
+			{
+				ClassType* ptr = getPtr(state);
+				if (lua_gettop(state) == 2)
+				{
+					ptr->*data_ = types::get(state, 2, types::type_tag<MemType>());
+				}
+
+				return types::push(state, standard::forward<MemType>(ptr->*data_));
+			}
+		};
+		template<class MemType, class ClassType>
+		baseInvoker* create(MemType ClassType::*data)
+		{
+			typedef mem_data_invoker<MemType, ClassType> invoker_type;
+			return new invoker_type(data);
+		}
+
 	}
+
 
 	typedef nativefunction::functor_type function_t;
 	template<typename T>
 	inline function_t function(T f)
 	{
-		return function_t(nativefunction::create(static_cast<T>(f)));
+		return function_t(nativefunction::create(standard::forward<T>(f)));
 	}
 
 	namespace types
@@ -118,6 +154,17 @@ namespace kaguya
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}
+#if defined(_HAS_RVALUE_REFERENCES) || defined(__cpp_rvalue_references)
+		inline int push(lua_State* l, nativefunction::functor_type&& f)
+		{
+			lua_pushnumber(l, 1);//no overload
+			void *storage = lua_newuserdata(l, sizeof(nativefunction::functor_type));
+			new(storage) nativefunction::functor_type(standard::forward<nativefunction::functor_type>(f));
+			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
+			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
+			return 1;
+		}
+#endif
 	}
 };
 

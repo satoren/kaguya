@@ -186,6 +186,22 @@ namespace selector_test
 			//if (!state("assert(value4:getInt() == 64)")) { return false; }
 			return true;
 		};
+
+		bool data_member_bind(kaguya::State& state)
+		{
+			state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
+				.addConstructor<int>()
+				.addMember("intmember", &ABC::intmember)
+				);
+
+			if (!state("value = assert(ABC.new(64))")) { return false; }
+			if (!state("assert(value:intmember() == 64)")) { return false; }
+
+
+			if (!state("value:intmember(4)")) { return false; }
+			if (!state("assert(value:intmember() == 4)")) { return false; }
+			return true;
+		}
 	}
 
 	namespace t_03_function
@@ -360,14 +376,13 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::string_constructor);
 		ADD_TEST(selector_test::t_02_classreg::overloaded_constructor);
 		ADD_TEST(selector_test::t_02_classreg::copy_constructor);
+		ADD_TEST(selector_test::t_02_classreg::data_member_bind);
 
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);
 		ADD_TEST(selector_test::t_03_function::member_function_test);
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
 		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
 		
-		
-
 		test_result = execute_test(testmap);
 	}
 	return test_result ? 0 : -1;

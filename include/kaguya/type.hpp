@@ -53,7 +53,27 @@ namespace kaguya
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
 
+		inline bool strict_check_type(lua_State* l, int index, type_tag<short> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned short> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
 		inline bool strict_check_type(lua_State* l, int index, type_tag<int> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned int> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strict_check_type(lua_State* l, int index, type_tag<int64_t> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strict_check_type(lua_State* l, int index, type_tag<uint64_t> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
@@ -74,15 +94,11 @@ namespace kaguya
 		{
 			return lua_type(l, index) == LUA_TSTRING;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<int64_t> tag)
-		{
-			return lua_type(l, index) == LUA_TNUMBER;
-		}
 
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<T> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) !=0;
+			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
 		}
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<const T&> tag)
@@ -114,13 +130,21 @@ namespace kaguya
 			return lua_isnumber(l, index) != 0;
 		}
 
-		inline bool check_type(lua_State* l, int index, type_tag<int> tag)
+		inline bool check_type(lua_State* l, int index, type_tag<int64_t> tag)
 		{
 #if LUA_VERSION_NUM >= 503
 			return lua_isinteger(l, index) != 0;
 #else
 			return lua_isnumber(l, index) != 0;
 #endif
+		}
+		inline bool check_type(lua_State* l, int index, type_tag<unsigned int> tag)
+		{
+			return check_type(l, index, type_tag<int64_t>());
+		}
+		inline bool check_type(lua_State* l, int index, type_tag<int> tag)
+		{
+			return check_type(l, index, type_tag<int64_t>());
 		}
 
 		inline bool check_type(lua_State* l, int index, type_tag<const char*> tag)
@@ -139,15 +163,7 @@ namespace kaguya
 		{
 			return check_type(l, index, type_tag<std::string>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<int64_t> tag)
-		{
-#if LUA_VERSION_NUM >= 503
-			return lua_isinteger(l, index) != 0;
-#else
-			return lua_isnumber(l, index) != 0;
-#endif
-		}
-		
+
 		template<typename T>
 		inline T get(lua_State* l, int index, type_tag<T> tag = type_tag<T>())
 		{
@@ -182,14 +198,22 @@ namespace kaguya
 		{
 			return lua_tonumber(l, index);
 		}
-
-		inline int get(lua_State* l, int index, type_tag<int> tag = type_tag<int>())
+		
+		inline int64_t get(lua_State* l, int index, type_tag<int64_t> tag = type_tag<int64_t>())
 		{
 #if LUA_VERSION_NUM >= 503
-			return int(lua_tointeger(l, index));
+			return int64_t(lua_tointeger(l, index));
 #else
-			return int(lua_tonumber(l, index));
+			return int64_t(lua_tonumber(l, index));
 #endif
+		}
+		inline unsigned int get(lua_State* l, int index, type_tag<unsigned int> tag = type_tag<unsigned int>())
+		{
+			return unsigned int(get(l, index, type_tag<int64_t>()));
+		}
+		inline int get(lua_State* l, int index, type_tag<int> tag = type_tag<int>())
+		{
+			return int(get(l, index, type_tag<int64_t>()));
 		}
 
 		inline const char* get(lua_State* l, int index, type_tag<const char*> tag = type_tag<const char*>())
@@ -210,14 +234,6 @@ namespace kaguya
 		{
 			return get(l, index, type_tag<std::string>());
 		}
-		inline int64_t get(lua_State* l, int index, type_tag<int64_t> tag = type_tag<int64_t>())
-		{
-#if LUA_VERSION_NUM >= 503
-			return int64_t(lua_tointeger(l, index));
-#else
-			return int64_t(lua_tonumber(l, index));
-#endif
-		}
 
 		struct newtable_tag {};
 
@@ -237,15 +253,6 @@ namespace kaguya
 			lua_pushnumber(l, v);
 			return 1;
 		}
-		inline int push(lua_State* l, int v)
-		{
-#if LUA_VERSION_NUM >= 503
-			lua_pushinteger(l, v);
-#else
-			lua_pushnumber(l, v);
-#endif
-			return 1;
-		}
 		inline int push(lua_State* l, int64_t v)
 		{
 #if LUA_VERSION_NUM >= 503
@@ -254,6 +261,27 @@ namespace kaguya
 			lua_pushnumber(l, v);
 #endif
 			return 1;
+		}
+		inline int push(lua_State* l, uint64_t v)
+		{
+			return push(l, int64_t(v));
+		}
+
+		inline int push(lua_State* l, int v)
+		{
+			return push(l, int64_t(v));
+		}
+		inline int push(lua_State* l, unsigned int v)
+		{
+			return push(l, int64_t(v));
+		}
+		inline int push(lua_State* l, short v)
+		{
+			return push(l, int(v));
+		}
+		inline int push(lua_State* l, unsigned short v)
+		{
+			return push(l, int(v));
 		}
 		inline int push(lua_State* l, const char* v)
 		{
@@ -285,6 +313,13 @@ namespace kaguya
 			return 1;
 		}
 
+#if defined(_HAS_RVALUE_REFERENCES) || defined(__cpp_rvalue_references)
+		inline int push(lua_State* l, std::string&& s)
+		{
+			lua_pushlstring(l, s.data(), s.size());
+			return 1;
+		}
+#endif
 		template<typename T>
 		inline int push(lua_State* l, T& v)
 		{
@@ -300,7 +335,7 @@ namespace kaguya
 			return 1;
 		}
 		template<typename T>
-		inline int push(lua_State* l,const T* v)
+		inline int push(lua_State* l, const T* v)
 		{
 			lua_pushlightuserdata(l, v);
 			luaL_setmetatable(l, metatable_name<const T>().c_str());

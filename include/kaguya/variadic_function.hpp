@@ -32,7 +32,7 @@ namespace kaguya
 					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
 				}
 				Ret r = func_(args);
-				return types::push(state, static_cast<Ret>(r));
+				return types::push(state, standard::forward<Ret>(r));
 			}
 		};
 		template<typename Ret>
@@ -85,7 +85,7 @@ namespace kaguya
 				}
 
 				Ret r = (t->*func_)(args);
-				return types::push(state, static_cast<Ret>(r));
+				return types::push(state, standard::forward<Ret>(r));
 			}
 		};
 		template <typename Ret, typename T>
@@ -144,7 +144,7 @@ namespace kaguya
 				}
 
 				Ret r = (t->*func_)(args);
-				return types::push(state, static_cast<Ret>(r));
+				return types::push(state, standard::forward <Ret>(r));
 			}
 		};
 		template <typename Ret, typename T>
@@ -200,7 +200,7 @@ namespace kaguya
 					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
 				}
 				Ret r = func_(args);
-				return types::push(state, static_cast<Ret>(r));
+				return types::push(state, standard::forward<Ret>(r));
 			}
 		};
 		template<typename Ret>

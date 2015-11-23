@@ -36,6 +36,7 @@ namespace kaguya
 		using boost::tuple;
 		using boost::shared_ptr;
 		using boost::get;
+		using boost::forward;
 
 		std::string to_string(int v)
 		{
@@ -50,6 +51,7 @@ namespace kaguya
 		using std::shared_ptr;
 		using std::to_string;
 		using std::get;
+		using std::forward;
 #endif
 	}
 

@@ -14,13 +14,39 @@ namespace kaguya
 
 	struct Metatable
 	{
+		struct value_type
+		{
+			value_type(int v) :ivalue(v), type(int_value){}
+			value_type(int64_t v) :ivalue(v), type(int_value) {}
+			value_type(float v) :dvalue(v), type(double_value) {}
+			value_type(double v) :dvalue(v), type(double_value) {}
+			value_type(const std::string& v) :strvalue(v), type(str_value) {}
+			value_type(const char* v) :strvalue(v), type(str_value) {}
+			enum {str_value,int_value,double_value} type;
+			std::string strvalue;
+			int64_t ivalue;
+			double dvalue;
+		};
+
 		typedef nativefunction::functor_type functor_type;
 		typedef std::vector<functor_type> func_array_type;
 		typedef std::map<std::string, func_array_type> func_map_type;
 
+		typedef std::map<std::string, value_type> value_map;
+
+
 
 		Metatable(std::string name) :metatable_name_(name)
 		{
+		}
+
+
+		template<typename Fun>
+		Metatable& addFunction(const char* name, Fun f)
+		{
+			functor_type fun(kaguya::nativefunction::create(f));
+			member_function_map_[name].push_back(fun);
+			return *this;
 		}
 
 		void registerTable(lua_State* state)const
