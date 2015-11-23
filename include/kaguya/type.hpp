@@ -26,6 +26,12 @@ namespace kaguya
 			return LUA_TNIL != lua_type(l, -1);			
 		}
 
+		template<typename T>
+		inline std::string metatable_name()
+		{
+			return typeid(T).name() + std::string("_kaguya_meta_type");
+		}
+
 		template<class T>
 		T* get_pointer(lua_State* l, int index, type_tag<T> tag)
 		{
@@ -57,11 +63,6 @@ namespace kaguya
 		}
 
 
-		template<typename T>
-		inline std::string metatable_name()
-		{
-			return typeid(T).name() + std::string("_kaguya_meta_type");
-		}
 
 		template<typename T>
 		inline bool strict_check_type(lua_State* l, int index, type_tag<T> tag)
@@ -477,8 +478,8 @@ namespace kaguya
 			}
 			else
 			{
-				void *storage = lua_newuserdata(l, sizeof(pointer_wrapper<T>));
-				new(storage) pointer_wrapper<T>(v);
+				void *storage = lua_newuserdata(l, sizeof(meta_pointer_wrapper<T>));
+				new(storage) meta_pointer_wrapper<T>(v);
 				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
 			}
 			return 1;
