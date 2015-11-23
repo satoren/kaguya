@@ -20,7 +20,9 @@ extern "C" {
 #include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
+#if BOOST_VERSION >= 104800
 #include <boost/move/move.hpp>
+#endif
 #else
 #include <functional>
 #include <tuple>
@@ -37,7 +39,11 @@ namespace kaguya
 		using boost::tuple;
 		using boost::shared_ptr;
 		using boost::get;
+#if BOOST_VERSION >= 104800
 		using boost::forward;
+#else
+		template<typename T>T forward(T v) { return v; }
+#endif
 
 		std::string to_string(int v)
 		{
@@ -45,7 +51,10 @@ namespace kaguya
 			snprintf(buffer, sizeof(buffer), "%d", v);
 			return buffer;
 		}
-
+		template<typename T>T forward(T v)
+		{
+			return v;
+		}
 #else
 		using std::function;
 		using std::tuple;
