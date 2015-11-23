@@ -20,12 +20,10 @@ namespace kaguya
 		{
 			set_meta_table(reg);
 
+			(*this)["ptr_wrapper"].set_meta_table(Metatable(types::metatable_name<types::meta_pointer_wrapper<T> >(), reg.name()));
 			if (auto_reg_shared_ptr)
 			{
-				//auto register shared_ptr<T> type
-				ClassMetatable<standard::shared_ptr<T> > sreg;
-				sreg.setMembers(reg.members());
-				(*this)["shared_ptr"].set_meta_table(sreg);
+				(*this)["shared_ptr"].set_meta_table(Metatable(types::metatable_name<standard::shared_ptr<T> >(), reg.name()));
 			}
 		}
 
@@ -174,7 +172,6 @@ namespace kaguya
 			reg.registerTable(state_);
 
 			lua_settable(state_, -3);
-			lua_pop(state_, 1);
 		}
 
 		Selector(lua_State* state, std::string name, std::vector<LuaRef> path, LuaRef key,ErrorHandler& error_handler) :state_(state), error_handler_(error_handler), name_(name), path_(path), key_(key)

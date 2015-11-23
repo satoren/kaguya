@@ -59,7 +59,6 @@ namespace selector_test
 		};
 	}
 
-
 	namespace t_02_classreg
 	{
 		struct ABC
@@ -73,7 +72,7 @@ namespace selector_test
 			ABC(std::string a) :stringmember(a) { }
 			ABC(int intmem, const std::string& strmem) :intmember(intmem), stringmember(strmem) { }
 			ABC(const std::string& strmem, int intmem) :intmember(intmem), stringmember(strmem) { }
-			ABC(const ABC&src) :intmember(src.intmember), stringmember(src.stringmember) { }
+			ABC(const ABC&src) :intmember(src.intmember), stringmember(src.stringmember) {}
 
 			int getInt() const {
 				return intmember;
@@ -168,12 +167,12 @@ namespace selector_test
 			if (!state("value2 = assert(value:copy())")) { return false; }
 			if (!state("assert(value2:getString() == \"string_value3\")")) { return false; }
 			if (!state("assert(value2:getInt() == 64)")) { return false; }
-//			if (!state("value3 = assert(value:references())")) { return false; }
-//			if (!state("assert(value3:getString() == \"string_value3\")")) { return false; }
-//			if (!state("assert(value3:getInt() == 64)")) { return false; }
-//			if (!state("value4 = assert(value:pointer())")) { return false; }
-//			if (!state("assert(value4:getString() == \"string_value3\")")) { return false; }
-//			if (!state("assert(value4:getInt() == 64)")) { return false; }
+			if (!state("value3 = assert(value:references())")) { return false; }
+			if (!state("assert(value3:getString() == \"string_value3\")")) { return false; }
+			if (!state("assert(value3:getInt() == 64)")) { return false; }
+			if (!state("value4 = assert(value:pointer())")) { return false; }
+			if (!state("assert(value4:getString() == \"string_value3\")")) { return false; }
+			if (!state("assert(value4:getInt() == 64)")) { return false; }
 
 			if (!state("value5 = assert(value:shared_copy())")) { return false; }
 			if (!state("value =1")) { return false; }
@@ -241,9 +240,9 @@ namespace selector_test
 			lfoo["bar"](&foo, "bar");
 			if (foo.bar != "bar") { return false; }
 
-//			state["foo"] = &foo;
-//			state("foo:setBar(\"test\")");
-//			if (foo.bar != "test") { return false; }
+			state["foo"] = &foo;
+			state("foo:setBar(\"test\")");
+			if (foo.bar != "test") { return false; }
 
 #if __cplusplus >= 201104L
 			lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));

@@ -39,6 +39,11 @@ namespace kaguya
 		Metatable(std::string name) :metatable_name_(name)
 		{
 		}
+		Metatable(std::string name, std::string parent_name) :metatable_name_(name), parent_metatable_name_(parent_name)
+		{
+		}
+
+		const std::string name()const { return metatable_name_; }
 
 
 		template<typename Fun>
@@ -52,6 +57,10 @@ namespace kaguya
 		void registerTable(lua_State* state)const
 		{
 			luaL_newmetatable(state, metatable_name_.c_str());
+			if (!parent_metatable_name_.empty())
+			{
+				luaL_setmetatable(state, parent_metatable_name_.c_str());
+			}
 			registerFunctions(state);
 			lua_pushvalue(state, -1);
 			lua_setfield(state, -1, "__index");
@@ -84,6 +93,7 @@ namespace kaguya
 		func_map_type function_map_;
 		func_map_type member_function_map_;
 		std::string metatable_name_;
+		std::string parent_metatable_name_;
 	};
 
 	template<typename class_type>

@@ -12,6 +12,51 @@ namespace kaguya
 		template<typename T>
 		struct type_tag {};
 
+		template<class T>
+		struct meta_pointer_wrapper { 
+			meta_pointer_wrapper(T* p) :ptr(p){}
+			T* ptr; 
+		};
+
+
+		bool available_metatable(lua_State* l, const char* t)
+		{
+			utils::ScopedSavedStack save(l);
+			luaL_getmetatable(l,t);
+			return LUA_TNIL != lua_type(l, -1);			
+		}
+
+		template<class T>
+		T* get_pointer(lua_State* l, int index, type_tag<T> tag)
+		{
+			if (lua_type(l, index) == LUA_TLIGHTUSERDATA || !available_metatable(l, metatable_name<T>().c_str()))
+			{
+				return (T*)lua_topointer(l, index);
+			}
+			else if (lua_topointer(l, index) == 0)
+			{
+				return 0;
+			}
+			else
+			{
+				T* ptr = (T*)luaL_testudata(l, index, metatable_name<T>().c_str());
+				if (!ptr)
+				{
+					standard::shared_ptr<T>* shared_ptr = reinterpret_cast<standard::shared_ptr<T>*>(luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str()));
+					if (shared_ptr) { ptr = shared_ptr->get(); }
+				}
+				if (!ptr)
+				{
+					meta_pointer_wrapper<T>* ptr_wrapper = reinterpret_cast<meta_pointer_wrapper<T>*>(luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str()));
+					if (ptr_wrapper) { ptr = ptr_wrapper->ptr; }
+				}
+
+				return ptr;
+			}
+			return 0;
+		}
+
+
 		template<typename T>
 		inline std::string metatable_name()
 		{
@@ -36,7 +81,11 @@ namespace kaguya
 		template<typename T>
 		inline bool strict_check_type(lua_State* l, int index, type_tag<T*> tag)
 		{
-			return lua_type(l, index) == LUA_TLIGHTUSERDATA || luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0
+				|| !available_metatable(l, metatable_name<T>().c_str())
+				|| luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str()) != 0
+				|| luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str()) != 0;
 		}
 
 		inline bool strict_check_type(lua_State* l, int index, type_tag<bool> tag)
@@ -106,22 +155,33 @@ namespace kaguya
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<T> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return  lua_type(l, index) == LUA_TLIGHTUSERDATA
+				|| !available_metatable(l, metatable_name<T>().c_str())
+				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
 		}
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<const T&> tag)
 		{
-			return check_type(l, index, type_tag<T>());
+			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+				|| !available_metatable(l, metatable_name<T>().c_str())
+				|| check_type(l, index, type_tag<T>());
 		}
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<T&> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+				|| !available_metatable(l, metatable_name<T>().c_str())
+				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
 		}
 		template<typename T>
 		inline bool check_type(lua_State* l, int index, type_tag<T*> tag)
 		{
-			return lua_type(l, index) == LUA_TLIGHTUSERDATA || lua_topointer(l, index) == 0 || luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+				|| lua_topointer(l, index) == 0
+				|| !available_metatable(l, metatable_name<T>().c_str())
+				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0
+				|| luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str()) != 0
+				|| luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str()) != 0;
 		}
 
 		inline bool check_type(lua_State* l, int index, type_tag<bool> tag)
@@ -191,7 +251,12 @@ namespace kaguya
 		template<typename T>
 		inline T get(lua_State* l, int index, type_tag<T> tag = type_tag<T>())
 		{
-			return *((T*)luaL_checkudata(l, index, metatable_name<T>().c_str()));
+			T* pointer = get_pointer(l, index, type_tag<T>());
+			if (!pointer)
+			{
+				throw std::invalid_argument("type mismatch!!");
+			}
+			return *pointer;
 		}
 		template<typename T>
 		inline T get(lua_State* l, int index, type_tag<const T&> tag = type_tag<const T&>())
@@ -201,19 +266,17 @@ namespace kaguya
 		template<typename T>
 		inline T& get(lua_State* l, int index, type_tag<T&> tag = type_tag<T&>())
 		{
-			return *((T*)luaL_checkudata(l, index, metatable_name<T>().c_str()));
+			T* pointer = get_pointer(l, index, type_tag<T>());
+			if (!pointer)
+			{
+				throw std::invalid_argument("type mismatch!!");
+			}
+			return *pointer;
 		}
 		template<typename T>
 		inline T* get(lua_State* l, int index, type_tag<T*> tag = type_tag<T*>())
 		{
-			if (lua_type(l, index) == LUA_TLIGHTUSERDATA)
-			{
-				return (T*)lua_topointer(l, index);
-			}
-			else
-			{
-				return (T*)luaL_testudata(l, index, metatable_name<T>().c_str());
-			}
+			return get_pointer(l, index, type_tag<T>());
 		}
 
 		inline bool get(lua_State* l, int index, type_tag<bool> tag = type_tag<bool>())
@@ -378,22 +441,46 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, T& v)
 		{
-			lua_pushlightuserdata(l, &v);
-//			luaL_setmetatable(l, metatable_name<T>().c_str());
+			if (!available_metatable(l, metatable_name<T>().c_str()))
+			{
+				lua_pushlightuserdata(l, &v);
+			}
+			else
+			{
+				void *storage = lua_newuserdata(l, sizeof(meta_pointer_wrapper<T>));
+				new(storage) meta_pointer_wrapper<T>(&v);
+				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
+			}
 			return 1;
 		}
 		template<typename T>
 		inline int push(lua_State* l, T* v)
 		{
-			lua_pushlightuserdata(l, v);
-//			luaL_setmetatable(l, metatable_name<T>().c_str());
+			if (!available_metatable(l, metatable_name<T>().c_str()))
+			{
+				lua_pushlightuserdata(l, v);
+			}
+			else
+			{
+				void *storage = lua_newuserdata(l, sizeof(meta_pointer_wrapper<T>));
+				new(storage) meta_pointer_wrapper<T>(v);
+				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
+			}
 			return 1;
 		}
 		template<typename T>
 		inline int push(lua_State* l, const T* v)
 		{
-			lua_pushlightuserdata(l, v);
-//			luaL_setmetatable(l, metatable_name<const T>().c_str());
+			if (!available_metatable(l, metatable_name<T>().c_str()))
+			{
+				lua_pushlightuserdata(l, v);
+			}
+			else
+			{
+				void *storage = lua_newuserdata(l, sizeof(pointer_wrapper<T>));
+				new(storage) pointer_wrapper<T>(v);
+				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
+			}
 			return 1;
 		}
 #include "kaguya/gen/push_tuple.inl"
