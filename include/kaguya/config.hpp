@@ -51,10 +51,6 @@ namespace kaguya
 			snprintf(buffer, sizeof(buffer), "%d", v);
 			return buffer;
 		}
-		template<typename T>T forward(T v)
-		{
-			return v;
-		}
 #else
 		using std::function;
 		using std::tuple;
