@@ -11,7 +11,7 @@ namespace
 {
 	void SetupVideoGl(kaguya::Selector& sdl)
 	{
-		Selector& gl = sdl["GL"];
+		Selector gl = sdl["GL"];
 
 
 #define REG_SDL_GL_ENUM(V) gl[#V + 7] = V
@@ -241,7 +241,7 @@ int luaopen_samplesdlbind(lua_State *L)
 {
 	State state(L);
 
-	Selector& sdl = state["SDL"];
+	Selector sdl = state["SDL"];
 	SetupInit(sdl);
 	SetupVideo(sdl);
 	SetupEvent(sdl);

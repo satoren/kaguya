@@ -1,7 +1,8 @@
 require("samplesdlbind")
 --sample code from https://wiki.libsdl.org/SDL_CreateRenderer
 SDL.Init(SDL.INIT_VIDEO)
-local window = assert(SDL.CreateWindow("test window",SDL.WINDOWPOS_CENTERED,SDL.WINDOWPOS_CENTERED,400,400,SDL.WINDOW_RESIZABLE | SDL.WINDOW_OPENGL))
+--can not bit and on lua5.2
+local window = assert(SDL.CreateWindow("test window",SDL.WINDOWPOS_CENTERED,SDL.WINDOWPOS_CENTERED,400,400,SDL.WINDOW_RESIZABLE))
 local renderer = SDL.CreateRenderer(window, -1, SDL.RENDERER_ACCELERATED);
 
 local bitmapSurface = SDL.LoadBMP("img/hello.bmp");

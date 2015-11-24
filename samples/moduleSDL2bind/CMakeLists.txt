@@ -14,13 +14,14 @@ endif(NOT LUA_INCLUDE_DIRS)
 
 if(NOT SDL_INCLUDE_DIRS)
   find_package(PkgConfig)
-  pkg_search_module(SDL SDL2)
+  pkg_search_module(SDL REQUIRED sdl2)
 endif(NOT SDL_INCLUDE_DIRS)
 
 if(MSVC)
 add_definitions("-DKAGUYA_USE_BOOST=0")
 endif(MSVC)
 
+include_directories(${LUA_INCLUDE_DIRS})
 include_directories(${SDL_INCLUDE_DIRS})
 include_directories("../../include")#include kaguya dir
 
