@@ -2520,7 +2520,7 @@ struct constructor_caller0:baseInvoker{
   virtual int invoke(lua_State *state)
   {
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage);
+    types::constructor<CLASS>(storage);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2541,7 +2541,7 @@ struct constructor_caller1:baseInvoker{
   {
     T1 t1 = types::get(state,1,types::type_tag<T1>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1);
+    types::constructor<CLASS>(storage,t1);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2563,7 +2563,7 @@ struct constructor_caller2:baseInvoker{
     T1 t1 = types::get(state,1,types::type_tag<T1>());
     T2 t2 = types::get(state,2,types::type_tag<T2>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2);
+    types::constructor<CLASS>(storage,t1,t2);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2586,7 +2586,7 @@ struct constructor_caller3:baseInvoker{
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3);
+    types::constructor<CLASS>(storage,t1,t2,t3);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2610,7 +2610,7 @@ struct constructor_caller4:baseInvoker{
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3,t4);
+    types::constructor<CLASS>(storage,t1,t2,t3,t4);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2635,7 +2635,7 @@ struct constructor_caller5:baseInvoker{
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3,t4,t5);
+    types::constructor<CLASS>(storage,t1,t2,t3,t4,t5);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2661,7 +2661,7 @@ struct constructor_caller6:baseInvoker{
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6);
+    types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2688,7 +2688,7 @@ struct constructor_caller7:baseInvoker{
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7);
+    types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2716,7 +2716,7 @@ struct constructor_caller8:baseInvoker{
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8);
+    types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }
@@ -2745,7 +2745,7 @@ struct constructor_caller9:baseInvoker{
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
-    CLASS* ptr = types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8,t9);
+    types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8,t9);
     luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
     return 1;
   }

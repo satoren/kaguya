@@ -174,7 +174,7 @@ namespace kaguya
 			lua_settable(state_, -3);
 		}
 
-		Selector(lua_State* state, std::string name, std::vector<LuaRef> path, LuaRef key,ErrorHandler& error_handler) :state_(state), error_handler_(error_handler), name_(name), path_(path), key_(key)
+		Selector(lua_State* state, std::string name, std::vector<LuaRef> path, LuaRef key,ErrorHandler& error_handler) :state_(state), error_handler_(error_handler), name_(name),  key_(key),path_(path)
 		{
 		}
 

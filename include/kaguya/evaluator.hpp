@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "kaguya/config.hpp"
 #include "kaguya/lua_ref.hpp"
 #include "kaguya/error_handler.hpp"

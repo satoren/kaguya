@@ -22,10 +22,10 @@ namespace kaguya
 			value_type(double v) :dvalue(v), type(double_value) {}
 			value_type(const std::string& v) :strvalue(v), type(str_value) {}
 			value_type(const char* v) :strvalue(v), type(str_value) {}
-			enum {str_value,int_value,double_value} type;
 			std::string strvalue;
 			int64_t ivalue;
 			double dvalue;
+			enum {str_value,int_value,double_value} type;
 		};
 
 		typedef nativefunction::functor_type functor_type;

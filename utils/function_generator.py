@@ -356,7 +356,7 @@ def constructor_function(out,arg_num):
 	out.write('  void *storage = lua_newuserdata(state, sizeof(CLASS));\n')
 
 
-	out.write('    CLASS* ptr = types::constructor<CLASS>(storage')
+	out.write('    types::constructor<CLASS>(storage')
 	if arg_num > 0:
 		out.write(',')
 		args(out,arg_num,'t')

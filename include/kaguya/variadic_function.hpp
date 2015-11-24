@@ -249,7 +249,7 @@ namespace kaguya
 					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
 				}
 				void *storage = lua_newuserdata(state, sizeof(CLASS));
-				CLASS* ptr = types::constructor<CLASS>(storage, args);
+				types::constructor<CLASS>(storage, args);
 				luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
 				return 1;
 			}

@@ -25,7 +25,8 @@ file(GLOB testSources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories("./")
 
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++11")
+add_definitions("-Wall")
+#add_definitions("-std=c++11")
 if(MSVC)
 add_definitions("-DKAGUYA_USE_BOOST=0")
 endif(MSVC)
