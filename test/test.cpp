@@ -74,6 +74,26 @@ namespace selector_test
 			ABC(const std::string& strmem, int intmem) :intmember(intmem), stringmember(strmem) { }
 			ABC(const ABC&src) :intmember(src.intmember), stringmember(src.stringmember) {}
 
+
+			bool operator ==(const ABC& rhs)const {
+				return intmember == rhs.intmember && stringmember == rhs.stringmember;
+			}
+			bool operator <(const ABC& rhs)const {
+				return intmember < rhs.intmember || (intmember == rhs.intmember && stringmember < rhs.stringmember);
+			}
+			bool operator !=(const ABC& rhs)const {
+				return !(*this == rhs);
+			}
+			bool operator >(const ABC& rhs)const {
+				return (rhs < *this);
+			}
+			bool operator >=(const ABC& rhs)const {
+				return !(*this < rhs);
+			}
+			bool operator <=(const ABC& rhs)const {
+				return !(*this > rhs);
+			}
+
 			int getInt() const {
 				return intmember;
 			}
@@ -199,6 +219,28 @@ namespace selector_test
 
 			if (!state("value:intmember(4)")) { return false; }
 			if (!state("assert(value:intmember() == 4)")) { return false; }
+			return true;
+		}
+
+		bool operator_bind(kaguya::State& state)
+		{
+			state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
+				.addConstructor<int>()
+				.addMember("__eq", &ABC::operator==)
+				.addMember("__lt", &ABC::operator<)
+				.addMember("__le", &ABC::operator<=)
+				);
+
+			if (!state("value1 = assert(ABC.new(64))")) { return false; }
+			if (!state("value2 = assert(ABC.new(64))")) { return false; }
+			if (!state("assert(value1 == value2)")) { return false; }
+			if (!state("assert(value1 >= value2)")) { return false; }
+
+			if (!state("value1 = assert(ABC.new(64))")) { return false; }
+			if (!state("value2 = assert(ABC.new(61))")) { return false; }
+			if (!state("assert(value1 ~= value2)")) { return false; }
+			if (!state("assert(value1 > value2)")) { return false; }
+			if (!state("assert(value1 >= value2)")) { return false; }
 			return true;
 		}
 	}
@@ -376,6 +418,7 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::overloaded_constructor);
 		ADD_TEST(selector_test::t_02_classreg::copy_constructor);
 		ADD_TEST(selector_test::t_02_classreg::data_member_bind);
+		ADD_TEST(selector_test::t_02_classreg::operator_bind);		
 
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);
 		ADD_TEST(selector_test::t_03_function::member_function_test);

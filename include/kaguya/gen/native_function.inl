@@ -1322,7 +1322,7 @@ if(getPtr(state) == 0){return false;}
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)();
+    Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1365,7 +1365,7 @@ if(getPtr(state) == 0){return false;}
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)();
+    Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1409,7 +1409,7 @@ if(getPtr(state) == 0){return false;}
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2);
+    Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1453,7 +1453,7 @@ if(getPtr(state) == 0){return false;}
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2);
+    Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1498,7 +1498,7 @@ if(getPtr(state) == 0){return false;}
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3);
+    Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1543,7 +1543,7 @@ if(getPtr(state) == 0){return false;}
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3);
+    Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1589,7 +1589,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1635,7 +1635,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1682,7 +1682,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1729,7 +1729,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1777,7 +1777,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1825,7 +1825,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1874,7 +1874,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1923,7 +1923,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -1973,7 +1973,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -2023,7 +2023,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -2074,7 +2074,7 @@ if(getPtr(state) == 0){return false;}
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     T10 t10 = types::get(state,10,types::type_tag<T10>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
@@ -2125,7 +2125,7 @@ if(getPtr(state) == 0){return false;}
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     T10 t10 = types::get(state,10,types::type_tag<T10>());
   T1* ptr = getPtr(state);
-    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
+    Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
 };

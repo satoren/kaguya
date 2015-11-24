@@ -282,7 +282,7 @@ def tepmlate_mem_function(out,arg_num,funattr):
 	out.write('  T1* ptr = getPtr(state);\n')
 	
 	out.write('    Ret r = (ptr->*func_)(')
-	args(out,arg_num,'t',1)
+	args(out,arg_num+1,'t',1)
 	out.write(');\n')
 	out.write('    return types::push(state,standard::forward<Ret>(r));\n')
 	out.write('  }\n')
