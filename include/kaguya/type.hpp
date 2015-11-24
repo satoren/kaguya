@@ -38,7 +38,12 @@ namespace kaguya
 		template<class T>
 		T* get_pointer(lua_State* l, int index, type_tag<T> tag)
 		{
-			if (lua_type(l, index) == LUA_TLIGHTUSERDATA || !available_metatable(l, metatable_name<T>().c_str()))
+			int type = lua_type(l, index);
+			if (type == LUA_TTABLE)//allow table for __gc
+			{
+				return 0;
+			}
+			if (type == LUA_TLIGHTUSERDATA || !available_metatable(l, metatable_name<T>().c_str()))
 			{
 				return (T*)lua_topointer(l, index);
 			}
@@ -181,11 +186,12 @@ namespace kaguya
 		inline bool check_type(lua_State* l, int index, type_tag<T*> tag)
 		{
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+				|| lua_type(l, index) == LUA_TTABLE //allow table for __gc
 				|| lua_topointer(l, index) == 0
 				|| !available_metatable(l, metatable_name<T>().c_str())
-				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0
-				|| luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str()) != 0
-				|| luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str()) != 0;
+				|| luaL_testudata(l, index, metatable_name<T>().c_str())
+				|| luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str())
+				|| luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str());
 		}
 
 		inline bool check_type(lua_State* l, int index, type_tag<bool> tag)
@@ -497,7 +503,10 @@ namespace kaguya
 
 		template<typename T>inline void destructor(T* pointer)
 		{
-			pointer->~T();
+			if (pointer)
+			{
+				pointer->~T();
+			}
 		}
 
 

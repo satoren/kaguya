@@ -23,7 +23,7 @@ namespace kaguya
 			(*this)["ptr_wrapper"].set_meta_table(Metatable(types::metatable_name<types::meta_pointer_wrapper<T> >(), reg.name()));
 			if (auto_reg_shared_ptr)
 			{
-				(*this)["shared_ptr"].set_meta_table(Metatable(types::metatable_name<standard::shared_ptr<T> >(), reg.name()));
+				(*this)["shared_ptr"].set_meta_table(ClassMetatable<standard::shared_ptr<T> >(reg.name()));
 			}
 		}
 

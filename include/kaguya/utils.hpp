@@ -39,7 +39,7 @@ namespace kaguya
 				{
 					result += ",";
 				}
-				if (luaL_getmetafield(state, i, "__name") == LUA_TSTRING)
+				if (lua_type(state, i) == LUA_TUSERDATA && luaL_getmetafield(state, i, "__name") == LUA_TSTRING)
 				{
 					result += lua_tostring(state, -1);
 					lua_pop(state, 1);

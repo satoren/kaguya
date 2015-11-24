@@ -99,7 +99,7 @@ namespace kaguya
 	template<typename class_type>
 	struct ClassMetatable :Metatable
 	{
-		ClassMetatable() :Metatable(types::metatable_name<class_type>())
+		ClassMetatable(std::string parent_metatable="") :Metatable(types::metatable_name<class_type>(), parent_metatable)
 		{
 			functor_type dtor(kaguya::nativefunction::create(&types::destructor<class_type>));
 			function_map_["__gc"].push_back(dtor);
