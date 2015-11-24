@@ -13,26 +13,36 @@ namespace kaguya
 	{
 		template<typename T>
 		struct type_tag {};
-		
+
 
 		template<class T>
-		struct meta_pointer_wrapper { 
-			meta_pointer_wrapper(T* p) :ptr(p){}
-			T* ptr; 
+		struct meta_pointer_wrapper {
+			meta_pointer_wrapper(T* p) :ptr(p) {}
+			T* ptr;
 		};
 
 
 		bool available_metatable(lua_State* l, const char* t)
 		{
 			utils::ScopedSavedStack save(l);
-			luaL_getmetatable(l,t);
-			return LUA_TNIL != lua_type(l, -1);			
+			luaL_getmetatable(l, t);
+			return LUA_TNIL != lua_type(l, -1);
 		}
 
 		template<typename T>
 		inline std::string metatable_name()
 		{
-			return typeid(T*).name() + std::string("_kaguya_meta_type");
+			//faster but no human readable
+			//intptr_t ptrvalue = intptr_t(typeid(T*).name());
+			//char metaname[16 + sizeof(intptr_t)*2]="kaguya_type_";
+			//size_t pos = strlen("kaguya_type_");
+			//for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
+			//{
+			//	metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
+			//}
+			//return metaname;
+
+			return typeid(T*).name() + std::string("_kaguya_type");
 		}
 
 		template<class T>
@@ -302,7 +312,7 @@ namespace kaguya
 		{
 			return lua_tonumber(l, index);
 		}
-		
+
 		inline int64_t get(lua_State* l, int index, type_tag<int64_t> tag = type_tag<int64_t>())
 		{
 #if LUA_VERSION_NUM >= 503

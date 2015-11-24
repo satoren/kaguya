@@ -16,48 +16,52 @@ namespace kaguya
 	{
 		struct baseInvoker
 		{
-			virtual bool checktype(lua_State *state,bool strictcheck) = 0;
+			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
 			virtual ~baseInvoker() {}
 		};
 
 		typedef standard::shared_ptr<nativefunction::baseInvoker> functor_type;
 
+		inline functor_type* pick_match_function(lua_State *l)
+		{
+			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
+
+			if (overloadnum == 1)
+			{
+				functor_type* fun = static_cast<functor_type*>(lua_touserdata(l, lua_upvalueindex(2)));
+				if ((*fun)->checktype(l, false))
+				{
+					return fun;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			functor_type* weak_match = 0;
+			for (int i = 0; i < overloadnum; ++i)
+			{
+				functor_type* fun = static_cast<functor_type*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
+				if ((*fun)->checktype(l, true))
+				{
+					return fun;
+				}
+				else if (weak_match == 0 && (*fun)->checktype(l, false))
+				{
+					weak_match = fun;
+				}
+			}
+			return weak_match;
+		}
 
 		inline int functor_dispatcher(lua_State *l)
 		{
-			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
-			
-			for (int i = 0; i < overloadnum; ++i)
+			functor_type* fun = pick_match_function(l);
+			if (fun && (*fun))
 			{
-				functor_type& fun = *(static_cast<functor_type*>(lua_touserdata(l, lua_upvalueindex(i + 2))));
-				if (!fun->checktype(l,true))
-				{
-					continue;
-				}
 				try {
-					return fun->invoke(l);
-				}
-				catch (std::exception & e) {
-					lua_pushstring(l, e.what());
-					return lua_error(l);
-				}
-				catch (...) {
-					lua_pushliteral(l, "Unknown exception");
-					return lua_error(l);
-				}
-			}
-
-			for (int i = 0; i < overloadnum; ++i)
-			{
-				functor_type& fun = *(static_cast<functor_type*>(lua_touserdata(l, lua_upvalueindex(i + 2))));
-
-				if (!fun->checktype(l, false))
-				{
-					continue;
-				}
-				try {
-					return fun->invoke(l);
+					return (*fun)->invoke(l);
 				}
 				catch (std::exception & e) {
 					lua_pushstring(l, e.what());
@@ -132,10 +136,10 @@ namespace kaguya
 				return types::push(state, standard::forward<MemType>(ptr->*data_));
 			}
 		};
-		template< class ClassType,class MemType>
+		template< class ClassType, class MemType>
 		baseInvoker* create(MemType ClassType::*data)
 		{
-			typedef mem_data_invoker<ClassType,MemType> invoker_type;
+			typedef mem_data_invoker<ClassType, MemType> invoker_type;
 			return new invoker_type(data);
 		}
 
