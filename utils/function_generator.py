@@ -55,17 +55,22 @@ def strict_check_type(out,arg_num,offset=0,customcheck=""):
 	out.write('    if(lua_gettop(state) != ' + str(arg_num) + '){return false;}\n')
 	
 	out.write(customcheck)
-	out.write('    if(strictcheck){\n')
-	out.write('      if(false')
-	for i in range (offset+1,arg_num+1):
-		out.write('|| !types::strict_check_type(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>())')
-	out.write('){return false;}\n')
-	out.write('  }else{\n')	
-	out.write('      if(false')
-	for i in range (offset+1,arg_num+1):
-		out.write('|| !types::check_type(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>())')
-	out.write('){return false;}\n')
-	out.write('  }\n')
+	if arg_num> offset:
+		out.write('    if(strictcheck){\n')
+		out.write('      if(')
+		for i in range (offset+1,arg_num+1):
+			if i>offset+1:
+				out.write('||')
+			out.write('!types::strict_check_type(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>())')
+		out.write('){return false;}\n')
+		out.write('  }else{\n')	
+		out.write('      if(')
+		for i in range (offset+1,arg_num+1):
+			if i>offset+1:
+				out.write('||')
+			out.write('!types::check_type(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>())')
+		out.write('){return false;}\n')
+		out.write('  }\n')
 	out.write('    return true;\n')
 	out.write('  }\n')
 

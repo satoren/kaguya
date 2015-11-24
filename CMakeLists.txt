@@ -25,10 +25,12 @@ file(GLOB testSources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories("./")
 
-add_definitions("-Wall")
-#add_definitions("-std=c++11")
 if(MSVC)
 add_definitions("-DKAGUYA_USE_BOOST=0")
+else(MSVC)
+#-Wall nonsense on MSVC
+add_definitions("-Wall")
+#add_definitions("-std=c++11")
 endif(MSVC)
 
 add_executable(test_runner test/test.cpp ${testSources} ${headers})

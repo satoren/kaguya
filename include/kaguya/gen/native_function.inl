@@ -6,11 +6,6 @@ struct function_caller0:baseInvoker{
   function_caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -33,9 +28,9 @@ struct function_caller1:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())){return false;}
   }
     return true;
   }
@@ -60,9 +55,9 @@ struct function_caller2:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -88,9 +83,9 @@ struct function_caller3:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -117,9 +112,9 @@ struct function_caller4:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -147,9 +142,9 @@ struct function_caller5:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -178,9 +173,9 @@ struct function_caller6:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -210,9 +205,9 @@ struct function_caller7:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -243,9 +238,9 @@ struct function_caller8:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -277,9 +272,9 @@ struct function_caller9:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -310,11 +305,6 @@ struct void_function_caller0:baseInvoker{
   void_function_caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -336,9 +326,9 @@ struct void_function_caller1:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())){return false;}
   }
     return true;
   }
@@ -363,9 +353,9 @@ struct void_function_caller2:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -391,9 +381,9 @@ struct void_function_caller3:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -420,9 +410,9 @@ struct void_function_caller4:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -450,9 +440,9 @@ struct void_function_caller5:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -481,9 +471,9 @@ struct void_function_caller6:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -513,9 +503,9 @@ struct void_function_caller7:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -546,9 +536,9 @@ struct void_function_caller8:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -580,9 +570,9 @@ struct void_function_caller9:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -614,11 +604,6 @@ struct caller0:baseInvoker{
   caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -641,9 +626,9 @@ struct caller1:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())){return false;}
   }
     return true;
   }
@@ -668,9 +653,9 @@ struct caller2:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -696,9 +681,9 @@ struct caller3:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -725,9 +710,9 @@ struct caller4:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -755,9 +740,9 @@ struct caller5:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -786,9 +771,9 @@ struct caller6:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -818,9 +803,9 @@ struct caller7:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -851,9 +836,9 @@ struct caller8:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -885,9 +870,9 @@ struct caller9:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -917,11 +902,6 @@ struct void_caller0:baseInvoker{
   func_type func_;
   void_caller0(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -942,9 +922,9 @@ struct void_caller1:baseInvoker{
   void_caller1(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())){return false;}
   }
     return true;
   }
@@ -968,9 +948,9 @@ struct void_caller2:baseInvoker{
   void_caller2(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -995,9 +975,9 @@ struct void_caller3:baseInvoker{
   void_caller3(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -1023,9 +1003,9 @@ struct void_caller4:baseInvoker{
   void_caller4(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -1052,9 +1032,9 @@ struct void_caller5:baseInvoker{
   void_caller5(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -1082,9 +1062,9 @@ struct void_caller6:baseInvoker{
   void_caller6(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -1113,9 +1093,9 @@ struct void_caller7:baseInvoker{
   void_caller7(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -1145,9 +1125,9 @@ struct void_caller8:baseInvoker{
   void_caller8(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -1178,9 +1158,9 @@ struct void_caller9:baseInvoker{
   void_caller9(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -1213,11 +1193,6 @@ struct mem_caller0:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -1241,11 +1216,6 @@ struct constmem_caller0:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -1270,9 +1240,9 @@ struct mem_caller1:baseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -1299,9 +1269,9 @@ struct constmem_caller1:baseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -1328,9 +1298,9 @@ struct mem_caller2:baseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -1358,9 +1328,9 @@ struct constmem_caller2:baseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -1388,9 +1358,9 @@ struct mem_caller3:baseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -1419,9 +1389,9 @@ struct constmem_caller3:baseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -1450,9 +1420,9 @@ struct mem_caller4:baseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -1482,9 +1452,9 @@ struct constmem_caller4:baseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -1514,9 +1484,9 @@ struct mem_caller5:baseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -1547,9 +1517,9 @@ struct constmem_caller5:baseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -1580,9 +1550,9 @@ struct mem_caller6:baseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -1614,9 +1584,9 @@ struct constmem_caller6:baseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -1648,9 +1618,9 @@ struct mem_caller7:baseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -1683,9 +1653,9 @@ struct constmem_caller7:baseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -1718,9 +1688,9 @@ struct mem_caller8:baseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -1754,9 +1724,9 @@ struct constmem_caller8:baseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -1790,9 +1760,9 @@ struct mem_caller9:baseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())||!types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())||!types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
   }
@@ -1827,9 +1797,9 @@ struct constmem_caller9:baseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())||!types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())||!types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
   }
@@ -1863,11 +1833,6 @@ struct void_mem_caller0:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -1891,11 +1856,6 @@ struct constvoid_mem_caller0:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -1920,9 +1880,9 @@ struct void_mem_caller1:baseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -1949,9 +1909,9 @@ struct constvoid_mem_caller1:baseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -1978,9 +1938,9 @@ struct void_mem_caller2:baseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -2008,9 +1968,9 @@ struct constvoid_mem_caller2:baseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -2038,9 +1998,9 @@ struct void_mem_caller3:baseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -2069,9 +2029,9 @@ struct constvoid_mem_caller3:baseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -2100,9 +2060,9 @@ struct void_mem_caller4:baseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -2132,9 +2092,9 @@ struct constvoid_mem_caller4:baseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -2164,9 +2124,9 @@ struct void_mem_caller5:baseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -2197,9 +2157,9 @@ struct constvoid_mem_caller5:baseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -2230,9 +2190,9 @@ struct void_mem_caller6:baseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -2264,9 +2224,9 @@ struct constvoid_mem_caller6:baseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -2298,9 +2258,9 @@ struct void_mem_caller7:baseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -2333,9 +2293,9 @@ struct constvoid_mem_caller7:baseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -2368,9 +2328,9 @@ struct void_mem_caller8:baseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -2404,9 +2364,9 @@ struct constvoid_mem_caller8:baseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
@@ -2440,9 +2400,9 @@ struct void_mem_caller9:baseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())||!types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())||!types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
   }
@@ -2477,9 +2437,9 @@ struct constvoid_mem_caller9:baseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())||!types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
-      if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
+      if(!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())||!types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
   }
@@ -2510,11 +2470,6 @@ struct constructor_caller0:baseInvoker{
   constructor_caller0(){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
-    if(strictcheck){
-      if(false){return false;}
-  }else{
-      if(false){return false;}
-  }
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -2531,9 +2486,9 @@ struct constructor_caller1:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())){return false;}
   }
     return true;
   }
@@ -2552,9 +2507,9 @@ struct constructor_caller2:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())){return false;}
   }
     return true;
   }
@@ -2574,9 +2529,9 @@ struct constructor_caller3:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())){return false;}
   }
     return true;
   }
@@ -2597,9 +2552,9 @@ struct constructor_caller4:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())){return false;}
   }
     return true;
   }
@@ -2621,9 +2576,9 @@ struct constructor_caller5:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())){return false;}
   }
     return true;
   }
@@ -2646,9 +2601,9 @@ struct constructor_caller6:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
   }
@@ -2672,9 +2627,9 @@ struct constructor_caller7:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
   }
@@ -2699,9 +2654,9 @@ struct constructor_caller8:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
   }
@@ -2727,9 +2682,9 @@ struct constructor_caller9:baseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(false|| !types::strict_check_type(state,1,types::type_tag<T1>())|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::strict_check_type(state,1,types::type_tag<T1>())||!types::strict_check_type(state,2,types::type_tag<T2>())||!types::strict_check_type(state,3,types::type_tag<T3>())||!types::strict_check_type(state,4,types::type_tag<T4>())||!types::strict_check_type(state,5,types::type_tag<T5>())||!types::strict_check_type(state,6,types::type_tag<T6>())||!types::strict_check_type(state,7,types::type_tag<T7>())||!types::strict_check_type(state,8,types::type_tag<T8>())||!types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
-      if(false|| !types::check_type(state,1,types::type_tag<T1>())|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
+      if(!types::check_type(state,1,types::type_tag<T1>())||!types::check_type(state,2,types::type_tag<T2>())||!types::check_type(state,3,types::type_tag<T3>())||!types::check_type(state,4,types::type_tag<T4>())||!types::check_type(state,5,types::type_tag<T5>())||!types::check_type(state,6,types::type_tag<T6>())||!types::check_type(state,7,types::type_tag<T7>())||!types::check_type(state,8,types::type_tag<T8>())||!types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
   }
