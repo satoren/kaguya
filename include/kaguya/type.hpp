@@ -29,7 +29,7 @@ namespace kaguya
 		template<typename T>
 		inline std::string metatable_name()
 		{
-			return typeid(T).name() + std::string("_kaguya_meta_type");
+			return typeid(T*).name() + std::string("_kaguya_meta_type");
 		}
 
 		template<class T>
