@@ -96,7 +96,7 @@ namespace kaguya
 
 #include "kaguya/gen/native_function.inl"
 
-		template<typename MemType, typename ClassType>
+		template<class ClassType, class MemType>
 		struct mem_data_invoker :baseInvoker {
 			typedef MemType ClassType::*data_type;
 			data_type data_;
@@ -132,10 +132,10 @@ namespace kaguya
 				return types::push(state, standard::forward<MemType>(ptr->*data_));
 			}
 		};
-		template<class MemType, class ClassType>
+		template< class ClassType,class MemType>
 		baseInvoker* create(MemType ClassType::*data)
 		{
-			typedef mem_data_invoker<MemType, ClassType> invoker_type;
+			typedef mem_data_invoker<ClassType,MemType> invoker_type;
 			return new invoker_type(data);
 		}
 

@@ -211,6 +211,8 @@ namespace selector_test
 			state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 				.addConstructor<int>()
 				.addMember("intmember", &ABC::intmember)
+				.addConstructor<std::string>()
+				.addMember("stringmember", &ABC::stringmember)
 				);
 
 			if (!state("value = assert(ABC.new(64))")) { return false; }
@@ -219,6 +221,10 @@ namespace selector_test
 
 			if (!state("value:intmember(4)")) { return false; }
 			if (!state("assert(value:intmember() == 4)")) { return false; }
+
+
+			if (!state("value:stringmember(\"test\")")) { return false; }
+			if (!state("assert(value:stringmember() == \"test\")")) { return false; }
 			return true;
 		}
 
@@ -283,9 +289,12 @@ namespace selector_test
 			if (foo.bar != "bar") { return false; }
 
 			state["foo"] = &foo;
+
 			state("foo:setBar(\"test\")");
 			if (foo.bar != "test") { return false; }
 
+			state["foo"]["setBar"](kaguya::ThisType() , "test2");
+			if (foo.bar != "test2") { return false; }
 #if __cplusplus >= 201104L
 			lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
 			if (!state("Foo.bar(\"test\")")) { return false; }

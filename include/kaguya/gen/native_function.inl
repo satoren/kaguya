@@ -1212,7 +1212,7 @@ struct mem_caller0:baseInvoker{
   mem_caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false){return false;}
   }else{
@@ -1220,23 +1220,9 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)();
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1254,7 +1240,7 @@ struct constmem_caller0:baseInvoker{
   constmem_caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false){return false;}
   }else{
@@ -1262,23 +1248,9 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)();
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1296,7 +1268,7 @@ struct mem_caller1:baseInvoker{
   mem_caller1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
@@ -1304,24 +1276,10 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1339,7 +1297,7 @@ struct constmem_caller1:baseInvoker{
   constmem_caller1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
@@ -1347,24 +1305,10 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1382,7 +1326,7 @@ struct mem_caller2:baseInvoker{
   mem_caller2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
@@ -1390,25 +1334,11 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1426,7 +1356,7 @@ struct constmem_caller2:baseInvoker{
   constmem_caller2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
@@ -1434,25 +1364,11 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1470,7 +1386,7 @@ struct mem_caller3:baseInvoker{
   mem_caller3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
@@ -1478,26 +1394,12 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1515,7 +1417,7 @@ struct constmem_caller3:baseInvoker{
   constmem_caller3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
@@ -1523,26 +1425,12 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1560,7 +1448,7 @@ struct mem_caller4:baseInvoker{
   mem_caller4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
@@ -1568,27 +1456,13 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1606,7 +1480,7 @@ struct constmem_caller4:baseInvoker{
   constmem_caller4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
@@ -1614,27 +1488,13 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1652,27 +1512,13 @@ struct mem_caller5:baseInvoker{
   mem_caller5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1681,7 +1527,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1699,27 +1545,13 @@ struct constmem_caller5:baseInvoker{
   constmem_caller5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1728,7 +1560,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1746,27 +1578,13 @@ struct mem_caller6:baseInvoker{
   mem_caller6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1776,7 +1594,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1794,27 +1612,13 @@ struct constmem_caller6:baseInvoker{
   constmem_caller6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1824,7 +1628,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1842,27 +1646,13 @@ struct mem_caller7:baseInvoker{
   mem_caller7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1873,7 +1663,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1891,27 +1681,13 @@ struct constmem_caller7:baseInvoker{
   constmem_caller7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1922,7 +1698,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1940,27 +1716,13 @@ struct mem_caller8:baseInvoker{
   mem_caller8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -1972,7 +1734,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1990,27 +1752,13 @@ struct constmem_caller8:baseInvoker{
   constmem_caller8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2022,7 +1770,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -2040,27 +1788,13 @@ struct mem_caller9:baseInvoker{
   mem_caller9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 10){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2073,7 +1807,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     T10 t10 = types::get(state,10,types::type_tag<T10>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -2091,27 +1825,13 @@ struct constmem_caller9:baseInvoker{
   constmem_caller9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 10){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2124,7 +1844,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     T10 t10 = types::get(state,10,types::type_tag<T10>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -2142,7 +1862,7 @@ struct void_mem_caller0:baseInvoker{
   void_mem_caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false){return false;}
   }else{
@@ -2150,23 +1870,9 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)();
     return 0;
   }
@@ -2184,7 +1890,7 @@ struct constvoid_mem_caller0:baseInvoker{
   constvoid_mem_caller0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false){return false;}
   }else{
@@ -2192,23 +1898,9 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)();
     return 0;
   }
@@ -2226,7 +1918,7 @@ struct void_mem_caller1:baseInvoker{
   void_mem_caller1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
@@ -2234,24 +1926,10 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2);
     return 0;
   }
@@ -2269,7 +1947,7 @@ struct constvoid_mem_caller1:baseInvoker{
   constvoid_mem_caller1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())){return false;}
   }else{
@@ -2277,24 +1955,10 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2);
     return 0;
   }
@@ -2312,7 +1976,7 @@ struct void_mem_caller2:baseInvoker{
   void_mem_caller2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
@@ -2320,25 +1984,11 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3);
     return 0;
   }
@@ -2356,7 +2006,7 @@ struct constvoid_mem_caller2:baseInvoker{
   constvoid_mem_caller2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())){return false;}
   }else{
@@ -2364,25 +2014,11 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3);
     return 0;
   }
@@ -2400,7 +2036,7 @@ struct void_mem_caller3:baseInvoker{
   void_mem_caller3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
@@ -2408,26 +2044,12 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4);
     return 0;
   }
@@ -2445,7 +2067,7 @@ struct constvoid_mem_caller3:baseInvoker{
   constvoid_mem_caller3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())){return false;}
   }else{
@@ -2453,26 +2075,12 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4);
     return 0;
   }
@@ -2490,7 +2098,7 @@ struct void_mem_caller4:baseInvoker{
   void_mem_caller4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
@@ -2498,27 +2106,13 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5);
     return 0;
   }
@@ -2536,7 +2130,7 @@ struct constvoid_mem_caller4:baseInvoker{
   constvoid_mem_caller4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())){return false;}
   }else{
@@ -2544,27 +2138,13 @@ if(getPtr(state) == 0){return false;}
   }
     return true;
   }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
-  }
   virtual int invoke(lua_State *state)
   {
     T2 t2 = types::get(state,2,types::type_tag<T2>());
     T3 t3 = types::get(state,3,types::type_tag<T3>());
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5);
     return 0;
   }
@@ -2582,27 +2162,13 @@ struct void_mem_caller5:baseInvoker{
   void_mem_caller5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2611,7 +2177,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6);
     return 0;
   }
@@ -2629,27 +2195,13 @@ struct constvoid_mem_caller5:baseInvoker{
   constvoid_mem_caller5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2658,7 +2210,7 @@ if(getPtr(state) == 0){return false;}
     T4 t4 = types::get(state,4,types::type_tag<T4>());
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6);
     return 0;
   }
@@ -2676,27 +2228,13 @@ struct void_mem_caller6:baseInvoker{
   void_mem_caller6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2706,7 +2244,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return 0;
   }
@@ -2724,27 +2262,13 @@ struct constvoid_mem_caller6:baseInvoker{
   constvoid_mem_caller6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2754,7 +2278,7 @@ if(getPtr(state) == 0){return false;}
     T5 t5 = types::get(state,5,types::type_tag<T5>());
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return 0;
   }
@@ -2772,27 +2296,13 @@ struct void_mem_caller7:baseInvoker{
   void_mem_caller7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2803,7 +2313,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
@@ -2821,27 +2331,13 @@ struct constvoid_mem_caller7:baseInvoker{
   constvoid_mem_caller7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2852,7 +2348,7 @@ if(getPtr(state) == 0){return false;}
     T6 t6 = types::get(state,6,types::type_tag<T6>());
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
@@ -2870,27 +2366,13 @@ struct void_mem_caller8:baseInvoker{
   void_mem_caller8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2902,7 +2384,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
@@ -2920,27 +2402,13 @@ struct constvoid_mem_caller8:baseInvoker{
   constvoid_mem_caller8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -2952,7 +2420,7 @@ if(getPtr(state) == 0){return false;}
     T7 t7 = types::get(state,7,types::type_tag<T7>());
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
@@ -2970,27 +2438,13 @@ struct void_mem_caller9:baseInvoker{
   void_mem_caller9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 10){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -3003,7 +2457,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     T10 t10 = types::get(state,10,types::type_tag<T10>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return 0;
   }
@@ -3021,27 +2475,13 @@ struct constvoid_mem_caller9:baseInvoker{
   constvoid_mem_caller9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 10){return false;}
-if(getPtr(state) == 0){return false;}
+if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}
     if(strictcheck){
       if(false|| !types::strict_check_type(state,2,types::type_tag<T2>())|| !types::strict_check_type(state,3,types::type_tag<T3>())|| !types::strict_check_type(state,4,types::type_tag<T4>())|| !types::strict_check_type(state,5,types::type_tag<T5>())|| !types::strict_check_type(state,6,types::type_tag<T6>())|| !types::strict_check_type(state,7,types::type_tag<T7>())|| !types::strict_check_type(state,8,types::type_tag<T8>())|| !types::strict_check_type(state,9,types::type_tag<T9>())|| !types::strict_check_type(state,10,types::type_tag<T10>())){return false;}
   }else{
       if(false|| !types::check_type(state,2,types::type_tag<T2>())|| !types::check_type(state,3,types::type_tag<T3>())|| !types::check_type(state,4,types::type_tag<T4>())|| !types::check_type(state,5,types::type_tag<T5>())|| !types::check_type(state,6,types::type_tag<T6>())|| !types::check_type(state,7,types::type_tag<T7>())|| !types::check_type(state,8,types::type_tag<T8>())|| !types::check_type(state,9,types::type_tag<T9>())|| !types::check_type(state,10,types::type_tag<T10>())){return false;}
   }
     return true;
-  }
-  T1* getPtr(lua_State *state) {
-    if (types::check_type(state, 1, types::type_tag<T1*>()))
-    {
-      return types::get(state, 1, types::type_tag<T1*>());
-   }
-   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))
-    {
-      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());
-      if (shared_ptr) {
-        return shared_ptr->get();
-      }
-    }
-    return 0;
   }
   virtual int invoke(lua_State *state)
   {
@@ -3054,7 +2494,7 @@ if(getPtr(state) == 0){return false;}
     T8 t8 = types::get(state,8,types::type_tag<T8>());
     T9 t9 = types::get(state,9,types::type_tag<T9>());
     T10 t10 = types::get(state,10,types::type_tag<T10>());
-  T1* ptr = getPtr(state);
+  T1* ptr = types::get(state, 1, types::type_tag<T1*>());
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return 0;
   }

@@ -27,6 +27,17 @@ namespace kaguya
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			return *this;
 		}
+#if defined(_HAS_RVALUE_REFERENCES) || defined(__cpp_rvalue_references)
+		LuaRef(LuaRef&& src)throw() :state_(0), ref_(LUA_REFNIL)
+		{
+			swap(src);
+		}
+		LuaRef& operator =(LuaRef&& src)throw()
+		{
+			swap(src);
+			return *this;
+		}
+#endif
 
 		LuaRef(lua_State* state) :state_(state), ref_(LUA_REFNIL) {}
 
@@ -34,6 +45,12 @@ namespace kaguya
 		LuaRef(lua_State* state, StackTop s) :state_(state), ref_(LUA_REFNIL)
 		{
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+		}
+
+		void swap(LuaRef& other)throw()
+		{
+			std::swap(state_, other.state_);
+			std::swap(ref_, other.ref_);
 		}
 
 		template<typename T>
@@ -44,7 +61,10 @@ namespace kaguya
 		}
 		~LuaRef()
 		{
-			luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+			if (ref_ != LUA_REFNIL)
+			{
+				luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+			}
 		}
 
 		//push to Lua stack

@@ -7,10 +7,13 @@
 
 namespace kaguya
 {
+	struct ThisType {};//for selector
+
 	namespace types
 	{
 		template<typename T>
 		struct type_tag {};
+		
 
 		template<class T>
 		struct meta_pointer_wrapper { 
@@ -409,12 +412,12 @@ namespace kaguya
 		}
 		inline int push(lua_State* l, std::string& s)
 		{
-			lua_pushlstring(l, s.data(), s.size());
+			lua_pushlstring(l, s.c_str(), s.size());
 			return 1;
 		}
 		inline int push(lua_State* l, const std::string& s)
 		{
-			lua_pushlstring(l, s.data(), s.size());
+			lua_pushlstring(l, s.c_str(), s.size());
 			return 1;
 		}
 		inline int push(lua_State* l, newtable_tag)
@@ -448,9 +451,10 @@ namespace kaguya
 			}
 			else
 			{
-				void *storage = lua_newuserdata(l, sizeof(meta_pointer_wrapper<T>));
-				new(storage) meta_pointer_wrapper<T>(&v);
-				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
+				typedef meta_pointer_wrapper<T> wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(&v);
+				luaL_setmetatable(l, metatable_name<wrapper_type>().c_str());
 			}
 			return 1;
 		}
@@ -463,9 +467,10 @@ namespace kaguya
 			}
 			else
 			{
-				void *storage = lua_newuserdata(l, sizeof(meta_pointer_wrapper<T>));
-				new(storage) meta_pointer_wrapper<T>(v);
-				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
+				typedef meta_pointer_wrapper<T> wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(v);
+				luaL_setmetatable(l, metatable_name<wrapper_type>().c_str());
 			}
 			return 1;
 		}
@@ -478,9 +483,10 @@ namespace kaguya
 			}
 			else
 			{
-				void *storage = lua_newuserdata(l, sizeof(meta_pointer_wrapper<T>));
-				new(storage) meta_pointer_wrapper<T>(v);
-				luaL_setmetatable(l, metatable_name<meta_pointer_wrapper<T> >().c_str());
+				typedef meta_pointer_wrapper<T> wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(v);
+				luaL_setmetatable(l, metatable_name<wrapper_type>().c_str());
 			}
 			return 1;
 		}

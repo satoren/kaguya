@@ -256,22 +256,8 @@ def tepmlate_mem_function(out,arg_num,funattr):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num+1,1,'if(getPtr(state) == 0){return false;}\n')
+	strict_check_type(out,arg_num+1,1,'if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}\n')
 	
-	out.write('  T1* getPtr(lua_State *state) {\n')
-	out.write('    if (types::check_type(state, 1, types::type_tag<T1*>()))\n')
-	out.write('    {\n')
-	out.write('      return types::get(state, 1, types::type_tag<T1*>());\n')
-	out.write('   }\n')
-	out.write('   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))\n')
-	out.write('    {\n')
-	out.write('      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());\n')
-	out.write('      if (shared_ptr) {\n')
-	out.write('        return shared_ptr->get();\n')
-	out.write('      }\n')
-	out.write('    }\n')
-	out.write('    return 0;\n')
-	out.write('  }\n')
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
@@ -279,7 +265,7 @@ def tepmlate_mem_function(out,arg_num,funattr):
 	get_call(out,arg_num+1,1)
 	
 	
-	out.write('  T1* ptr = getPtr(state);\n')
+	out.write('  T1* ptr = types::get(state, 1, types::type_tag<T1*>());\n')
 	
 	out.write('    Ret r = (ptr->*func_)(')
 	args(out,arg_num+1,'t',1)
@@ -315,29 +301,14 @@ def void_tepmlate_mem_function(out,arg_num,funattr):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num+1,1,'if(getPtr(state) == 0){return false;}\n')
-	
-	out.write('  T1* getPtr(lua_State *state) {\n')
-	out.write('    if (types::check_type(state, 1, types::type_tag<T1*>()))\n')
-	out.write('    {\n')
-	out.write('      return types::get(state, 1, types::type_tag<T1*>());\n')
-	out.write('   }\n')
-	out.write('   if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<T1>*>()))\n')
-	out.write('    {\n')
-	out.write('      standard::shared_ptr<T1>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<T1>*>());\n')
-	out.write('      if (shared_ptr) {\n')
-	out.write('        return shared_ptr->get();\n')
-	out.write('      }\n')
-	out.write('    }\n')
-	out.write('    return 0;\n')
-	out.write('  }\n')
+	strict_check_type(out,arg_num+1,1,'if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}\n')
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
 
 
 	get_call(out,arg_num+1,1)
-	out.write('  T1* ptr = getPtr(state);\n')
+	out.write('  T1* ptr = types::get(state, 1, types::type_tag<T1*>());\n')
 	out.write('    (ptr->*func_)(')
 	args(out,arg_num+1,'t',1)
 	out.write(');\n')

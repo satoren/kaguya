@@ -219,7 +219,8 @@ namespace kaguya
 
 		void checkTable() {
 			utils::ScopedSavedStack save(state_);
-			if (type() != LUA_TTABLE) {
+			int vtype = type();
+			if (vtype != LUA_TTABLE && vtype != LUA_TUSERDATA) {
 				put(types::newtable_tag());
 			};
 		}
