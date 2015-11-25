@@ -358,7 +358,25 @@ namespace selector_test
 			state("a,b = multresfun()");
 			return state("assert(a == 12  and b == \"23\")");
 		}
+	}
 
+	namespace t_04_lua_ref
+	{
+		bool multi_return_function_test(kaguya::State& state)
+		{
+			kaguya::LuaRef ref(state.state(), "abc");
+			if (ref.get<std::string>() != "abc") { return false; }
+
+			state("abc={d =1,e=3,f=64,g=\"sss\"}");
+			kaguya::LuaRef abctable = state["abc"];
+
+			if (abctable["d"].get<int>() != 1) { return false; }
+			if (abctable["e"].get<int>() != 3) { return false; }
+			if (abctable["f"].get<int>() != 64) { return false; }
+			if (abctable["g"].get<std::string>() != "sss") { return false; }
+
+			return true;
+		}
 	}
 }
 
@@ -433,7 +451,10 @@ int main()
 		ADD_TEST(selector_test::t_03_function::member_function_test);
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
 		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
+
+		ADD_TEST(selector_test::t_04_lua_ref::multi_return_function_test);
 		
+
 		test_result = execute_test(testmap);
 	}
 	return test_result ? 0 : -1;

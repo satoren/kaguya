@@ -14,7 +14,29 @@ namespace kaguya
 		lua_State *state_;
 		int ref_;
 
+		void unref()
+		{
+			if (state_ != 0 && ref_ != LUA_REFNIL)
+			{
+				luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+				state_ = 0;
+				ref_ = LUA_REFNIL;
+			}
+		}
 	public:
+		enum value_type
+		{
+			TYPE_NIL = LUA_TNIL,
+			TYPE_BOOL = LUA_TBOOLEAN,
+			TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,
+			TYPE_NUMBER = LUA_TNUMBER,
+			TYPE_STRING = LUA_TSTRING,
+			TYPE_TABLE = LUA_TTABLE,
+			TYPE_FUNCTION = LUA_TFUNCTION,
+			TYPE_USERDATA = LUA_TUSERDATA,
+			TYPE_TTHREAD = LUA_TTHREAD,
+		};
+
 		LuaRef(const LuaRef& src) :state_(src.state_)
 		{
 			src.push();
@@ -22,6 +44,7 @@ namespace kaguya
 		}
 		LuaRef& operator =(const LuaRef& src)
 		{
+			unref();
 			state_ = src.state_;
 			src.push();
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
@@ -39,6 +62,7 @@ namespace kaguya
 		}
 #endif
 
+		LuaRef() :state_(0), ref_(LUA_REFNIL) {}
 		LuaRef(lua_State* state) :state_(state), ref_(LUA_REFNIL) {}
 
 
@@ -61,10 +85,7 @@ namespace kaguya
 		}
 		~LuaRef()
 		{
-			if (ref_ != LUA_REFNIL)
-			{
-				luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
-			}
+			unref();
 		}
 
 		//push to Lua stack
@@ -72,7 +93,6 @@ namespace kaguya
 		{
 			lua_rawgeti(state_, LUA_REGISTRYINDEX, ref_);
 		}
-
 
 		template<typename T>
 		T get()const
@@ -82,17 +102,46 @@ namespace kaguya
 			return types::get(state_, -1, types::type_tag<T>());
 		}
 
-		int type() const
+		LuaRef operator[](const char* str)
+		{
+			utils::ScopedSavedStack save(state_);
+			int t = type();
+			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+			{
+				return LuaRef();
+			}
+			push();
+			lua_getfield(state_, -1, str);
+			return LuaRef(state_, StackTop());
+		}
+		LuaRef operator[](const std::string& str)
+		{
+			(*this)[str.c_str()];
+		}
+		LuaRef operator[](int index)
+		{
+			utils::ScopedSavedStack save(state_);
+			int t = type();
+			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+			{
+				return LuaRef();
+			}
+			push();
+			lua_geti(state_, -1, index);
+			return LuaRef(state_, StackTop());
+		}
+
+		enum value_type type() const
 		{
 			utils::ScopedSavedStack save(state_);
 
 			if (ref_ == LUA_REFNIL)
 			{
-				return LUA_TNIL;
+				return TYPE_NIL;
 			}
 
 			push();
-			return lua_type(state_, -1);
+			return (value_type)lua_type(state_, -1);
 		}
 		std::string typeName()const
 		{
