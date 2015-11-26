@@ -28,7 +28,7 @@ namespace kaguya
 			ScopedSavedStack & operator=(ScopedSavedStack const &);
 		};
 
-		inline std::string argment_types(lua_State *state)
+		inline std::string argmentTypes(lua_State *state)
 		{
 			int top = lua_gettop(state);
 

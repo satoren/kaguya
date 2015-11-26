@@ -39,7 +39,7 @@ def void_template(out,arg_num):
 
 def get_call(out,arg_num,offset=0):
 	for i in range (offset + 1,arg_num + 1):
-		out.write('    T'+str(i) +' t' +str(i) +' = types::get(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>());\n')
+		out.write('    T'+str(i) +' t' +str(i) +' = types::get(state,' + str(i) + ',types::typetag<T'+ str(i) + '>());\n')
 
 def arg_types_string(out,arg_num):
 	out.write('std::string()')
@@ -50,7 +50,7 @@ def arg_types_string(out,arg_num):
 
 
 	
-def strict_check_type(out,arg_num,offset=0,customcheck=""):
+def strictCheckType(out,arg_num,offset=0,customcheck=""):
 	out.write('  virtual bool checktype(lua_State *state,bool strictcheck){\n')
 	out.write('    if(lua_gettop(state) != ' + str(arg_num) + '){return false;}\n')
 	
@@ -61,14 +61,14 @@ def strict_check_type(out,arg_num,offset=0,customcheck=""):
 		for i in range (offset+1,arg_num+1):
 			if i>offset+1:
 				out.write('||')
-			out.write('!types::strict_check_type(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>())')
+			out.write('!types::strictCheckType(state,' + str(i) + ',types::typetag<T'+ str(i) + '>())')
 		out.write('){return false;}\n')
 		out.write('  }else{\n')	
 		out.write('      if(')
 		for i in range (offset+1,arg_num+1):
 			if i>offset+1:
 				out.write('||')
-			out.write('!types::check_type(state,' + str(i) + ',types::type_tag<T'+ str(i) + '>())')
+			out.write('!types::checkType(state,' + str(i) + ',types::typetag<T'+ str(i) + '>())')
 		out.write('){return false;}\n')
 		out.write('  }\n')
 	out.write('    return true;\n')
@@ -76,7 +76,7 @@ def strict_check_type(out,arg_num,offset=0,customcheck=""):
 
 
 def standard_function(out,arg_num):
-	basename = 'baseInvoker'
+	basename = 'BaseInvoker'
 	classname = 'function_caller' + str(arg_num)
 
 	template(out,arg_num)
@@ -86,7 +86,7 @@ def standard_function(out,arg_num):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num)
+	strictCheckType(out,arg_num)
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
 
@@ -100,7 +100,7 @@ def standard_function(out,arg_num):
 	out.write('};\n')
 
 	template(out,arg_num)
-	out.write('baseInvoker* create(standard::function<Ret (')
+	out.write('BaseInvoker* create(standard::function<Ret (')
 	args(out,arg_num,'T');
 
 	out.write(')> fun)\n')
@@ -111,15 +111,15 @@ def standard_function(out,arg_num):
 	if arg_num > 0:
 		out.write(',')
 		args(out,arg_num,'T')
-	out.write('> caller_type;\n');
+	out.write('> InvokerType;\n');
 	
-	out.write('  return new caller_type(fun);\n')
+	out.write('  return new InvokerType(fun);\n')
 	out.write('}\n')
 
 
 def void_standard_function(out,arg_num):
-	basename = 'baseInvoker'
-	classname = 'void_function_caller' + str(arg_num)
+	basename = 'BaseInvoker'
+	classname = 'VoidFunctionInvoker' + str(arg_num)
 
 	void_template(out,arg_num)
 	out.write('struct ' + classname + ':' + basename)
@@ -130,7 +130,7 @@ def void_standard_function(out,arg_num):
 	#constructor
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num)
+	strictCheckType(out,arg_num)
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
@@ -145,7 +145,7 @@ def void_standard_function(out,arg_num):
 	out.write('};\n')
 
 	void_template(out,arg_num)
-	out.write('baseInvoker* create(standard::function<void (')
+	out.write('BaseInvoker* create(standard::function<void (')
 	args(out,arg_num,'T');
 
 	out.write(')> fun)\n')
@@ -156,15 +156,15 @@ def void_standard_function(out,arg_num):
 		out.write('<')
 		args(out,arg_num,'T')
 		out.write('>')
-	out.write(' caller_type;\n');
+	out.write(' InvokerType;\n');
 
-	out.write('  return new caller_type(fun);\n')
+	out.write('  return new InvokerType(fun);\n')
 	out.write('}\n')
 
 
 def tepmlate_function(out,arg_num):
-	basename = 'baseInvoker'
-	classname = 'caller' + str(arg_num)
+	basename = 'BaseInvoker'
+	classname = 'FunInvoker' + str(arg_num)
 
 	template(out,arg_num)
 	out.write('struct ' + classname + ':' + basename)
@@ -174,7 +174,7 @@ def tepmlate_function(out,arg_num):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num)
+	strictCheckType(out,arg_num)
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
@@ -189,7 +189,7 @@ def tepmlate_function(out,arg_num):
 	out.write('};\n')
 
 	template(out,arg_num)
-	out.write('baseInvoker* create(Ret (*fun)(')
+	out.write('BaseInvoker* create(Ret (*fun)(')
 	args(out,arg_num,'T');
 
 	out.write('))\n')
@@ -200,14 +200,14 @@ def tepmlate_function(out,arg_num):
 	if arg_num > 0:
 		out.write(',')
 		args(out,arg_num,'T')
-	out.write('> caller_type;\n');
+	out.write('> InvokerType;\n');
 	
-	out.write('  return new caller_type(fun);\n')
+	out.write('  return new InvokerType(fun);\n')
 	out.write('}\n')
 
 def void_tepmlate_function(out,arg_num):
-	basename = 'baseInvoker'
-	classname = 'void_caller' + str(arg_num)
+	basename = 'BaseInvoker'
+	classname = 'VoidFunInvoker' + str(arg_num)
 
 	void_template(out,arg_num)
 	out.write('struct ' + classname + ':' + basename)
@@ -217,7 +217,7 @@ def void_tepmlate_function(out,arg_num):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}')
 
-	strict_check_type(out,arg_num)
+	strictCheckType(out,arg_num)
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
@@ -233,7 +233,7 @@ def void_tepmlate_function(out,arg_num):
 
 
 	void_template(out,arg_num)
-	out.write('baseInvoker* create(void (*fun)(')
+	out.write('BaseInvoker* create(void (*fun)(')
 	args(out,arg_num,'T');
 
 	out.write('))\n')
@@ -244,15 +244,15 @@ def void_tepmlate_function(out,arg_num):
 		out.write('<')
 		args(out,arg_num,'T')
 		out.write('>')
-	out.write(' caller_type;\n');
+	out.write(' InvokerType;\n');
 
-	out.write('  return new caller_type(fun);\n')
+	out.write('  return new InvokerType(fun);\n')
 	out.write('}\n')
 
 
 def tepmlate_mem_function(out,arg_num,funattr):
-	basename = 'baseInvoker'
-	classname = funattr+'mem_caller' + str(arg_num)
+	basename = 'BaseInvoker'
+	classname = funattr+'MemFunInvoker' + str(arg_num)
 
 	template(out,arg_num + 1)
 	out.write('struct ' + classname + ':' + basename)
@@ -261,7 +261,7 @@ def tepmlate_mem_function(out,arg_num,funattr):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num+1,1,'if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}\n')
+	strictCheckType(out,arg_num+1,1,'if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}\n')
 	
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
@@ -270,7 +270,7 @@ def tepmlate_mem_function(out,arg_num,funattr):
 	get_call(out,arg_num+1,1)
 	
 	
-	out.write('  T1* ptr = types::get(state, 1, types::type_tag<T1*>());\n')
+	out.write('  T1* ptr = types::get(state, 1, types::typetag<T1*>());\n')
 	
 	out.write('    Ret r = (ptr->*func_)(')
 	args(out,arg_num+1,'t',1)
@@ -280,7 +280,7 @@ def tepmlate_mem_function(out,arg_num,funattr):
 	out.write('};\n')
 
 	template(out,arg_num + 1)
-	out.write('baseInvoker* create(Ret (T1::*fun)(')
+	out.write('BaseInvoker* create(Ret (T1::*fun)(')
 	args(out,arg_num+1,'T',1);
 
 	out.write(')' +funattr + ')\n')
@@ -288,14 +288,14 @@ def tepmlate_mem_function(out,arg_num,funattr):
 
 	out.write('  typedef ' + classname+'<Ret,')
 	args(out,arg_num+1,'T')
-	out.write('> caller_type;\n');
+	out.write('> InvokerType;\n');
 	
-	out.write('  return new caller_type(fun);\n')
+	out.write('  return new InvokerType(fun);\n')
 	out.write('}\n')
 
 def void_tepmlate_mem_function(out,arg_num,funattr):
-	basename = 'baseInvoker'
-	classname = funattr+'void_mem_caller' + str(arg_num)
+	basename = 'BaseInvoker'
+	classname = funattr+'VoidMemFunInvoker' + str(arg_num)
 
 	void_template(out,arg_num+1)
 	out.write('struct ' + classname + ':' + basename)
@@ -306,14 +306,14 @@ def void_tepmlate_mem_function(out,arg_num,funattr):
 
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 
-	strict_check_type(out,arg_num+1,1,'if(types::get(state, 1, types::type_tag<T1*>()) == 0){return false;}\n')
+	strictCheckType(out,arg_num+1,1,'if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}\n')
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
 
 
 	get_call(out,arg_num+1,1)
-	out.write('  T1* ptr = types::get(state, 1, types::type_tag<T1*>());\n')
+	out.write('  T1* ptr = types::get(state, 1, types::typetag<T1*>());\n')
 	out.write('    (ptr->*func_)(')
 	args(out,arg_num+1,'t',1)
 	out.write(');\n')
@@ -322,7 +322,7 @@ def void_tepmlate_mem_function(out,arg_num,funattr):
 	out.write('};\n')
 
 	void_template(out,arg_num+1)
-	out.write('baseInvoker* create(void (T1::*fun)(')
+	out.write('BaseInvoker* create(void (T1::*fun)(')
 	args(out,arg_num+1,'T',1);
 
 	out.write(')'+ funattr +')\n')
@@ -331,15 +331,15 @@ def void_tepmlate_mem_function(out,arg_num,funattr):
 
 	out.write('  typedef ' + classname+'<')
 	args(out,arg_num+1,'T')
-	out.write('> caller_type;\n');
+	out.write('> InvokerType;\n');
 
-	out.write('  return new caller_type(fun);\n')
+	out.write('  return new InvokerType(fun);\n')
 	out.write('}\n')
 
 
 def constructor_function(out,arg_num):
-	basename = 'baseInvoker'
-	classname = 'constructor_caller' + str(arg_num)
+	basename = 'BaseInvoker'
+	classname = 'ConstructorInvoker' + str(arg_num)
 
 	out.write('template<typename CLASS')
 	if arg_num > 0:
@@ -352,7 +352,7 @@ def constructor_function(out,arg_num):
 
 	out.write('  ' + classname + '(){}\n')
 
-	strict_check_type(out,arg_num)
+	strictCheckType(out,arg_num)
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
@@ -366,7 +366,7 @@ def constructor_function(out,arg_num):
 		out.write(',')
 		args(out,arg_num,'t')
 	out.write(');\n')
-	out.write('    luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());\n')
+	out.write('    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());\n')
 	out.write('    return 1;\n')
 	out.write('  }\n')
 	out.write('};\n')

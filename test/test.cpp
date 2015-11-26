@@ -313,11 +313,11 @@ namespace selector_test
 			std::vector<kaguya::LuaRef> args;
 
 			VariFoo() {}
-			VariFoo(kaguya::variadic_arg_type a) :args(a) {
+			VariFoo(kaguya::VariadicArgType a) :args(a) {
 
 			}
 
-			void variadic_arg_func(kaguya::variadic_arg_type args)
+			void variadic_arg_func(kaguya::VariadicArgType args)
 			{
 				this->args = args;
 			}

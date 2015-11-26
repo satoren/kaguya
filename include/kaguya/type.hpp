@@ -13,12 +13,12 @@ namespace kaguya
 	namespace types
 	{
 		template<typename T>
-		struct type_tag {};
+		struct typetag {};
 
 
 		template<class T>
-		struct meta_pointer_wrapper {
-			meta_pointer_wrapper(T* p) :ptr(p) {}
+		struct MetaPointerWrapper {
+			MetaPointerWrapper(T* p) :ptr(p) {}
 			T* ptr;
 		};
 
@@ -31,16 +31,16 @@ namespace kaguya
 		}
 
 		//faster but no human readable
-		//struct metatable_name_t
+		//struct metatableName_t
 		//{
 		//	char metaname[16 + sizeof(intptr_t) * 2];//XXXXXXXX(ptrlen*(8/7))_kaguya_type
 		//	const char* c_str()const { return metaname; }
 		//	operator std::string()const { return metaname; }
 		//};
 		//template<typename T>
-		//inline metatable_name_t metatable_name()
+		//inline metatableName_t metatableName()
 		//{
-		//	metatable_name_t result;
+		//	metatableName_t result;
 		//	intptr_t ptrvalue = intptr_t(typeid(T*).name());
 		//	size_t pos =0;
 		//	for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
@@ -53,20 +53,20 @@ namespace kaguya
 		//}
 
 		template<typename T>
-		inline std::string metatable_name()
+		inline std::string metatableName()
 		{
 			return typeid(T*).name() + std::string("_kaguya_type");
 		}
 
 		template<class T>
-		T* get_pointer(lua_State* l, int index, type_tag<T> tag)
+		T* get_pointer(lua_State* l, int index, typetag<T> tag)
 		{
 			int type = lua_type(l, index);
 			if (type == LUA_TTABLE)//allow table for __gc
 			{
 				return 0;
 			}
-			if (type == LUA_TLIGHTUSERDATA || !available_metatable(l, metatable_name<T>().c_str()))
+			if (type == LUA_TLIGHTUSERDATA || !available_metatable(l, metatableName<T>().c_str()))
 			{
 				return (T*)lua_topointer(l, index);
 			}
@@ -76,15 +76,15 @@ namespace kaguya
 			}
 			else
 			{
-				T* ptr = (T*)luaL_testudata(l, index, metatable_name<T>().c_str());
+				T* ptr = (T*)luaL_testudata(l, index, metatableName<T>().c_str());
 				if (!ptr)
 				{
-					standard::shared_ptr<T>* shared_ptr = reinterpret_cast<standard::shared_ptr<T>*>(luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str()));
+					standard::shared_ptr<T>* shared_ptr = reinterpret_cast<standard::shared_ptr<T>*>(luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str()));
 					if (shared_ptr) { ptr = shared_ptr->get(); }
 				}
 				if (!ptr)
 				{
-					meta_pointer_wrapper<T>* ptr_wrapper = reinterpret_cast<meta_pointer_wrapper<T>*>(luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str()));
+					MetaPointerWrapper<T>* ptr_wrapper = reinterpret_cast<MetaPointerWrapper<T>*>(luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str()));
 					if (ptr_wrapper) { ptr = ptr_wrapper->ptr; }
 				}
 
@@ -96,142 +96,142 @@ namespace kaguya
 
 
 		template<typename T>
-		inline bool strict_check_type(lua_State* l, int index, type_tag<T> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
 		}
 		template<typename T>
-		inline bool strict_check_type(lua_State* l, int index, type_tag<const T&> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<const T&> tag)
 		{
-			return strict_check_type(l, index, type_tag<T>());
+			return strictCheckType(l, index, typetag<T>());
 		}
 		template<typename T>
-		inline bool strict_check_type(lua_State* l, int index, type_tag<T&> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<T&> tag)
 		{
-			return luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+			return luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
 		}
 		template<typename T>
-		inline bool strict_check_type(lua_State* l, int index, type_tag<T*> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<T*> tag)
 		{
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0
-				|| !available_metatable(l, metatable_name<T>().c_str())
-				|| luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str()) != 0
-				|| luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str()) != 0;
+				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
+				|| !available_metatable(l, metatableName<T>().c_str())
+				|| luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str()) != 0
+				|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str()) != 0;
 		}
 
-		inline bool strict_check_type(lua_State* l, int index, type_tag<bool> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<bool> tag)
 		{
 			return lua_type(l, index) == LUA_TBOOLEAN;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<float> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<float> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
 
-		inline bool strict_check_type(lua_State* l, int index, type_tag<double> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<double> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
 
-		inline bool strict_check_type(lua_State* l, int index, type_tag<short> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<short> tag)
 		{//need check range?
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned short> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<unsigned short> tag)
 		{//need check range?
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<signed char> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<signed char> tag)
 		{//need check range?
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned char> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<unsigned char> tag)
 		{//need check range?
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<int> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<int> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<unsigned int> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<unsigned int> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<int64_t> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<int64_t> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<uint64_t> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<uint64_t> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
 
-		inline bool strict_check_type(lua_State* l, int index, type_tag<const char*> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<const char*> tag)
 		{
 			return lua_type(l, index) == LUA_TSTRING;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<std::string> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<std::string> tag)
 		{
 			return lua_type(l, index) == LUA_TSTRING;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<const std::string&> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<const std::string&> tag)
 		{
 			return lua_type(l, index) == LUA_TSTRING;
 		}
-		inline bool strict_check_type(lua_State* l, int index, type_tag<const std::string> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<const std::string> tag)
 		{
 			return lua_type(l, index) == LUA_TSTRING;
 		}
 
 		template<typename T>
-		inline bool check_type(lua_State* l, int index, type_tag<T> tag)
+		inline bool checkType(lua_State* l, int index, typetag<T> tag)
 		{
 			return  lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| !available_metatable(l, metatable_name<T>().c_str())
-				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+				|| !available_metatable(l, metatableName<T>().c_str())
+				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
 		}
 		template<typename T>
-		inline bool check_type(lua_State* l, int index, type_tag<const T&> tag)
+		inline bool checkType(lua_State* l, int index, typetag<const T&> tag)
 		{
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| !available_metatable(l, metatable_name<T>().c_str())
-				|| check_type(l, index, type_tag<T>());
+				|| !available_metatable(l, metatableName<T>().c_str())
+				|| checkType(l, index, typetag<T>());
 		}
 		template<typename T>
-		inline bool check_type(lua_State* l, int index, type_tag<T&> tag)
+		inline bool checkType(lua_State* l, int index, typetag<T&> tag)
 		{
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| !available_metatable(l, metatable_name<T>().c_str())
-				|| luaL_testudata(l, index, metatable_name<T>().c_str()) != 0;
+				|| !available_metatable(l, metatableName<T>().c_str())
+				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
 		}
 		template<typename T>
-		inline bool check_type(lua_State* l, int index, type_tag<T*> tag)
+		inline bool checkType(lua_State* l, int index, typetag<T*> tag)
 		{
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
 				|| lua_type(l, index) == LUA_TTABLE //allow table for __gc
 				|| lua_topointer(l, index) == 0
-				|| !available_metatable(l, metatable_name<T>().c_str())
-				|| luaL_testudata(l, index, metatable_name<T>().c_str())
-				|| luaL_testudata(l, index, metatable_name<standard::shared_ptr<T> >().c_str())
-				|| luaL_testudata(l, index, metatable_name<meta_pointer_wrapper<T> >().c_str());
+				|| !available_metatable(l, metatableName<T>().c_str())
+				|| luaL_testudata(l, index, metatableName<T>().c_str())
+				|| luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str())
+				|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str());
 		}
 
-		inline bool check_type(lua_State* l, int index, type_tag<bool> tag)
+		inline bool checkType(lua_State* l, int index, typetag<bool> tag)
 		{
 			return lua_isboolean(l, index) != 0;
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<float> tag)
+		inline bool checkType(lua_State* l, int index, typetag<float> tag)
 		{
 			return lua_isnumber(l, index) != 0;
 		}
 
-		inline bool check_type(lua_State* l, int index, type_tag<double> tag)
+		inline bool checkType(lua_State* l, int index, typetag<double> tag)
 		{
 			return lua_isnumber(l, index) != 0;
 		}
 
-		inline bool check_type(lua_State* l, int index, type_tag<int64_t> tag)
+		inline bool checkType(lua_State* l, int index, typetag<int64_t> tag)
 		{
 #if LUA_VERSION_NUM >= 503
 			return lua_isinteger(l, index) != 0;
@@ -239,52 +239,52 @@ namespace kaguya
 			return lua_isnumber(l, index) != 0;
 #endif
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<unsigned int> tag)
+		inline bool checkType(lua_State* l, int index, typetag<unsigned int> tag)
 		{
-			return check_type(l, index, type_tag<int64_t>());
+			return checkType(l, index, typetag<int64_t>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<int> tag)
+		inline bool checkType(lua_State* l, int index, typetag<int> tag)
 		{
-			return check_type(l, index, type_tag<int64_t>());
+			return checkType(l, index, typetag<int64_t>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<unsigned short> tag)
+		inline bool checkType(lua_State* l, int index, typetag<unsigned short> tag)
 		{
-			return check_type(l, index, type_tag<int64_t>());
+			return checkType(l, index, typetag<int64_t>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<short> tag)
+		inline bool checkType(lua_State* l, int index, typetag<short> tag)
 		{
-			return check_type(l, index, type_tag<int64_t>());
+			return checkType(l, index, typetag<int64_t>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<unsigned char> tag)
+		inline bool checkType(lua_State* l, int index, typetag<unsigned char> tag)
 		{
-			return check_type(l, index, type_tag<int64_t>());
+			return checkType(l, index, typetag<int64_t>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<signed char> tag)
+		inline bool checkType(lua_State* l, int index, typetag<signed char> tag)
 		{
-			return check_type(l, index, type_tag<int64_t>());
+			return checkType(l, index, typetag<int64_t>());
 		}
 
-		inline bool check_type(lua_State* l, int index, type_tag<const char*> tag)
+		inline bool checkType(lua_State* l, int index, typetag<const char*> tag)
 		{
 			return lua_isstring(l, index) != 0;
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<std::string> tag)
+		inline bool checkType(lua_State* l, int index, typetag<std::string> tag)
 		{
 			return lua_isstring(l, index) != 0;
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<const std::string&> tag)
+		inline bool checkType(lua_State* l, int index, typetag<const std::string&> tag)
 		{
-			return check_type(l, index, type_tag<std::string>());
+			return checkType(l, index, typetag<std::string>());
 		}
-		inline bool check_type(lua_State* l, int index, type_tag<const std::string> tag)
+		inline bool checkType(lua_State* l, int index, typetag<const std::string> tag)
 		{
-			return check_type(l, index, type_tag<std::string>());
+			return checkType(l, index, typetag<std::string>());
 		}
 
 		template<typename T>
-		inline T get(lua_State* l, int index, type_tag<T> tag = type_tag<T>())
+		inline T get(lua_State* l, int index, typetag<T> tag = typetag<T>())
 		{
-			T* pointer = get_pointer(l, index, type_tag<T>());
+			T* pointer = get_pointer(l, index, typetag<T>());
 			if (!pointer)
 			{
 				throw std::invalid_argument("type mismatch!!");
@@ -292,14 +292,14 @@ namespace kaguya
 			return *pointer;
 		}
 		template<typename T>
-		inline T get(lua_State* l, int index, type_tag<const T&> tag = type_tag<const T&>())
+		inline T get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
 		{
-			return get(l, index, type_tag<T>());
+			return get(l, index, typetag<T>());
 		}
 		template<typename T>
-		inline T& get(lua_State* l, int index, type_tag<T&> tag = type_tag<T&>())
+		inline T& get(lua_State* l, int index, typetag<T&> tag = typetag<T&>())
 		{
-			T* pointer = get_pointer(l, index, type_tag<T>());
+			T* pointer = get_pointer(l, index, typetag<T>());
 			if (!pointer)
 			{
 				throw std::invalid_argument("type mismatch!!");
@@ -307,26 +307,26 @@ namespace kaguya
 			return *pointer;
 		}
 		template<typename T>
-		inline T* get(lua_State* l, int index, type_tag<T*> tag = type_tag<T*>())
+		inline T* get(lua_State* l, int index, typetag<T*> tag = typetag<T*>())
 		{
-			return get_pointer(l, index, type_tag<T>());
+			return get_pointer(l, index, typetag<T>());
 		}
 
-		inline bool get(lua_State* l, int index, type_tag<bool> tag = type_tag<bool>())
+		inline bool get(lua_State* l, int index, typetag<bool> tag = typetag<bool>())
 		{
 			return lua_toboolean(l, index) != 0;
 		}
-		inline float get(lua_State* l, int index, type_tag<float> tag = type_tag<float>())
+		inline float get(lua_State* l, int index, typetag<float> tag = typetag<float>())
 		{
 			return float(lua_tonumber(l, index));
 		}
 
-		inline double get(lua_State* l, int index, type_tag<double> tag = type_tag<double>())
+		inline double get(lua_State* l, int index, typetag<double> tag = typetag<double>())
 		{
 			return lua_tonumber(l, index);
 		}
 
-		inline int64_t get(lua_State* l, int index, type_tag<int64_t> tag = type_tag<int64_t>())
+		inline int64_t get(lua_State* l, int index, typetag<int64_t> tag = typetag<int64_t>())
 		{
 #if LUA_VERSION_NUM >= 503
 			return int64_t(lua_tointeger(l, index));
@@ -334,48 +334,48 @@ namespace kaguya
 			return int64_t(lua_tonumber(l, index));
 #endif
 		}
-		inline unsigned int get(lua_State* l, int index, type_tag<unsigned int> tag = type_tag<unsigned int>())
+		inline unsigned int get(lua_State* l, int index, typetag<unsigned int> tag = typetag<unsigned int>())
 		{
-			return (unsigned int)(get(l, index, type_tag<int64_t>()));
+			return (unsigned int)(get(l, index, typetag<int64_t>()));
 		}
-		inline int get(lua_State* l, int index, type_tag<int> tag = type_tag<int>())
+		inline int get(lua_State* l, int index, typetag<int> tag = typetag<int>())
 		{
-			return int(get(l, index, type_tag<int64_t>()));
+			return int(get(l, index, typetag<int64_t>()));
 		}
-		inline unsigned int get(lua_State* l, int index, type_tag<unsigned short> tag = type_tag<unsigned short>())
+		inline unsigned int get(lua_State* l, int index, typetag<unsigned short> tag = typetag<unsigned short>())
 		{
-			return (unsigned short)(get(l, index, type_tag<int64_t>()));
+			return (unsigned short)(get(l, index, typetag<int64_t>()));
 		}
-		inline int get(lua_State* l, int index, type_tag<short> tag = type_tag<short>())
+		inline int get(lua_State* l, int index, typetag<short> tag = typetag<short>())
 		{
-			return short(get(l, index, type_tag<int64_t>()));
+			return short(get(l, index, typetag<int64_t>()));
 		}
-		inline unsigned int get(lua_State* l, int index, type_tag<unsigned char> tag = type_tag<unsigned char>())
+		inline unsigned int get(lua_State* l, int index, typetag<unsigned char> tag = typetag<unsigned char>())
 		{
-			return (unsigned char)(get(l, index, type_tag<int64_t>()));
+			return (unsigned char)(get(l, index, typetag<int64_t>()));
 		}
-		inline int get(lua_State* l, int index, type_tag<signed char> tag = type_tag<signed char>())
+		inline int get(lua_State* l, int index, typetag<signed char> tag = typetag<signed char>())
 		{
-			return(signed char)(get(l, index, type_tag<int64_t>()));
+			return(signed char)(get(l, index, typetag<int64_t>()));
 		}
 
-		inline const char* get(lua_State* l, int index, type_tag<const char*> tag = type_tag<const char*>())
+		inline const char* get(lua_State* l, int index, typetag<const char*> tag = typetag<const char*>())
 		{
 			return lua_tolstring(l, index, 0);
 		}
-		inline std::string get(lua_State* l, int index, type_tag<std::string> tag = type_tag<std::string>())
+		inline std::string get(lua_State* l, int index, typetag<std::string> tag = typetag<std::string>())
 		{
 			size_t size = 0;
 			const char* buffer = lua_tolstring(l, index, &size);
 			return std::string(buffer, size);
 		}
-		inline std::string get(lua_State* l, int index, type_tag<const std::string&> tag = type_tag<const std::string&>())
+		inline std::string get(lua_State* l, int index, typetag<const std::string&> tag = typetag<const std::string&>())
 		{
-			return get(l, index, type_tag<std::string>());
+			return get(l, index, typetag<std::string>());
 		}
-		inline std::string get(lua_State* l, int index, type_tag<const std::string> tag = type_tag<const std::string>())
+		inline std::string get(lua_State* l, int index, typetag<const std::string> tag = typetag<const std::string>())
 		{
-			return get(l, index, type_tag<std::string>());
+			return get(l, index, typetag<std::string>());
 		}
 
 
@@ -466,7 +466,7 @@ namespace kaguya
 		{
 			void *storage = lua_newuserdata(l, sizeof(T));
 			new(storage) T(v);
-			luaL_setmetatable(l, types::metatable_name<T>().c_str());
+			luaL_setmetatable(l, types::metatableName<T>().c_str());
 			return 1;
 		}
 
@@ -480,48 +480,48 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, T& v)
 		{
-			if (!available_metatable(l, metatable_name<T>().c_str()))
+			if (!available_metatable(l, metatableName<T>().c_str()))
 			{
 				lua_pushlightuserdata(l, &v);
 			}
 			else
 			{
-				typedef meta_pointer_wrapper<T> wrapper_type;
+				typedef MetaPointerWrapper<T> wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(&v);
-				luaL_setmetatable(l, metatable_name<wrapper_type>().c_str());
+				luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
 			}
 			return 1;
 		}
 		template<typename T>
 		inline int push(lua_State* l, T* v)
 		{
-			if (!available_metatable(l, metatable_name<T>().c_str()))
+			if (!available_metatable(l, metatableName<T>().c_str()))
 			{
 				lua_pushlightuserdata(l, v);
 			}
 			else
 			{
-				typedef meta_pointer_wrapper<T> wrapper_type;
+				typedef MetaPointerWrapper<T> wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(v);
-				luaL_setmetatable(l, metatable_name<wrapper_type>().c_str());
+				luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
 			}
 			return 1;
 		}
 		template<typename T>
 		inline int push(lua_State* l, const T* v)
 		{
-			if (!available_metatable(l, metatable_name<T>().c_str()))
+			if (!available_metatable(l, metatableName<T>().c_str()))
 			{
 				lua_pushlightuserdata(l, v);
 			}
 			else
 			{
-				typedef meta_pointer_wrapper<T> wrapper_type;
+				typedef MetaPointerWrapper<T> wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(v);
-				luaL_setmetatable(l, metatable_name<wrapper_type>().c_str());
+				luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
 			}
 			return 1;
 		}

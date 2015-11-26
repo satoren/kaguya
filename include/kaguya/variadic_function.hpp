@@ -12,15 +12,15 @@
 #define KAGUYA_FUNCTOR_METATABLE "functor_kaguya_metatype"
 namespace kaguya
 {
-	typedef const std::vector<LuaRef>& variadic_arg_type;
+	typedef const std::vector<LuaRef>& VariadicArgType;
 	namespace nativefunction
 	{
 		//variadic argment
 		template<typename Ret>
-		struct variadic_arg_caller :baseInvoker {
-			typedef Ret(*func_type)(variadic_arg_type);
+		struct VariadicArgInvoker :BaseInvoker {
+			typedef Ret(*func_type)(VariadicArgType);
 			func_type func_;
-			variadic_arg_caller(func_type fun) :func_(fun) {}
+			VariadicArgInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
@@ -29,23 +29,23 @@ namespace kaguya
 				args.reserve(top + 1);
 				for (int i = 1; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 				Ret r = func_(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
 		};
 		template<typename Ret>
-		baseInvoker* create(Ret(*fun)(variadic_arg_type))
+		BaseInvoker* create(Ret(*fun)(VariadicArgType))
 		{
-			typedef variadic_arg_caller<Ret> caller_type;
+			typedef VariadicArgInvoker<Ret> caller_type;
 			return new caller_type(fun);
 		}
 
-		struct variadic_arg_void_caller :baseInvoker {
-			typedef void(*func_type)(variadic_arg_type);
+		struct VariadicArgVoidInvoker :BaseInvoker {
+			typedef void(*func_type)(VariadicArgType);
 			func_type func_;
-			variadic_arg_void_caller(func_type fun) :func_(fun) {}
+			VariadicArgVoidInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
@@ -54,34 +54,34 @@ namespace kaguya
 				args.reserve(top + 1);
 				for (int i = 1; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 				func_(args);
 				return 0;
 			}
 		};
-		baseInvoker* create(void(*fun)(variadic_arg_type))
+		BaseInvoker* create(void(*fun)(VariadicArgType))
 		{
-			typedef variadic_arg_void_caller caller_type;
+			typedef VariadicArgVoidInvoker caller_type;
 			return new caller_type(fun);
 		}
 
 		template <typename Ret, typename T>
-		struct variadic_arg_mem_function_caller :baseInvoker {
-			typedef Ret(T::*func_type)(variadic_arg_type);
+		struct VariadicArgMemFunInvoker :BaseInvoker {
+			typedef Ret(T::*func_type)(VariadicArgType);
 			func_type func_;
-			variadic_arg_mem_function_caller(func_type fun) :func_(fun) {}
+			VariadicArgMemFunInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
-				T* t = types::get(state, 1, types::type_tag<T*>());
+				T* t = types::get(state, 1, types::typetag<T*>());
 
 				std::vector<LuaRef> args;
 				int top = lua_gettop(state);
 				args.reserve(top);
 				for (int i = 2; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 
 				Ret r = (t->*func_)(args);
@@ -89,28 +89,28 @@ namespace kaguya
 			}
 		};
 		template <typename Ret, typename T>
-		baseInvoker* create(Ret(T::*fun)(variadic_arg_type))
+		BaseInvoker* create(Ret(T::*fun)(VariadicArgType))
 		{
-			typedef variadic_arg_mem_function_caller<Ret, T> caller_type;
+			typedef VariadicArgMemFunInvoker<Ret, T> caller_type;
 			return new caller_type(fun);
 		}
 
 		template <typename T>
-		struct variadic_arg_mem_void_function_caller :baseInvoker {
-			typedef void (T::*func_type)(variadic_arg_type);
+		struct VariadicArgMemVoidFunInvoker :BaseInvoker {
+			typedef void (T::*func_type)(VariadicArgType);
 			func_type func_;
-			variadic_arg_mem_void_function_caller(func_type fun) :func_(fun) {}
+			VariadicArgMemVoidFunInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
-				T* t = types::get(state, 1, types::type_tag<T*>());
+				T* t = types::get(state, 1, types::typetag<T*>());
 
 				std::vector<LuaRef> args;
 				int top = lua_gettop(state);
 				args.reserve(top);
 				for (int i = 2; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 
 				(t->*func_)(args);
@@ -118,29 +118,29 @@ namespace kaguya
 			}
 		};
 		template <typename T>
-		baseInvoker* create(void (T::*fun)(variadic_arg_type))
+		BaseInvoker* create(void (T::*fun)(VariadicArgType))
 		{
-			typedef variadic_arg_mem_void_function_caller<T> caller_type;
+			typedef VariadicArgMemVoidFunInvoker<T> caller_type;
 			return new caller_type(fun);
 		}
 
 
 		template <typename Ret, typename T>
-		struct variadic_arg_const_mem_function_caller :baseInvoker {
-			typedef Ret(T::*func_type)(variadic_arg_type)const;
+		struct VariadicArgConstMemFunInvoker :BaseInvoker {
+			typedef Ret(T::*func_type)(VariadicArgType)const;
 			func_type func_;
-			variadic_arg_const_mem_function_caller(func_type fun) :func_(fun) {}
+			VariadicArgConstMemFunInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
-				T* t = types::get(state, 1, types::type_tag<T*>());
+				T* t = types::get(state, 1, types::typetag<T*>());
 
 				std::vector<LuaRef> args;
 				int top = lua_gettop(state);
 				args.reserve(top-1);
 				for (int i = 2; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 
 				Ret r = (t->*func_)(args);
@@ -148,28 +148,28 @@ namespace kaguya
 			}
 		};
 		template <typename Ret, typename T>
-		baseInvoker* create(Ret(T::*fun)(variadic_arg_type)const)
+		BaseInvoker* create(Ret(T::*fun)(VariadicArgType)const)
 		{
-			typedef variadic_arg_const_mem_function_caller<Ret, T> caller_type;
+			typedef VariadicArgConstMemFunInvoker<Ret, T> caller_type;
 			return new caller_type(fun);
 		}
 
 		template <typename T>
-		struct variadic_arg_const_mem_void_function_caller :baseInvoker {
-			typedef void (T::*func_type)(variadic_arg_type)const;
+		struct VariadicArgConstMemVoidFunInvoker :BaseInvoker {
+			typedef void (T::*func_type)(VariadicArgType)const;
 			func_type func_;
-			variadic_arg_const_mem_void_function_caller(func_type fun) :func_(fun) {}
+			VariadicArgConstMemVoidFunInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
-				T* t = types::get(state, 1, types::type_tag<T*>());
+				T* t = types::get(state, 1, types::typetag<T*>());
 
 				std::vector<LuaRef> args;
 				int top = lua_gettop(state);
 				args.reserve(top-1);
 				for (int i = 2; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 
 				(t->*func_)(args);
@@ -177,18 +177,18 @@ namespace kaguya
 			}
 		};
 		template <typename T>
-		baseInvoker* create(void (T::*fun)(variadic_arg_type)const)
+		BaseInvoker* create(void (T::*fun)(VariadicArgType)const)
 		{
-			typedef variadic_arg_const_mem_void_function_caller<T> caller_type;
+			typedef VariadicArgConstMemVoidFunInvoker<T> caller_type;
 			return new caller_type(fun);
 		}
 
 
 		template<typename Ret>
-		struct variadic_arg_function_caller :baseInvoker {
-			typedef standard::function<Ret(variadic_arg_type)> func_type;
+		struct VariadicArgFunInvoker :BaseInvoker {
+			typedef standard::function<Ret(VariadicArgType)> func_type;
 			func_type func_;
-			variadic_arg_function_caller(func_type fun) :func_(fun) {}
+			VariadicArgFunInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
@@ -197,23 +197,23 @@ namespace kaguya
 				args.reserve(top + 1);
 				for (int i = 1; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 				Ret r = func_(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
 		};
 		template<typename Ret>
-		baseInvoker* create(standard::function<Ret(variadic_arg_type)> fun)
+		BaseInvoker* create(standard::function<Ret(VariadicArgType)> fun)
 		{
-			typedef variadic_arg_function_caller<Ret> caller_type;
+			typedef VariadicArgFunInvoker<Ret> caller_type;
 			return new caller_type(fun);
 		}
 
-		struct variadic_arg_void_function_caller :baseInvoker {
-			typedef standard::function<void(variadic_arg_type)> func_type;
+		struct VariadicArgVoidFunInvoker :BaseInvoker {
+			typedef standard::function<void(VariadicArgType)> func_type;
 			func_type func_;
-			variadic_arg_void_function_caller(func_type fun) :func_(fun) {}
+			VariadicArgVoidFunInvoker(func_type fun) :func_(fun) {}
 			virtual bool checktype(lua_State *state,bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
@@ -222,21 +222,21 @@ namespace kaguya
 				args.reserve(top + 1);
 				for (int i = 1; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 				func_(args);
 				return 0;
 			}
 		};
-		baseInvoker* create(standard::function<void(variadic_arg_type)> fun)
+		BaseInvoker* create(standard::function<void(VariadicArgType)> fun)
 		{
-			typedef variadic_arg_void_function_caller caller_type;
+			typedef VariadicArgVoidFunInvoker caller_type;
 			return new caller_type(fun);
 		}
 
 		template<typename CLASS>
-		struct variadic_constructor_caller :baseInvoker {
-			variadic_constructor_caller() {}
+		struct VariadicArgConstructorInvoker :BaseInvoker {
+			VariadicArgConstructorInvoker() {}
 			virtual bool checktype(lua_State *state, bool) { return true; }
 
 			virtual int invoke(lua_State *state)
@@ -246,11 +246,11 @@ namespace kaguya
 				args.reserve(top + 1);
 				for (int i = 1; i <= top; ++i)
 				{
-					args.push_back(types::get(state, i, types::type_tag<LuaRef>()));
+					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 				}
 				void *storage = lua_newuserdata(state, sizeof(CLASS));
 				types::constructor<CLASS>(storage, args);
-				luaL_setmetatable(state, types::metatable_name<CLASS>().c_str());
+				luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
 				return 1;
 			}
 		};

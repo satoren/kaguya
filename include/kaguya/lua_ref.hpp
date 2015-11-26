@@ -14,20 +14,20 @@ namespace kaguya
 	struct StackTop {};
 
 
-	class table_key_reference;
-	class fun_evaluator;
+	class TableKeyReference;
+	class FunEvaluator;
 	class mem_fun_binder;
 
 
 	class LuaRef
 	{
-		friend class table_key_reference;
+		friend class TableKeyReference;
 		lua_State *state_;
 		int ref_;
 
 		void unref()
 		{
-			if (!is_nilref())
+			if (!isNilref())
 			{
 				luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
 				state_ = 0;
@@ -82,8 +82,9 @@ namespace kaguya
 			types::push(state_, standard::forward<V>(value));
 			lua_settable(state_, -3);
 		}
+
 	public:
-		bool is_nilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
+		bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
 		enum value_type
 		{
 			TYPE_NIL = LUA_TNIL,
@@ -99,7 +100,7 @@ namespace kaguya
 
 		LuaRef(const LuaRef& src) :state_(src.state_)
 		{
-			if (!src.is_nilref())
+			if (!src.isNilref())
 			{
 				src.push();
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
@@ -113,7 +114,7 @@ namespace kaguya
 		{
 			unref();
 			state_ = src.state_;
-			if (!src.is_nilref())
+			if (!src.isNilref())
 			{
 				src.push();
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
@@ -178,15 +179,15 @@ namespace kaguya
 		{
 			if (state_ == 0 || ref_ == LUA_REFNIL)
 			{
-				throw lua_type_mismatch("is nil");
+				throw LuaTypeMismatch("is nil");
 			}
 			utils::ScopedSavedStack save(state_);
 			push();
-			if (!types::check_type(state_, -1, types::type_tag<T>()))
+			if (!types::checkType(state_, -1, types::typetag<T>()))
 			{
-				throw lua_type_mismatch(typeName() + std::string("is not ") + typeid(T).name());
+				throw LuaTypeMismatch(typeName() + std::string("is not ") + typeid(T).name());
 			}
-			return types::get(state_, -1, types::type_tag<T>());
+			return types::get(state_, -1, types::typetag<T>());
 		}
 
 		template<typename T>
@@ -198,10 +199,10 @@ namespace kaguya
 
 		mem_fun_binder operator->*(const char* key);
 
-		table_key_reference operator[](const LuaRef& key);
-		table_key_reference operator[](const char* str);
-		table_key_reference operator[](const std::string& str);
-		table_key_reference operator[](int index);
+		TableKeyReference operator[](const LuaRef& key);
+		TableKeyReference operator[](const char* str);
+		TableKeyReference operator[](const std::string& str);
+		TableKeyReference operator[](int index);
 
 		const LuaRef operator[](const LuaRef& key)const
 		{
@@ -407,12 +408,12 @@ namespace kaguya
 	namespace types
 	{
 		template<>
-		inline bool check_type(lua_State* l, int index, type_tag<LuaRef>)
+		inline bool checkType(lua_State* l, int index, typetag<LuaRef>)
 		{
 			return true;
 		}
 		template<>
-		inline LuaRef get(lua_State* l, int index, type_tag<LuaRef> tag)
+		inline LuaRef get(lua_State* l, int index, typetag<LuaRef> tag)
 		{
 			lua_pushvalue(l, index);
 			return LuaRef(l, StackTop());

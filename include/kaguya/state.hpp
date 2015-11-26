@@ -29,7 +29,7 @@ namespace kaguya
 		}
 		void init()
 		{
-		//	setErrorFunction(&stderror_out);
+			setErrorFunction(&stderror_out);
 			nativefunction::reg_functor_destructor(state_);
 		}
 	public:
@@ -48,11 +48,11 @@ namespace kaguya
 				lua_close(state_);
 			}
 		}
-/*
+
 		void setErrorFunction(standard::function<void(int statuscode,const char*message)> errorfunction)
 		{
 			error_handler_.setFunction(errorfunction);			
-		}*/
+		}
 
 		void openlibs()
 		{
@@ -108,14 +108,14 @@ namespace kaguya
 		{
 			return dostring(str);
 		}
-		table_key_reference operator[](const std::string& str)
+		TableKeyReference operator[](const std::string& str)
 		{
-			return table_key_reference(globalTable(), LuaRef(state_, str));
+			return TableKeyReference(globalTable(), LuaRef(state_, str));
 		}
 
-		table_key_reference operator[](const char* str)
+		TableKeyReference operator[](const char* str)
 		{
-			return table_key_reference(globalTable(),LuaRef(state_, str));
+			return TableKeyReference(globalTable(),LuaRef(state_, str));
 		}
 
 		LuaRef globalTable()

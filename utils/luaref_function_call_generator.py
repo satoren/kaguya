@@ -19,16 +19,16 @@ def generate_fun_args(out,arg_num):
 
 def generate(out,arg_num):
 	generate_template(out,arg_num)
-	out.write('fun_evaluator LuaRef::operator()(')
+	out.write('FunEvaluator LuaRef::operator()(')
 	generate_fun_args(out,arg_num)
 	out.write(')\n')
 	out.write('{\n')
 	out.write('  value_type typ = type();\n')
-	out.write('  if(typ != TYPE_FUNCTION){throw lua_type_mismatch("is not function");}\n')
+	out.write('  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}\n')
 	out.write('  std::vector<LuaRef> args;\n')
 	for i in range (arg_num):
 		out.write('  args.push_back(LuaRef(state_,standard::forward<T' +  str(i+1) + '>(t' + str(i+1) + ')));\n')
-	out.write('  return fun_evaluator(state_,*this,args);\n')
+	out.write('  return FunEvaluator(state_,*this,args);\n')
 	out.write('}\n')
 
 if __name__ == "__main__":

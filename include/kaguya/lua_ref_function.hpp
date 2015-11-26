@@ -13,22 +13,22 @@
 
 namespace kaguya
 {
-	class fun_evaluator
+	class FunEvaluator
 	{
 	public:
-		fun_evaluator(lua_State* state,LuaRef fun, std::vector<LuaRef> args) :state_(state),eval_info_(new eval())
+		FunEvaluator(lua_State* state,LuaRef fun, std::vector<LuaRef> args) :state_(state),eval_info_(new eval())
 		{
 			eval_info_->owner = this;
 			std::swap(eval_info_->fun, fun);
 			std::swap(eval_info_->args, args);
 		}
 
-		fun_evaluator(const fun_evaluator&other):state_(other.state_), eval_info_(other.eval_info_)
+		FunEvaluator(const FunEvaluator&other):state_(other.state_), eval_info_(other.eval_info_)
 		{
 			eval_info_->owner = this;
 		}
 
-		~fun_evaluator()
+		~FunEvaluator()
 		{
 			evaluate(0);
 		}
@@ -84,7 +84,7 @@ namespace kaguya
 				}
 				int result = lua_pcall(state_, eval_info_->args.size(), resultnum, 0);
 
-				except::check_error_and_throw(result, state_);
+				except::checkErrorAndThrow(result, state_);
 				for (int i = 0; i < resultnum; ++i)
 				{
 					eval_info_->results.push_back(LuaRef(state_, StackTop()));
@@ -99,10 +99,10 @@ namespace kaguya
 			std::vector<LuaRef> args;
 			std::vector<LuaRef> results;
 			bool invoked;
-			fun_evaluator* owner;
+			FunEvaluator* owner;
 		};
 
-		fun_evaluator& operator=(const fun_evaluator& src);
+		FunEvaluator& operator=(const FunEvaluator& src);
 
 		lua_State* state_;
 		standard::shared_ptr<eval> eval_info_;

@@ -14,22 +14,22 @@ namespace kaguya
 {
 	namespace nativefunction
 	{
-		struct baseInvoker
+		struct BaseInvoker
 		{
 			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
-			virtual ~baseInvoker() {}
+			virtual ~BaseInvoker() {}
 		};
 
-		typedef standard::shared_ptr<nativefunction::baseInvoker> functor_type;
+		typedef standard::shared_ptr<nativefunction::BaseInvoker> FunctorType;
 
-		inline functor_type* pick_match_function(lua_State *l)
+		inline FunctorType* pick_match_function(lua_State *l)
 		{
 			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 
 			if (overloadnum == 1)
 			{
-				functor_type* fun = static_cast<functor_type*>(lua_touserdata(l, lua_upvalueindex(2)));
+				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(2)));
 				if ((*fun)->checktype(l, false))
 				{
 					return fun;
@@ -39,10 +39,10 @@ namespace kaguya
 					return 0;
 				}
 			}
-			functor_type* weak_match = 0;
+			FunctorType* weak_match = 0;
 			for (int i = 0; i < overloadnum; ++i)
 			{
-				functor_type* fun = static_cast<functor_type*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
+				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
 				if ((*fun)->checktype(l, true))
 				{
 					return fun;
@@ -57,7 +57,7 @@ namespace kaguya
 
 		inline int functor_dispatcher(lua_State *l)
 		{
-			functor_type* fun = pick_match_function(l);
+			FunctorType* fun = pick_match_function(l);
 			if (fun && (*fun))
 			{
 				try {
@@ -72,15 +72,15 @@ namespace kaguya
 					return lua_error(l);
 				}
 			}
-			std::string message = "argment not matched:" + utils::argment_types(l);
+			std::string message = "argment not matched:" + utils::argmentTypes(l);
 			lua_pushstring(l, message.c_str());
 			return lua_error(l);
 		}
 
 		inline int functor_destructor(lua_State *state)
 		{
-			functor_type* f = (functor_type*)luaL_checkudata(state, 1, KAGUYA_FUNCTOR_METATABLE);
-			f->~functor_type();
+			FunctorType* f = (FunctorType*)luaL_checkudata(state, 1, KAGUYA_FUNCTOR_METATABLE);
+			f->~FunctorType();
 			return 0;
 		}
 		inline void reg_functor_destructor(lua_State* state)
@@ -101,24 +101,24 @@ namespace kaguya
 #include "kaguya/gen/native_function.inl"
 
 		template<class ClassType, class MemType>
-		struct mem_data_invoker :baseInvoker {
+		struct MemDataInvoker :BaseInvoker {
 			typedef MemType ClassType::*data_type;
 			data_type data_;
-			mem_data_invoker(data_type data) :data_(data) {}
+			MemDataInvoker(data_type data) :data_(data) {}
 			virtual bool checktype(lua_State *state, bool strictcheck) {
 				if (lua_gettop(state) != 1 && lua_gettop(state) != 2) { return false; }
 				if (getPtr(state) == 0) { return false; }
 				return true;
 			}
 			ClassType* getPtr(lua_State *state) {
-				if (types::check_type(state, 1, types::type_tag<ClassType*>()))
+				if (types::checkType(state, 1, types::typetag<ClassType*>()))
 				{
-					return types::get(state, 1, types::type_tag<ClassType*>());
+					return types::get(state, 1, types::typetag<ClassType*>());
 				}
 
-				if (types::check_type(state, 1, types::type_tag<standard::shared_ptr<ClassType>*>()))
+				if (types::checkType(state, 1, types::typetag<standard::shared_ptr<ClassType>*>()))
 				{
-					standard::shared_ptr<ClassType>* shared_ptr = types::get(state, 1, types::type_tag<standard::shared_ptr<ClassType>*>());
+					standard::shared_ptr<ClassType>* shared_ptr = types::get(state, 1, types::typetag<standard::shared_ptr<ClassType>*>());
 					if (shared_ptr) {
 						return shared_ptr->get();
 					}
@@ -130,62 +130,62 @@ namespace kaguya
 				ClassType* ptr = getPtr(state);
 				if (lua_gettop(state) == 2)
 				{
-					ptr->*data_ = types::get(state, 2, types::type_tag<MemType>());
+					ptr->*data_ = types::get(state, 2, types::typetag<MemType>());
 				}
 
 				return types::push(state, standard::forward<MemType>(ptr->*data_));
 			}
 		};
 		template< class ClassType, class MemType>
-		baseInvoker* create(MemType ClassType::*data)
+		BaseInvoker* create(MemType ClassType::*data)
 		{
-			typedef mem_data_invoker<ClassType, MemType> invoker_type;
+			typedef MemDataInvoker<ClassType, MemType> invoker_type;
 			return new invoker_type(data);
 		}
 
 	}
 
 
-	typedef nativefunction::functor_type function_t;
+	typedef nativefunction::FunctorType FunctorType;
 	template<typename T>
-	inline function_t function(T f)
+	inline FunctorType function(T f)
 	{
-		return function_t(nativefunction::create(standard::forward<T>(f)));
+		return FunctorType(nativefunction::create(standard::forward<T>(f)));
 	}
 
 	namespace types
 	{
 		template<>
-		inline nativefunction::functor_type get(lua_State* l, int index, type_tag<nativefunction::functor_type> tag)
+		inline nativefunction::FunctorType get(lua_State* l, int index, typetag<nativefunction::FunctorType> tag)
 		{
-			return *(static_cast<nativefunction::functor_type*>(luaL_checkudata(l, index, KAGUYA_FUNCTOR_METATABLE)));
+			return *(static_cast<nativefunction::FunctorType*>(luaL_checkudata(l, index, KAGUYA_FUNCTOR_METATABLE)));
 		}
 		template<>
-		inline int push(lua_State* l, const nativefunction::functor_type& f)
+		inline int push(lua_State* l, const nativefunction::FunctorType& f)
 		{
 			lua_pushnumber(l, 1);//no overload
-			void *storage = lua_newuserdata(l, sizeof(nativefunction::functor_type));
-			new(storage) nativefunction::functor_type(f);
+			void *storage = lua_newuserdata(l, sizeof(nativefunction::FunctorType));
+			new(storage) nativefunction::FunctorType(f);
 			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}
 		template<>
-		inline int push(lua_State* l, nativefunction::functor_type& f)
+		inline int push(lua_State* l, nativefunction::FunctorType& f)
 		{
 			lua_pushnumber(l, 1);//no overload
-			void *storage = lua_newuserdata(l, sizeof(nativefunction::functor_type));
-			new(storage) nativefunction::functor_type(f);
+			void *storage = lua_newuserdata(l, sizeof(nativefunction::FunctorType));
+			new(storage) nativefunction::FunctorType(f);
 			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}
 #if KAGUYA_USE_RVALUE_REFERENCE
-		inline int push(lua_State* l, nativefunction::functor_type&& f)
+		inline int push(lua_State* l, nativefunction::FunctorType&& f)
 		{
 			lua_pushnumber(l, 1);//no overload
-			void *storage = lua_newuserdata(l, sizeof(nativefunction::functor_type));
-			new(storage) nativefunction::functor_type(standard::forward<nativefunction::functor_type>(f));
+			void *storage = lua_newuserdata(l, sizeof(nativefunction::FunctorType));
+			new(storage) nativefunction::FunctorType(standard::forward<nativefunction::FunctorType>(f));
 			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
