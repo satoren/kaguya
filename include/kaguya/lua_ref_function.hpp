@@ -75,12 +75,12 @@ namespace kaguya
 			if (eval_info_->owner == this && !eval_info_->invoked)
 			{
 				eval_info_->invoked = true;
-				eval_info_->fun.push();
+				eval_info_->fun.push(state_);
 
 				const std::vector<LuaRef>& args = eval_info_->args;
 				for (size_t i = 0; i < args.size(); ++i)
 				{
-					args[i].push();
+					args[i].push(state_);
 				}
 				int result = lua_pcall(state_, eval_info_->args.size(), resultnum, 0);
 

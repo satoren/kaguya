@@ -72,7 +72,7 @@ namespace kaguya
 				return;
 			}
 			utils::ScopedSavedStack save(state_);
-			push();
+			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE)
 			{
@@ -83,7 +83,23 @@ namespace kaguya
 			lua_settable(state_, -3);
 		}
 
+		static lua_State* toMainThread(lua_State* state)
+		{
+			if (state)
+			{
+				lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
+				lua_State* mainthread = lua_tothread(state, -1);
+				lua_pop(state, 1);
+				if (mainthread)
+				{
+					return mainthread;
+				}
+			}
+			return state;
+		}
 	public:
+
+		struct NoMainCheck {};
 		bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
 		enum value_type
 		{
@@ -102,7 +118,7 @@ namespace kaguya
 		{
 			if (!src.isNilref())
 			{
-				src.push();
+				src.push(state_);
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			else
@@ -116,7 +132,7 @@ namespace kaguya
 			state_ = src.state_;
 			if (!src.isNilref())
 			{
-				src.push();
+				src.push(state_);
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			else
@@ -141,9 +157,15 @@ namespace kaguya
 		LuaRef(lua_State* state) :state_(state), ref_(LUA_REFNIL) {}
 
 
+		LuaRef(lua_State* state, StackTop, NoMainCheck) :state_(state), ref_(LUA_REFNIL)
+		{
+			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+		}
+
 		LuaRef(lua_State* state, StackTop) :state_(state), ref_(LUA_REFNIL)
 		{
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			state_ = toMainThread(state_);
 		}
 
 		void swap(LuaRef& other)throw()
@@ -153,10 +175,17 @@ namespace kaguya
 		}
 
 		template<typename T>
+		LuaRef(lua_State* state, T v, NoMainCheck) : state_(state)
+		{
+			types::push(state_, v);
+			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+		}
+		template<typename T>
 		LuaRef(lua_State* state, T v) : state_(state)
 		{
 			types::push(state_, v);
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			state_ = toMainThread(state_);
 		}
 		~LuaRef()
 		{
@@ -170,8 +199,11 @@ namespace kaguya
 		}
 		void push(lua_State* state)const
 		{
-			assert(state == state_);
-			lua_rawgeti(state_, LUA_REGISTRYINDEX, ref_);
+			if (state != state_)
+			{//state check
+				assert(toMainThread(state) == toMainThread(state_));
+			}
+			lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
 		}
 
 		template<typename T>
@@ -182,7 +214,7 @@ namespace kaguya
 				throw LuaTypeMismatch("is nil");
 			}
 			utils::ScopedSavedStack save(state_);
-			push();
+			push(state_);
 			if (!types::checkType(state_, -1, types::typetag<T>()))
 			{
 				throw LuaTypeMismatch(typeName() + std::string("is not ") + typeid(T).name());
@@ -228,7 +260,7 @@ namespace kaguya
 				return LuaRef();
 			}
 			utils::ScopedSavedStack save(state_);
-			push();
+			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
@@ -236,7 +268,7 @@ namespace kaguya
 			}
 			key.push(state_);
 			lua_gettable(state_, -2);
-			return LuaRef(state_, StackTop());
+			return LuaRef(state_, StackTop(), NoMainCheck());
 		}
 		LuaRef getField(const char* str)const
 		{
@@ -245,7 +277,7 @@ namespace kaguya
 				return LuaRef();
 			}
 			utils::ScopedSavedStack save(state_);
-			push();
+			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
@@ -274,7 +306,7 @@ namespace kaguya
 			}
 			types::push(state_, index);
 			lua_gettable(state_, -2);
-			return LuaRef(state_, StackTop());
+			return LuaRef(state_, StackTop(), NoMainCheck());
 		}
 		template<typename T>
 		void setField(int key, T value)
@@ -306,7 +338,7 @@ namespace kaguya
 			}
 			std::vector<LuaRef> res;
 			utils::ScopedSavedStack save(state_);
-			push();
+			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
@@ -316,9 +348,9 @@ namespace kaguya
 			lua_pushnil(state_);
 			while (lua_next(state_, top) != 0)
 			{
-				LuaRef value(state_, StackTop());
+				LuaRef value(state_, StackTop(), NoMainCheck());
 				lua_pushvalue(state_, -1);//push key to stack for next
-				LuaRef key(state_, StackTop());
+				LuaRef key(state_, StackTop(), NoMainCheck());
 				f(key, value);
 			}
 		}
@@ -348,7 +380,7 @@ namespace kaguya
 				return TYPE_NIL;
 			}
 			utils::ScopedSavedStack save(state_);
-			push();
+			push(state_);
 			return (value_type)lua_type(state_, -1);
 		}
 		std::string typeName()const
@@ -367,7 +399,7 @@ namespace kaguya
 		{
 			utils::ScopedSavedStack save(state_);
 			other.push(state_);
-			push();
+			push(state_);
 			return lua_compare(state_, -1, -2, LUA_OPLT) != 0;
 		}
 		bool operator<=(const LuaRef& other)const

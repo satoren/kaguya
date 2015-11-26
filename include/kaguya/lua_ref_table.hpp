@@ -82,8 +82,8 @@ namespace kaguya
 		void set_meta_table(const Metatable& reg)
 		{
 			utils::ScopedSavedStack save(state_);
-			parent_.push();
-			key_.push();
+			parent_.push(state_);
+			key_.push(state_);
 			reg.registerTable(state_);
 
 			lua_settable(state_, -3);
