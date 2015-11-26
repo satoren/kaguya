@@ -299,10 +299,10 @@ namespace selector_test
 
 			(state["foo"]->*"setBar")("test2");
 			if (foo.bar != "test2") { return false; }
-#if __cplusplus >= 201104L
+#if __cplusplus >= 201103L || defined(__cpp_lambdas)
 			lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
 			if (!state("Foo.bar(\"test\")")) { return false; }
-			return foo.bar != "test";
+			return foo.bar == "test";
 #else
 			return true;
 #endif
