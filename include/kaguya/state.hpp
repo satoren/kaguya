@@ -6,9 +6,9 @@
 
 #include "kaguya/utils.hpp"
 #include "kaguya/metatable.hpp"
-#include "kaguya/selector.hpp"
 #include "kaguya/error_handler.hpp"
 
+#include "kaguya/lua_ref_table.hpp"
 
 namespace kaguya
 {
@@ -29,7 +29,7 @@ namespace kaguya
 		}
 		void init()
 		{
-			setErrorFunction(&stderror_out);
+		//	setErrorFunction(&stderror_out);
 			nativefunction::reg_functor_destructor(state_);
 		}
 	public:
@@ -48,11 +48,11 @@ namespace kaguya
 				lua_close(state_);
 			}
 		}
-
+/*
 		void setErrorFunction(standard::function<void(int statuscode,const char*message)> errorfunction)
 		{
 			error_handler_.setFunction(errorfunction);			
-		}
+		}*/
 
 		void openlibs()
 		{
@@ -108,14 +108,19 @@ namespace kaguya
 		{
 			return dostring(str);
 		}
-		Selector operator[](const std::string& str)
+		table_key_reference operator[](const std::string& str)
 		{
-			return Selector(state_, str,error_handler_);
+			return table_key_reference(globalTable(), LuaRef(state_, str));
 		}
 
-		Selector operator[](const char* str)
+		table_key_reference operator[](const char* str)
 		{
-			return Selector(state_, str,error_handler_);
+			return table_key_reference(globalTable(),LuaRef(state_, str));
+		}
+
+		LuaRef globalTable()
+		{
+			return LuaRef(state_, GlobalTable());
 		}
 
 		void garbage_collect()

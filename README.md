@@ -57,7 +57,9 @@ lua_close(l);//need close
   std::string a_value = state["a"];
   assert(a_value == "test");
   
-  state["tbl"]["value"] = 1;//tbl ={};tbl.value = 1 in lua
+  state["tbl"] = kaguya::NewTable();//tbl ={};
+  state["tbl"]["value"] = 1;//tbl.value = 1 in lua
+  
   state("assert(tbl.value == 1)");
   
 ```

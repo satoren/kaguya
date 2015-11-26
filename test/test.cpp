@@ -39,6 +39,8 @@ namespace selector_test
 		bool bool_set(kaguya::State& state)
 		{
 			state["value"] = true;
+			assert(state["value"] == true);
+			state("print(value)");
 			return state("assert(value == true)");
 		};
 		bool int_set(kaguya::State& state)
@@ -53,6 +55,8 @@ namespace selector_test
 		};
 		bool table_set(kaguya::State& state)
 		{
+			state["value"] = kaguya::NewTable();
+			state["value"]["abc"] = kaguya::NewTable();
 			state["value"]["abc"]["def"] = 7;
 			state["value"]["abc"]["bbb"] = "test";
 			return state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")");
@@ -293,7 +297,7 @@ namespace selector_test
 			state("foo:setBar(\"test\")");
 			if (foo.bar != "test") { return false; }
 
-			state["foo"]["setBar"](kaguya::ThisType() , "test2");
+			(state["foo"]->*"setBar")("test2");
 			if (foo.bar != "test2") { return false; }
 #if __cplusplus >= 201104L
 			lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
@@ -309,8 +313,8 @@ namespace selector_test
 			std::vector<kaguya::LuaRef> args;
 
 			VariFoo() {}
-			VariFoo(kaguya::variadic_arg_type a):args(a){
-			
+			VariFoo(kaguya::variadic_arg_type a) :args(a) {
+
 			}
 
 			void variadic_arg_func(kaguya::variadic_arg_type args)
@@ -349,9 +353,9 @@ namespace selector_test
 		bool multi_return_function_test(kaguya::State& state)
 		{
 			state("multresfun =function() return 1,2,4,8,16 end");
-			int a,b,c,d,e;
-			kaguya::tie(a,b,c,d,e) = state["multresfun"]();
-			if(!(a == 1 && b == 2 && c == 4 && d == 8 && e == 16)){return false; }
+			int a, b, c, d, e;
+			kaguya::tie(a, b, c, d, e) = state["multresfun"]();
+			if (!(a == 1 && b == 2 && c == 4 && d == 8 && e == 16)) { return false; }
 
 			state["multresfun"] = kaguya::function(tuplefun);
 
@@ -362,7 +366,7 @@ namespace selector_test
 
 	namespace t_04_lua_ref
 	{
-		bool multi_return_function_test(kaguya::State& state)
+		bool access(kaguya::State& state)
 		{
 			kaguya::LuaRef ref(state.state(), "abc");
 			if (ref.get<std::string>() != "abc") { return false; }
@@ -370,11 +374,67 @@ namespace selector_test
 			state("abc={d =1,e=3,f=64,g=\"sss\"}");
 			kaguya::LuaRef abctable = state["abc"];
 
-			if (abctable["d"].get<int>() != 1) { return false; }
-			if (abctable["e"].get<int>() != 3) { return false; }
-			if (abctable["f"].get<int>() != 64) { return false; }
-			if (abctable["g"].get<std::string>() != "sss") { return false; }
+			if (abctable["d"] != 1) { return false; }
+			if (abctable["e"] != 3) { return false; }
+			if (abctable["f"] != 64) { return false; }
+			if (abctable["g"] != std::string("sss")) { return false; }
 
+			typedef std::map<kaguya::LuaRef, kaguya::LuaRef> maptype;
+			const maptype& map = abctable.map();
+
+			if (map.size() != 4) { return false; }
+
+			abctable.setField("a", "test");
+			if (abctable["a"] != std::string("test")) { return false; }
+
+			abctable.setField("a", 22);
+			if (abctable["a"] != 22) { return false; }
+
+			return true;
+		}
+		bool newtable(kaguya::State& state)
+		{
+			kaguya::LuaRef ref(state.state(), kaguya::NewTable());
+
+			ref["tbl"] = kaguya::NewTable();
+			kaguya::LuaRef othertable = ref["tbl"];
+
+			if (othertable.map().size() != 0) { return false; }
+			if (othertable.type() != kaguya::LuaRef::TYPE_TABLE) { return false; }
+
+			othertable["foo"] = 3;
+			if (othertable["foo"] != 3) { return false; }
+
+			return true;
+		}
+
+		int free_standing_function()
+		{
+			return 12;
+		}
+
+		bool callfunction(kaguya::State& state)
+		{
+			kaguya::LuaRef globalTable = state.globalTable();
+			globalTable["tbl"] = kaguya::NewTable();
+			kaguya::LuaRef tbl = globalTable["tbl"];
+
+			state("tbl.fun=function() return 1 end");
+			if (tbl.map().size() != 1) { return false; }
+
+			int result = tbl["fun"]();
+			if (result != 1) { return false; }
+
+			state("tbl.value=6");
+			state("tbl.memfun=function(self) return self.value end");
+			result = (tbl->*"memfun")();//==tbl["memfun"](tbl) like tbl:memfun() in Lua
+
+			if (result != 6) { return false; }
+
+			globalTable["free2"] = kaguya::function(&free_standing_function);
+
+			if (state("assert(free2()=12)")) { return false; }
+			;
 			return true;
 		}
 	}
@@ -445,15 +505,17 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::overloaded_constructor);
 		ADD_TEST(selector_test::t_02_classreg::copy_constructor);
 		ADD_TEST(selector_test::t_02_classreg::data_member_bind);
-		ADD_TEST(selector_test::t_02_classreg::operator_bind);		
+		ADD_TEST(selector_test::t_02_classreg::operator_bind);
 
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);
 		ADD_TEST(selector_test::t_03_function::member_function_test);
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
 		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
 
-		ADD_TEST(selector_test::t_04_lua_ref::multi_return_function_test);
-		
+		ADD_TEST(selector_test::t_04_lua_ref::access);
+		ADD_TEST(selector_test::t_04_lua_ref::newtable);
+		ADD_TEST(selector_test::t_04_lua_ref::callfunction);
+
 
 		test_result = execute_test(testmap);
 	}

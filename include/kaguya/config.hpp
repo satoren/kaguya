@@ -28,8 +28,16 @@ extern "C" {
 #include <tuple>
 #include <memory>
 #include <utility>
-
 #endif
+
+#ifndef KAGUYA_USE_RVALUE_REFERENCE
+#if defined(__cpp_rvalue_references ) || defined(_HAS_RVALUE_REFERENCES)
+#define KAGUYA_USE_RVALUE_REFERENCE 1
+#else
+#define KAGUYA_USE_RVALUE_REFERENCE 0
+#endif
+#endif
+
 namespace kaguya
 {
 	namespace standard

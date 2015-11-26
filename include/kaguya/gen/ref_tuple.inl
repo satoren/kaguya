@@ -5,7 +5,8 @@ struct ref_tuple1
   ref_tuple1(T0& va0):v0(va0){}
   T0& v0;
   static const int size=1;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -18,7 +19,8 @@ struct ref_tuple2
   ref_tuple2(T0& va0,T1& va1):v0(va0),v1(va1){}
   T0& v0;  T1& v1;
   static const int size=2;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -32,7 +34,8 @@ struct ref_tuple3
   ref_tuple3(T0& va0,T1& va1,T2& va2):v0(va0),v1(va1),v2(va2){}
   T0& v0;  T1& v1;  T2& v2;
   static const int size=3;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -47,7 +50,8 @@ struct ref_tuple4
   ref_tuple4(T0& va0,T1& va1,T2& va2,T3& va3):v0(va0),v1(va1),v2(va2),v3(va3){}
   T0& v0;  T1& v1;  T2& v2;  T3& v3;
   static const int size=4;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -63,7 +67,8 @@ struct ref_tuple5
   ref_tuple5(T0& va0,T1& va1,T2& va2,T3& va3,T4& va4):v0(va0),v1(va1),v2(va2),v3(va3),v4(va4){}
   T0& v0;  T1& v1;  T2& v2;  T3& v3;  T4& v4;
   static const int size=5;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -80,7 +85,8 @@ struct ref_tuple6
   ref_tuple6(T0& va0,T1& va1,T2& va2,T3& va3,T4& va4,T5& va5):v0(va0),v1(va1),v2(va2),v3(va3),v4(va4),v5(va5){}
   T0& v0;  T1& v1;  T2& v2;  T3& v3;  T4& v4;  T5& v5;
   static const int size=6;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -98,7 +104,8 @@ struct ref_tuple7
   ref_tuple7(T0& va0,T1& va1,T2& va2,T3& va3,T4& va4,T5& va5,T6& va6):v0(va0),v1(va1),v2(va2),v3(va3),v4(va4),v5(va5),v6(va6){}
   T0& v0;  T1& v1;  T2& v2;  T3& v3;  T4& v4;  T5& v5;  T6& v6;
   static const int size=7;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -117,7 +124,8 @@ struct ref_tuple8
   ref_tuple8(T0& va0,T1& va1,T2& va2,T3& va3,T4& va4,T5& va5,T6& va6,T7& va7):v0(va0),v1(va1),v2(va2),v3(va3),v4(va4),v5(va5),v6(va6),v7(va7){}
   T0& v0;  T1& v1;  T2& v2;  T3& v3;  T4& v4;  T5& v5;  T6& v6;  T7& v7;
   static const int size=8;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();
@@ -137,7 +145,8 @@ struct ref_tuple9
   ref_tuple9(T0& va0,T1& va1,T2& va2,T3& va3,T4& va4,T5& va5,T6& va6,T7& va7,T8& va8):v0(va0),v1(va1),v2(va2),v3(va3),v4(va4),v5(va5),v6(va6),v7(va7),v8(va8){}
   T0& v0;  T1& v1;  T2& v2;  T3& v3;  T4& v4;  T5& v5;  T6& v6;  T7& v7;  T8& v8;
   static const int size=9;
-  void operator=(const Evaluator& eval)
+  template<class T>
+  void operator=(const T& eval)
   {
     const std::vector<LuaRef>& res = eval.get_result(size);
     if(0 < res.size())v0 = res[0].get<T0>();

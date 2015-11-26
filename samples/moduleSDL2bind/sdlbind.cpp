@@ -9,8 +9,9 @@
 using namespace kaguya;
 namespace
 {
-	void SetupVideoGl(kaguya::Selector& sdl)
+	void SetupVideoGl(LuaRef& sdl)
 	{
+		sdl["GL"] = NewTable();
 		Selector gl = sdl["GL"];
 
 
@@ -56,7 +57,7 @@ namespace
 		return SDL_LoadBMP_RW(SDL_RWFromFile(file, "rb"), 1);
 	}
 
-	void SetupVideo(kaguya::Selector& sdl)
+	void SetupVideo(LuaRef& sdl)
 	{
 		sdl["CreateWindow"] = function(&SDL_CreateWindow);
 		sdl["DestroyWindow"] = function(&SDL_DestroyWindow);
@@ -104,7 +105,7 @@ namespace
 		SetupVideoGl(sdl);
 	}
 
-	void SetupEvent(kaguya::Selector& sdl)
+	void SetupEvent(LuaRef& sdl)
 	{
 		sdl["Event"].setClass(
 			ClassMetatable<SDL_Event>()
@@ -213,7 +214,7 @@ namespace
 
 #undef REG_SDL_EVENT_ENUM
 	}
-	void SetupInit(kaguya::Selector& sdl)
+	void SetupInit(LuaRef& sdl)
 	{
 		sdl["INIT_TIMER"] = SDL_INIT_TIMER;
 		sdl["INIT_AUDIO"] = SDL_INIT_AUDIO;
@@ -241,7 +242,8 @@ int luaopen_samplesdlbind(lua_State *L)
 {
 	State state(L);
 
-	Selector sdl = state["SDL"];
+    state["SDL"]= NewTable();
+	LuaRef sdl = state["SDL"];
 	SetupInit(sdl);
 	SetupVideo(sdl);
 	SetupEvent(sdl);

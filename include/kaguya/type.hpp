@@ -7,7 +7,8 @@
 
 namespace kaguya
 {
-	struct ThisType {};//for selector
+	struct NewTable {};
+	struct GlobalTable {};
 
 	namespace types
 	{
@@ -29,19 +30,31 @@ namespace kaguya
 			return LUA_TNIL != lua_type(l, -1);
 		}
 
+		//faster but no human readable
+		//struct metatable_name_t
+		//{
+		//	char metaname[16 + sizeof(intptr_t) * 2];//XXXXXXXX(ptrlen*(8/7))_kaguya_type
+		//	const char* c_str()const { return metaname; }
+		//	operator std::string()const { return metaname; }
+		//};
+		//template<typename T>
+		//inline metatable_name_t metatable_name()
+		//{
+		//	metatable_name_t result;
+		//	intptr_t ptrvalue = intptr_t(typeid(T*).name());
+		//	size_t pos =0;
+		//	for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
+		//	{
+		//		result.metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
+		//	}
+		//	memcpy(&result.metaname[pos], "_kaguya_type", strlen("_kaguya_type"));
+		//	result.metaname[pos+ strlen("_kaguya_type")] = '\0';
+		//	return result;
+		//}
+
 		template<typename T>
 		inline std::string metatable_name()
 		{
-			//faster but no human readable
-			//intptr_t ptrvalue = intptr_t(typeid(T*).name());
-			//char metaname[16 + sizeof(intptr_t)*2]="kaguya_type_";
-			//size_t pos = strlen("kaguya_type_");
-			//for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
-			//{
-			//	metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
-			//}
-			//return metaname;
-
 			return typeid(T*).name() + std::string("_kaguya_type");
 		}
 
@@ -365,7 +378,6 @@ namespace kaguya
 			return get(l, index, type_tag<std::string>());
 		}
 
-		struct newtable_tag {};
 
 
 		inline int push(lua_State* l, bool v)
@@ -436,11 +448,18 @@ namespace kaguya
 			lua_pushlstring(l, s.c_str(), s.size());
 			return 1;
 		}
-		inline int push(lua_State* l, newtable_tag)
+		inline int push(lua_State* l, NewTable)
 		{
 			lua_newtable(l);
 			return 1;
 		}
+
+		inline int push(lua_State* l, GlobalTable)
+		{
+			lua_pushglobaltable(l);
+			return 1;
+		}
+
 
 		template<typename T>
 		inline int push(lua_State* l, const T& v)
@@ -451,7 +470,7 @@ namespace kaguya
 			return 1;
 		}
 
-#if defined(_HAS_RVALUE_REFERENCES) || defined(__cpp_rvalue_references)
+#if KAGUYA_USE_RVALUE_REFERENCE
 		inline int push(lua_State* l, std::string&& s)
 		{
 			lua_pushlstring(l, s.data(), s.size());

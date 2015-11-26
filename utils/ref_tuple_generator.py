@@ -23,7 +23,9 @@ def gen_ref_tuple(write,arg_num):
 	gen_args(write,arg_num,"  T#N#& v#N#;","")
 	
 	write("\n  static const int size="+str(arg_num)+";\n")
-	write("  void operator=(const Evaluator& eval)\n  {\n")
+	
+	write("  template<class T>\n")
+	write("  void operator=(const T& eval)\n  {\n")
 	write("    const std::vector<LuaRef>& res = eval.get_result(size);\n")
 	
 	gen_args(write,arg_num,"    if(#N# < res.size())v#N# = res[#N#].get<T#N#>();","\n")

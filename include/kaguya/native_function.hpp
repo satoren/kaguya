@@ -155,10 +155,12 @@ namespace kaguya
 
 	namespace types
 	{
-		inline nativefunction::functor_type& get(lua_State* l, int index, type_tag<nativefunction::functor_type> tag = type_tag<nativefunction::functor_type>())
+		template<>
+		inline nativefunction::functor_type get(lua_State* l, int index, type_tag<nativefunction::functor_type> tag)
 		{
 			return *(static_cast<nativefunction::functor_type*>(luaL_checkudata(l, index, KAGUYA_FUNCTOR_METATABLE)));
 		}
+		template<>
 		inline int push(lua_State* l, const nativefunction::functor_type& f)
 		{
 			lua_pushnumber(l, 1);//no overload
@@ -168,7 +170,17 @@ namespace kaguya
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}
-#if defined(_HAS_RVALUE_REFERENCES) || defined(__cpp_rvalue_references)
+		template<>
+		inline int push(lua_State* l, nativefunction::functor_type& f)
+		{
+			lua_pushnumber(l, 1);//no overload
+			void *storage = lua_newuserdata(l, sizeof(nativefunction::functor_type));
+			new(storage) nativefunction::functor_type(f);
+			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
+			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
+			return 1;
+		}
+#if KAGUYA_USE_RVALUE_REFERENCE
 		inline int push(lua_State* l, nativefunction::functor_type&& f)
 		{
 			lua_pushnumber(l, 1);//no overload
