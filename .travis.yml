@@ -12,7 +12,9 @@ addons:
     packages:
     - liblua5.2-dev
     - libboost-all-dev
-    - g++4.8
+    - gcc-4.8
+    - g++-4.8
+    - cmake
 env:
   - BUILD_TYPE=Release
   - BUILD_TYPE=Debug
