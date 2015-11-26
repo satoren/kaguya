@@ -2,9 +2,8 @@ sudo: false
 language: cpp
 
 compiler:
-  - clang++
-  - g++
-  - g++4.8
+  - clang++-3.7
+  - g++-4.8
 addons:
   apt:
     sources:
@@ -12,11 +11,13 @@ addons:
     packages:
     - liblua5.2-dev
     - libboost-all-dev
-    - gcc-4.8
     - g++-4.8
+    - clang++-3.7
     - cmake
 env:
-  - BUILD_TYPE=Release
-  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release CXX_FLAGS=-std=c++03
+  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++03
+  - BUILD_TYPE=Release CXX_FLAGS=-std=c++11
+  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++11
 script:
-  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && make && ./test_runner
+  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && ./test_runner
