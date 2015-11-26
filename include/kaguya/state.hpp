@@ -60,11 +60,11 @@ namespace kaguya
 			luaL_openlibs(state_);
 		}
 
-		bool loadFile(const std::string& str)
+		bool dofile(const std::string& str)
 		{
-			return loadFile(str.c_str());
+			return dofile(str.c_str());
 		}
-		bool loadFile(const char* file)
+		bool dofile(const char* file)
 		{
 			utils::ScopedSavedStack save(state_);
 
@@ -123,7 +123,7 @@ namespace kaguya
 			return LuaRef(state_, GlobalTable());
 		}
 
-		void garbage_collect()
+		void garbageCollect()
 		{
 			lua_gc(state_, LUA_GCCOLLECT, 0);
 		}

@@ -200,7 +200,7 @@ namespace selector_test
 
 			if (!state("value5 = assert(value:shared_copy())")) { return false; }
 			if (!state("value =1")) { return false; }
-			state.garbage_collect();//value3 and value4 to dangling pointer
+			state.garbageCollect();//warning!! value3 and value4 to dangling pointer
 			if (!state("assert(value5:getString() == \"string_value3\")")) { return false; }
 			if (!state("assert(value5:getInt() == 64)")) { return false; }
 			//if (!state("assert(value3:getString() == \"string_value3\")")) { return false; }
@@ -363,6 +363,26 @@ namespace selector_test
 			state("a,b = multresfun()");
 			return state("assert(a == 12  and b == \"23\")");
 		}
+		bool coroutine(kaguya::State& state)
+		{
+			if (!state("cor = coroutine.create( function()"
+				"coroutine.yield(32) "
+				"coroutine.yield(53) "
+				"return 2 "
+				" end)")) return false;
+
+			if (!state("corfunc =  function()"
+				"  local stat,ret = coroutine.resume( cor ) "
+				"  return ret "
+				" end")) return false;
+			kaguya::LuaRef corfun = state["corfunc"];
+
+			int r1 = corfun();
+			int r2 = corfun();
+			if (!(r1 == 32 && r2 == 53)) return false;
+
+			return true;
+		}
 	}
 
 	namespace t_04_lua_ref
@@ -448,6 +468,7 @@ typedef std::map<std::string, test_function_t> test_function_map_t;
 
 bool execute_test(const test_function_map_t& testmap)
 {
+	bool fail = true;
 	int testcount = testmap.size();
 	int testindex = 1;
 	for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
@@ -458,7 +479,17 @@ bool execute_test(const test_function_map_t& testmap)
 
 		std::cout << test_name << "  (" << testindex << "/" << testcount << ") testing...";
 
-		if (it->second(state))
+		bool result = false;
+		try
+		{
+			result = it->second(state);
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
+
+		if (result)
 		{
 			//test pass
 			int stack_leak = lua_gettop(state.state());
@@ -469,18 +500,18 @@ bool execute_test(const test_function_map_t& testmap)
 			else
 			{
 				std::cout << "stack leaked count=" << stack_leak << std::endl;
-				return false;
+				fail = false;
 			}
 		}
 		else
 		{
 			//test failure
 			std::cout << "failure" << std::endl;
-			return false;
+			fail = false;
 		}
 	}
 
-	return true;
+	return fail;
 }
 
 int main()
@@ -512,6 +543,7 @@ int main()
 		ADD_TEST(selector_test::t_03_function::member_function_test);
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
 		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
+		ADD_TEST(selector_test::t_03_function::coroutine);
 
 		ADD_TEST(selector_test::t_04_lua_ref::access);
 		ADD_TEST(selector_test::t_04_lua_ref::newtable);

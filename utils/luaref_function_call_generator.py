@@ -23,7 +23,8 @@ def generate(out,arg_num):
 	generate_fun_args(out,arg_num)
 	out.write(')\n')
 	out.write('{\n')
-	out.write('if(type() != TYPE_FUNCTION){throw lua_type_mismatch("is not function");}\n')
+	out.write('  value_type typ = type();\n')
+	out.write('  if(typ != TYPE_FUNCTION){throw lua_type_mismatch("is not function");}\n')
 	out.write('  std::vector<LuaRef> args;\n')
 	for i in range (arg_num):
 		out.write('  args.push_back(LuaRef(state_,standard::forward<T' +  str(i+1) + '>(t' + str(i+1) + ')));\n')
