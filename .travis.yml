@@ -2,8 +2,10 @@ sudo: false
 language: cpp
 
 compiler:
-  - clang++-3.7
+  - clang
   - g++-4.8
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
 addons:
   apt:
     sources:
@@ -12,7 +14,6 @@ addons:
     - liblua5.2-dev
     - libboost-all-dev
     - g++-4.8
-    - clang++-3.7
     - cmake
 env:
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++03

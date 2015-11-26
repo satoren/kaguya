@@ -354,6 +354,7 @@ namespace selector_test
 		{
 			state("multresfun =function() return 1,2,4,8,16 end");
 			int a, b, c, d, e;
+			a = b = c = d = e = 0;
 			kaguya::tie(a, b, c, d, e) = state["multresfun"]();
 			if (!(a == 1 && b == 2 && c == 4 && d == 8 && e == 16)) { return false; }
 
