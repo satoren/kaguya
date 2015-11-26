@@ -2,12 +2,17 @@ sudo: false
 language: cpp
 
 compiler:
-  - clang
-  - gcc
+  - clang++
+  - g++
+  - g++4.8
 addons:
   apt:
     packages:
     - liblua5.2-dev
     - libboost-all-dev
+    - g++4.8
+env:
+  - BUILD_TYPE=Release
+  - BUILD_TYPE=Debug
 script:
-  - mkdir build && cd build && cmake ../ && make && ./test_runner
+  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && make && ./test_runner
