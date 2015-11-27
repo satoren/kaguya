@@ -69,6 +69,7 @@ namespace kaguya
 		{
 			if (ref_ == LUA_REFNIL)
 			{
+				except::typeMismatchError(state_, "is nil");
 				return;
 			}
 			utils::ScopedSavedStack save(state_);
@@ -76,6 +77,7 @@ namespace kaguya
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE)
 			{
+				except::typeMismatchError(state_, typeName() + "is not table");
 				return;
 			}
 			types::push(state_, key);
@@ -98,18 +100,18 @@ namespace kaguya
 			return state;
 		}
 	public:
-		int thread_status()
+		int thread_status()const
 		{
 			if (isNilref())
 			{
-				throw LuaTypeMismatch("is nil");
+				except::typeMismatchError(state_, "is nil");
 			}
 			utils::ScopedSavedStack save(state_);
 			lua_State* thread = get<lua_State*>();
 
 			if (!thread)
 			{
-				throw LuaTypeMismatch("is not thread");
+				except::typeMismatchError(state_, "is not thread");
 			}
 			return lua_status(thread);
 		}
@@ -226,13 +228,13 @@ namespace kaguya
 		{
 			if (state_ == 0 || ref_ == LUA_REFNIL)
 			{
-				throw LuaTypeMismatch("is nil");
+				except::typeMismatchError(state_, "is nil");
 			}
 			utils::ScopedSavedStack save(state_);
 			push(state_);
 			if (!types::checkType(state_, -1, types::typetag<T>()))
 			{
-				throw LuaTypeMismatch(typeName() + std::string("is not ") + typeid(T).name());
+				except::typeMismatchError(state_, typeName() + std::string("is not ") + typeid(T).name());
 			}
 			return types::get(state_, -1, types::typetag<T>());
 		}
@@ -241,7 +243,6 @@ namespace kaguya
 		operator T()const {
 			return get<T>();
 		}
-
 #include "kaguya/gen/luaref_fun_def.inl"
 
 		mem_fun_binder operator->*(const char* key);
@@ -272,14 +273,16 @@ namespace kaguya
 		{
 			if (ref_ == LUA_REFNIL)
 			{
-				return LuaRef();
+				except::typeMismatchError(state_, "is nil");
+				return LuaRef(state_);
 			}
 			utils::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
-				return LuaRef();
+				except::typeMismatchError(state_, typeName() + "is not table");
+				return LuaRef(state_);
 			}
 			key.push(state_);
 			lua_gettable(state_, -2);
@@ -289,14 +292,16 @@ namespace kaguya
 		{
 			if (ref_ == LUA_REFNIL)
 			{
-				return LuaRef();
+				except::typeMismatchError(state_, "is nil");
+				return LuaRef(state_);
 			}
 			utils::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
-				return LuaRef();
+				except::typeMismatchError(state_, typeName() + "is not table");
+				return LuaRef(state_);
 			}
 			types::push(state_, str);
 			lua_gettable(state_, -2);
@@ -310,14 +315,16 @@ namespace kaguya
 		{
 			if (ref_ == LUA_REFNIL)
 			{
-				return LuaRef();
+				except::typeMismatchError(state_, "is nil");
+				return LuaRef(state_);
 			}
 			utils::ScopedSavedStack save(state_);
 			push();
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
-				return LuaRef();
+				except::typeMismatchError(state_, typeName() + "is not table");
+				return LuaRef(state_);
 			}
 			types::push(state_, index);
 			lua_gettable(state_, -2);

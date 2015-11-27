@@ -15,11 +15,16 @@ extern "C" {
 #endif
 #endif
 
+#ifndef KAGUYA_ERROR_NO_THROW
+#define KAGUYA_ERROR_NO_THROW 1
+#endif
+
 
 #if KAGUYA_USE_BOOST
 #include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 #if BOOST_VERSION >= 104800
 #include <boost/move/move.hpp>
 #endif
@@ -28,6 +33,7 @@ extern "C" {
 #include <tuple>
 #include <memory>
 #include <utility>
+#include <mutex>
 #endif
 
 #ifndef KAGUYA_USE_RVALUE_REFERENCE
@@ -47,6 +53,8 @@ namespace kaguya
 		using boost::tuple;
 		using boost::shared_ptr;
 		using boost::get;
+		using boost::mutex;
+		using boost::lock_guard;
 #if BOOST_VERSION >= 104800
 		using boost::forward;
 #else
@@ -66,6 +74,8 @@ namespace kaguya
 		using std::to_string;
 		using std::get;
 		using std::forward;
+		using std::mutex;
+		using std::lock_guard;
 #endif
 	}
 

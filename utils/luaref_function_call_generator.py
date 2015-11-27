@@ -24,7 +24,7 @@ def generate(out,arg_num):
 	out.write(')\n')
 	out.write('{\n')
 	out.write('  value_type typ = type();\n')
-	out.write('  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}\n')
+	out.write('  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}\n')
 	out.write('  std::vector<LuaRef> args;\n')
 	for i in range (arg_num):
 		out.write('  args.push_back(LuaRef(state_,standard::forward<T' +  str(i+1) + '>(t' + str(i+1) + ')));\n')

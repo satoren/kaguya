@@ -3,11 +3,13 @@
 #include <exception>
 
 #include "kaguya/utils.hpp"
-
+#include "kaguya/error_handler.hpp"
+#define KAGUYA_
 
 
 namespace kaguya
 {
+#if !KAGUYA_ERROR_NO_THROW
 	class LuaException :public std::exception
 	{
 		int status_;
@@ -55,14 +57,22 @@ namespace kaguya
 	public:
 		LuaSyntaxError(int status, const std::string what) :LuaException(status, what) {}
 	};
-
+#endif
 	namespace except
 	{
-
+		void typeMismatchError(lua_State *state, const std::string& message)
+		{
+#if !KAGUYA_ERROR_NO_THROW
+			throw lua_type_mismatch("is not function");
+#else
+			ErrorHandler::instance().handle(message.c_str(), state);
+#endif
+		}
 		void checkErrorAndThrow(int status, lua_State *state)
 		{
 			if (status != 0)
 			{
+#if !KAGUYA_ERROR_NO_THROW
 				const char* message = 0;
 				switch (status)
 				{
@@ -86,6 +96,9 @@ namespace kaguya
 				default:
 					throw LuaUnknownError(status, "lua unknown error");
 				}
+#else
+				ErrorHandler::instance().handle(status, state);
+#endif
 			}
 		}
 	}

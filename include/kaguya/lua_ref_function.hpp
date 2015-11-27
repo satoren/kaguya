@@ -29,6 +29,11 @@ namespace kaguya
 			}
 		}
 
+		FunEvaluator(lua_State* state) :state_(state), eval_info_()
+		{
+			//error!
+		}
+
 		FunEvaluator(const FunEvaluator&other) :state_(other.state_), eval_info_(other.eval_info_)
 		{
 			eval_info_->owner = this;

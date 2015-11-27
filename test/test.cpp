@@ -490,14 +490,35 @@ namespace selector_test
 
 			globalTable["free2"] = kaguya::function(&free_standing_function);
 
-			if (state("assert(free2()=12)")) { return false; }
+			if (state("assert(free2()==12)")) { return false; }
 			;
 			return true;
 		}
 	}
+
+	namespace t_05_error_handler
+	{
+		int error_count = 0;
+		void error_fun(int status,const char* message)
+		{
+			error_count++;
+		}
+		bool set_error_function(kaguya::State& state)
+		{
+			state.setErrorHandler(error_fun);
+			int a= state("awdorgkwl;gw");
+			if (error_count != 1) { return false; }
+			state["yy"]["yy"]["yy"];
+			return error_count == 3;
+		}
+	}
+
 }
 
-
+void test_error_hanndler(int status, const char* message)
+{
+	throw std::runtime_error(std::string(message));
+}
 
 typedef bool(*test_function_t)(kaguya::State&);
 typedef std::map<std::string, test_function_t> test_function_map_t;
@@ -510,6 +531,8 @@ bool execute_test(const test_function_map_t& testmap)
 	for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
 	{
 		kaguya::State state; state.openlibs();
+
+		state.setErrorHandler(test_error_hanndler);
 
 		const std::string& test_name = it->first;
 
@@ -547,7 +570,7 @@ bool execute_test(const test_function_map_t& testmap)
 		}
 	}
 
-	return fail;
+	return !fail;
 }
 
 int main()
@@ -585,6 +608,7 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::newtable);
 		ADD_TEST(selector_test::t_04_lua_ref::callfunction);
 
+		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 
 		test_result = execute_test(testmap);
 	}

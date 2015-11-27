@@ -16,9 +16,7 @@ namespace kaguya
 	{
 		lua_State *state_;
 		bool created_;
-
-		ErrorHandler error_handler_;
-
+		
 		//non copyable
 		State(const State&);
 		State& operator =(const State&);
@@ -29,7 +27,7 @@ namespace kaguya
 		}
 		void init()
 		{
-			setErrorFunction(&stderror_out);
+			setErrorHandler(&stderror_out);
 			nativefunction::reg_functor_destructor(state_);
 		}
 	public:
@@ -49,9 +47,31 @@ namespace kaguya
 			}
 		}
 
-		void setErrorFunction(standard::function<void(int statuscode,const char*message)> errorfunction)
+
+		static int error_handler_cleanner(lua_State *state)
 		{
-			error_handler_.setFunction(errorfunction);			
+			ErrorHandler::instance().unregisterHandler(state);
+			return 0;
+		}
+
+		void setErrorHandler(standard::function<void(int statuscode,const char*message)> errorfunction)
+		{
+			utils::ScopedSavedStack save(state_);
+			ErrorHandler::instance().registerHandler(state_, errorfunction);
+
+			luaL_getmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
+			int result = lua_type(state_, -1);
+			lua_pop(state_, 1);
+			if (result != LUA_TTABLE)//not registered cleaner
+			{
+				luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
+				lua_pushcclosure(state_, &error_handler_cleanner, 0);
+				lua_setfield(state_, -2, "__gc");
+				lua_setfield(state_, -1, "__index");
+				lua_newtable(state_);
+				luaL_setmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
+				luaL_ref(state_, LUA_REGISTRYINDEX);
+			}
 		}
 
 		void openlibs()
@@ -72,13 +92,13 @@ namespace kaguya
 
 			if (status)
 			{
-				error_handler_.handle(status, state_);
+				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
 			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
 			{
-				error_handler_.handle(status, state_);
+				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
 			return true;
@@ -87,12 +107,16 @@ namespace kaguya
 		bool dostring(const char* str)
 		{
 			utils::ScopedSavedStack save(state_);
-			int status = luaL_dostring(state_, str);
+
+			int status = luaL_loadstring(state_, str);
+
+			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
 			{
-				error_handler_.handle(status, state_);
+				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
+			status = luaL_dostring(state_, str);
 			return true;
 		}
 		bool dostring(const std::string& str)
