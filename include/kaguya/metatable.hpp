@@ -57,14 +57,21 @@ namespace kaguya
 
 		void registerTable(lua_State* state)const
 		{
-			luaL_newmetatable(state, metatableName_.c_str());
-			if (!parent_metatableName_.empty())
+			if (luaL_newmetatable(state, metatableName_.c_str()))
 			{
-				luaL_setmetatable(state, parent_metatableName_.c_str());
+				registerFunctions(state);
+				lua_pushvalue(state, -1);
+				lua_setfield(state, -1, "__index");
+				
+				if (!parent_metatableName_.empty())
+				{
+					luaL_setmetatable(state, parent_metatableName_.c_str());
+				}
 			}
-			registerFunctions(state);
-			lua_pushvalue(state, -1);
-			lua_setfield(state, -1, "__index");
+			else
+			{
+				except::OtherError(state, metatableName_ + " is already registered");
+			}
 		}
 	protected:
 		void registerFunction(lua_State* state,const char* name, const FuncArrayType& func_array)const

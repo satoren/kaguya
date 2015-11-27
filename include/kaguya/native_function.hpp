@@ -86,13 +86,8 @@ namespace kaguya
 		}
 		inline void reg_functor_destructor(lua_State* state)
 		{
-			luaL_getmetatable(state, KAGUYA_FUNCTOR_METATABLE);
-
-			int result = lua_type(state, -1);
-			lua_pop(state, 1);
-			if (result == LUA_TNIL)
+			if (luaL_newmetatable(state, KAGUYA_FUNCTOR_METATABLE))
 			{
-				luaL_newmetatable(state, KAGUYA_FUNCTOR_METATABLE);
 				lua_pushcclosure(state, &functor_destructor, 0);
 				lua_setfield(state, -2, "__gc");
 				lua_setfield(state, -1, "__index");

@@ -9,7 +9,6 @@
 #include "kaguya/lua_ref.hpp"
 
 
-#define KAGUYA_FUNCTOR_METATABLE "functor_kaguya_metatype"
 namespace kaguya
 {
 	typedef const std::vector<LuaRef>& VariadicArgType;

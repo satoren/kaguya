@@ -59,12 +59,8 @@ namespace kaguya
 			utils::ScopedSavedStack save(state_);
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
 
-			luaL_getmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
-			int result = lua_type(state_, -1);
-			lua_pop(state_, 1);
-			if (result != LUA_TTABLE)//not registered cleaner
+			if (luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE))
 			{
-				luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
 				lua_pushcclosure(state_, &error_handler_cleanner, 0);
 				lua_setfield(state_, -2, "__gc");
 				lua_setfield(state_, -1, "__index");

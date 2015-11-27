@@ -40,7 +40,6 @@ namespace selector_test
 		{
 			state["value"] = true;
 			assert(state["value"] == true);
-			state("print(value)");
 			return state("assert(value == true)");
 		};
 		bool int_set(kaguya::State& state)
@@ -406,7 +405,7 @@ namespace selector_test
 					"end "
 					"end")) return false;
 				kaguya::LuaRef corfun = state["corfun"];
-				cor2(corfun,10);
+				cor2(corfun, 10);
 				int yieldnum = 0;
 				while (cor2.thread_status() == LUA_YIELD)
 				{
@@ -499,14 +498,14 @@ namespace selector_test
 	namespace t_05_error_handler
 	{
 		int error_count = 0;
-		void error_fun(int status,const char* message)
+		void error_fun(int status, const char* message)
 		{
 			error_count++;
 		}
 		bool set_error_function(kaguya::State& state)
 		{
 			state.setErrorHandler(error_fun);
-			int a= state("awdorgkwl;gw");
+			int a = state("awdorgkwl;gw");
 			if (error_count != 1) { return false; }
 			state["yy"]["yy"]["yy"];
 			return error_count == 3;
@@ -515,7 +514,7 @@ namespace selector_test
 
 }
 
-void test_error_hanndler(int status, const char* message)
+void test_error_handler(int status, const char* message)
 {
 	throw std::runtime_error(std::string(message));
 }
@@ -532,7 +531,7 @@ bool execute_test(const test_function_map_t& testmap)
 	{
 		kaguya::State state; state.openlibs();
 
-		state.setErrorHandler(test_error_hanndler);
+		state.setErrorHandler(test_error_handler);
 
 		const std::string& test_name = it->first;
 
@@ -567,6 +566,29 @@ bool execute_test(const test_function_map_t& testmap)
 			//test failure
 			std::cout << "failure" << std::endl;
 			fail = true;
+		}
+	}
+
+	return !fail;
+}
+
+void ignore_error_handler(int status, const char* message)
+{
+}
+bool microbenchmark(const test_function_map_t& testmap)
+{
+	bool fail = false;
+	int testcount = testmap.size();
+	int testindex = 1;
+
+	kaguya::State state; state.openlibs();
+	state.setErrorHandler(ignore_error_handler);
+	for (int i = 0; i < 10000; ++i)
+	{
+		for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
+		{
+			bool result = false;
+			result = it->second(state);
 		}
 	}
 
@@ -611,6 +633,8 @@ int main()
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 
 		test_result = execute_test(testmap);
+
+//		microbenchmark(testmap);
 	}
 	return test_result ? 0 : -1;
 }

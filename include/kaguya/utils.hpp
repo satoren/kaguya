@@ -70,7 +70,13 @@ namespace kaguya
 				case LUA_TNUMBER:  /* numbers */
 					printf("%g", lua_tonumber(L, i));
 					break;
-
+				case LUA_TUSERDATA:
+					if (luaL_getmetafield(L, i, "__name") == LUA_TSTRING)
+					{
+						printf("userdata:%s",lua_tostring(L, -1));
+						lua_pop(L, 1);
+						break;
+					}
 				default:  /* other values */
 					printf("%s", lua_typename(L, t));
 					break;
