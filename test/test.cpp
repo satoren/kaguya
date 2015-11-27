@@ -490,7 +490,7 @@ namespace selector_test
 
 			globalTable["free2"] = kaguya::function(&free_standing_function);
 
-			if (state("assert(free2()==12)")) { return false; }
+			if (!state("assert(free2()==12)")) { return false; }
 			;
 			return true;
 		}
@@ -525,7 +525,7 @@ typedef std::map<std::string, test_function_t> test_function_map_t;
 
 bool execute_test(const test_function_map_t& testmap)
 {
-	bool fail = true;
+	bool fail = false;
 	int testcount = testmap.size();
 	int testindex = 1;
 	for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
@@ -559,14 +559,14 @@ bool execute_test(const test_function_map_t& testmap)
 			else
 			{
 				std::cout << "stack leaked count=" << stack_leak << std::endl;
-				fail = false;
+				fail = true;
 			}
 		}
 		else
 		{
 			//test failure
 			std::cout << "failure" << std::endl;
-			fail = false;
+			fail = true;
 		}
 	}
 

@@ -109,6 +109,11 @@ namespace kaguya
 			utils::ScopedSavedStack save(state_);
 
 			int status = luaL_loadstring(state_, str);
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state_);
+				return false;
+			}
 
 			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
@@ -116,7 +121,6 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
-			status = luaL_dostring(state_, str);
 			return true;
 		}
 		bool dostring(const std::string& str)
