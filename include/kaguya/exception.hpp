@@ -51,6 +51,11 @@ namespace kaguya
 		LuaTypeMismatch(const std::string what) :LuaException(0, what) {}
 	};
 
+	class LuaSyntaxError :public LuaException {
+	public:
+		LuaSyntaxError(const std::string what) :LuaException(0, what) {}
+	};
+
 	namespace except
 	{
 
@@ -64,17 +69,20 @@ namespace kaguya
 				case LUA_OK:
 				case LUA_YIELD:
 					return;
+				case LUA_ERRSYNTAX:
+					message = lua_tostring(state, -1);
+					throw LuaRuntimeError(status, message ? std::string(message) : "unknown syntax error");
 				case LUA_ERRRUN:
 					message = lua_tostring(state, -1);
-					throw LuaRuntimeError(status, message ? message : "");
+					throw LuaRuntimeError(status, message ? std::string(message) : "unknown runtime error");
 				case LUA_ERRMEM:
 					throw LuaMemoryError(status, "lua memory allocation error");
 				case LUA_ERRERR:
 					message = lua_tostring(state, -1);
-					throw LuaRunningError(status, std::string(message ? message : ""));
+					throw LuaRunningError(status, message ? std::string(message) : "unknown error");
 				case LUA_ERRGCMM:
 					message = lua_tostring(state, -1);
-					throw LuaGCError(status, std::string(message? message:""));
+					throw LuaGCError(status, message ? std::string(message) : "unknown gc error");
 				default:
 					throw LuaUnknownError(status, "lua unknown error");
 				}

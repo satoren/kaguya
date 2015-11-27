@@ -396,6 +396,27 @@ namespace selector_test
 
 				if (!(r1 == 3 && r2 == 6 && r3 == 9 && r4 == 12)) return false;
 			}
+			{
+
+				state["cor2"] = kaguya::NewThread();
+				kaguya::LuaRef cor2 = state["cor2"];
+				if (!state("corfun = function(arg)"
+					"for i = 1,arg do "
+					"coroutine.yield() "
+					"end "
+					"end")) return false;
+				kaguya::LuaRef corfun = state["corfun"];
+				cor2(corfun,10);
+				int yieldnum = 0;
+				while (cor2.thread_status() == LUA_YIELD)
+				{
+					cor2();
+					yieldnum++;
+				}
+
+				if (!(yieldnum == 10)) return false;
+			}
+
 			return true;
 		}
 	}

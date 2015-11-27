@@ -98,6 +98,21 @@ namespace kaguya
 			return state;
 		}
 	public:
+		int thread_status()
+		{
+			if (isNilref())
+			{
+				throw LuaTypeMismatch("is nil");
+			}
+			utils::ScopedSavedStack save(state_);
+			lua_State* thread = get<lua_State*>();
+
+			if (!thread)
+			{
+				throw LuaTypeMismatch("is not thread");
+			}
+			return lua_status(thread);
+		}
 
 		struct NoMainCheck {};
 		bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
