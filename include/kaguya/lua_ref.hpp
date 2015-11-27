@@ -111,7 +111,7 @@ namespace kaguya
 			TYPE_TABLE = LUA_TTABLE,
 			TYPE_FUNCTION = LUA_TFUNCTION,
 			TYPE_USERDATA = LUA_TUSERDATA,
-			TYPE_TTHREAD = LUA_TTHREAD,
+			TYPE_THREAD = LUA_TTHREAD,
 		};
 
 		LuaRef(const LuaRef& src) :state_(src.state_)

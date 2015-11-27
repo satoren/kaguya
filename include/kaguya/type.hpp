@@ -8,6 +8,7 @@
 namespace kaguya
 {
 	struct NewTable {};
+	struct NewThread {};
 	struct GlobalTable {};
 
 	namespace types
@@ -312,6 +313,13 @@ namespace kaguya
 			return get_pointer(l, index, typetag<T>());
 		}
 
+
+		inline lua_State* get(lua_State* l, int index, typetag<lua_State> tag = typetag<lua_State>())
+		{
+			return lua_tothread(l, index);
+		}
+
+
 		inline bool get(lua_State* l, int index, typetag<bool> tag = typetag<bool>())
 		{
 			return lua_toboolean(l, index) != 0;
@@ -453,6 +461,13 @@ namespace kaguya
 			lua_newtable(l);
 			return 1;
 		}
+
+		inline int push(lua_State* l, NewThread)
+		{
+			lua_newthread(l);
+			return 1;
+		}
+		
 
 		inline int push(lua_State* l, GlobalTable)
 		{

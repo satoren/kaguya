@@ -2,7 +2,7 @@
 FunEvaluator LuaRef::operator()()
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   return FunEvaluator(state_,*this,args);
 }
@@ -10,7 +10,7 @@ template<typename T1>
 FunEvaluator LuaRef::operator()(T1 t1)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   return FunEvaluator(state_,*this,args);
@@ -19,7 +19,7 @@ template<typename T1,typename T2>
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -29,7 +29,7 @@ template<typename T1,typename T2,typename T3>
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -40,7 +40,7 @@ template<typename T1,typename T2,typename T3,typename T4>
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -52,7 +52,7 @@ template<typename T1,typename T2,typename T3,typename T4,typename T5>
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -65,7 +65,7 @@ template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -79,7 +79,7 @@ template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -94,7 +94,7 @@ template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));
@@ -110,7 +110,7 @@ template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6
 FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8,T9 t9)
 {
   value_type typ = type();
-  if(typ != TYPE_FUNCTION){throw LuaTypeMismatch("is not function");}
+  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){throw LuaTypeMismatch("is not function");}
   std::vector<LuaRef> args;
   args.push_back(LuaRef(state_,standard::forward<T1>(t1)));
   args.push_back(LuaRef(state_,standard::forward<T2>(t2)));

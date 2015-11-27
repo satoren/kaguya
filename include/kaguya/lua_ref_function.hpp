@@ -16,14 +16,20 @@ namespace kaguya
 	class FunEvaluator
 	{
 	public:
-		FunEvaluator(lua_State* state,LuaRef fun, std::vector<LuaRef> args) :state_(state),eval_info_(new eval())
+		FunEvaluator(lua_State* state, LuaRef fun, std::vector<LuaRef> args) :state_(state), eval_info_(new eval())
 		{
 			eval_info_->owner = this;
 			std::swap(eval_info_->fun, fun);
 			std::swap(eval_info_->args, args);
+
+			if (eval_info_->fun.type() == LuaRef::TYPE_THREAD)
+			{
+				state_ = eval_info_->fun.get<lua_State*>();//get coroutine thread
+				eval_info_->coroutine = true;
+			}
 		}
 
-		FunEvaluator(const FunEvaluator&other):state_(other.state_), eval_info_(other.eval_info_)
+		FunEvaluator(const FunEvaluator&other) :state_(other.state_), eval_info_(other.eval_info_)
 		{
 			eval_info_->owner = this;
 		}
@@ -62,7 +68,7 @@ namespace kaguya
 			return !((*this) == v);
 		}
 		bool operator == (const char* v)const { return get<std::string>() == v; }
-		
+
 		const std::vector<LuaRef>& get_result(int result_count)const
 		{
 			evaluate(result_count);
@@ -75,30 +81,49 @@ namespace kaguya
 			if (eval_info_->owner == this && !eval_info_->invoked)
 			{
 				eval_info_->invoked = true;
-				eval_info_->fun.push(state_);
-
 				const std::vector<LuaRef>& args = eval_info_->args;
-				for (size_t i = 0; i < args.size(); ++i)
+				if (eval_info_->coroutine)
 				{
-					args[i].push(state_);
+					for (size_t i = 0; i < args.size(); ++i)
+					{
+						args[i].push(state_);
+					}
+					int result = lua_resume(state_, 0, args.size()? args.size()-1:0);
+					except::checkErrorAndThrow(result, state_);
+					for (int i = 0; i < resultnum; ++i)
+					{
+						eval_info_->results.push_back(LuaRef(state_, StackTop()));
+					}
+					std::reverse(eval_info_->results.begin(), eval_info_->results.end());
 				}
-				int result = lua_pcall(state_, eval_info_->args.size(), resultnum, 0);
+				else
+				{
+					eval_info_->fun.push(state_);
 
-				except::checkErrorAndThrow(result, state_);
-				for (int i = 0; i < resultnum; ++i)
-				{
-					eval_info_->results.push_back(LuaRef(state_, StackTop()));
+					for (size_t i = 0; i < args.size(); ++i)
+					{
+						args[i].push(state_);
+					}
+					int result = lua_pcall(state_, eval_info_->args.size(), resultnum, 0);
+
+					except::checkErrorAndThrow(result, state_);
+					for (int i = 0; i < resultnum; ++i)
+					{
+						eval_info_->results.push_back(LuaRef(state_, StackTop()));
+					}
+					std::reverse(eval_info_->results.begin(), eval_info_->results.end());
 				}
-				std::reverse(eval_info_->results.begin(), eval_info_->results.end());
 			}
 		}
 
 		struct eval
 		{
+			eval() :invoked(false), coroutine(false) {}
 			LuaRef fun;
 			std::vector<LuaRef> args;
 			std::vector<LuaRef> results;
 			bool invoked;
+			bool coroutine;
 			FunEvaluator* owner;
 		};
 
@@ -113,7 +138,7 @@ namespace kaguya
 	{
 	public:
 		template<class T>
-		mem_fun_binder(LuaRef self,T key)
+		mem_fun_binder(LuaRef self, T key)
 		{
 			std::swap(self, self_);
 			fun_ = self_.getField(key);
@@ -127,7 +152,7 @@ namespace kaguya
 
 	mem_fun_binder LuaRef::operator->*(const char* key)
 	{
-		return mem_fun_binder(*this,key);
+		return mem_fun_binder(*this, key);
 	}
 }
 //#include "kaguya/metatable.hpp"

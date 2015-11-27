@@ -58,18 +58,23 @@ namespace kaguya
 		{
 			if (status != 0)
 			{
+				const char* message=0;
 				switch (status)
 				{
 				case LUA_OK:
+				case LUA_YIELD:
 					return;
 				case LUA_ERRRUN:
-					throw LuaRuntimeError(status, std::string(lua_tostring(state, -1)));
+					message = lua_tostring(state, -1);
+					throw LuaRuntimeError(status, message ? message : "");
 				case LUA_ERRMEM:
 					throw LuaMemoryError(status, "lua memory allocation error");
 				case LUA_ERRERR:
-					throw LuaRunningError(status, std::string(lua_tostring(state, -1)));
+					message = lua_tostring(state, -1);
+					throw LuaRunningError(status, std::string(message ? message : ""));
 				case LUA_ERRGCMM:
-					throw LuaGCError(status, std::string(lua_tostring(state, -1)));
+					message = lua_tostring(state, -1);
+					throw LuaGCError(status, std::string(message? message:""));
 				default:
 					throw LuaUnknownError(status, "lua unknown error");
 				}

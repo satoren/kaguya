@@ -365,22 +365,37 @@ namespace selector_test
 		}
 		bool coroutine(kaguya::State& state)
 		{
-			if (!state("cor = coroutine.create( function()"
-				"coroutine.yield(32) "
-				"coroutine.yield(53) "
-				"return 2 "
-				" end)")) return false;
+			{
+				if (!state("cor = coroutine.create( function()"
+					"coroutine.yield(32) "
+					"coroutine.yield(53) "
+					"return 2 "
+					" end)")) return false;
 
-			if (!state("corfunc =  function()"
-				"  local stat,ret = coroutine.resume( cor ) "
-				"  return ret "
-				" end")) return false;
-			kaguya::LuaRef corfun = state["corfunc"];
+				kaguya::LuaRef cor = state["cor"];
+				int r1 = cor();
+				int r2 = cor();
+				int r3 = cor();
+				if (!(r1 == 32 && r2 == 53 && r3 == 2)) return false;
+			}
+			{
+				state["cor2"] = kaguya::NewThread();
+				kaguya::LuaRef cor2 = state["cor2"];
+				if (!state("corfun = function(arg)"
+					"coroutine.yield(arg) "
+					"coroutine.yield(arg*2) "
+					"coroutine.yield(arg*3) "
+					"return arg*4 "
+					" end")) return false;
 
-			int r1 = corfun();
-			int r2 = corfun();
-			if (!(r1 == 32 && r2 == 53)) return false;
+				kaguya::LuaRef corfun = state["corfun"];
+				int r1 = cor2(corfun, 3);
+				int r2 = cor2();
+				int r3 = cor2();
+				int r4 = cor2();
 
+				if (!(r1 == 3 && r2 == 6 && r3 == 9 && r4 == 12)) return false;
+			}
 			return true;
 		}
 	}
