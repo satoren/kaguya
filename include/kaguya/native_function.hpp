@@ -66,15 +66,16 @@ namespace kaguya
 				}
 				catch (std::exception & e) {
 					lua_pushstring(l, e.what());
-					return lua_error(l);
 				}
 				catch (...) {
 					lua_pushliteral(l, "Unknown exception");
-					return lua_error(l);
 				}
 			}
-			std::string message = "argment not matched:" + utils::argmentTypes(l);
-			lua_pushstring(l, message.c_str());
+			else
+			{
+				std::string message = "argment not matched:" + utils::argmentTypes(l);
+				lua_pushstring(l, message.c_str());
+			}
 			return lua_error(l);
 		}
 
