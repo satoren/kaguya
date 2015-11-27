@@ -16,10 +16,10 @@ namespace kaguya
 	public:
 		LuaException(int status, const char* what)throw() :status_(status), what_c_(what) {}
 		LuaException(int status, const std::string what) :status_(status), what_(what), what_c_(0) {}
-		int status()const throw(){ return status_; }
+		int status()const throw() { return status_; }
 		const char* what() const throw() { return what_c_ ? what_c_ : what_.c_str(); }
 
-		~LuaException()throw(){}
+		~LuaException()throw() {}
 	};
 	class LuaRuntimeError :public LuaException {
 	public:
@@ -53,7 +53,7 @@ namespace kaguya
 
 	class LuaSyntaxError :public LuaException {
 	public:
-		LuaSyntaxError(const std::string what) :LuaException(0, what) {}
+		LuaSyntaxError(int status, const std::string what) :LuaException(status, what) {}
 	};
 
 	namespace except
@@ -63,7 +63,7 @@ namespace kaguya
 		{
 			if (status != 0)
 			{
-				const char* message=0;
+				const char* message = 0;
 				switch (status)
 				{
 				case LUA_OK:
@@ -71,7 +71,7 @@ namespace kaguya
 					return;
 				case LUA_ERRSYNTAX:
 					message = lua_tostring(state, -1);
-					throw LuaRuntimeError(status, message ? std::string(message) : "unknown syntax error");
+					throw LuaSyntaxError(status, message ? std::string(message) : "unknown syntax error");
 				case LUA_ERRRUN:
 					message = lua_tostring(state, -1);
 					throw LuaRuntimeError(status, message ? std::string(message) : "unknown runtime error");
