@@ -80,8 +80,10 @@ namespace kaguya
 				except::typeMismatchError(state_, typeName() + "is not table");
 				return;
 			}
-			types::push(state_, key);
-			types::push(state_, standard::forward<V>(value));
+			int kc = types::push(state_, key);
+			int vc = types::push(state_, standard::forward<V>(value));
+
+			if (!pushCountCheck<K>(kc) || !pushCountCheck<V>(vc)) { return; }
 			lua_settable(state_, -3);
 		}
 
@@ -98,6 +100,18 @@ namespace kaguya
 				}
 			}
 			return state;
+		}
+
+		template<typename T>
+		bool pushCountCheck(int count)
+		{
+			if (count != 1)
+			{
+				if (count > 1) { except::typeMismatchError(state_, std::string("can not push multiple value:") + typeid(T).name()); }
+				if (count == 0) { except::typeMismatchError(state_, std::string("can not push ") + typeid(T).name() + " value"); }
+				return false;
+			}
+			return true;
 		}
 	public:
 		int thread_status()const
@@ -194,13 +208,17 @@ namespace kaguya
 		template<typename T>
 		LuaRef(lua_State* state, T v, NoMainCheck) : state_(state)
 		{
-			types::push(state_, v);
+			util::ScopedSavedStack save(state_);
+			int vc = types::push(state_, v);
+			if (!pushCountCheck<T>(vc)) { return; }
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 		}
 		template<typename T>
 		LuaRef(lua_State* state, T v) : state_(state)
 		{
-			types::push(state_, v);
+			util::ScopedSavedStack save(state_);
+			int vc = types::push(state_, v);
+			if (!pushCountCheck<T>(vc)) { return; }
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			state_ = toMainThread(state_);
 		}
