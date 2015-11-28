@@ -4,7 +4,7 @@
 
 #include "kaguya/config.hpp"
 
-#include "kaguya/utils.hpp"
+#include "kaguya/utility.hpp"
 #include "kaguya/metatable.hpp"
 #include "kaguya/error_handler.hpp"
 
@@ -56,7 +56,7 @@ namespace kaguya
 
 		void setErrorHandler(standard::function<void(int statuscode,const char*message)> errorfunction)
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
 
 			if (luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE))
@@ -72,7 +72,7 @@ namespace kaguya
 
 		void openlibs()
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			luaL_openlibs(state_);
 		}
 
@@ -82,7 +82,7 @@ namespace kaguya
 		}
 		bool dofile(const char* file)
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 
 			int status = luaL_loadfile(state_, file);
 
@@ -102,7 +102,7 @@ namespace kaguya
 
 		bool dostring(const char* str)
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 
 			int status = luaL_loadstring(state_, str);
 			if (status)

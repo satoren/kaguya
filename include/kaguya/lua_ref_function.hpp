@@ -8,7 +8,7 @@
 #include "kaguya/lua_ref.hpp"
 #include "kaguya/exception.hpp"
 #include "kaguya/type.hpp"
-#include "kaguya/utils.hpp"
+#include "kaguya/utility.hpp"
 
 
 namespace kaguya
@@ -83,6 +83,8 @@ namespace kaguya
 
 		void evaluate(int resultnum)const
 		{
+			util::ScopedSavedStack save(state_);
+
 			if (eval_info_->owner == this && !eval_info_->invoked)
 			{
 				eval_info_->invoked = true;

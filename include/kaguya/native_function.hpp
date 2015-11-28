@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "kaguya/config.hpp"
-#include "kaguya/utils.hpp"
+#include "kaguya/utility.hpp"
 #include "kaguya/type.hpp"
 #include "kaguya/lua_ref.hpp"
 
@@ -65,16 +65,16 @@ namespace kaguya
 					return (*fun)->invoke(l);
 				}
 				catch (std::exception & e) {
-					lua_pushstring(l, e.what());
+					util::traceBack(l,e.what());
 				}
 				catch (...) {
-					lua_pushliteral(l, "Unknown exception");
+					util::traceBack(l, "Unknown exception");
 				}
 			}
 			else
 			{
-				std::string message = "argment not matched:" + utils::argmentTypes(l);
-				lua_pushstring(l, message.c_str());
+				std::string message = "argment not matched:" + util::argmentTypes(l);
+				util::traceBack(l, message.c_str());
 			}
 			return lua_error(l);
 		}

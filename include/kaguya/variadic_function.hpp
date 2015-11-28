@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "kaguya/config.hpp"
-#include "kaguya/utils.hpp"
+#include "kaguya/utility.hpp"
 #include "kaguya/type.hpp"
 #include "kaguya/lua_ref.hpp"
 

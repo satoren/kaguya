@@ -6,7 +6,7 @@
 #include "kaguya/config.hpp"
 #include "kaguya/exception.hpp"
 #include "kaguya/type.hpp"
-#include "kaguya/utils.hpp"
+#include "kaguya/utility.hpp"
 
 
 namespace kaguya
@@ -72,7 +72,7 @@ namespace kaguya
 				except::typeMismatchError(state_, "is nil");
 				return;
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE)
@@ -106,7 +106,7 @@ namespace kaguya
 			{
 				except::typeMismatchError(state_, "is nil");
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			lua_State* thread = get<lua_State*>();
 
 			if (!thread)
@@ -230,7 +230,7 @@ namespace kaguya
 			{
 				except::typeMismatchError(state_, "is nil");
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push(state_);
 			if (!types::checkType(state_, -1, types::typetag<T>()))
 			{
@@ -276,7 +276,7 @@ namespace kaguya
 				except::typeMismatchError(state_, "is nil");
 				return LuaRef(state_);
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
@@ -295,7 +295,7 @@ namespace kaguya
 				except::typeMismatchError(state_, "is nil");
 				return LuaRef(state_);
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
@@ -318,7 +318,7 @@ namespace kaguya
 				except::typeMismatchError(state_, "is nil");
 				return LuaRef(state_);
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push();
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
@@ -359,7 +359,7 @@ namespace kaguya
 				return;
 			}
 			std::vector<LuaRef> res;
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
@@ -401,7 +401,7 @@ namespace kaguya
 			{
 				return TYPE_NIL;
 			}
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			push(state_);
 			return (value_type)lua_type(state_, -1);
 		}
@@ -412,21 +412,21 @@ namespace kaguya
 
 		bool operator==(const LuaRef& other)const
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push();
 			return lua_compare(state_, -1, -2, LUA_OPEQ) != 0;
 		}
 		bool operator<(const LuaRef& other)const
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push(state_);
 			return lua_compare(state_, -1, -2, LUA_OPLT) != 0;
 		}
 		bool operator<=(const LuaRef& other)const
 		{
-			utils::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push();
 			return lua_compare(state_, -1, -2, LUA_OPLE) != 0;

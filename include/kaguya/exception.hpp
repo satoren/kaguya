@@ -2,7 +2,7 @@
 
 #include <exception>
 
-#include "kaguya/utils.hpp"
+#include "kaguya/utility.hpp"
 #include "kaguya/error_handler.hpp"
 #define KAGUYA_
 

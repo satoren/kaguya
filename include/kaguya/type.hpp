@@ -26,7 +26,7 @@ namespace kaguya
 
 		bool available_metatable(lua_State* l, const char* t)
 		{
-			utils::ScopedSavedStack save(l);
+			util::ScopedSavedStack save(l);
 			luaL_getmetatable(l, t);
 			return LUA_TNIL != lua_type(l, -1);
 		}

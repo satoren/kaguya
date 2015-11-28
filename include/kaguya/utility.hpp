@@ -5,7 +5,7 @@
 namespace kaguya
 {
 
-	namespace utils
+	namespace util
 	{
 		class ScopedSavedStack {
 			lua_State * state_;
@@ -50,6 +50,10 @@ namespace kaguya
 				}
 			}
 			return result;
+		}
+		inline void traceBack(lua_State* state,const char* message,int level=0)
+		{
+			luaL_traceback(state, state, message, level);
 		}
 
 		inline void stackDump(lua_State *L) {

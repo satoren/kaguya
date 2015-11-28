@@ -515,11 +515,23 @@ namespace selector_test
 		}
 		bool set_error_function(kaguya::State& state)
 		{
+			error_count = 0;
 			state.setErrorHandler(error_fun);
 			int a = state("awdorgkwl;gw");
 			if (error_count != 1) { return false; }
 			state["yy"]["yy"]["yy"];
 			return error_count == 3;
+		}
+		bool function_call_error(kaguya::State& state)
+		{
+			error_count = 0;
+			state.setErrorHandler(error_fun);
+
+			state["errofun"] = kaguya::function(error_fun);
+			state["errofun"](33);
+
+			kaguya::util::stackDump(state.state());
+			return error_count == 1;
 		}
 	}
 
@@ -646,6 +658,8 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::callfunction);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
+		ADD_TEST(selector_test::t_05_error_handler::function_call_error);
+		
 
 		test_result = execute_test(testmap);
 
