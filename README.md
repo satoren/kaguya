@@ -49,7 +49,7 @@ extern "C" int luaopen_modulename(lua_State *L)
 }
 ```
 
-### Runnig code
+### Runnig Lua code
 ```c++
   kaguya::State state;state.openlibs();
   state("a = \"test\"");//from string
@@ -120,12 +120,31 @@ state["fun"] = kaguya::function(&c_free_standing_function);
 state["fun"](54); //c_free_standing_function called:54
 state("fun(22)");//c_free_standing_function called:22
 
-state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::emdl;});//C++11
+state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::endl;});//C++11 lambda
 state("lambda(22)");//lambda called
 ```
 
-#### Variadic argment function
+#### Variadic argments function
 ```c++
-state["va_fun"] = kaguya::function([](kaguya::VariadicArgType arg) {for (auto v : arg) { std::cout << int(v) << ","; }std::cout << std::endl; });//C++11
+state["va_fun"] = kaguya::function([](kaguya::VariadicArgType arg) {for (auto v : arg) { std::cout << v.get<std::string>() << ","; }std::cout << std::endl; });//C++11 lambda
 state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
+
+```
+
+#### Coroutine
+```c++
+state["cor"] = kaguya::NewThread();//create coroutine
+kaguya::LuaRef cor = state["cor"];
+state("corfun = function(arg)"
+"coroutine.yield(arg) "
+"coroutine.yield(arg*2) "
+"coroutine.yield(arg*3) "
+"return arg*4 "
+" end");//define corouine function
+kaguya::LuaRef corfun = state["corfun"];//function get
+//exec coroutine with function and argment
+stc::cout << int(cor(corfun, 3)) << std::endl;//3
+stc::cout << int(cor()) << std::endl;//6
+stc::cout << int(cor()) << std::endl;//9
+stc::cout << int(cor()) << std::endl;//12
 ```
