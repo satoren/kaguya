@@ -517,7 +517,8 @@ namespace selector_test
 		{
 			error_count = 0;
 			state.setErrorHandler(error_fun);
-			int a = state("awdorgkwl;gw");
+			if (state("awdorgkwl;gw")){return false;}
+			
 			if (error_count != 1) { return false; }
 			state["yy"]["yy"]["yy"];
 			return error_count == 3;
@@ -600,22 +601,17 @@ void ignore_error_handler(int status, const char* message)
 }
 bool microbenchmark(const test_function_map_t& testmap)
 {
-	bool fail = false;
-	int testcount = testmap.size();
-	int testindex = 1;
-
 	kaguya::State state; state.openlibs();
 	state.setErrorHandler(ignore_error_handler);
 	for (int i = 0; i < 10000; ++i)
 	{
-		for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
+		for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it)
 		{
-			bool result = false;
-			result = it->second(state);
+			it->second(state);
 		}
 	}
 
-	return !fail;
+	return true;
 }
 
 int main()

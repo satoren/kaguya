@@ -147,14 +147,14 @@ namespace kaguya
 
 		template <typename T, typename Ret, typename... Args>
 		struct lambda_fun<Ret(T::*)(Args...) const> {
-			using type = standard::function<Ret (Args...)>;
+			typedef standard::function<Ret (Args...)> type;
 		};
 
 		//for lambda or bind
 		template< typename L>
 		BaseInvoker* create(L l)
 		{
-			return create(lambda_fun<L>::type(l));
+			return create(typename lambda_fun<L>::type(l));
 		}
 #endif
 	}
