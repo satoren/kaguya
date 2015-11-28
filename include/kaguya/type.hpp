@@ -408,7 +408,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 503
 			lua_pushinteger(l, v);
 #else
-			lua_pushnumber(l, v);
+			lua_pushnumber(l, lua_Number(v));
 #endif
 			return 1;
 		}
@@ -471,7 +471,11 @@ namespace kaguya
 
 		inline int push(lua_State* l, GlobalTable)
 		{
+#if LUA_VERSION_NUM >= 502
 			lua_pushglobaltable(l);
+#else
+			lua_pushvalue(l, LUA_GLOBALSINDEX);
+#endif
 			return 1;
 		}
 

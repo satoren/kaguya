@@ -95,7 +95,11 @@ namespace kaguya
 					{
 						args[i].push(state_);
 					}
+#if LUA_VERSION_NUM >= 502
 					int result = lua_resume(state_, 0, args.size()? args.size()-1:0);
+#else
+					int result = lua_resume(state_, args.size() ? args.size() - 1 : 0);
+#endif
 					except::checkErrorAndThrow(result, state_);
 					for (int i = 0; i < resultnum; ++i)
 					{

@@ -89,6 +89,7 @@ namespace kaguya
 
 		static lua_State* toMainThread(lua_State* state)
 		{
+#if LUA_VERSION_NUM >= 502
 			if (state)
 			{
 				lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
@@ -99,6 +100,7 @@ namespace kaguya
 					return mainthread;
 				}
 			}
+#endif
 			return state;
 		}
 
@@ -234,10 +236,12 @@ namespace kaguya
 		}
 		void push(lua_State* state)const
 		{
+#if LUA_VERSION_NUM >= 502
 			if (state != state_)
 			{//state check
 				assert(toMainThread(state) == toMainThread(state_));
 			}
+#endif
 			lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
 		}
 
@@ -433,21 +437,33 @@ namespace kaguya
 			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push();
+#if LUA_VERSION_NUM >= 502
 			return lua_compare(state_, -1, -2, LUA_OPEQ) != 0;
+#else
+			return lua_equal(state_, -1, -2) != 0;
+#endif
 		}
 		bool operator<(const LuaRef& other)const
 		{
 			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push(state_);
+#if LUA_VERSION_NUM >= 502
 			return lua_compare(state_, -1, -2, LUA_OPLT) != 0;
+#else
+			return lua_lessthan(state_, -1, -2) != 0;
+#endif
 		}
 		bool operator<=(const LuaRef& other)const
 		{
 			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push();
+#if LUA_VERSION_NUM >= 502
 			return lua_compare(state_, -1, -2, LUA_OPLE) != 0;
+#else
+			return lua_equal(state_, -1, -2) != 0 || lua_lessthan(state_, -1, -2) != 0;
+#endif
 		}
 		bool operator>=(const LuaRef& other)const
 		{
