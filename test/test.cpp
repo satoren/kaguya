@@ -418,6 +418,17 @@ namespace selector_test
 
 			return true;
 		}
+#if KAGUYA_USE_DECLTYPE
+		bool lambdafun(kaguya::State& state)
+		{
+			state["ABC"] = kaguya::function([](int a) {return a * 2; });
+			int a = state["ABC"](54);
+			if (a != 108) { return false; }
+
+			state["free2"] = kaguya::function([]() {return 12; });
+			return state["free2"]() == 12.0;
+		}
+#endif
 	}
 
 	namespace t_04_lua_ref
@@ -625,6 +636,10 @@ int main()
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
 		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
 		ADD_TEST(selector_test::t_03_function::coroutine);
+#if KAGUYA_USE_DECLTYPE
+		ADD_TEST(selector_test::t_03_function::lambdafun);
+
+#endif
 
 		ADD_TEST(selector_test::t_04_lua_ref::access);
 		ADD_TEST(selector_test::t_04_lua_ref::newtable);

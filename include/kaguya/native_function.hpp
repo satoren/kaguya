@@ -140,6 +140,23 @@ namespace kaguya
 			return new invoker_type(data);
 		}
 
+
+#if KAGUYA_USE_DECLTYPE
+		template <typename T>
+		struct lambda_fun : public lambda_fun<decltype(&T::operator())> {};
+
+		template <typename T, typename Ret, typename... Args>
+		struct lambda_fun<Ret(T::*)(Args...) const> {
+			using type = standard::function<Ret (Args...)>;
+		};
+
+		//for lambda or bind
+		template< typename L>
+		BaseInvoker* create(L l)
+		{
+			return create(lambda_fun<L>::type(l));
+		}
+#endif
 	}
 
 

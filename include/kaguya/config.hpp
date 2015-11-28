@@ -15,9 +15,6 @@ extern "C" {
 #endif
 #endif
 
-#ifndef KAGUYA_ERROR_NO_THROW
-#define KAGUYA_ERROR_NO_THROW 1
-#endif
 
 
 #if KAGUYA_USE_BOOST
@@ -36,6 +33,11 @@ extern "C" {
 #include <mutex>
 #endif
 
+
+#ifndef KAGUYA_ERROR_NO_THROW
+#define KAGUYA_ERROR_NO_THROW 1
+#endif
+
 #ifndef KAGUYA_USE_RVALUE_REFERENCE
 #if defined(__cpp_rvalue_references ) || defined(_HAS_RVALUE_REFERENCES)
 #define KAGUYA_USE_RVALUE_REFERENCE 1
@@ -43,6 +45,16 @@ extern "C" {
 #define KAGUYA_USE_RVALUE_REFERENCE 0
 #endif
 #endif
+
+#ifndef KAGUYA_USE_DECLTYPE
+#if defined(__cpp_decltype) || __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600)
+#define KAGUYA_USE_DECLTYPE 1
+#else
+#define KAGUYA_USE_DECLTYPE 0
+#endif
+#endif
+
+
 
 namespace kaguya
 {
