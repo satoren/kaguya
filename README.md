@@ -14,6 +14,7 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
 Kaguya is Lua binding library for C++ 
 - header-file only
+-  for lua module system
 
 ## run test
 ```
@@ -31,16 +32,21 @@ make
 int main()
 {
   kaguya::State state;
-  state.openlibs();//open lua standar library
+  state.openlibs();//open lua standard library
+  state.dofile("/path/to/script.lua")
 }
 ```
 
 ### Or free standing lua state
 ```c++
-lua_State* l = luaL_newstate();
-kaguya::State state(l);
-state.openlibs();
-lua_close(l);//need close
+extern "C" int luaopen_modulename(lua_State *L)
+{
+  using namespace kaguya;
+   State state(l);
+   LuaRef module = (state["modulename"] = NewTable());
+   module["function"] = function(somefunction);
+   return 0;
+}
 ```
 
 ### Runnig code
@@ -113,4 +119,13 @@ void c_free_standing_function(int v){std::cout <<"c_free_standing_function calle
 state["fun"] = kaguya::function(&c_free_standing_function);
 state["fun"](54); //c_free_standing_function called:54
 state("fun(22)");//c_free_standing_function called:22
+
+state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::emdl;});//C++11
+state("lambda(22)");//lambda called
+```
+
+#### Variadic argment function
+```c++
+state["va_fun"] = kaguya::function([](kaguya::VariadicArgType arg) {for (auto v : arg) { std::cout << int(v) << ","; }std::cout << std::endl; });//C++11
+state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
 ```
