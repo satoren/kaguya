@@ -242,11 +242,10 @@ int luaopen_samplesdlbind(lua_State *L)
 {
 	State state(L);
 
-    state["SDL"]= NewTable();
-	LuaRef sdl = state["SDL"];
+	LuaRef sdl = state.newLib();
 	SetupInit(sdl);
 	SetupVideo(sdl);
 	SetupEvent(sdl);
 
-	return 0;
+	return 1;
 }

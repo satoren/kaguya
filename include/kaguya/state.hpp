@@ -30,6 +30,12 @@ namespace kaguya
 			setErrorHandler(&stderror_out);
 			nativefunction::reg_functor_destructor(state_);
 		}
+
+		static int error_handler_cleanner(lua_State *state)
+		{
+			ErrorHandler::instance().unregisterHandler(state);
+			return 0;
+		}
 	public:
 		State() :state_(luaL_newstate()), created_(true)
 		{
@@ -47,24 +53,17 @@ namespace kaguya
 			}
 		}
 
-
-		static int error_handler_cleanner(lua_State *state)
-		{
-			ErrorHandler::instance().unregisterHandler(state);
-			return 0;
-		}
-
 		void setErrorHandler(standard::function<void(int statuscode,const char*message)> errorfunction)
 		{
 			util::ScopedSavedStack save(state_);
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
 
-			if (luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE))
+			if (luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE))//register error handler destructor to Lua state
 			{
 				lua_pushcclosure(state_, &error_handler_cleanner, 0);
 				lua_setfield(state_, -2, "__gc");
 				lua_setfield(state_, -1, "__index");
-				lua_newtable(state_);
+				lua_newuserdata(state_,1);//dummy data for gc call
 				luaL_setmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
 				luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
@@ -151,6 +150,15 @@ namespace kaguya
 		{
 			lua_gc(state_, LUA_GCCOLLECT, 0);
 		}
+
+		//for Lua module
+		LuaRef newLib()
+		{
+			LuaRef newtable(state_,NewTable());
+			newtable.push(state_);
+			return newtable;
+		}
+
 		lua_State *state() { return state_; };
 	};
 };

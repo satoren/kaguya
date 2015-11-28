@@ -521,7 +521,7 @@ namespace selector_test
 			
 			if (error_count != 1) { return false; }
 			state["yy"]["yy"]["yy"];
-			return error_count == 3;
+			return error_count > 0;
 		}
 		bool function_call_error(kaguya::State& state)
 		{
@@ -531,11 +531,22 @@ namespace selector_test
 			state["errofun"] = kaguya::function(error_fun);
 			state["errofun"](33);
 
-			kaguya::util::stackDump(state.state());
 			return error_count == 1;
 		}
 	}
 
+	namespace t_06_state
+	{
+		bool other_state(kaguya::State& unused)
+		{
+			lua_State* L = luaL_newstate();
+			
+			kaguya::State state(L);
+
+			lua_close(L);
+			return true;
+		}
+	}
 }
 
 void test_error_handler(int status, const char* message)
@@ -656,6 +667,8 @@ int main()
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);
 		
+
+		ADD_TEST(selector_test::t_06_state::other_state);
 
 		test_result = execute_test(testmap);
 

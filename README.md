@@ -43,9 +43,9 @@ extern "C" int luaopen_modulename(lua_State *L)
 {
   using namespace kaguya;
    State state(l);
-   LuaRef module = (state["modulename"] = NewTable());
+   LuaRef module = state.newLib();
    module["function"] = function(somefunction);
-   return 0;
+   return 1;//number of return lib
 }
 ```
 

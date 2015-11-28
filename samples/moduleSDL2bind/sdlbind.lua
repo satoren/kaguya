@@ -1,4 +1,4 @@
-require("samplesdlbind")
+SDL=require("samplesdlbind")
 --sample code from https://wiki.libsdl.org/SDL_CreateRenderer
 SDL.Init(SDL.INIT_VIDEO)
 --can not bit and on lua5.2
