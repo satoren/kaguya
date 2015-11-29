@@ -360,19 +360,6 @@ namespace kaguya
 			return get_pointer(l, index, typetag<T>());
 		}
 
-		template<typename T>
-		typename standard::enable_if< standard::is_enum<T>::value ,T>::type
-		getEnum(lua_State* l, int index, typetag<T>)
-		{
-			return (T)(get(l, index, typetag<long long>()));
-		}
-		template<typename T>
-		typename standard::enable_if< !standard::is_enum<T>::value, T>::type
-			getEnum(lua_State* l, int index, typetag<T>)
-		{
-			assert(false);
-			return (T)(0);
-		}
 
 		inline lua_State* get(lua_State* l, int index, typetag<lua_State> tag = typetag<lua_State>())
 		{
@@ -462,6 +449,19 @@ namespace kaguya
 			return get(l, index, typetag<std::string>());
 		}
 
+		template<typename T>
+		typename standard::enable_if< standard::is_enum<T>::value ,T>::type
+		getEnum(lua_State* l, int index, typetag<T>)
+		{
+			return (T)(get(l, index, typetag<long long>()));
+		}
+		template<typename T>
+		typename standard::enable_if< !standard::is_enum<T>::value, T>::type
+			getEnum(lua_State* l, int index, typetag<T>)
+		{
+			assert(false);
+			return (T)(0);
+		}
 
 
 		inline int push(lua_State* l, bool v)
@@ -575,7 +575,7 @@ namespace kaguya
 		typename standard::enable_if< standard::is_enum<T>::value, int>::type
 			pushEnum(lua_State* l, const T& v)
 		{
-			return push(l, long long(v));
+			return push(l, (long long)(v));
 		}
 		template<typename T>
 		typename standard::enable_if< !standard::is_enum<T>::value, int>::type
