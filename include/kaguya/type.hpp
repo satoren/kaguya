@@ -397,17 +397,17 @@ namespace kaguya
 		inline long long get(lua_State* l, int index, typetag<long long> tag = typetag<long long>())
 		{
 #if LUA_VERSION_NUM >= 503
-			return long long(lua_tointeger(l, index));
+			return (long long)(lua_tointeger(l, index));
 #else
-			return long long(lua_tonumber(l, index));
+			return (long long)(lua_tonumber(l, index));
 #endif
 		}
 		inline unsigned long long get(lua_State* l, int index, typetag<unsigned long long> tag = typetag<unsigned long long>())
 		{
 #if LUA_VERSION_NUM >= 503
-			return long unsigned long(lua_tointeger(l, index));
+			return (unsigned long long)(lua_tointeger(l, index));
 #else
-			return long long(lua_tonumber(l, index));
+			return (unsigned long long)(lua_tonumber(l, index));
 #endif
 		}
 		inline unsigned int get(lua_State* l, int index, typetag<unsigned long> tag = typetag<unsigned long>())
@@ -490,16 +490,24 @@ namespace kaguya
 		}
 		inline int push(lua_State* l, unsigned long long v)
 		{
-			return push(l, long long(v));
+			return push(l, (long long)(v));
 		}
 
+		inline int push(lua_State* l, long v)
+		{
+			return push(l, (long long)(v));
+		}
+		inline int push(lua_State* l, unsigned long v)
+		{
+			return push(l, (long long)(v));
+		}
 		inline int push(lua_State* l, int v)
 		{
-			return push(l, long long(v));
+			return push(l, (long long)(v));
 		}
 		inline int push(lua_State* l, unsigned int v)
 		{
-			return push(l, long long(v));
+			return push(l, (long long)(v));
 		}
 		inline int push(lua_State* l, short v)
 		{
