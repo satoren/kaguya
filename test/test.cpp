@@ -60,6 +60,23 @@ namespace selector_test
 			state["value"]["abc"]["bbb"] = "test";
 			return state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")");
 		};
+
+		enum
+		{
+			Foo = 0,
+			Bar = 1,
+		};
+
+		bool enum_set(kaguya::State& state)
+		{
+			state["value"] = Foo;
+			return state("assert(value == 0)");
+		};
+		bool enum_get(kaguya::State& state)
+		{
+			state("value = 1");
+			return state["value"] == Bar;
+		};
 	}
 
 	namespace t_02_classreg
@@ -429,6 +446,26 @@ namespace selector_test
 			return state["free2"]() == 12.0;
 		}
 #endif
+
+		enum TestEnum
+		{
+			Fooe = 0,
+			Bare = 1,
+			DoDoe = 32,
+		};
+		TestEnum enumdispatchtest(TestEnum arg)
+		{
+			assert(arg == Bare);
+			return DoDoe;
+		}
+		bool enumdispatch(kaguya::State& state)
+		{
+			state["ABC"] = kaguya::function(&free_standing_function);
+			state["enumfun"] = kaguya::function(&enumdispatchtest);
+			TestEnum result = state["enumfun"](Bare);
+
+			return result == DoDoe;
+		}
 	}
 
 	namespace t_04_lua_ref
@@ -517,8 +554,8 @@ namespace selector_test
 		{
 			error_count = 0;
 			state.setErrorHandler(error_fun);
-			if (state("awdorgkwl;gw")){return false;}
-			
+			if (state("awdorgkwl;gw")) { return false; }
+
 			if (error_count != 1) { return false; }
 			state["yy"]["yy"]["yy"];
 			return error_count > 0;
@@ -540,7 +577,7 @@ namespace selector_test
 		bool other_state(kaguya::State& unused)
 		{
 			lua_State* L = luaL_newstate();
-			
+
 			kaguya::State state(L);
 
 			lua_close(L);
@@ -642,6 +679,10 @@ int main()
 		ADD_TEST(selector_test::t_01_primitive::string_set);
 		ADD_TEST(selector_test::t_01_primitive::table_set);
 
+
+		ADD_TEST(selector_test::t_01_primitive::enum_set);
+		ADD_TEST(selector_test::t_01_primitive::enum_get);
+
 		ADD_TEST(selector_test::t_02_classreg::default_constructor);
 		ADD_TEST(selector_test::t_02_classreg::int_constructor);
 		ADD_TEST(selector_test::t_02_classreg::string_constructor);
@@ -666,13 +707,13 @@ int main()
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);
-		
+
 
 		ADD_TEST(selector_test::t_06_state::other_state);
 
 		test_result = execute_test(testmap);
 
-//		microbenchmark(testmap);
+		//		microbenchmark(testmap);
 	}
 	return test_result ? 0 : -1;
 }

@@ -95,7 +95,6 @@ namespace kaguya
 		}
 
 
-
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
 		{
@@ -185,24 +184,28 @@ namespace kaguya
 			return lua_type(l, index) == LUA_TSTRING;
 		}
 
+
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<T> tag)
 		{
-			return  lua_type(l, index) == LUA_TLIGHTUSERDATA
+			return (standard::is_enum<T>::value && checkType(l,index, typetag<int>()))
+				|| lua_type(l, index) == LUA_TLIGHTUSERDATA
 				|| !available_metatable(l, metatableName<T>().c_str())
 				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
 		}
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<const T&> tag)
 		{
-			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+			return (standard::is_enum<T>::value && checkType(l, index, typetag<int>()))
+				|| lua_type(l, index) == LUA_TLIGHTUSERDATA
 				|| !available_metatable(l, metatableName<T>().c_str())
 				|| checkType(l, index, typetag<T>());
 		}
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<T&> tag)
 		{
-			return lua_type(l, index) == LUA_TLIGHTUSERDATA
+			return (standard::is_enum<T>::value && checkType(l, index, typetag<int>()))
+				|| lua_type(l, index) == LUA_TLIGHTUSERDATA
 				|| !available_metatable(l, metatableName<T>().c_str())
 				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
 		}
@@ -282,28 +285,48 @@ namespace kaguya
 			return checkType(l, index, typetag<std::string>());
 		}
 
+
+
 		template<typename T>
 		inline T get(lua_State* l, int index, typetag<T> tag = typetag<T>())
 		{
-			T* pointer = get_pointer(l, index, typetag<T>());
-			if (!pointer)
+			if (standard::is_enum<T>())
 			{
-				throw std::invalid_argument("type mismatch!!");
+				return getEnum(l,index, typetag<T>());
 			}
-			return *pointer;
+			else
+			{
+				T* pointer = get_pointer(l, index, typetag<T>());
+				if (!pointer)
+				{
+					except::typeMismatchError(l, "type mismatch!!");
+				}
+				return *pointer;
+			}
 		}
 		template<typename T>
 		inline T get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
 		{
-			return get(l, index, typetag<T>());
+			if (standard::is_enum<T>())
+			{
+				return getEnum(l, index, typetag<T>());
+			}
+			else
+			{
+				return get(l, index, typetag<T>());
+			}
 		}
 		template<typename T>
 		inline T& get(lua_State* l, int index, typetag<T&> tag = typetag<T&>())
 		{
+			if (standard::is_enum<T>())
+			{
+				return getEnum(l,index, typetag<T>());
+			}
 			T* pointer = get_pointer(l, index, typetag<T>());
 			if (!pointer)
 			{
-				throw std::invalid_argument("type mismatch!!");
+				except::typeMismatchError(l, "type mismatch!!");
 			}
 			return *pointer;
 		}
@@ -313,6 +336,19 @@ namespace kaguya
 			return get_pointer(l, index, typetag<T>());
 		}
 
+		template<typename T>
+		typename standard::enable_if< standard::is_enum<T>::value ,T>::type
+		getEnum(lua_State* l, int index, typetag<T>)
+		{
+			return (T)(get(l, index, typetag<int64_t>()));
+		}
+		template<typename T>
+		typename standard::enable_if< !standard::is_enum<T>::value, T>::type
+			getEnum(lua_State* l, int index, typetag<T>)
+		{
+			assert(false);
+			return (T)(0);
+		}
 
 		inline lua_State* get(lua_State* l, int index, typetag<lua_State> tag = typetag<lua_State>())
 		{
@@ -479,16 +515,6 @@ namespace kaguya
 			return 1;
 		}
 
-
-		template<typename T>
-		inline int push(lua_State* l, const T& v)
-		{
-			void *storage = lua_newuserdata(l, sizeof(T));
-			new(storage) T(v);
-			luaL_setmetatable(l, types::metatableName<T>().c_str());
-			return 1;
-		}
-
 #if KAGUYA_USE_RVALUE_REFERENCE
 		inline int push(lua_State* l, std::string&& s)
 		{
@@ -496,10 +522,42 @@ namespace kaguya
 			return 1;
 		}
 #endif
+
+		template<typename T>
+		typename standard::enable_if< standard::is_enum<T>::value, int>::type
+			pushEnum(lua_State* l, const T& v)
+		{
+			return push(l, int64_t(v));
+		}
+		template<typename T>
+		typename standard::enable_if< !standard::is_enum<T>::value, int>::type
+			pushEnum(lua_State* l, const T& v)
+		{
+			assert(false);
+			return 0;
+		}
+
+		template<typename T>
+		inline int push(lua_State* l, const T& v)
+		{
+			if (standard::is_enum<T>::value)
+			{
+				return pushEnum(l,v);
+			}
+			void *storage = lua_newuserdata(l, sizeof(T));
+			new(storage) T(v);
+			luaL_setmetatable(l, types::metatableName<T>().c_str());
+			return 1;
+		}
+
 		template<typename T>
 		inline int push(lua_State* l, T& v)
 		{
-			if (!available_metatable(l, metatableName<T>().c_str()))
+			if (standard::is_enum<T>::value)
+			{
+				return pushEnum(l, v);
+			}
+			else if (!available_metatable(l, metatableName<T>().c_str()))
 			{
 				lua_pushlightuserdata(l, &v);
 			}

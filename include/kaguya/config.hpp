@@ -22,6 +22,7 @@ extern "C" {
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/type_traits.hpp>
 #if BOOST_VERSION >= 104800
 #include <boost/move/move.hpp>
 #endif
@@ -31,6 +32,7 @@ extern "C" {
 #include <memory>
 #include <utility>
 #include <mutex>
+#include <type_traits>
 #endif
 
 
@@ -67,6 +69,8 @@ namespace kaguya
 		using boost::get;
 		using boost::mutex;
 		using boost::lock_guard;
+		using boost::is_enum;
+		using boost::enable_if;
 #if BOOST_VERSION >= 104800
 		using boost::forward;
 #else
@@ -85,9 +89,11 @@ namespace kaguya
 		using std::shared_ptr;
 		using std::to_string;
 		using std::get;
-		using std::forward;
 		using std::mutex;
 		using std::lock_guard;
+		using std::is_enum;
+		using std::enable_if;
+		using std::forward;
 #endif
 	}
 
