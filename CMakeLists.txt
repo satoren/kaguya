@@ -3,9 +3,13 @@ project(Kaguya)
 
 if(NOT LUA_INCLUDE_DIRS)
   find_package(PkgConfig)
-  pkg_search_module(LUA lua5.3)
+  set(LUA_SEARCHVERS lua5.3 lua5.2 luajit lua5.1)
+  foreach(modulename ${LUA_SEARCHVERS})
+    pkg_search_module(LUA ${modulename})
+  endforeach(modulename)
+
   if(NOT LUA_INCLUDE_DIRS)
-  pkg_search_module(LUA REQUIRED lua5.2)
+    message(SEND_ERROR "Can't find lua library")   
   endif()
 endif(NOT LUA_INCLUDE_DIRS)
 

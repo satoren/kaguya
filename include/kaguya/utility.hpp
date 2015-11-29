@@ -53,7 +53,11 @@ namespace kaguya
 		}
 		inline void traceBack(lua_State* state,const char* message,int level=0)
 		{
+#if LUA_VERSION_NUM >= 502
 			luaL_traceback(state, state, message, level);
+#else
+			lua_pushstring(state, message);
+#endif
 		}
 
 		inline void stackDump(lua_State *L) {
