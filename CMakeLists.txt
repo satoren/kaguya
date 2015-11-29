@@ -37,13 +37,6 @@ add_definitions("-Wall")
 #add_definitions("-std=c++11")
 endif(MSVC)
 
-if (CMAKE_COMPILER_IS_GNUCC)
-execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-                OUTPUT_VARIABLE GCC_VERSION)
-if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)     
-add_definitions("-std=c++11")
-endif()
-endif()
 
 
 link_directories(${LUA_LIBRARY_DIRS})

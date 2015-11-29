@@ -61,7 +61,7 @@ namespace selector_test
 			return state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")");
 		};
 
-		enum
+		enum testenum
 		{
 			Foo = 0,
 			Bar = 1,

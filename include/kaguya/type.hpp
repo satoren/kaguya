@@ -450,13 +450,13 @@ namespace kaguya
 		}
 
 		template<typename T>
-		typename standard::enable_if< standard::is_enum<T>::value ,T>::type
+		typename traits::enable_if< standard::is_enum<T>::value ,T>::type
 		getEnum(lua_State* l, int index, typetag<T>)
 		{
 			return (T)(get(l, index, typetag<long long>()));
 		}
 		template<typename T>
-		typename standard::enable_if< !standard::is_enum<T>::value, T>::type
+		typename traits::enable_if< !standard::is_enum<T>::value, T>::type
 			getEnum(lua_State* l, int index, typetag<T>)
 		{
 			assert(false);
@@ -572,13 +572,13 @@ namespace kaguya
 #endif
 
 		template<typename T>
-		typename standard::enable_if< standard::is_enum<T>::value, int>::type
+		typename traits::enable_if< standard::is_enum<T>::value, int>::type
 			pushEnum(lua_State* l, const T& v)
 		{
 			return push(l, (long long)(v));
 		}
 		template<typename T>
-		typename standard::enable_if< !standard::is_enum<T>::value, int>::type
+		typename traits::enable_if< !standard::is_enum<T>::value, int>::type
 			pushEnum(lua_State* l, const T& v)
 		{
 			assert(false);
