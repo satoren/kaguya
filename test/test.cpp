@@ -460,7 +460,6 @@ namespace selector_test
 		}
 		bool enumdispatch(kaguya::State& state)
 		{
-			state["ABC"] = kaguya::function(&free_standing_function);
 			state["enumfun"] = kaguya::function(&enumdispatchtest);
 			TestEnum result = state["enumfun"](Bare);
 
@@ -599,6 +598,9 @@ bool execute_test(const test_function_map_t& testmap)
 	bool fail = false;
 	int testcount = testmap.size();
 	int testindex = 1;
+
+	std::vector<std::string> pass_tests;
+	std::vector<std::string> fail_tests;
 	for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
 	{
 		kaguya::State state; state.openlibs();
@@ -626,11 +628,13 @@ bool execute_test(const test_function_map_t& testmap)
 			if (stack_leak == 0)
 			{
 				std::cout << "done" << std::endl;
+				pass_tests.push_back(test_name);
 			}
 			else
 			{
 				std::cout << "stack leaked count=" << stack_leak << std::endl;
 				fail = true;
+				fail_tests.push_back(test_name);
 			}
 		}
 		else
@@ -638,7 +642,25 @@ bool execute_test(const test_function_map_t& testmap)
 			//test failure
 			std::cout << "failure" << std::endl;
 			fail = true;
+			fail_tests.push_back(test_name);
 		}
+	}
+	if (fail)
+	{
+		std::cout << "test failed!!" << std::endl;
+		std::cout << "error in ";
+
+		for (size_t i = 0; i < fail_tests.size(); ++i)
+		{
+
+			std::cout << fail_tests[i] << ",";
+		}
+
+		std::cout << std::endl;
+
+	}
+	else
+	{
 	}
 
 	return !fail;

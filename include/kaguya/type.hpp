@@ -158,11 +158,19 @@ namespace kaguya
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strictCheckType(lua_State* l, int index, typetag<int64_t> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<long> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
-		inline bool strictCheckType(lua_State* l, int index, typetag<uint64_t> tag)
+		inline bool strictCheckType(lua_State* l, int index, typetag<unsigned long> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strictCheckType(lua_State* l, int index, typetag<long long> tag)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		inline bool strictCheckType(lua_State* l, int index, typetag<unsigned long long> tag)
 		{
 			return lua_type(l, index) == LUA_TNUMBER;
 		}
@@ -235,7 +243,7 @@ namespace kaguya
 			return lua_isnumber(l, index) != 0;
 		}
 
-		inline bool checkType(lua_State* l, int index, typetag<int64_t> tag)
+		inline bool checkType(lua_State* l, int index, typetag<long long> tag)
 		{
 #if LUA_VERSION_NUM >= 503
 			return lua_isinteger(l, index) != 0;
@@ -243,29 +251,45 @@ namespace kaguya
 			return lua_isnumber(l, index) != 0;
 #endif
 		}
+		inline bool checkType(lua_State* l, int index, typetag<unsigned long long> tag)
+		{
+#if LUA_VERSION_NUM >= 503
+			return lua_isinteger(l, index) != 0;
+#else
+			return lua_isnumber(l, index) != 0;
+#endif
+		}
+		inline bool checkType(lua_State* l, int index, typetag<long> tag)
+		{
+			return checkType(l, index, typetag<long long>());
+		}
+		inline bool checkType(lua_State* l, int index, typetag<unsigned long> tag)
+		{
+			return checkType(l, index, typetag<long long>());
+		}
 		inline bool checkType(lua_State* l, int index, typetag<unsigned int> tag)
 		{
-			return checkType(l, index, typetag<int64_t>());
+			return checkType(l, index, typetag<long long>());
 		}
 		inline bool checkType(lua_State* l, int index, typetag<int> tag)
 		{
-			return checkType(l, index, typetag<int64_t>());
+			return checkType(l, index, typetag<long long>());
 		}
 		inline bool checkType(lua_State* l, int index, typetag<unsigned short> tag)
 		{
-			return checkType(l, index, typetag<int64_t>());
+			return checkType(l, index, typetag<long long>());
 		}
 		inline bool checkType(lua_State* l, int index, typetag<short> tag)
 		{
-			return checkType(l, index, typetag<int64_t>());
+			return checkType(l, index, typetag<long long>());
 		}
 		inline bool checkType(lua_State* l, int index, typetag<unsigned char> tag)
 		{
-			return checkType(l, index, typetag<int64_t>());
+			return checkType(l, index, typetag<long long>());
 		}
 		inline bool checkType(lua_State* l, int index, typetag<signed char> tag)
 		{
-			return checkType(l, index, typetag<int64_t>());
+			return checkType(l, index, typetag<long long>());
 		}
 
 		inline bool checkType(lua_State* l, int index, typetag<const char*> tag)
@@ -340,7 +364,7 @@ namespace kaguya
 		typename standard::enable_if< standard::is_enum<T>::value ,T>::type
 		getEnum(lua_State* l, int index, typetag<T>)
 		{
-			return (T)(get(l, index, typetag<int64_t>()));
+			return (T)(get(l, index, typetag<long long>()));
 		}
 		template<typename T>
 		typename standard::enable_if< !standard::is_enum<T>::value, T>::type
@@ -370,37 +394,53 @@ namespace kaguya
 			return lua_tonumber(l, index);
 		}
 
-		inline int64_t get(lua_State* l, int index, typetag<int64_t> tag = typetag<int64_t>())
+		inline long long get(lua_State* l, int index, typetag<long long> tag = typetag<long long>())
 		{
 #if LUA_VERSION_NUM >= 503
-			return int64_t(lua_tointeger(l, index));
+			return long long(lua_tointeger(l, index));
 #else
-			return int64_t(lua_tonumber(l, index));
+			return long long(lua_tonumber(l, index));
 #endif
+		}
+		inline unsigned long long get(lua_State* l, int index, typetag<unsigned long long> tag = typetag<unsigned long long>())
+		{
+#if LUA_VERSION_NUM >= 503
+			return long unsigned long(lua_tointeger(l, index));
+#else
+			return long long(lua_tonumber(l, index));
+#endif
+		}
+		inline unsigned int get(lua_State* l, int index, typetag<unsigned long> tag = typetag<unsigned long>())
+		{
+			return (unsigned long)(get(l, index, typetag<unsigned long>()));
+		}
+		inline int get(lua_State* l, int index, typetag<long> tag = typetag<long>())
+		{
+			return (long)(get(l, index, typetag<long>()));
 		}
 		inline unsigned int get(lua_State* l, int index, typetag<unsigned int> tag = typetag<unsigned int>())
 		{
-			return (unsigned int)(get(l, index, typetag<int64_t>()));
+			return (unsigned int)(get(l, index, typetag<long long>()));
 		}
 		inline int get(lua_State* l, int index, typetag<int> tag = typetag<int>())
 		{
-			return int(get(l, index, typetag<int64_t>()));
+			return int(get(l, index, typetag<long long>()));
 		}
 		inline unsigned int get(lua_State* l, int index, typetag<unsigned short> tag = typetag<unsigned short>())
 		{
-			return (unsigned short)(get(l, index, typetag<int64_t>()));
+			return (unsigned short)(get(l, index, typetag<long long>()));
 		}
 		inline int get(lua_State* l, int index, typetag<short> tag = typetag<short>())
 		{
-			return short(get(l, index, typetag<int64_t>()));
+			return short(get(l, index, typetag<long long>()));
 		}
 		inline unsigned int get(lua_State* l, int index, typetag<unsigned char> tag = typetag<unsigned char>())
 		{
-			return (unsigned char)(get(l, index, typetag<int64_t>()));
+			return (unsigned char)(get(l, index, typetag<long long>()));
 		}
 		inline int get(lua_State* l, int index, typetag<signed char> tag = typetag<signed char>())
 		{
-			return(signed char)(get(l, index, typetag<int64_t>()));
+			return(signed char)(get(l, index, typetag<long long>()));
 		}
 
 		inline const char* get(lua_State* l, int index, typetag<const char*> tag = typetag<const char*>())
@@ -439,7 +479,7 @@ namespace kaguya
 			lua_pushnumber(l, v);
 			return 1;
 		}
-		inline int push(lua_State* l, int64_t v)
+		inline int push(lua_State* l, long long v)
 		{
 #if LUA_VERSION_NUM >= 503
 			lua_pushinteger(l, v);
@@ -448,18 +488,18 @@ namespace kaguya
 #endif
 			return 1;
 		}
-		inline int push(lua_State* l, uint64_t v)
+		inline int push(lua_State* l, unsigned long long v)
 		{
-			return push(l, int64_t(v));
+			return push(l, long long(v));
 		}
 
 		inline int push(lua_State* l, int v)
 		{
-			return push(l, int64_t(v));
+			return push(l, long long(v));
 		}
 		inline int push(lua_State* l, unsigned int v)
 		{
-			return push(l, int64_t(v));
+			return push(l, long long(v));
 		}
 		inline int push(lua_State* l, short v)
 		{
@@ -527,7 +567,7 @@ namespace kaguya
 		typename standard::enable_if< standard::is_enum<T>::value, int>::type
 			pushEnum(lua_State* l, const T& v)
 		{
-			return push(l, int64_t(v));
+			return push(l, long long(v));
 		}
 		template<typename T>
 		typename standard::enable_if< !standard::is_enum<T>::value, int>::type
