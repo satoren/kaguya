@@ -127,7 +127,6 @@ namespace selector_test
 			ABC& references() { return *this; }
 			ABC* pointer() { return this; }
 			kaguya::standard::shared_ptr<ABC> shared_copy() { return kaguya::standard::shared_ptr<ABC>(new ABC(*this)); }
-
 		};
 
 		bool default_constructor(kaguya::State& state)
@@ -267,6 +266,21 @@ namespace selector_test
 			if (!state("assert(value1 ~= value2)")) { return false; }
 			if (!state("assert(value1 > value2)")) { return false; }
 			if (!state("assert(value1 >= value2)")) { return false; }
+
+			return true;
+		}
+		bool add_field(kaguya::State& state)
+		{
+			state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
+				.addConstructor<int>()
+				.addStaticField("TEST", 1)
+				.addStaticField("TEST2", "343")
+				.addStaticField("TEST3", 133.23)
+				);
+
+			if (!state("assert(ABC.TEST == 1)")) { return false; }
+			if (!state("assert(ABC.TEST2 == \"343\")")) { return false; }
+			if (!state("assert(ABC.TEST3 == 133.23)")) { return false; }
 			return true;
 		}
 	}
@@ -712,6 +726,8 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::copy_constructor);
 		ADD_TEST(selector_test::t_02_classreg::data_member_bind);
 		ADD_TEST(selector_test::t_02_classreg::operator_bind);
+		ADD_TEST(selector_test::t_02_classreg::add_field);
+		
 
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);
 		ADD_TEST(selector_test::t_03_function::member_function_test);

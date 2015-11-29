@@ -14,26 +14,26 @@ namespace kaguya
 
 	struct Metatable
 	{
-		/*
-		struct value_type
+		struct ValueType
 		{
-			value_type(int v) :ivalue(v), type(int_value){}
-			value_type(int64_t v) :ivalue(v), type(int_value) {}
-			value_type(float v) :dvalue(v), type(double_value) {}
-			value_type(double v) :dvalue(v), type(double_value) {}
-			value_type(const std::string& v) :strvalue(v), type(str_value) {}
-			value_type(const char* v) :strvalue(v), type(str_value) {}
+			ValueType() :ivalue(0), dvalue(0), type(int_value) {}
+			ValueType(int v) :ivalue(v), dvalue(0), type(int_value) {}
+			ValueType(long long v) :ivalue(v), dvalue(0), type(int_value) {}
+			ValueType(float v) :ivalue(0), dvalue(v), type(double_value) {}
+			ValueType(double v) :ivalue(0), dvalue(v), type(double_value) {}
+			ValueType(const std::string& v) :strvalue(v), ivalue(0), dvalue(0), type(str_value) {}
+			ValueType(const char* v) :strvalue(v), ivalue(0), dvalue(0), type(str_value) {}
 			std::string strvalue;
-			int64_t ivalue;
+			long long ivalue;
 			double dvalue;
-			enum {str_value,int_value,double_value} type;
-		};*/
+			enum { str_value, int_value, double_value } type;
+		};
 
 		typedef nativefunction::FunctorType FunctorType;
 		typedef std::vector<FunctorType> FuncArrayType;
 		typedef std::map<std::string, FuncArrayType> FuncMapType;
 
-//		typedef std::map<std::string, value_type> value_map;
+		typedef std::map<std::string, ValueType> ValueMapType;
 
 
 
@@ -55,6 +55,32 @@ namespace kaguya
 			return *this;
 		}
 
+		Metatable& addField(const char* name, const std::string& str)
+		{
+			return addField(name, str.c_str());
+		}
+		Metatable& addField(const char* name, const char* str)
+		{
+			value_map_[name] = ValueType(str);
+			return *this;
+		}
+		Metatable& addField(const char* name, double v)
+		{
+			value_map_[name] = ValueType(v);
+			return *this;
+		}
+		Metatable& addField(const char* name, long long v)
+		{
+			value_map_[name] = ValueType(v);
+			return *this;
+		}
+		Metatable& addField(const char* name, int v)
+		{
+			value_map_[name] = ValueType(v);
+			return *this;
+		}
+
+
 		void registerTable(lua_State* state)const
 		{
 			if (luaL_newmetatable(state, metatableName_.c_str()))
@@ -62,7 +88,7 @@ namespace kaguya
 				registerFunctions(state);
 				lua_pushvalue(state, -1);
 				lua_setfield(state, -1, "__index");
-				
+
 				if (!parent_metatableName_.empty())
 				{
 					luaL_setmetatable(state, parent_metatableName_.c_str());
@@ -74,7 +100,7 @@ namespace kaguya
 			}
 		}
 	protected:
-		void registerFunction(lua_State* state,const char* name, const FuncArrayType& func_array)const
+		void registerFunction(lua_State* state, const char* name, const FuncArrayType& func_array)const
 		{
 			if (func_array.empty()) { return; }
 			lua_pushnumber(state, func_array.size());
@@ -87,6 +113,26 @@ namespace kaguya
 			lua_pushcclosure(state, &nativefunction::functor_dispatcher, func_array.size() + 1);
 			lua_setfield(state, -2, name);
 		}
+		void registerField(lua_State* state, const char* name, const ValueType& value)const
+		{
+			if (value.type == ValueType::str_value)
+			{
+				types::push(state, value.strvalue);
+			}
+			else if (value.type == ValueType::int_value)
+			{
+				types::push(state, value.ivalue);
+			}
+			else if (value.type == ValueType::double_value)
+			{
+				types::push(state, value.dvalue);
+			}
+			else
+			{
+				assert(false);
+			}
+			lua_setfield(state, -2, name);
+		}
 		void registerFunctions(lua_State* state)const
 		{
 			for (FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
@@ -97,9 +143,14 @@ namespace kaguya
 			{
 				registerFunction(state, it->first.c_str(), it->second);
 			}
+			for (ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
+			{
+				registerField(state, it->first.c_str(), it->second);
+			}
 		}
 		FuncMapType function_map_;
 		FuncMapType member_function_map_;
+		ValueMapType value_map_;
 		std::string metatableName_;
 		std::string parent_metatableName_;
 	};
@@ -107,14 +158,13 @@ namespace kaguya
 	template<typename class_type>
 	struct ClassMetatable :Metatable
 	{
-		ClassMetatable(std::string parent_metatable="") :Metatable(types::metatableName<class_type>(), parent_metatable)
+		ClassMetatable(std::string parent_metatable = "") :Metatable(types::metatableName<class_type>(), parent_metatable)
 		{
 			FunctorType dtor(kaguya::nativefunction::create(&types::destructor<class_type>));
 			function_map_["__gc"].push_back(dtor);
 		}
 
 #include "gen/add_constructor.inl"
-
 		//variadic argment constructor(receive const std::vector<LuaRef>&)
 //		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
 		ClassMetatable& addConstructorVariadicArg()
@@ -124,20 +174,26 @@ namespace kaguya
 			return *this;
 		}
 
-		template<typename Fun>
-		ClassMetatable& addMember(const char* name, Fun f)
+		template<typename Ret>
+		ClassMetatable& addMember(const char* name, Ret class_type::* f)
 		{
-			FunctorType fun(kaguya::nativefunction::create(f));
-			member_function_map_[name].push_back(fun);
+			addFunction(name, f);
 			return *this;
 		}
 
-		void setMembers(const FuncMapType& funcs)
+
+		template<typename Fun>
+		ClassMetatable& addStaticMember(const char* name, Fun f)
 		{
-			member_function_map_ = funcs;
+			addFunction(name, f);
+			return *this;
 		}
-		FuncMapType members()const {
-			return member_function_map_;
+
+		template<typename Data>
+		ClassMetatable& addStaticField(const char* name, Data f)
+		{
+			addField(name, f);
+			return *this;
 		}
 	};
 };
