@@ -64,7 +64,7 @@ namespace kaguya
 			{
 				typedef typename traits::remove_cv<T>::type noncv_type;
 				typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-				typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
+				typedef typename traits::remove_reference<noncvpointer_type>::type noncvpointerref_type;
 				return metatableNameNonCV(typetag<noncvpointerref_type>());
 			}
 			template<typename T>
@@ -72,7 +72,7 @@ namespace kaguya
 			{
 				typedef typename traits::remove_cv<T>::type noncv_type;
 				typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-				typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
+				typedef typename traits::remove_reference<noncvpointer_type>::type noncvpointerref_type;
 				return metatableNameNonCV(typetag<MetaPointerWrapper<noncvpointerref_type> >());
 			}
 			template<typename T>
@@ -80,7 +80,7 @@ namespace kaguya
 			{
 				typedef typename traits::remove_cv<T>::type noncv_type;
 				typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-				typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
+				typedef typename traits::remove_reference<noncvpointer_type>::type noncvpointerref_type;
 				return metatableNameNonCV(typetag<standard::shared_ptr<noncvpointerref_type> >());
 			}
 		}
@@ -89,7 +89,7 @@ namespace kaguya
 		{
 			typedef typename traits::remove_cv<T>::type noncv_type;
 			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-			typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			typedef typename traits::remove_reference<noncvpointer_type>::type noncvpointerref_type;
 			return nodirectuse::metatableNameDispatch(typetag<noncvpointerref_type>());
 		}
 
