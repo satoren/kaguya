@@ -10,7 +10,6 @@
 
 
 #define KAGUYA_FUNCTOR_METATABLE "functor_kaguya_metatype"
-#define KAGUYA_ERROR_HANDLER_METATABLE "error_handler_kaguya_metatype"
 namespace kaguya
 {
 	namespace nativefunction

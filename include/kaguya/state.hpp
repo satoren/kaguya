@@ -31,11 +31,6 @@ namespace kaguya
 			nativefunction::reg_functor_destructor(state_);
 		}
 
-		static int error_handler_cleanner(lua_State *state)
-		{
-			ErrorHandler::instance().unregisterHandler(state);
-			return 0;
-		}
 	public:
 		State() :state_(luaL_newstate()), created_(true)
 		{
@@ -57,16 +52,6 @@ namespace kaguya
 		{
 			util::ScopedSavedStack save(state_);
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
-
-			if (luaL_newmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE))//register error handler destructor to Lua state
-			{
-				lua_pushcclosure(state_, &error_handler_cleanner, 0);
-				lua_setfield(state_, -2, "__gc");
-				lua_setfield(state_, -1, "__index");
-				lua_newuserdata(state_,1);//dummy data for gc call
-				luaL_setmetatable(state_, KAGUYA_ERROR_HANDLER_METATABLE);
-				luaL_ref(state_, LUA_REGISTRYINDEX);
-			}
 		}
 
 		void openlibs()

@@ -5,6 +5,8 @@
 #include "kaguya/config.hpp"
 
 
+#define KAGUYA_ERROR_HANDLER_METATABLE "error_handler_kaguya_metatype"
+
 namespace kaguya
 {
 
@@ -14,7 +16,7 @@ namespace kaguya
 	}
 	struct ErrorHandler
 	{
-		typedef standard::function<void(int, const char* )> function_type;
+		typedef standard::function<void(int, const char*)> function_type;
 
 
 		void handle(const char* message, lua_State *state)
@@ -30,17 +32,17 @@ namespace kaguya
 			function_type handler = getHandler(state);
 			if (handler)
 			{
-				handler(status_code,get_error_message(state));
+				handler(status_code, get_error_message(state));
 			}
 		}
 
-		function_type getHandler(lua_State* state)const
+		function_type getHandler(lua_State* state)
 		{
-			standard::lock_guard<standard::mutex> lk(mutex_);
-			std::map<lua_State*, function_type>::const_iterator match = handler_map_.find(state);
-			if (match != handler_map_.end())
+
+			function_type* funptr = getFunctionPointer(state);
+			if (funptr)
 			{
-				return match->second;
+				return *funptr;
 			}
 			return function_type();
 		}
@@ -50,16 +52,38 @@ namespace kaguya
 		{
 			if (state)
 			{
-				standard::lock_guard<standard::mutex> lk(mutex_);
-				handler_map_.erase(state);
+				function_type* funptr = getFunctionPointer(state);
+				if (funptr)
+				{
+					*funptr = function_type();
+				}
 			}
 		}
-		void registerHandler(lua_State* state,function_type f)
+		void registerHandler(lua_State* state, function_type f)
 		{
 			if (state)
 			{
-				standard::lock_guard<standard::mutex> lk(mutex_);
-				handler_map_[state] = f;
+				util::ScopedSavedStack save(state);
+				lua_pushlightuserdata(state, this);
+				if (luaL_newmetatable(state, KAGUYA_ERROR_HANDLER_METATABLE))//register error handler destructor to Lua state
+				{
+					lua_pushcclosure(state, &error_handler_cleanner, 0);
+					lua_setfield(state, -2, "__gc");
+					lua_setfield(state, -1, "__index");
+					void* ptr = lua_newuserdata(state, sizeof(function_type));//dummy data for gc call
+					function_type* funptr = new(ptr) function_type();
+					luaL_setmetatable(state, KAGUYA_ERROR_HANDLER_METATABLE);
+					lua_settable(state, LUA_REGISTRYINDEX);
+					*funptr = f;
+				}
+				else
+				{
+					function_type* funptr = getFunctionPointer(state);
+					if (funptr)
+					{
+						*funptr = f;
+					}
+				}
 			}
 		}
 
@@ -68,12 +92,29 @@ namespace kaguya
 			return instance_;
 		}
 	private:
-		ErrorHandler() {}
+		function_type* getFunctionPointer(lua_State* state)
+		{
+			if (state)
+			{
+				util::ScopedSavedStack save(state);
+				lua_pushlightuserdata(state, this);
+				lua_gettable(state, LUA_REGISTRYINDEX);
+				function_type* ptr = (function_type*)lua_touserdata(state, -1);
+				return ptr;
+			}
+			return 0;
+		}
 
-		std::map<lua_State*, function_type> handler_map_;
-		mutable  standard::mutex mutex_;
+		ErrorHandler() {}
 
 		ErrorHandler(const ErrorHandler&);
 		ErrorHandler& operator=(const ErrorHandler&);
+
+		static int error_handler_cleanner(lua_State *state)
+		{
+			function_type* ptr = (function_type*)lua_touserdata(state, 1);
+			ptr->~function_type();
+			return 0;
+		}
 	};
 };

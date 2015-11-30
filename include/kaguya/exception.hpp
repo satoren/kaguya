@@ -81,7 +81,7 @@ namespace kaguya
 		}
 		void checkErrorAndThrow(int status, lua_State *state)
 		{
-			if (status != 0)
+			if (status != LUA_OK && status!=LUA_YIELD)
 			{
 				ErrorHandler::instance().handle(status, state);
 #if !KAGUYA_ERROR_NO_THROW
