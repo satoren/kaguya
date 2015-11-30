@@ -61,25 +61,25 @@ namespace kaguya
 		template<typename T>
 		inline std::string metatableName()
 		{
-			typedef traits::remove_cv<T>::type noncv_type;
-			typedef traits::remove_pointer<noncv_type>::type noncvpointer_type;
-			typedef traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			typedef typename traits::remove_cv<T>::type noncv_type;
+			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
 			return metatableName(typetag<noncvpointerref_type>());
 		}
 		template<typename T>
 		inline std::string metatableName(typetag<MetaPointerWrapper<T> > tag)
 		{
-			typedef traits::remove_cv<T>::type noncv_type;
-			typedef traits::remove_pointer<noncv_type>::type noncvpointer_type;
-			typedef traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			typedef typename traits::remove_cv<T>::type noncv_type;
+			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
 			return typeid(MetaPointerWrapper<noncvpointerref_type>).name() + std::string("_kaguya_type");
 		}
 		template<typename T>
 		inline std::string metatableName(typetag<standard::shared_ptr<T> > tag)
 		{
-			typedef traits::remove_cv<T>::type noncv_type;
-			typedef traits::remove_pointer<noncv_type>::type noncvpointer_type;
-			typedef traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			typedef typename traits::remove_cv<T>::type noncv_type;
+			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef typename traits::remove_reference<noncv_type>::type noncvpointerref_type;
 			return typeid(standard::shared_ptr<noncvpointerref_type>).name() + std::string("_kaguya_type");
 		}
 
