@@ -478,18 +478,33 @@ namespace kaguya
 			return !(other == *this);
 		}
 
-		template<typename T>
-		bool operator == (const T v)const
-		{
-			return get<T>() == v;
-		}
-		template<typename T>
-		bool operator != (const T v)const
-		{
-			return !((*this) == v);
-		}
-		bool operator == (const char* v)const { return get<std::string>() == v; }
 	};
+
+	template<typename T>
+	bool operator == (const LuaRef& lhs,const T& rhs)
+	{
+		return lhs.get<T>() == rhs;
+	}
+	template<typename T>
+	bool operator != (const LuaRef& lhs, const T& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	bool operator == (const LuaRef& lhs, const char* rhs) { return lhs.get<std::string>() == rhs; }
+
+	template<typename T>
+	bool operator == (const T& lhs, const LuaRef& rhs)
+	{
+		return lhs == rhs.get<T>();
+	}
+	template<typename T>
+	bool operator != (const T& lhs,const LuaRef& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	bool operator == (const char* lhs,const LuaRef& rhs) { return lhs == rhs.get<std::string>(); }
+
+
 
 	typedef LuaRef Selector;
 

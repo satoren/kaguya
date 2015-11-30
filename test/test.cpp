@@ -283,6 +283,68 @@ namespace selector_test
 			if (!state("assert(ABC.TEST3 == 133.23)")) { return false; }
 			return true;
 		}
+
+
+		struct CopyableClass
+		{
+			CopyableClass(int i) :member(i) {}
+			bool operator==(const CopyableClass& rhs)const
+			{
+				return member == rhs.member;
+			}
+			bool operator!=(const CopyableClass& rhs)const
+			{
+				return member != rhs.member;
+			}
+		private:
+			CopyableClass();
+			int member;
+		};
+		bool copyable_class_test(kaguya::State& state)
+		{
+			state["CopyableClass"].setClass(kaguya::ClassMetatable<CopyableClass>()
+				.addConstructor<int>()
+				.addMember("__eq", &CopyableClass::operator==)
+				);
+			state["copy"] = CopyableClass(2);
+			if (state["copy"] != CopyableClass(2)) { return false; }
+			if (CopyableClass(2) != state["copy"]) { return false; }
+			CopyableClass copy = state["copy"];
+			if (copy != CopyableClass(2)) { return false; }
+			return true;
+		}
+		
+
+		struct NoncopyableClass
+		{
+			NoncopyableClass(int i) :member(i) {}
+			bool operator==(const NoncopyableClass& rhs)const
+			{
+				return member == rhs.member;
+			}
+			bool operator!=(const NoncopyableClass& rhs)const
+			{
+				return member != rhs.member;
+			}
+		private:
+			NoncopyableClass();
+			NoncopyableClass(const NoncopyableClass&);
+			int member;
+		};
+		bool noncopyable_class_test(kaguya::State& state)
+		{
+			state["NoncopyableClass"].setClass(kaguya::ClassMetatable<NoncopyableClass>()
+				.addConstructor<int>()
+				.addMember("__eq", &NoncopyableClass::operator==)
+				);
+
+			NoncopyableClass noncopy(2);
+			state["noncopy"] = &noncopy;
+
+			const NoncopyableClass* noncpyref = state["noncopy"];
+			if (noncpyref != &noncopy) { return false; }
+			return true;
+		}
 	}
 
 	namespace t_03_function
@@ -727,6 +789,10 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::data_member_bind);
 		ADD_TEST(selector_test::t_02_classreg::operator_bind);
 		ADD_TEST(selector_test::t_02_classreg::add_field);
+		ADD_TEST(selector_test::t_02_classreg::copyable_class_test);
+		ADD_TEST(selector_test::t_02_classreg::noncopyable_class_test);
+		
+
 		
 
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);

@@ -54,9 +54,33 @@ namespace kaguya
 		//}
 
 		template<typename T>
-		inline std::string metatableName()
+		inline std::string metatableName(typetag<T> tag)
 		{
 			return typeid(T*).name() + std::string("_kaguya_type");
+		}
+		template<typename T>
+		inline std::string metatableName()
+		{
+			typedef traits::remove_cv<T>::type noncv_type;
+			typedef traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			return metatableName(typetag<noncvpointerref_type>());
+		}
+		template<typename T>
+		inline std::string metatableName(typetag<MetaPointerWrapper<T> > tag)
+		{
+			typedef traits::remove_cv<T>::type noncv_type;
+			typedef traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			return typeid(MetaPointerWrapper<noncvpointerref_type>).name() + std::string("_kaguya_type");
+		}
+		template<typename T>
+		inline std::string metatableName(typetag<standard::shared_ptr<T> > tag)
+		{
+			typedef traits::remove_cv<T>::type noncv_type;
+			typedef traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef traits::remove_reference<noncv_type>::type noncvpointerref_type;
+			return typeid(standard::shared_ptr<noncvpointerref_type>).name() + std::string("_kaguya_type");
 		}
 
 		template<class T>
@@ -329,24 +353,18 @@ namespace kaguya
 			}
 		}
 		template<typename T>
-		inline T get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
+		inline const T& get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
 		{
-			if (standard::is_enum<T>())
+			T* pointer = get_pointer(l, index, typetag<T>());
+			if (!pointer)
 			{
-				return getEnum(l, index, typetag<T>());
+				except::typeMismatchError(l, "type mismatch!!");
 			}
-			else
-			{
-				return get(l, index, typetag<T>());
-			}
+			return *pointer;
 		}
 		template<typename T>
 		inline T& get(lua_State* l, int index, typetag<T&> tag = typetag<T&>())
 		{
-			if (standard::is_enum<T>())
-			{
-				return getEnum(l,index, typetag<T>());
-			}
 			T* pointer = get_pointer(l, index, typetag<T>());
 			if (!pointer)
 			{
@@ -365,7 +383,6 @@ namespace kaguya
 		{
 			return lua_tothread(l, index);
 		}
-
 
 		inline bool get(lua_State* l, int index, typetag<bool> tag = typetag<bool>())
 		{
@@ -460,7 +477,8 @@ namespace kaguya
 			getEnum(lua_State* l, int index, typetag<T>)
 		{
 			assert(false);
-			return (T)(0);
+			exit(-1);//SFINAE failed
+			return *(T*)(0);
 		}
 
 
