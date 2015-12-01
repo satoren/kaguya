@@ -1,0 +1,23 @@
+version: 1.0.{build}
+os:
+- Visual Studio 2013
+- Visual Studio 2015
+configuration:
+- Debug
+- Release
+install:
+- ps: >-
+    if(!(Test-Path -Path lua-5.3.1 )){
+      choco install 7zip.commandline
+      Invoke-WebRequest  http://www.lua.org/ftp/lua-5.3.1.tar.gz -OutFile lua-5.3.1.tar.gz
+      7z x lua-5.3.1.tar.gz
+      7z x lua-5.3.1.tar
+    }
+cache: lua-5.3.1
+before_build:
+- cmd: cmake ./
+build:
+  project: Kaguya.sln
+  verbosity: detailed
+test_script:
+- ps: Invoke-Expression ($env:Configuration+"\test_runner.exe")
