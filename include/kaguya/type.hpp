@@ -358,6 +358,7 @@ namespace kaguya
 				if (!pointer)
 				{
 					except::typeMismatchError(l, "type mismatch!!");
+					throw std::invalid_argument("type mismatch!!");//can not comeback from error
 				}
 				return *pointer;
 			}
@@ -369,6 +370,7 @@ namespace kaguya
 			if (!pointer)
 			{
 				except::typeMismatchError(l, "type mismatch!!");
+				throw std::invalid_argument("type mismatch!!");//can not comeback from error
 			}
 			return *pointer;
 		}
@@ -379,6 +381,7 @@ namespace kaguya
 			if (!pointer)
 			{
 				except::typeMismatchError(l, "type mismatch!!");
+				throw std::invalid_argument("type mismatch!!");//can not comeback from error
 			}
 			return *pointer;
 		}
