@@ -174,13 +174,22 @@ namespace kaguya
 			return *this;
 		}
 
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+		//can not write  Ret class_type::* f on MSC++2013
+		template<typename Fun>
+		ClassMetatable& addMember(const char* name, Fun f)
+		{
+			addFunction(name, f);
+			return *this;
+		}
+#else
 		template<typename Ret>
 		ClassMetatable& addMember(const char* name, Ret class_type::* f)
 		{
 			addFunction(name, f);
 			return *this;
 		}
-
+#endif
 
 		template<typename Fun>
 		ClassMetatable& addStaticMember(const char* name, Fun f)
