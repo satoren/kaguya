@@ -11,7 +11,7 @@ endif(NOT LUA_INCLUDE_DIRS)
 
 
 if(NOT LUA_INCLUDE_DIRS)
-  //search local directory
+  #search local directory
   if(NOT ${LOCAL_LUA_DIRECTORY})
   set(LOCAL_LUA_DIRECTORY lua-5.3.1)
   endif()
