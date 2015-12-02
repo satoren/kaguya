@@ -88,8 +88,8 @@ namespace selector_test
 
 			ABC() :intmember(0) {}
 			ABC(int a) :intmember(a) { }
-			ABC(const char* a) :stringmember(a) { }
-			ABC(std::string a) :stringmember(a) { }
+			ABC(const char* a) :intmember(0),stringmember(a) { }
+			ABC(std::string a) :intmember(0), stringmember(a) { }
 			ABC(int intmem, const std::string& strmem) :intmember(intmem), stringmember(strmem) { }
 			ABC(const std::string& strmem, int intmem) :intmember(intmem), stringmember(strmem) { }
 			ABC(const ABC&src) :intmember(src.intmember), stringmember(src.stringmember) {}
@@ -683,7 +683,7 @@ namespace selector_test
 			if (state("awdorgkwl;gw")) { return false; }
 
 			if (error_count != 1) { return false; }
-			state["yy"]["yy"]["yy"];
+			state["yy"]["yy"]["yy"]();
 			return error_count > 0;
 		}
 		bool function_call_error(kaguya::State& state)

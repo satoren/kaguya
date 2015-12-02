@@ -186,7 +186,7 @@ namespace kaguya
 		}
 		//push to Lua stack
 		template<typename T>
-		LuaRef pushToStack(T value)
+		void pushToStack(T value)
 		{
 			types::push(state_, value);
 		}

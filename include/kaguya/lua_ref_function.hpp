@@ -52,9 +52,7 @@ namespace kaguya
 			{
 				return eval_info_->results.back().get<T>();
 			}
-			//error
-			assert(false);
-			return T();
+			return LuaRef(state_);//method invoke error
 		}
 
 		template<typename T>
@@ -85,7 +83,7 @@ namespace kaguya
 		{
 			util::ScopedSavedStack save(state_);
 
-			if (eval_info_->owner == this && !eval_info_->invoked)
+			if (eval_info_&& eval_info_->owner == this && !eval_info_->invoked)
 			{
 				eval_info_->invoked = true;
 				const std::vector<LuaRef>& args = eval_info_->args;
@@ -129,7 +127,7 @@ namespace kaguya
 
 		struct eval
 		{
-			eval() :invoked(false), coroutine(false) {}
+			eval() :invoked(false), coroutine(false), owner(0){}
 			LuaRef fun;
 			std::vector<LuaRef> args;
 			std::vector<LuaRef> results;
