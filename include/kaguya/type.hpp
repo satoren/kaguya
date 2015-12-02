@@ -150,7 +150,6 @@ namespace kaguya
 		{
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
 				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
-				|| !available_metatable(l, metatableName<T>().c_str())
 				|| luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str()) != 0
 				|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str()) != 0;
 		}

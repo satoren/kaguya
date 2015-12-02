@@ -313,7 +313,7 @@ namespace selector_test
 			if (copy != CopyableClass(2)) { return false; }
 			return true;
 		}
-		
+
 
 		struct NoncopyableClass
 		{
@@ -626,6 +626,47 @@ namespace selector_test
 			kaguya::LuaRef globalTable = state.globalTable();
 			return ob() != globalTable;
 		}
+		bool typetyest_function(kaguya::State& state)
+		{
+			kaguya::LuaRef globalTable = state.globalTable();
+			return true;
+		}
+		bool operator_equal_test(kaguya::State& state)
+		{
+			kaguya::LuaRef globalTable = state.globalTable();
+
+			if (globalTable != state.globalTable()) { return false; }
+			if (!(globalTable == state.globalTable())) { return false; }
+
+			kaguya::LuaRef luanum = state.newRef(422);
+			kaguya::LuaRef luanum2 = state.newRef(42);
+			kaguya::LuaRef luanum3 = state.newRef(422);
+
+			if (luanum == luanum2) { return false; }
+			if (!(luanum != luanum2)) { return false; }
+			if (luanum < luanum2) { return false; }
+			if (luanum <= luanum2) { return false; }
+			if (!(luanum > luanum2)) { return false; }
+			if (!(luanum >= luanum2)) { return false; }
+
+			if (!(luanum == luanum3)) { return false; }
+			if (luanum != luanum3) { return false; }
+			if (luanum < luanum3) { return false; }
+			if (!(luanum <= luanum3)) { return false; }
+			if (luanum > luanum3) { return false; }
+			if (!(luanum >= luanum3)) { return false; }
+
+			return true;
+		}
+		bool typetest(kaguya::State& state)
+		{
+			kaguya::LuaRef luanum = state.newRef(422);
+			if (!luanum.typeTest<int>()) { return false; }
+			if (luanum.typeTest<std::string>()) { return false; }
+			if (luanum.typeTest<ob>()) { return false; }
+
+			return true;
+		}
 	}
 
 	namespace t_05_error_handler
@@ -818,9 +859,9 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::add_field);
 		ADD_TEST(selector_test::t_02_classreg::copyable_class_test);
 		ADD_TEST(selector_test::t_02_classreg::noncopyable_class_test);
-		
 
-		
+
+
 
 		ADD_TEST(selector_test::t_03_function::free_standing_function_test);
 		ADD_TEST(selector_test::t_03_function::member_function_test);
@@ -836,6 +877,9 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::newtable);
 		ADD_TEST(selector_test::t_04_lua_ref::callfunction);
 		ADD_TEST(selector_test::t_04_lua_ref::test_operator_bool);
+		ADD_TEST(selector_test::t_04_lua_ref::typetyest_function);
+		ADD_TEST(selector_test::t_04_lua_ref::operator_equal_test);
+		ADD_TEST(selector_test::t_04_lua_ref::typetest);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);

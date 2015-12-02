@@ -247,7 +247,15 @@ namespace kaguya
 #endif
 			lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
 		}
-		
+
+		template<typename T>
+		bool typeTest()const
+		{
+			util::ScopedSavedStack save(state_);
+			push();//push to stack
+			return types::strictCheckType(state_,-1,types::typetag<T>());
+		}
+
 		template<typename T>
 		T get(types::typetag<T>)const
 		{
