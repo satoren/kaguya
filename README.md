@@ -121,7 +121,7 @@ state["fun"](54); //c_free_standing_function called:54
 state("fun(22)");//c_free_standing_function called:22
 
 state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::endl;});//C++11 lambda
-state("lambda(22)");//lambda called
+state("lambda()");//lambda called
 ```
 
 #### Variadic argments function
@@ -143,8 +143,8 @@ state("corfun = function(arg)"
 " end");//define corouine function
 kaguya::LuaRef corfun = state["corfun"];//function get
 //exec coroutine with function and argment
-stc::cout << int(cor(corfun, 3)) << std::endl;//3
-stc::cout << int(cor()) << std::endl;//6
-stc::cout << int(cor()) << std::endl;//9
-stc::cout << int(cor()) << std::endl;//12
+std::cout << int(cor(corfun, 3)) << std::endl;//3
+std::cout << int(cor()) << std::endl;//6
+std::cout << int(cor()) << std::endl;//9
+std::cout << int(cor()) << std::endl;//12
 ```
