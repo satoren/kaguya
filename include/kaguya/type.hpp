@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstring>
 
 #include "kaguya/config.hpp"
 #include "kaguya/traits.hpp"
@@ -34,34 +35,37 @@ namespace kaguya
 
 		namespace nodirectuse {
 			//faster but no human readable
-			//struct metatableName_t
-			//{
-			//	char metaname[16 + sizeof(intptr_t) * 2];//XXXXXXXX(ptrlen*(8/7))_kaguya_type
-			//	const char* c_str()const { return metaname; }
-			//	operator std::string()const { return metaname; }
-			//};
-			//template<typename T>
-			//inline metatableName_t metatableNameNonCV(typetag<T> )
-			//{
-			//	metatableName_t result;
-			//	intptr_t ptrvalue = intptr_t(typeid(T*).name());
-			//	size_t pos =0;
-			//	for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
-			//	{
-			//		result.metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
-			//	}
-			//	memcpy(&result.metaname[pos], "_kaguya_type", strlen("_kaguya_type"));
-			//	result.metaname[pos+ strlen("_kaguya_type")] = '\0';
-			//	return result;
-			//}
+#ifdef NDEBUG
+			struct metatableName_t
+			{
+				char metaname[16 + sizeof(intptr_t) * 2];//XXXXXXXX(ptrlen*(8/7))_kaguya_type
+				const char* c_str()const { return metaname; }
+				operator std::string()const { return metaname; }
+			};
 			template<typename T>
-			inline std::string metatableNameNonCV(typetag<T>)
+			inline metatableName_t metatableNameNonCV(typetag<T> )
+			{
+				metatableName_t result;
+				intptr_t ptrvalue = intptr_t(typeid(T*).name());
+				size_t pos =0;
+				for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
+				{
+					result.metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
+				}
+				memcpy(&result.metaname[pos], "_kaguya_type", strlen("_kaguya_type"));
+				result.metaname[pos+ strlen("_kaguya_type")] = '\0';
+				return result;
+			}
+#else
+			typedef std::string metatableName_t;
+			template<typename T>
+			inline metatableName_t metatableNameNonCV(typetag<T>)
 			{
 				return typeid(T*).name() + std::string("_kaguya_type");
 			}
-
+#endif
 			template<typename T>
-			inline std::string metatableNameDispatch(typetag<T>)
+			inline metatableName_t metatableNameDispatch(typetag<T>)
 			{
 				typedef typename traits::remove_cv<T>::type noncv_type;
 				typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
@@ -69,7 +73,7 @@ namespace kaguya
 				return metatableNameNonCV(typetag<noncvpointerref_type>());
 			}
 			template<typename T>
-			inline std::string metatableNameDispatch(typetag<MetaPointerWrapper<T> >)
+			inline metatableName_t metatableNameDispatch(typetag<MetaPointerWrapper<T> >)
 			{
 				typedef typename traits::remove_cv<T>::type noncv_type;
 				typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
@@ -77,7 +81,7 @@ namespace kaguya
 				return metatableNameNonCV(typetag<MetaPointerWrapper<noncvpointerref_type> >());
 			}
 			template<typename T>
-			inline std::string metatableNameDispatch(typetag<standard::shared_ptr<T> >)
+			inline metatableName_t metatableNameDispatch(typetag<standard::shared_ptr<T> >)
 			{
 				typedef typename traits::remove_cv<T>::type noncv_type;
 				typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
@@ -86,7 +90,7 @@ namespace kaguya
 			}
 		}
 		template<typename T>
-		inline std::string metatableName()
+		inline nodirectuse::metatableName_t metatableName()
 		{
 			typedef typename traits::remove_cv<T>::type noncv_type;
 			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
@@ -98,11 +102,12 @@ namespace kaguya
 		T* get_pointer(lua_State* l, int index, typetag<T> tag)
 		{
 			int type = lua_type(l, index);
+
 			if (type == LUA_TTABLE)//allow table for __gc
 			{
 				return 0;
 			}
-			if (type == LUA_TLIGHTUSERDATA || !available_metatable(l, metatableName<T>().c_str()))
+			if (type == LUA_TLIGHTUSERDATA)
 			{
 				return (T*)lua_topointer(l, index);
 			}
@@ -115,13 +120,13 @@ namespace kaguya
 				T* ptr = (T*)luaL_testudata(l, index, metatableName<T>().c_str());
 				if (!ptr)
 				{
-					standard::shared_ptr<T>* shared_ptr = reinterpret_cast<standard::shared_ptr<T>*>(luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str()));
-					if (shared_ptr) { ptr = shared_ptr->get(); }
+					MetaPointerWrapper<T>* ptr_wrapper = reinterpret_cast<MetaPointerWrapper<T>*>(luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str()));
+					if (ptr_wrapper) { ptr = ptr_wrapper->ptr; }
 				}
 				if (!ptr)
 				{
-					MetaPointerWrapper<T>* ptr_wrapper = reinterpret_cast<MetaPointerWrapper<T>*>(luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str()));
-					if (ptr_wrapper) { ptr = ptr_wrapper->ptr; }
+					standard::shared_ptr<T>* shared_ptr = reinterpret_cast<standard::shared_ptr<T>*>(luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str()));
+					if (shared_ptr) { ptr = shared_ptr->get(); }
 				}
 
 				return ptr;
@@ -393,7 +398,7 @@ namespace kaguya
 		}
 
 
-		inline lua_State* get(lua_State* l, int index, typetag<lua_State> tag = typetag<lua_State>())
+		inline lua_State* get(lua_State* l, int index, typetag<lua_State*> tag = typetag<lua_State*>())
 		{
 			return lua_tothread(l, index);
 		}

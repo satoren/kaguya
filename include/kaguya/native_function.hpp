@@ -30,14 +30,7 @@ namespace kaguya
 			if (overloadnum == 1)
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(2)));
-				if ((*fun)->checktype(l, false))
-				{
-					return fun;
-				}
-				else
-				{
-					return 0;
-				}
+				return fun;
 			}
 			FunctorType* weak_match = 0;
 			for (int i = 0; i < overloadnum; ++i)
