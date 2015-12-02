@@ -71,7 +71,9 @@ namespace kaguya
 					lua_setfield(state, -2, "__gc");
 					lua_setfield(state, -1, "__index");
 					void* ptr = lua_newuserdata(state, sizeof(function_type));//dummy data for gc call
+					if (!ptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 					function_type* funptr = new(ptr) function_type();
+					if (!funptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 					luaL_setmetatable(state, KAGUYA_ERROR_HANDLER_METATABLE);
 					lua_settable(state, LUA_REGISTRYINDEX);
 					*funptr = f;

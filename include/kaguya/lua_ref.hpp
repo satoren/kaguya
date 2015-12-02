@@ -73,18 +73,18 @@ namespace kaguya
 				return;
 			}
 			util::ScopedSavedStack save(state_);
-			push(state_);
+			push(state_);//push table to stack
 			int t = (value_type)lua_type(state_, -1);
 			if (t != LUA_TTABLE)
 			{
 				except::typeMismatchError(state_, typeName() + "is not table");
 				return;
 			}
-			int kc = types::push(state_, key);
-			int vc = types::push(state_, standard::forward<V>(value));
+			int kc = types::push(state_, key);//push table key
+			int vc = types::push(state_, standard::forward<V>(value));//push value
 
 			if (!pushCountCheck<K>(kc) || !pushCountCheck<V>(vc)) { return; }
-			lua_settable(state_, -3);
+			lua_settable(state_, -3);//thistable[key] = value 
 		}
 
 		static lua_State* toMainThread(lua_State* state)
@@ -115,12 +115,14 @@ namespace kaguya
 			}
 			return true;
 		}
+		
 	public:
 		int thread_status()const
 		{
 			if (isNilref())
 			{
 				except::typeMismatchError(state_, "is nil");
+				return LUA_ERRRUN;
 			}
 			util::ScopedSavedStack save(state_);
 			lua_State* thread = get<lua_State*>();
@@ -128,6 +130,7 @@ namespace kaguya
 			if (!thread)
 			{
 				except::typeMismatchError(state_, "is not thread");
+				return LUA_ERRRUN;
 			}
 			return lua_status(thread);
 		}
@@ -244,19 +247,29 @@ namespace kaguya
 #endif
 			lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
 		}
+		
+		template<typename T>
+		T get(types::typetag<T>)const
+		{
+			return get<T>();
+		}
 
+		std::string get(types::typetag<const std::string&>)const
+		{
+			return get<std::string>();
+		}
 		template<typename T>
 		T get()const
 		{
 			if (state_ == 0 || ref_ == LUA_REFNIL)
 			{
-				except::typeMismatchError(state_, "is nil");
+				throw LuaTypeMismatch("is nil");
 			}
 			util::ScopedSavedStack save(state_);
 			push(state_);
 			if (!types::checkType(state_, -1, types::typetag<T>()))
 			{
-				except::typeMismatchError(state_, typeName() + std::string("is not ") + typeid(T).name());
+				throw LuaTypeMismatch(typeName() + std::string("is not ") + typeid(T).name());
 			}
 			return types::get(state_, -1, types::typetag<T>());
 		}
@@ -265,6 +278,11 @@ namespace kaguya
 		operator T()const {
 			return get<T>();
 		}
+
+		operator bool()const {
+			return !isNilref() && get<bool>() == true;
+		}
+
 #include "kaguya/gen/luaref_fun_def.inl"
 
 		mem_fun_binder operator->*(const char* key);
@@ -483,7 +501,21 @@ namespace kaguya
 	template<typename T>
 	bool operator == (const LuaRef& lhs,const T& rhs)
 	{
-		return lhs.get<T>() == rhs;
+		try
+		{
+			return lhs.get(types::typetag<const T&>()) == rhs;
+		}
+		catch (const LuaTypeMismatch&)
+		{
+		}
+		try
+		{
+			return lhs.get(types::typetag<T>()) == rhs;
+		}
+		catch (const LuaTypeMismatch&)
+		{
+		}
+		return false;
 	}
 	template<typename T>
 	bool operator != (const LuaRef& lhs, const T& rhs)
@@ -495,7 +527,21 @@ namespace kaguya
 	template<typename T>
 	bool operator == (const T& lhs, const LuaRef& rhs)
 	{
-		return lhs == rhs.get<T>();
+		try
+		{
+			return lhs == rhs.get(types::typetag<const T&>());
+		}
+		catch (const LuaTypeMismatch&)
+		{
+		}
+		try
+		{
+			return lhs == rhs.get(types::typetag<T>());
+		}
+		catch (const LuaTypeMismatch&)
+		{
+		}
+		return false;
 	}
 	template<typename T>
 	bool operator != (const T& lhs,const LuaRef& rhs)

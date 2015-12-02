@@ -616,6 +616,16 @@ namespace selector_test
 			;
 			return true;
 		}
+
+		struct ob
+		{
+			operator bool()const { return true; }
+		};
+		bool test_operator_bool(kaguya::State& state)
+		{
+			kaguya::LuaRef globalTable = state.globalTable();
+			return ob() != globalTable;
+		}
 	}
 
 	namespace t_05_error_handler
@@ -654,8 +664,25 @@ namespace selector_test
 			lua_State* L = luaL_newstate();
 
 			kaguya::State state(L);
+			kaguya::State state2(L);
+			kaguya::State state3(L);
+			kaguya::State state4(L);
+			kaguya::State state5(L);
 
 			lua_close(L);
+			return true;
+		}
+
+		void ignore_error_fun(int status, const char* message)
+		{
+		}
+		bool load_string(kaguya::State& state)
+		{
+			kaguya::LuaRef luafun = state.loadstring("assert(11 == 11);return true");
+			if (luafun() == false) { return false; }
+			state.setErrorHandler(ignore_error_fun);
+			kaguya::LuaRef errorref = state.loadstring("function() e");//syntax error
+			if (errorref) { return false; }
 			return true;
 		}
 	}
@@ -808,12 +835,13 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::access);
 		ADD_TEST(selector_test::t_04_lua_ref::newtable);
 		ADD_TEST(selector_test::t_04_lua_ref::callfunction);
+		ADD_TEST(selector_test::t_04_lua_ref::test_operator_bool);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);
 
-
 		ADD_TEST(selector_test::t_06_state::other_state);
+		ADD_TEST(selector_test::t_06_state::load_string);
 
 		test_result = execute_test(testmap);
 

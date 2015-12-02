@@ -9,7 +9,6 @@
 
 namespace kaguya
 {
-#if !KAGUYA_ERROR_NO_THROW
 	class LuaException :public std::exception
 	{
 		int status_;
@@ -23,6 +22,12 @@ namespace kaguya
 
 		~LuaException()throw() {}
 	};
+	class LuaTypeMismatch :public LuaException {
+	public:
+		LuaTypeMismatch(const char* what)throw() :LuaException(0, what) {}
+		LuaTypeMismatch(const std::string& what) :LuaException(0, what) {}
+	};
+#if !KAGUYA_ERROR_NO_THROW
 	class LuaRuntimeError :public LuaException {
 	public:
 		LuaRuntimeError(int status, const char* what)throw() :LuaException(status, what) {}
@@ -53,11 +58,6 @@ namespace kaguya
 		LuaSyntaxError(int status, const std::string& what) :LuaException(status, what) {}
 	};
 
-	class LuaTypeMismatch :public LuaException {
-	public:
-		LuaTypeMismatch(const char* what)throw() :LuaException(0, what) {}
-		LuaTypeMismatch(const std::string& what) :LuaException(0, what) {}
-	};
 	class LuaKaguyaError :public LuaException {
 	public:
 		LuaKaguyaError(const std::string& what) :LuaException(0, what) {}

@@ -4,6 +4,7 @@
 
 #include "kaguya/config.hpp"
 #include "kaguya/traits.hpp"
+#include "kaguya/exception.hpp"
 
 namespace kaguya
 {
@@ -357,8 +358,7 @@ namespace kaguya
 				T* pointer = get_pointer(l, index, typetag<T>());
 				if (!pointer)
 				{
-					except::typeMismatchError(l, "type mismatch!!");
-					throw std::invalid_argument("type mismatch!!");//can not comeback from error
+					throw LuaTypeMismatch("type mismatch!!");
 				}
 				return *pointer;
 			}
@@ -366,11 +366,14 @@ namespace kaguya
 		template<typename T>
 		inline const T& get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
 		{
+			if (standard::is_enum<T>())
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
 			T* pointer = get_pointer(l, index, typetag<T>());
 			if (!pointer)
 			{
-				except::typeMismatchError(l, "type mismatch!!");
-				throw std::invalid_argument("type mismatch!!");//can not comeback from error
+				throw LuaTypeMismatch("type mismatch!!");
 			}
 			return *pointer;
 		}
@@ -380,7 +383,6 @@ namespace kaguya
 			T* pointer = get_pointer(l, index, typetag<T>());
 			if (!pointer)
 			{
-				except::typeMismatchError(l, "type mismatch!!");
 				throw std::invalid_argument("type mismatch!!");//can not comeback from error
 			}
 			return *pointer;
@@ -489,8 +491,7 @@ namespace kaguya
 		typename traits::enable_if< !standard::is_enum<T>::value, T>::type
 			getEnum(lua_State* l, int index, typetag<T>)
 		{
-			assert(false);
-			exit(-1);//SFINAE failed
+			throw LuaTypeMismatch("type mismatch!!");
 			return *(T*)(0);
 		}
 
