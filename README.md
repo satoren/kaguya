@@ -14,7 +14,7 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 ## Introduction
 Kaguya is Lua binding library for C++ 
 - header-file only
--  for lua module system
+- can use for lua module system
 
 ## run test
 ```
