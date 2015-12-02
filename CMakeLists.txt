@@ -44,7 +44,7 @@ include_directories("./")
 if(NOT MSVC)#-Wall nonsense on MSVC
 add_definitions("-Wall")
 #add_definitions("-std=c++11")
-endif(MSVC)
+endif(NOT MSVC)
 
 
 

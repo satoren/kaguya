@@ -81,14 +81,14 @@ namespace kaguya
 		}
 		void checkErrorAndThrow(int status, lua_State *state)
 		{
-			if (status != LUA_OK && status!=LUA_YIELD)
+			if (status != 0 && status!=LUA_YIELD)
 			{
 				ErrorHandler::instance().handle(status, state);
 #if !KAGUYA_ERROR_NO_THROW
 				const char* message = 0;
 				switch (status)
 				{
-				case LUA_OK:
+				case 0:
 				case LUA_YIELD:
 					return;
 				case LUA_ERRSYNTAX:
