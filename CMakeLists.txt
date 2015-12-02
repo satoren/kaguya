@@ -51,3 +51,6 @@ endif(NOT MSVC)
 link_directories(${LUA_LIBRARY_DIRS})
 add_executable(test_runner test/test.cpp ${testSources} ${headers})
 target_link_libraries(test_runner ${LUA_LIBRARIES})
+
+add_executable(benchmark test/benchmark.cpp ${headers})
+target_link_libraries(benchmark ${LUA_LIBRARIES})

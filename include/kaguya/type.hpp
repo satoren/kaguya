@@ -34,8 +34,8 @@ namespace kaguya
 		}
 
 		namespace nodirectuse {
-			//faster but no human readable
 #ifdef NDEBUG
+			//faster but no human readable
 			struct metatableName_t
 			{
 				char metaname[16 + sizeof(intptr_t) * 2];//XXXXXXXX(ptrlen*(8/7))_kaguya_type
@@ -46,6 +46,7 @@ namespace kaguya
 			inline metatableName_t metatableNameNonCV(typetag<T> )
 			{
 				metatableName_t result;
+				//hash_code is c++11 because use name ptr
 				intptr_t ptrvalue = intptr_t(typeid(T*).name());
 				size_t pos =0;
 				for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)

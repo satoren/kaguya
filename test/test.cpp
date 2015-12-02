@@ -218,10 +218,16 @@ namespace selector_test
 			state.garbageCollect();//warning!! value3 and value4 to dangling pointer
 			if (!state("assert(value5:getString() == \"string_value3\")")) { return false; }
 			if (!state("assert(value5:getInt() == 64)")) { return false; }
-			//if (!state("assert(value3:getString() == \"string_value3\")")) { return false; }
-			//if (!state("assert(value3:getInt() == 64)")) { return false; }
-			//if (!state("assert(value4:getString() == \"string_value3\")")) { return false; }
-			//if (!state("assert(value4:getInt() == 64)")) { return false; }
+
+
+			{
+				kaguya::standard::shared_ptr<ABC> shared_ptr(new ABC("shared_object", 53));
+				state["shared_object"] = shared_ptr;
+			}
+			if (!state("assert(shared_object:getInt() == 53)")) { return false; }
+			if (!state("assert(shared_object:getString() =='shared_object')")) { return false; }
+
+
 			return true;
 		};
 
