@@ -16,7 +16,7 @@ namespace kaguya
 	{
 		lua_State *state_;
 		bool created_;
-		
+
 		//non copyable
 		State(const State&);
 		State& operator =(const State&);
@@ -27,7 +27,10 @@ namespace kaguya
 		}
 		void init()
 		{
-			setErrorHandler(&stderror_out);
+			if (!ErrorHandler::instance().getHandler(state_))
+			{
+				setErrorHandler(&stderror_out);
+			}
 			nativefunction::reg_functor_destructor(state_);
 		}
 
@@ -48,7 +51,7 @@ namespace kaguya
 			}
 		}
 
-		void setErrorHandler(standard::function<void(int statuscode,const char*message)> errorfunction)
+		void setErrorHandler(standard::function<void(int statuscode, const char*message)> errorfunction)
 		{
 			util::ScopedSavedStack save(state_);
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
@@ -60,9 +63,50 @@ namespace kaguya
 			luaL_openlibs(state_);
 		}
 
-		bool dofile(const std::string& str)
+		//If there are no errors,compiled file as a Lua function and return
+		//Otherwise send error message to error handler and return nil reference 
+		LuaRef loadfile(const std::string& file)
 		{
-			return dofile(str.c_str());
+			return loadfile(file.c_str());
+		}
+		LuaRef loadfile(const char* file)
+		{
+			util::ScopedSavedStack save(state_);
+
+			int status = luaL_loadfile(state_, file);
+
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state_);
+				return LuaRef(state_);
+			}
+			return LuaRef(state_,StackTop());
+		}
+
+
+		//If there are no errors,compiled string as a Lua function and return
+		//Otherwise send error message to error handler and return nil reference 
+		LuaRef loadstring(const std::string& str)
+		{
+			return loadstring(str.c_str());
+		}
+		LuaRef loadstring(const char* str)
+		{
+			util::ScopedSavedStack save(state_);
+
+			int status = luaL_loadstring(state_, str);
+
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state_);
+				return LuaRef(state_);
+			}
+			return LuaRef(state_, StackTop());
+		}
+
+		bool dofile(const std::string& file)
+		{
+			return dofile(file.c_str());
 		}
 		bool dofile(const char* file)
 		{
@@ -107,7 +151,6 @@ namespace kaguya
 		{
 			return dostring(str.c_str());
 		}
-
 		bool operator()(const std::string& str)
 		{
 			return dostring(str);
@@ -123,23 +166,89 @@ namespace kaguya
 
 		TableKeyReference operator[](const char* str)
 		{
-			return TableKeyReference(globalTable(),LuaRef(state_, str));
+			return TableKeyReference(globalTable(), LuaRef(state_, str));
 		}
 
+		//return global table
 		LuaRef globalTable()
 		{
-			return LuaRef(state_, GlobalTable());
+			return newRef(GlobalTable());
 		}
 
+		//return new Lua reference
+		//example:
+		// LuaRef table = state.newRef(NewTable());//return new table
+		// LuaRef coroutine = state.newRef(NewThread());//return new thread (coroutine)
+		template<typename T>
+		LuaRef newRef(T value)
+		{
+			return LuaRef(state_, value);
+		}
+		//push to Lua stack
+		template<typename T>
+		LuaRef pushToStack(T value)
+		{
+			types::push(state_, value);
+		}
+
+		struct GCType
+		{
+			GCType(lua_State* state) :state_(state) {}
+
+			void collect()
+			{
+				lua_gc(state_, LUA_GCCOLLECT, 0);
+			}
+			bool step()
+			{
+				return lua_gc(state_, LUA_GCSTEP, 0) == 1;
+			}
+			void restart() { enable(); }
+			void stop() { disable(); }
+			int count()const { return lua_gc(state_, LUA_GCCOUNT, 0);}
+			int steppause(int value) { return lua_gc(state_, LUA_GCSETPAUSE, value); }
+			int setstepmul(int value) { return lua_gc(state_, LUA_GCSETSTEPMUL, value); }
+			void enable()
+			{
+				lua_gc(state_, LUA_GCRESTART, 0);
+			}
+			void disable()
+			{
+				lua_gc(state_, LUA_GCSTOP, 0);
+			}
+#if LUA_VERSION_NUM >= 502
+			bool isrunning()const { return isenabled(); }
+			bool isenabled()const
+			{
+				return lua_gc(state_, LUA_GCISRUNNING, 0) != 0;
+			}
+#endif
+
+		private:
+			lua_State* state_;
+		};
+
+		GCType gc()const
+		{
+			return GCType(state_);
+		}
+		//performs a full garbage-collection cycle.
 		void garbageCollect()
 		{
-			lua_gc(state_, LUA_GCCOLLECT, 0);
+			gc().collect();
 		}
+
+		//returns the current amount of memory (in Kbytes) in use by Lua.
+		size_t useKBytes()const
+		{
+			return size_t(gc().count());
+		}
+
 
 		//for Lua module
 		LuaRef newLib()
 		{
-			LuaRef newtable(state_,NewTable());
+			LuaRef newtable(state_, NewTable());
 			newtable.push(state_);
 			return newtable;
 		}

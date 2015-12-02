@@ -8,7 +8,8 @@ extern "C" {
 }
 
 #ifndef KAGUYA_USE_BOOST
-#if __cplusplus >= 201103L
+//not tested on older then MSVC++2013
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER>=1700)
 #define KAGUYA_USE_BOOST 0
 #else
 #define KAGUYA_USE_BOOST 1

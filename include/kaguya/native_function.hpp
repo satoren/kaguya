@@ -43,6 +43,10 @@ namespace kaguya
 			for (int i = 0; i < overloadnum; ++i)
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
+				if (!fun || !(*fun))
+				{
+					continue;
+				}
 				if ((*fun)->checktype(l, true))
 				{
 					return fun;
