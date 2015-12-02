@@ -18,6 +18,6 @@ before_build:
 - cmd: cmake ./
 build:
   project: Kaguya.sln
-  verbosity: detailed
+  verbosity: minimal
 test_script:
 - ps: Invoke-Expression ($env:Configuration+"\test_runner.exe")
