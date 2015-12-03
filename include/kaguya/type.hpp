@@ -104,15 +104,11 @@ namespace kaguya
 		{
 			int type = lua_type(l, index);
 
-			if (type == LUA_TTABLE)//allow table for __gc
-			{
-				return 0;
-			}
 			if (type == LUA_TLIGHTUSERDATA)
 			{
 				return (T*)lua_topointer(l, index);
 			}
-			else if (lua_topointer(l, index) == 0)
+			else if (type != LUA_TUSERDATA)
 			{
 				return 0;
 			}
@@ -676,7 +672,7 @@ namespace kaguya
 		{
 			if (!available_metatable(l, metatableName<T>().c_str()))
 			{
-				lua_pushlightuserdata(l, v);
+				lua_pushlightuserdata(l, const_cast<T*>(v));
 			}
 			else
 			{
