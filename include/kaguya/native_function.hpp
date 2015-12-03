@@ -138,10 +138,10 @@ namespace kaguya
 			}
 		};
 		template< class ClassType, class MemType>
-		BaseInvoker* create(MemType ClassType::*data)
+		FunctorType create(MemType ClassType::*data)
 		{
 			typedef MemDataInvoker<ClassType, MemType> invoker_type;
-			return new invoker_type(data);
+			return standard::shared_ptr<BaseInvoker>(new invoker_type(data));
 		}
 
 
@@ -156,7 +156,7 @@ namespace kaguya
 
 		//for lambda or bind
 		template< typename L>
-		BaseInvoker* create(L l)
+		FunctorType create(L l)
 		{
 			return create(typename lambda_fun<L>::type(l));
 		}

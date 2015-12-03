@@ -1,9 +1,10 @@
 //generated header by function_generator.py
 template<typename Ret>
-struct function_caller0:BaseInvoker{
+
+struct StdFunInvoker0:BaseInvoker{
   typedef standard::function<Ret()> func_type;
   func_type func_;
-  function_caller0(func_type fun):func_(fun){}
+  StdFunInvoker0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
     return true;
@@ -15,16 +16,21 @@ struct function_caller0:BaseInvoker{
   }
 };
 template<typename Ret>
-BaseInvoker* create(standard::function<Ret ()> fun)
+
+FunctorType create(standard::function<Ret()> fun)
 {
-  typedef function_caller0<Ret> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker0<Ret>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1>
-struct function_caller1:BaseInvoker{
+
+struct StdFunInvoker1:BaseInvoker{
   typedef standard::function<Ret(T1)> func_type;
   func_type func_;
-  function_caller1(func_type fun):func_(fun){}
+  StdFunInvoker1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
@@ -42,16 +48,21 @@ struct function_caller1:BaseInvoker{
   }
 };
 template<typename Ret,typename T1>
-BaseInvoker* create(standard::function<Ret (T1)> fun)
+
+FunctorType create(standard::function<Ret(T1)> fun)
 {
-  typedef function_caller1<Ret,T1> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker1<Ret,T1>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2>
-struct function_caller2:BaseInvoker{
+
+struct StdFunInvoker2:BaseInvoker{
   typedef standard::function<Ret(T1,T2)> func_type;
   func_type func_;
-  function_caller2(func_type fun):func_(fun){}
+  StdFunInvoker2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
@@ -70,16 +81,21 @@ struct function_caller2:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2>
-BaseInvoker* create(standard::function<Ret (T1,T2)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2)> fun)
 {
-  typedef function_caller2<Ret,T1,T2> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker2<Ret,T1,T2>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3>
-struct function_caller3:BaseInvoker{
+
+struct StdFunInvoker3:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3)> func_type;
   func_type func_;
-  function_caller3(func_type fun):func_(fun){}
+  StdFunInvoker3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
@@ -99,16 +115,21 @@ struct function_caller3:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3)> fun)
 {
-  typedef function_caller3<Ret,T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker3<Ret,T1,T2,T3>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-struct function_caller4:BaseInvoker{
+
+struct StdFunInvoker4:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4)> func_type;
   func_type func_;
-  function_caller4(func_type fun):func_(fun){}
+  StdFunInvoker4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
@@ -129,16 +150,21 @@ struct function_caller4:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3,T4)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3,T4)> fun)
 {
-  typedef function_caller4<Ret,T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker4<Ret,T1,T2,T3,T4>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-struct function_caller5:BaseInvoker{
+
+struct StdFunInvoker5:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5)> func_type;
   func_type func_;
-  function_caller5(func_type fun):func_(fun){}
+  StdFunInvoker5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
@@ -160,16 +186,21 @@ struct function_caller5:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3,T4,T5)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5)> fun)
 {
-  typedef function_caller5<Ret,T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker5<Ret,T1,T2,T3,T4,T5>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-struct function_caller6:BaseInvoker{
+
+struct StdFunInvoker6:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6)> func_type;
   func_type func_;
-  function_caller6(func_type fun):func_(fun){}
+  StdFunInvoker6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
@@ -192,16 +223,21 @@ struct function_caller6:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3,T4,T5,T6)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6)> fun)
 {
-  typedef function_caller6<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker6<Ret,T1,T2,T3,T4,T5,T6>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-struct function_caller7:BaseInvoker{
+
+struct StdFunInvoker7:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6,T7)> func_type;
   func_type func_;
-  function_caller7(func_type fun):func_(fun){}
+  StdFunInvoker7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
@@ -225,16 +261,21 @@ struct function_caller7:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3,T4,T5,T6,T7)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7)> fun)
 {
-  typedef function_caller7<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-struct function_caller8:BaseInvoker{
+
+struct StdFunInvoker8:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8)> func_type;
   func_type func_;
-  function_caller8(func_type fun):func_(fun){}
+  StdFunInvoker8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
@@ -259,16 +300,21 @@ struct function_caller8:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3,T4,T5,T6,T7,T8)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
 {
-  typedef function_caller8<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-struct function_caller9:BaseInvoker{
+
+struct StdFunInvoker9:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8,T9)> func_type;
   func_type func_;
-  function_caller9(func_type fun):func_(fun){}
+  StdFunInvoker9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
@@ -294,15 +340,19 @@ struct function_caller9:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(standard::function<Ret (T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
+
+FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
 {
-  typedef function_caller9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  typedef StdFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
-struct VoidFunctionInvoker0:BaseInvoker{
+
+
+struct VoidStdFunInvoker0:BaseInvoker{
   typedef standard::function<void()> func_type;
   func_type func_;
-  VoidFunctionInvoker0(func_type fun):func_(fun){}
+  VoidStdFunInvoker0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
     return true;
@@ -313,16 +363,18 @@ struct VoidFunctionInvoker0:BaseInvoker{
     return 0;
   }
 };
-BaseInvoker* create(standard::function<void ()> fun)
+FunctorType create(standard::function<void()> fun)
 {
-  typedef VoidFunctionInvoker0 InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker0 InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1>
-struct VoidFunctionInvoker1:BaseInvoker{
+struct VoidStdFunInvoker1:BaseInvoker{
   typedef standard::function<void(T1)> func_type;
   func_type func_;
-  VoidFunctionInvoker1(func_type fun):func_(fun){}
+  VoidStdFunInvoker1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
@@ -340,16 +392,18 @@ struct VoidFunctionInvoker1:BaseInvoker{
   }
 };
 template<typename T1>
-BaseInvoker* create(standard::function<void (T1)> fun)
+FunctorType create(standard::function<void(T1)> fun)
 {
-  typedef VoidFunctionInvoker1<T1> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker1<T1> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2>
-struct VoidFunctionInvoker2:BaseInvoker{
+struct VoidStdFunInvoker2:BaseInvoker{
   typedef standard::function<void(T1,T2)> func_type;
   func_type func_;
-  VoidFunctionInvoker2(func_type fun):func_(fun){}
+  VoidStdFunInvoker2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
@@ -368,16 +422,18 @@ struct VoidFunctionInvoker2:BaseInvoker{
   }
 };
 template<typename T1,typename T2>
-BaseInvoker* create(standard::function<void (T1,T2)> fun)
+FunctorType create(standard::function<void(T1,T2)> fun)
 {
-  typedef VoidFunctionInvoker2<T1,T2> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker2<T1,T2> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3>
-struct VoidFunctionInvoker3:BaseInvoker{
+struct VoidStdFunInvoker3:BaseInvoker{
   typedef standard::function<void(T1,T2,T3)> func_type;
   func_type func_;
-  VoidFunctionInvoker3(func_type fun):func_(fun){}
+  VoidStdFunInvoker3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
@@ -397,16 +453,18 @@ struct VoidFunctionInvoker3:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3>
-BaseInvoker* create(standard::function<void (T1,T2,T3)> fun)
+FunctorType create(standard::function<void(T1,T2,T3)> fun)
 {
-  typedef VoidFunctionInvoker3<T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker3<T1,T2,T3> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4>
-struct VoidFunctionInvoker4:BaseInvoker{
+struct VoidStdFunInvoker4:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4)> func_type;
   func_type func_;
-  VoidFunctionInvoker4(func_type fun):func_(fun){}
+  VoidStdFunInvoker4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
@@ -427,16 +485,18 @@ struct VoidFunctionInvoker4:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(standard::function<void (T1,T2,T3,T4)> fun)
+FunctorType create(standard::function<void(T1,T2,T3,T4)> fun)
 {
-  typedef VoidFunctionInvoker4<T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker4<T1,T2,T3,T4> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-struct VoidFunctionInvoker5:BaseInvoker{
+struct VoidStdFunInvoker5:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5)> func_type;
   func_type func_;
-  VoidFunctionInvoker5(func_type fun):func_(fun){}
+  VoidStdFunInvoker5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
@@ -458,16 +518,18 @@ struct VoidFunctionInvoker5:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(standard::function<void (T1,T2,T3,T4,T5)> fun)
+FunctorType create(standard::function<void(T1,T2,T3,T4,T5)> fun)
 {
-  typedef VoidFunctionInvoker5<T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker5<T1,T2,T3,T4,T5> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-struct VoidFunctionInvoker6:BaseInvoker{
+struct VoidStdFunInvoker6:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6)> func_type;
   func_type func_;
-  VoidFunctionInvoker6(func_type fun):func_(fun){}
+  VoidStdFunInvoker6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
@@ -490,16 +552,18 @@ struct VoidFunctionInvoker6:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(standard::function<void (T1,T2,T3,T4,T5,T6)> fun)
+FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6)> fun)
 {
-  typedef VoidFunctionInvoker6<T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker6<T1,T2,T3,T4,T5,T6> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-struct VoidFunctionInvoker7:BaseInvoker{
+struct VoidStdFunInvoker7:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6,T7)> func_type;
   func_type func_;
-  VoidFunctionInvoker7(func_type fun):func_(fun){}
+  VoidStdFunInvoker7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
@@ -523,16 +587,18 @@ struct VoidFunctionInvoker7:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(standard::function<void (T1,T2,T3,T4,T5,T6,T7)> fun)
+FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7)> fun)
 {
-  typedef VoidFunctionInvoker7<T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker7<T1,T2,T3,T4,T5,T6,T7> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-struct VoidFunctionInvoker8:BaseInvoker{
+struct VoidStdFunInvoker8:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8)> func_type;
   func_type func_;
-  VoidFunctionInvoker8(func_type fun):func_(fun){}
+  VoidStdFunInvoker8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
@@ -557,16 +623,18 @@ struct VoidFunctionInvoker8:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(standard::function<void (T1,T2,T3,T4,T5,T6,T7,T8)> fun)
+FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
 {
-  typedef VoidFunctionInvoker8<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-struct VoidFunctionInvoker9:BaseInvoker{
+struct VoidStdFunInvoker9:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> func_type;
   func_type func_;
-  VoidFunctionInvoker9(func_type fun):func_(fun){}
+  VoidStdFunInvoker9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
@@ -592,14 +660,17 @@ struct VoidFunctionInvoker9:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(standard::function<void (T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
+FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
 {
-  typedef VoidFunctionInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  typedef VoidStdFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret>
+
 struct FunInvoker0:BaseInvoker{
-  typedef Ret (*func_type)() ;
+  typedef Ret (*func_type)();
   func_type func_;
   FunInvoker0(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -613,14 +684,19 @@ struct FunInvoker0:BaseInvoker{
   }
 };
 template<typename Ret>
-BaseInvoker* create(Ret (*fun)())
+
+FunctorType create(Ret (*fun)())
 {
-  typedef FunInvoker0<Ret> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker0<Ret>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1>
+
 struct FunInvoker1:BaseInvoker{
-  typedef Ret (*func_type)(T1) ;
+  typedef Ret (*func_type)(T1);
   func_type func_;
   FunInvoker1(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -640,14 +716,19 @@ struct FunInvoker1:BaseInvoker{
   }
 };
 template<typename Ret,typename T1>
-BaseInvoker* create(Ret (*fun)(T1))
+
+FunctorType create(Ret (*fun)(T1))
 {
-  typedef FunInvoker1<Ret,T1> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker1<Ret,T1>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2>
+
 struct FunInvoker2:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2) ;
+  typedef Ret (*func_type)(T1,T2);
   func_type func_;
   FunInvoker2(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -668,14 +749,19 @@ struct FunInvoker2:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2>
-BaseInvoker* create(Ret (*fun)(T1,T2))
+
+FunctorType create(Ret (*fun)(T1,T2))
 {
-  typedef FunInvoker2<Ret,T1,T2> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker2<Ret,T1,T2>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3>
+
 struct FunInvoker3:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3) ;
+  typedef Ret (*func_type)(T1,T2,T3);
   func_type func_;
   FunInvoker3(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -697,14 +783,19 @@ struct FunInvoker3:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3))
+
+FunctorType create(Ret (*fun)(T1,T2,T3))
 {
-  typedef FunInvoker3<Ret,T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker3<Ret,T1,T2,T3>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
+
 struct FunInvoker4:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3,T4) ;
+  typedef Ret (*func_type)(T1,T2,T3,T4);
   func_type func_;
   FunInvoker4(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -727,14 +818,19 @@ struct FunInvoker4:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3,T4))
+
+FunctorType create(Ret (*fun)(T1,T2,T3,T4))
 {
-  typedef FunInvoker4<Ret,T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker4<Ret,T1,T2,T3,T4>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
+
 struct FunInvoker5:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3,T4,T5) ;
+  typedef Ret (*func_type)(T1,T2,T3,T4,T5);
   func_type func_;
   FunInvoker5(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -758,14 +854,19 @@ struct FunInvoker5:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3,T4,T5))
+
+FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5))
 {
-  typedef FunInvoker5<Ret,T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker5<Ret,T1,T2,T3,T4,T5>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
+
 struct FunInvoker6:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6) ;
+  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6);
   func_type func_;
   FunInvoker6(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -790,14 +891,19 @@ struct FunInvoker6:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3,T4,T5,T6))
+
+FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6))
 {
-  typedef FunInvoker6<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker6<Ret,T1,T2,T3,T4,T5,T6>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
+
 struct FunInvoker7:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7) ;
+  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7);
   func_type func_;
   FunInvoker7(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -823,14 +929,19 @@ struct FunInvoker7:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7))
+
+FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7))
 {
-  typedef FunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
+
 struct FunInvoker8:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8) ;
+  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8);
   func_type func_;
   FunInvoker8(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -857,14 +968,19 @@ struct FunInvoker8:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
+
+FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
 {
-  typedef FunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
+
 struct FunInvoker9:BaseInvoker{
-  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8,T9) ;
+  typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8,T9);
   func_type func_;
   FunInvoker9(func_type fun):func_(fun){}
   virtual bool checktype(lua_State *state,bool strictcheck){
@@ -892,15 +1008,20 @@ struct FunInvoker9:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
+
+FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
 {
-  typedef FunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  typedef FunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 struct VoidFunInvoker0:BaseInvoker{
-  typedef void (*func_type)() ;
+  typedef void (*func_type)();
   func_type func_;
-  VoidFunInvoker0(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker0(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 0){return false;}
     return true;
   }
@@ -910,16 +1031,19 @@ struct VoidFunInvoker0:BaseInvoker{
     return 0;
   }
 };
-BaseInvoker* create(void (*fun)())
+FunctorType create(void (*fun)())
 {
   typedef VoidFunInvoker0 InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1>
 struct VoidFunInvoker1:BaseInvoker{
-  typedef void (*func_type)(T1) ;
+  typedef void (*func_type)(T1);
   func_type func_;
-  VoidFunInvoker1(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker1(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())){return false;}
@@ -936,16 +1060,19 @@ struct VoidFunInvoker1:BaseInvoker{
   }
 };
 template<typename T1>
-BaseInvoker* create(void (*fun)(T1))
+FunctorType create(void (*fun)(T1))
 {
   typedef VoidFunInvoker1<T1> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2>
 struct VoidFunInvoker2:BaseInvoker{
-  typedef void (*func_type)(T1,T2) ;
+  typedef void (*func_type)(T1,T2);
   func_type func_;
-  VoidFunInvoker2(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker2(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
@@ -963,16 +1090,19 @@ struct VoidFunInvoker2:BaseInvoker{
   }
 };
 template<typename T1,typename T2>
-BaseInvoker* create(void (*fun)(T1,T2))
+FunctorType create(void (*fun)(T1,T2))
 {
   typedef VoidFunInvoker2<T1,T2> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3>
 struct VoidFunInvoker3:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3) ;
+  typedef void (*func_type)(T1,T2,T3);
   func_type func_;
-  VoidFunInvoker3(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker3(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
@@ -991,16 +1121,19 @@ struct VoidFunInvoker3:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3>
-BaseInvoker* create(void (*fun)(T1,T2,T3))
+FunctorType create(void (*fun)(T1,T2,T3))
 {
   typedef VoidFunInvoker3<T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4>
 struct VoidFunInvoker4:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3,T4) ;
+  typedef void (*func_type)(T1,T2,T3,T4);
   func_type func_;
-  VoidFunInvoker4(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker4(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
@@ -1020,16 +1153,19 @@ struct VoidFunInvoker4:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(void (*fun)(T1,T2,T3,T4))
+FunctorType create(void (*fun)(T1,T2,T3,T4))
 {
   typedef VoidFunInvoker4<T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 struct VoidFunInvoker5:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3,T4,T5) ;
+  typedef void (*func_type)(T1,T2,T3,T4,T5);
   func_type func_;
-  VoidFunInvoker5(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker5(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
@@ -1050,16 +1186,19 @@ struct VoidFunInvoker5:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(void (*fun)(T1,T2,T3,T4,T5))
+FunctorType create(void (*fun)(T1,T2,T3,T4,T5))
 {
   typedef VoidFunInvoker5<T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 struct VoidFunInvoker6:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3,T4,T5,T6) ;
+  typedef void (*func_type)(T1,T2,T3,T4,T5,T6);
   func_type func_;
-  VoidFunInvoker6(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker6(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
@@ -1081,16 +1220,19 @@ struct VoidFunInvoker6:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(void (*fun)(T1,T2,T3,T4,T5,T6))
+FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6))
 {
   typedef VoidFunInvoker6<T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 struct VoidFunInvoker7:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7) ;
+  typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7);
   func_type func_;
-  VoidFunInvoker7(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker7(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
@@ -1113,16 +1255,19 @@ struct VoidFunInvoker7:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(void (*fun)(T1,T2,T3,T4,T5,T6,T7))
+FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7))
 {
   typedef VoidFunInvoker7<T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 struct VoidFunInvoker8:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8) ;
+  typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8);
   func_type func_;
-  VoidFunInvoker8(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker8(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
@@ -1146,16 +1291,19 @@ struct VoidFunInvoker8:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
+FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
 {
   typedef VoidFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 struct VoidFunInvoker9:BaseInvoker{
-  typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8,T9) ;
+  typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8,T9);
   func_type func_;
-  VoidFunInvoker9(func_type fun):func_(fun){}  virtual bool checktype(lua_State *state,bool strictcheck){
+  VoidFunInvoker9(func_type fun):func_(fun){}
+  virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
       if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
@@ -1180,12 +1328,15 @@ struct VoidFunInvoker9:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
+FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
 {
   typedef VoidFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1>
+
 struct MemFunInvoker0:BaseInvoker{
   typedef Ret (T1::*func_type)() ;
   func_type func_;
@@ -1198,17 +1349,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   virtual int invoke(lua_State *state)
   {
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)();
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1>
-BaseInvoker* create(Ret (T1::*fun)())
+
+FunctorType create(Ret (T1::*fun)() )
 {
-  typedef MemFunInvoker0<Ret,T1> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker0<Ret,T1>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1>
+
 struct constMemFunInvoker0:BaseInvoker{
   typedef Ret (T1::*func_type)() const;
   func_type func_;
@@ -1221,17 +1378,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   virtual int invoke(lua_State *state)
   {
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)();
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1>
-BaseInvoker* create(Ret (T1::*fun)()const)
+
+FunctorType create(Ret (T1::*fun)() const)
 {
-  typedef constMemFunInvoker0<Ret,T1> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker0<Ret,T1>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2>
+
 struct MemFunInvoker1:BaseInvoker{
   typedef Ret (T1::*func_type)(T2) ;
   func_type func_;
@@ -1250,17 +1413,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   {
     T2 t2 = types::get(state,2,types::typetag<T2>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2>
-BaseInvoker* create(Ret (T1::*fun)(T2))
+
+FunctorType create(Ret (T1::*fun)(T2) )
 {
-  typedef MemFunInvoker1<Ret,T1,T2> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker1<Ret,T1,T2>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2>
+
 struct constMemFunInvoker1:BaseInvoker{
   typedef Ret (T1::*func_type)(T2) const;
   func_type func_;
@@ -1279,17 +1448,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   {
     T2 t2 = types::get(state,2,types::typetag<T2>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2>
-BaseInvoker* create(Ret (T1::*fun)(T2)const)
+
+FunctorType create(Ret (T1::*fun)(T2) const)
 {
-  typedef constMemFunInvoker1<Ret,T1,T2> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker1<Ret,T1,T2>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3>
+
 struct MemFunInvoker2:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3) ;
   func_type func_;
@@ -1309,17 +1484,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T2 t2 = types::get(state,2,types::typetag<T2>());
     T3 t3 = types::get(state,3,types::typetag<T3>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3))
+
+FunctorType create(Ret (T1::*fun)(T2,T3) )
 {
-  typedef MemFunInvoker2<Ret,T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker2<Ret,T1,T2,T3>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3>
+
 struct constMemFunInvoker2:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3) const;
   func_type func_;
@@ -1339,17 +1520,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T2 t2 = types::get(state,2,types::typetag<T2>());
     T3 t3 = types::get(state,3,types::typetag<T3>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3) const)
 {
-  typedef constMemFunInvoker2<Ret,T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker2<Ret,T1,T2,T3>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
+
 struct MemFunInvoker3:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4) ;
   func_type func_;
@@ -1370,17 +1557,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T3 t3 = types::get(state,3,types::typetag<T3>());
     T4 t4 = types::get(state,4,types::typetag<T4>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4) )
 {
-  typedef MemFunInvoker3<Ret,T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker3<Ret,T1,T2,T3,T4>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
+
 struct constMemFunInvoker3:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4) const;
   func_type func_;
@@ -1401,17 +1594,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T3 t3 = types::get(state,3,types::typetag<T3>());
     T4 t4 = types::get(state,4,types::typetag<T4>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4) const)
 {
-  typedef constMemFunInvoker3<Ret,T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker3<Ret,T1,T2,T3,T4>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
+
 struct MemFunInvoker4:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5) ;
   func_type func_;
@@ -1433,17 +1632,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T4 t4 = types::get(state,4,types::typetag<T4>());
     T5 t5 = types::get(state,5,types::typetag<T5>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5) )
 {
-  typedef MemFunInvoker4<Ret,T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker4<Ret,T1,T2,T3,T4,T5>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
+
 struct constMemFunInvoker4:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5) const;
   func_type func_;
@@ -1465,17 +1670,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T4 t4 = types::get(state,4,types::typetag<T4>());
     T5 t5 = types::get(state,5,types::typetag<T5>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5) const)
 {
-  typedef constMemFunInvoker4<Ret,T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker4<Ret,T1,T2,T3,T4,T5>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
+
 struct MemFunInvoker5:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6) ;
   func_type func_;
@@ -1498,17 +1709,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T5 t5 = types::get(state,5,types::typetag<T5>());
     T6 t6 = types::get(state,6,types::typetag<T6>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6) )
 {
-  typedef MemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
+
 struct constMemFunInvoker5:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6) const;
   func_type func_;
@@ -1531,17 +1748,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T5 t5 = types::get(state,5,types::typetag<T5>());
     T6 t6 = types::get(state,6,types::typetag<T6>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6) const)
 {
-  typedef constMemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
+
 struct MemFunInvoker6:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7) ;
   func_type func_;
@@ -1565,17 +1788,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T6 t6 = types::get(state,6,types::typetag<T6>());
     T7 t7 = types::get(state,7,types::typetag<T7>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) )
 {
-  typedef MemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
+
 struct constMemFunInvoker6:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7) const;
   func_type func_;
@@ -1599,17 +1828,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T6 t6 = types::get(state,6,types::typetag<T6>());
     T7 t7 = types::get(state,7,types::typetag<T7>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
 {
-  typedef constMemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
+
 struct MemFunInvoker7:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) ;
   func_type func_;
@@ -1634,17 +1869,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T7 t7 = types::get(state,7,types::typetag<T7>());
     T8 t8 = types::get(state,8,types::typetag<T8>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
 {
-  typedef MemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
+
 struct constMemFunInvoker7:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) const;
   func_type func_;
@@ -1669,17 +1910,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T7 t7 = types::get(state,7,types::typetag<T7>());
     T8 t8 = types::get(state,8,types::typetag<T8>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
 {
-  typedef constMemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
+
 struct MemFunInvoker8:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) ;
   func_type func_;
@@ -1705,17 +1952,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T8 t8 = types::get(state,8,types::typetag<T8>());
     T9 t9 = types::get(state,9,types::typetag<T9>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
 {
-  typedef MemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
+
 struct constMemFunInvoker8:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) const;
   func_type func_;
@@ -1741,17 +1994,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T8 t8 = types::get(state,8,types::typetag<T8>());
     T9 t9 = types::get(state,9,types::typetag<T9>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
 {
-  typedef constMemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
+
 struct MemFunInvoker9:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) ;
   func_type func_;
@@ -1778,17 +2037,23 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T9 t9 = types::get(state,9,types::typetag<T9>());
     T10 t10 = types::get(state,10,types::typetag<T10>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10))
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
 {
-  typedef MemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
-  return new InvokerType(fun);
+  typedef MemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
+
 struct constMemFunInvoker9:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const;
   func_type func_;
@@ -1815,16 +2080,21 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T9 t9 = types::get(state,9,types::typetag<T9>());
     T10 t10 = types::get(state,10,types::typetag<T10>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-BaseInvoker* create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10)const)
+
+FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
 {
-  typedef constMemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
-  return new InvokerType(fun);
+  typedef constMemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
+ InvokerType;
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1>
 struct VoidMemFunInvoker0:BaseInvoker{
   typedef void (T1::*func_type)() ;
@@ -1838,16 +2108,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   virtual int invoke(lua_State *state)
   {
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)();
     return 0;
   }
 };
 template<typename T1>
-BaseInvoker* create(void (T1::*fun)())
+FunctorType create(void (T1::*fun)() )
 {
   typedef VoidMemFunInvoker0<T1> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1>
 struct constVoidMemFunInvoker0:BaseInvoker{
   typedef void (T1::*func_type)() const;
@@ -1861,16 +2134,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   virtual int invoke(lua_State *state)
   {
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)();
     return 0;
   }
 };
 template<typename T1>
-BaseInvoker* create(void (T1::*fun)()const)
+FunctorType create(void (T1::*fun)() const)
 {
   typedef constVoidMemFunInvoker0<T1> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2>
 struct VoidMemFunInvoker1:BaseInvoker{
   typedef void (T1::*func_type)(T2) ;
@@ -1890,16 +2166,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   {
     T2 t2 = types::get(state,2,types::typetag<T2>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2);
     return 0;
   }
 };
 template<typename T1,typename T2>
-BaseInvoker* create(void (T1::*fun)(T2))
+FunctorType create(void (T1::*fun)(T2) )
 {
   typedef VoidMemFunInvoker1<T1,T2> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2>
 struct constVoidMemFunInvoker1:BaseInvoker{
   typedef void (T1::*func_type)(T2) const;
@@ -1919,16 +2198,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   {
     T2 t2 = types::get(state,2,types::typetag<T2>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2);
     return 0;
   }
 };
 template<typename T1,typename T2>
-BaseInvoker* create(void (T1::*fun)(T2)const)
+FunctorType create(void (T1::*fun)(T2) const)
 {
   typedef constVoidMemFunInvoker1<T1,T2> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3>
 struct VoidMemFunInvoker2:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3) ;
@@ -1949,16 +2231,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T2 t2 = types::get(state,2,types::typetag<T2>());
     T3 t3 = types::get(state,3,types::typetag<T3>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3>
-BaseInvoker* create(void (T1::*fun)(T2,T3))
+FunctorType create(void (T1::*fun)(T2,T3) )
 {
   typedef VoidMemFunInvoker2<T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3>
 struct constVoidMemFunInvoker2:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3) const;
@@ -1979,16 +2264,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T2 t2 = types::get(state,2,types::typetag<T2>());
     T3 t3 = types::get(state,3,types::typetag<T3>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3>
-BaseInvoker* create(void (T1::*fun)(T2,T3)const)
+FunctorType create(void (T1::*fun)(T2,T3) const)
 {
   typedef constVoidMemFunInvoker2<T1,T2,T3> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4>
 struct VoidMemFunInvoker3:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4) ;
@@ -2010,16 +2298,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T3 t3 = types::get(state,3,types::typetag<T3>());
     T4 t4 = types::get(state,4,types::typetag<T4>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4))
+FunctorType create(void (T1::*fun)(T2,T3,T4) )
 {
   typedef VoidMemFunInvoker3<T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4>
 struct constVoidMemFunInvoker3:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4) const;
@@ -2041,16 +2332,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T3 t3 = types::get(state,3,types::typetag<T3>());
     T4 t4 = types::get(state,4,types::typetag<T4>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4) const)
 {
   typedef constVoidMemFunInvoker3<T1,T2,T3,T4> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 struct VoidMemFunInvoker4:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5) ;
@@ -2073,16 +2367,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T4 t4 = types::get(state,4,types::typetag<T4>());
     T5 t5 = types::get(state,5,types::typetag<T5>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5))
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5) )
 {
   typedef VoidMemFunInvoker4<T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 struct constVoidMemFunInvoker4:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5) const;
@@ -2105,16 +2402,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T4 t4 = types::get(state,4,types::typetag<T4>());
     T5 t5 = types::get(state,5,types::typetag<T5>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5) const)
 {
   typedef constVoidMemFunInvoker4<T1,T2,T3,T4,T5> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 struct VoidMemFunInvoker5:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6) ;
@@ -2138,16 +2438,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T5 t5 = types::get(state,5,types::typetag<T5>());
     T6 t6 = types::get(state,6,types::typetag<T6>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6))
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) )
 {
   typedef VoidMemFunInvoker5<T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 struct constVoidMemFunInvoker5:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6) const;
@@ -2171,16 +2474,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T5 t5 = types::get(state,5,types::typetag<T5>());
     T6 t6 = types::get(state,6,types::typetag<T6>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) const)
 {
   typedef constVoidMemFunInvoker5<T1,T2,T3,T4,T5,T6> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 struct VoidMemFunInvoker6:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7) ;
@@ -2205,16 +2511,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T6 t6 = types::get(state,6,types::typetag<T6>());
     T7 t7 = types::get(state,7,types::typetag<T7>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7))
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) )
 {
   typedef VoidMemFunInvoker6<T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 struct constVoidMemFunInvoker6:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7) const;
@@ -2239,16 +2548,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T6 t6 = types::get(state,6,types::typetag<T6>());
     T7 t7 = types::get(state,7,types::typetag<T7>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
 {
   typedef constVoidMemFunInvoker6<T1,T2,T3,T4,T5,T6,T7> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 struct VoidMemFunInvoker7:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) ;
@@ -2274,16 +2586,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T7 t7 = types::get(state,7,types::typetag<T7>());
     T8 t8 = types::get(state,8,types::typetag<T8>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8))
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
 {
   typedef VoidMemFunInvoker7<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 struct constVoidMemFunInvoker7:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) const;
@@ -2309,16 +2624,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T7 t7 = types::get(state,7,types::typetag<T7>());
     T8 t8 = types::get(state,8,types::typetag<T8>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
 {
   typedef constVoidMemFunInvoker7<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 struct VoidMemFunInvoker8:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) ;
@@ -2345,16 +2663,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T8 t8 = types::get(state,8,types::typetag<T8>());
     T9 t9 = types::get(state,9,types::typetag<T9>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9))
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
 {
   typedef VoidMemFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 struct constVoidMemFunInvoker8:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) const;
@@ -2381,16 +2702,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T8 t8 = types::get(state,8,types::typetag<T8>());
     T9 t9 = types::get(state,9,types::typetag<T9>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
 {
   typedef constVoidMemFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 struct VoidMemFunInvoker9:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) ;
@@ -2418,16 +2742,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T9 t9 = types::get(state,9,types::typetag<T9>());
     T10 t10 = types::get(state,10,types::typetag<T10>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10))
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
 {
   typedef VoidMemFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 struct constVoidMemFunInvoker9:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const;
@@ -2455,16 +2782,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     T9 t9 = types::get(state,9,types::typetag<T9>());
     T10 t10 = types::get(state,10,types::typetag<T10>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
+  if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return 0;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-BaseInvoker* create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10)const)
+FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
 {
   typedef constVoidMemFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
-  return new InvokerType(fun);
+  return FunctorType(new InvokerType(fun));
 }
+
+
 template<typename CLASS>
 struct ConstructorInvoker0:BaseInvoker{
   ConstructorInvoker0(){}
