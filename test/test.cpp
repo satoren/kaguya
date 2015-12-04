@@ -383,7 +383,8 @@ namespace selector_test
 		{
 			state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
 				.addMember("setBar", &Foo::setBar)
-				, false);
+				.addCodeChunkResult("luafunc", "return function(a,b) return a*b end")
+				);
 			Foo foo;
 			kaguya::Selector lfoo = state["Foo"];
 			lfoo["bar"] = kaguya::function(&Foo::setBar);
@@ -394,6 +395,9 @@ namespace selector_test
 
 			state("foo:setBar(\"test\")");
 			if (foo.bar != "test") { return false; }
+
+			if (!state("assert(foo.luafunc(3,4) == 12)")) { return false; }
+
 
 			(state["foo"]->*"setBar")("test2");
 			if (foo.bar != "test2") { return false; }
@@ -461,6 +465,36 @@ namespace selector_test
 			state("a,b = multresfun()");
 			return state("assert(a == 12  and b == \"23\")");
 		}
+
+		bool vector_and_map_from_table_mapping(kaguya::State& state)
+		{
+			state("arraytablefn =function() return {32,1,2,4,8,16} end");
+			std::vector<int> b = state["arraytablefn"]();
+
+			if (!(b.size() == 6 && b[0] == 32 && b[1] == 1 && b[2] == 2 && b[3] == 4 && b[4] == 8 && b[5] == 16)) return false;
+
+
+			state("tablefn =function() return {a=32,b=1,c=2} end");
+			std::map<std::string, int> m = state["tablefn"]();
+			if (!(m["a"] == 32 && m["b"] == 1 && m["c"] == 2)) return false;
+
+			return true;
+		}
+
+		bool vector_and_map_to_table_mapping(kaguya::State& state)
+		{
+			std::vector<double> v; v.push_back(3); v.push_back(13); v.push_back(2); v.push_back(99);
+			state["v"] = v;
+			if (!state("assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)")) { return false; }
+
+
+			std::map<std::string,double> m; m["a"]=4; m["b"] = 32; m["c"] = 24;
+			state["m"] = m;
+			if (!state("assert(m['a'] == 4 and m['b'] == 32 and m['c'] == 24)")) { return false; }
+
+			return true;
+		}
+
 		bool coroutine(kaguya::State& state)
 		{
 			{
@@ -873,6 +907,8 @@ int main()
 		ADD_TEST(selector_test::t_03_function::member_function_test);
 		ADD_TEST(selector_test::t_03_function::variadic_function_test);
 		ADD_TEST(selector_test::t_03_function::multi_return_function_test);
+		ADD_TEST(selector_test::t_03_function::vector_and_map_from_table_mapping);
+		ADD_TEST(selector_test::t_03_function::vector_and_map_to_table_mapping);
 		ADD_TEST(selector_test::t_03_function::coroutine);
 #if KAGUYA_USE_DECLTYPE
 		ADD_TEST(selector_test::t_03_function::lambdafun);

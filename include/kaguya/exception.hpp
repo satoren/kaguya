@@ -79,7 +79,7 @@ namespace kaguya
 			throw LuaTypeMismatch(message);
 #endif
 		}
-		void checkErrorAndThrow(int status, lua_State *state)
+		bool checkErrorAndThrow(int status, lua_State *state)
 		{
 			if (status != 0 && status!=LUA_YIELD)
 			{
@@ -88,9 +88,6 @@ namespace kaguya
 				const char* message = 0;
 				switch (status)
 				{
-				case 0:
-				case LUA_YIELD:
-					return;
 				case LUA_ERRSYNTAX:
 					message = lua_tostring(state, -1);
 					throw LuaSyntaxError(status, message ? std::string(message) : "unknown syntax error");
@@ -109,7 +106,9 @@ namespace kaguya
 					throw LuaUnknownError(status, "lua unknown error");
 				}
 #endif
+				return false;
 			}
+			return true;
 		}
 	}
 }

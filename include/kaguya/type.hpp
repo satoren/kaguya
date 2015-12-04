@@ -9,7 +9,12 @@
 
 namespace kaguya
 {
-	struct NewTable {};
+	struct NewTable {
+		NewTable():reserve_array_(0), reserve_record_(0){}
+		NewTable(int reserve_array,int reserve_record_) :reserve_array_(reserve_array), reserve_record_(reserve_record_) {}
+		int reserve_array_;
+		int reserve_record_;
+	};
 	struct NewThread {};
 	struct GlobalTable {};
 
@@ -573,9 +578,9 @@ namespace kaguya
 			lua_pushlstring(l, s.c_str(), s.size());
 			return 1;
 		}
-		inline int push(lua_State* l, NewTable)
+		inline int push(lua_State* l, NewTable table)
 		{
-			lua_newtable(l);
+			lua_createtable(l, table.reserve_array_, table.reserve_record_);
 			return 1;
 		}
 
