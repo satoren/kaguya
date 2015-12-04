@@ -110,4 +110,105 @@ namespace kaguya
 	{
 		return TableKeyReference(*this, LuaRef(state_, index));
 	}
+	
+	
+	
+	
+	namespace types
+	{
+	
+		//vector and map to Lua table 
+		template<typename T>
+		inline bool checkType(lua_State* l, int index, typetag<std::vector<T> >)
+		{
+			LuaRef table = get(l, index, typetag<LuaRef>());
+			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				if (!it->first.typeTest<size_t>() || !it->second.typeTest<T>())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		template<typename T>
+		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag)
+		{
+			std::vector<T> result;
+			LuaRef table = get(l, index, typetag<LuaRef>());
+			std::vector<LuaRef> values = table.values();
+			for (std::vector<LuaRef>::iterator it = values.begin(); it != values.end(); ++it)
+			{
+				result.push_back(it->get<T>());
+			}
+			return result;
+		}
+		template<typename T>
+		inline int push(lua_State* l, const std::vector<T>& ref)
+		{
+			LuaRef table(l, NewTable(ref.size(), 0));
+
+			int count = 1;//array is 1 origin in Lua
+			for (typename std::vector<T>::const_iterator it = ref.begin(); it != ref.end(); ++it)
+			{
+				table[count++] = *it;
+			}
+			table.push(l);
+			return 1;
+		}
+		template<typename T>
+		inline int push(lua_State* l, std::vector<T>& ref)
+		{
+			return push(l, const_cast<const std::vector<T>&>(ref));
+		}
+
+		//std::map
+		template<typename K, typename V>
+		inline bool checkType(lua_State* l, int index, typetag<std::map<K, V> >)
+		{
+			LuaRef table = get(l, index, typetag<LuaRef>());
+			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				if (!it->first.typeTest<K>() || !it->second.typeTest<V>())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		template<typename K, typename V>
+		inline std::map<K, V> get(lua_State* l, int index, typetag<std::map<K, V> > tag)
+		{
+			std::map<K, V> result;
+			LuaRef table = get(l, index, typetag<LuaRef>());
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				result[it->first.get<K>()] = it->second.get<V>();
+			}
+			return result;
+		}
+		template<typename K, typename V>
+		inline int push(lua_State* l, const std::map<K, V>& ref)
+		{
+			LuaRef table(l, NewTable(ref.size(), 0));
+
+			int count = 0;
+			for (typename std::map<K,V>::const_iterator it = ref.begin(); it != ref.end(); ++it)
+			{
+				table[it->first] = it->second;
+			}
+			table.push(l);
+			return 1;
+		}
+		template<typename K, typename V>
+		inline int push(lua_State* l, std::map<K, V>& ref)
+		{
+			return push(l, const_cast<const std::map<K, V>&>(ref));
+		}
+	}
 }

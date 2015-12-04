@@ -5,7 +5,7 @@ SDL.Init(SDL.INIT_VIDEO)
 local window = assert(SDL.CreateWindow("test window",SDL.WINDOWPOS_CENTERED,SDL.WINDOWPOS_CENTERED,400,400,SDL.WINDOW_RESIZABLE))
 local renderer = SDL.CreateRenderer(window, -1, SDL.RENDERER_ACCELERATED);
 
-local bitmapSurface = SDL.LoadBMP("img/hello.bmp");
+local bitmapSurface = SDL.LoadBMP("neko-i.bmp");
 local bitmapTex = SDL.CreateTextureFromSurface(renderer, bitmapSurface);
 SDL.FreeSurface(bitmapSurface);
 while not quit do
