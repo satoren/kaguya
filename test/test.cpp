@@ -485,7 +485,7 @@ namespace selector_test
 		{
 			std::vector<double> v; v.push_back(3); v.push_back(13); v.push_back(2); v.push_back(99);
 			state["v"] = v;
-			if (!state("assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)")) { return false; }
+			if (!state("print(v[0])assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)")) { return false; }
 
 
 			std::map<std::string,double> m; m["a"]=4; m["b"] = 32; m["c"] = 24;

@@ -688,6 +688,25 @@ namespace kaguya
 			}
 			return 1;
 		}
+		
+		//vector
+		template<typename T>
+		inline bool checkType(lua_State* l, int index, typetag<std::vector<T> >);
+		template<typename T>
+		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag);
+		template<typename T>
+		inline int push(lua_State* l, const std::vector<T>& ref);
+		template<typename T>
+		inline int push(lua_State* l, std::vector<T>& ref);
+		//std::map
+		template<typename K, typename V>
+		inline bool checkType(lua_State* l, int index, typetag<std::map<K, V> >);
+		template<typename K, typename V>
+		inline std::map<K, V> get(lua_State* l, int index, typetag<std::map<K, V> > tag);
+		template<typename K, typename V>
+		inline int push(lua_State* l, const std::map<K, V>& ref);
+		template<typename K, typename V>
+		inline int push(lua_State* l, std::map<K, V>& ref);
 #include "kaguya/gen/push_tuple.inl"
 
 

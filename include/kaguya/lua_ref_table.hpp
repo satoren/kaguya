@@ -196,8 +196,6 @@ namespace kaguya
 		inline int push(lua_State* l, const std::map<K, V>& ref)
 		{
 			LuaRef table(l, NewTable(ref.size(), 0));
-
-			int count = 0;
 			for (typename std::map<K,V>::const_iterator it = ref.begin(); it != ref.end(); ++it)
 			{
 				table[it->first] = it->second;
