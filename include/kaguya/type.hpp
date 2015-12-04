@@ -272,7 +272,7 @@ namespace kaguya
 
 		inline bool checkType(lua_State* l, int index, typetag<bool> tag)
 		{
-			return lua_isboolean(l, index) != 0;
+			return true;
 		}
 		inline bool checkType(lua_State* l, int index, typetag<float> tag)
 		{

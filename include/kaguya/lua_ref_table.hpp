@@ -139,6 +139,7 @@ namespace kaguya
 			std::vector<T> result;
 			LuaRef table = get(l, index, typetag<LuaRef>());
 			std::vector<LuaRef> values = table.values();
+			result.reserve(values.size());
 			for (std::vector<LuaRef>::iterator it = values.begin(); it != values.end(); ++it)
 			{
 				result.push_back(it->get<T>());

@@ -239,6 +239,11 @@ namespace kaguya
 		}
 		void push(lua_State* state)const
 		{
+			if (isNilref())
+			{
+				lua_pushnil(state);
+				return;
+			}
 #if LUA_VERSION_NUM >= 502
 			if (state != state_)
 			{//state check
