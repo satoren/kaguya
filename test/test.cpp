@@ -707,6 +707,50 @@ namespace selector_test
 
 			return true;
 		}
+
+
+		struct CallbackTest
+		{
+			void callCallback(int x)
+			{
+				if (function_)
+				{
+					function_(x);
+				}
+			}
+			void setCallback(kaguya::LuaRef fun)
+			{
+				function_ = fun;
+			}
+			kaguya::LuaRef function_;
+		};
+
+		bool luafun_callback(kaguya::State& state)
+		{
+
+			state["CallbackTest"].setClass(kaguya::ClassMetatable<CallbackTest>()
+				.addConstructor()
+				.addMember("setCallback", &CallbackTest::setCallback)
+				.addMember("callCallback", &CallbackTest::callCallback));
+
+
+			state("callback = CallbackTest.new();"
+				"receive_data ={};"
+				"callback:setCallback(function(x) table.insert(receive_data,x) end);"
+				"callback:callCallback(54)"
+				"callback:callCallback(24)"
+				);
+
+			(state["callback"]->*"callCallback")(454);
+			std::vector<int> callback_data = state["receive_data"];
+
+			if (!(callback_data.size() == 3 && callback_data[0] == 54 
+				&& callback_data[1] == 24 && callback_data[2] == 454)) { return false; }
+
+			return true;
+		}
+
+		
 	}
 
 	namespace t_05_error_handler
@@ -922,6 +966,7 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::typetyest_function);
 		ADD_TEST(selector_test::t_04_lua_ref::operator_equal_test);
 		ADD_TEST(selector_test::t_04_lua_ref::typetest);
+		ADD_TEST(selector_test::t_04_lua_ref::luafun_callback);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);

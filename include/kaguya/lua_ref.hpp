@@ -260,6 +260,13 @@ namespace kaguya
 			push();//push to stack
 			return types::strictCheckType(state_,-1,types::typetag<T>());
 		}
+		template<typename T>
+		bool weakTypeTest()const
+		{
+			util::ScopedSavedStack save(state_);
+			push();//push to stack
+			return types::checkType(state_, -1, types::typetag<T>());
+		}
 
 		template<typename T>
 		T get(types::typetag<T>)const

@@ -241,6 +241,11 @@ namespace kaguya
 			return lua_type(l, index) == LUA_TSTRING;
 		}
 
+		inline bool strictCheckType(lua_State* l, int index, typetag<lua_State*> tag)
+		{
+			return lua_isthread(l, index);
+		}
+
 
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<T> tag)
@@ -270,8 +275,8 @@ namespace kaguya
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<T*> tag)
 		{
-			return lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| lua_type(l, index) == LUA_TTABLE //allow table for __gc
+			int typ = lua_type(l, index);
+			return typ == LUA_TLIGHTUSERDATA
 				|| lua_topointer(l, index) == 0
 				|| !available_metatable<T>(l)
 				|| luaL_testudata(l, index, metatableName<T>().c_str())
@@ -357,6 +362,11 @@ namespace kaguya
 		inline bool checkType(lua_State* l, int index, typetag<const std::string> tag)
 		{
 			return checkType(l, index, typetag<std::string>());
+		}
+
+		inline bool checkType(lua_State* l, int index, typetag<lua_State*> tag)
+		{
+			return lua_isthread(l, index);
 		}
 
 
@@ -700,6 +710,8 @@ namespace kaguya
 		
 		//vector
 		template<typename T>
+		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >);
+		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<std::vector<T> >);
 		template<typename T>
 		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag);
@@ -708,6 +720,8 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, std::vector<T>& ref);
 		//std::map
+		template<typename K, typename V>
+		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >);
 		template<typename K, typename V>
 		inline bool checkType(lua_State* l, int index, typetag<std::map<K, V> >);
 		template<typename K, typename V>

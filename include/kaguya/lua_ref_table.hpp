@@ -126,7 +126,7 @@ namespace kaguya
 			std::map<LuaRef, LuaRef> values = table.map();
 			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
 			{
-				if (!it->first.typeTest<size_t>() || !it->second.typeTest<T>())
+				if (!it->first.typeTest<size_t>() || !it->second.weakTypeTest<T>())
 				{
 					return false;
 				}
@@ -174,7 +174,7 @@ namespace kaguya
 			std::map<LuaRef, LuaRef> values = table.map();
 			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
 			{
-				if (!it->first.typeTest<K>() || !it->second.typeTest<V>())
+				if (!it->first.typeTest<K>() || !it->second.weakTypeTest<V>())
 				{
 					return false;
 				}
