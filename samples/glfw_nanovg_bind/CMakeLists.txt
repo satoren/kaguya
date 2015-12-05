@@ -7,6 +7,12 @@ include(../../cmake/FindLua.cmake)
 include_directories(${LUA_INCLUDE_DIRS})
 include_directories("../../include")#include kaguya dir
 
+
+add_library(luaeasing SHARED luaeasing.cpp)
+target_link_libraries(luaeasing ${LUA_LIBRARIES})
+SET_TARGET_PROPERTIES(luaeasing PROPERTIES OUTPUT_NAME luaeasing)
+SET_TARGET_PROPERTIES(luaeasing PROPERTIES PREFIX "")
+
 add_subdirectory(glad)
 add_subdirectory(glfw)
 include_directories(glfw/include)

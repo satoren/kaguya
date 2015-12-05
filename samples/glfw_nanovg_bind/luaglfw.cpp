@@ -357,6 +357,14 @@ namespace
 		return standard::tuple<int, int, int, int>(left, right, top, bottom);
 	}
 
+	standard::tuple<int, int> GetWindowPos(GLFWwindow* window)
+	{
+		int xpos = 0;
+		int ypos = 0;
+		glfwGetWindowPos(window, &xpos, &ypos);
+		return standard::tuple<int, int>(xpos, ypos);
+	}
+
 	standard::tuple<double, double> GetCursorPos(GLFWwindow* window)
 	{
 		double xpos = 0;
@@ -538,7 +546,8 @@ int luaopen_luaglfw(lua_State *L)
 	GLFW_LUA_REGFUNC(glfwSetWindowShouldClose);
 	GLFW_LUA_REGFUNC(glfwWindowShouldClose);
 	GLFW_LUA_REGFUNC(glfwSetWindowTitle);
-	GLFW_LUA_REGFUNC(glfwGetWindowPos);
+	
+	luaglfw["GetWindowPos"] = function(GetWindowPos);
 
 	GLFW_LUA_REGFUNC(glfwSetWindowPos);
 	GLFW_LUA_REGFUNC(glfwSetWindowSize);
@@ -873,8 +882,10 @@ int luaopen_luaglfw(lua_State *L)
 		.addStaticMember("getWindowFrameSize", &GetWindowFrameSize)
 
 		.addStaticMember("setClipboardString", &glfwSetClipboardString)
-		.addStaticMember("getClipboardString", &glfwGetClipboardString)
+		.addStaticMember("getWindowPos", &GetWindowPos)
 
+		.addStaticMember("setWindowTitle", &glfwSetWindowTitle)
+		.addStaticMember("setInputMode", &glfwSetInputMode)
 
 		.addStaticMember("getInputMode", &glfwGetInputMode)
 		.addStaticMember("setInputMode", &glfwSetInputMode)
@@ -900,6 +911,8 @@ int luaopen_luaglfw(lua_State *L)
 		.addStaticMember("setScrollCallback", &WindowCallbacks::SetScrollCallback)
 		.addStaticMember("setDropCallback", &WindowCallbacks::SetDropCallback)
 		);
+		
+
 
 	luaglfw["cursor"].setClass(ClassMetatable<MetaPointerWrapper<GLFWcursor> >()
 		.addStaticMember("new", &glfwCreateCursor)

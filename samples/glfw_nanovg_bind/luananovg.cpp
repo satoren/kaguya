@@ -55,10 +55,16 @@ int luaopen_luananovg(lua_State *L)
 {
 	State state(L);
 	LuaRef luananovg = state.newLib();
+	
+	//not nanovg but need
+	luananovg["glViewport"] = function(glViewport);
+	
+	
 	luananovg["Create"] = function(create);
 	luananovg["Delete"] = function(Delete);
 
 	luananovg["Color"].setClass(ClassMetatable<NVGcolor>());
+	
 
 #define NANOVG_LUA_REGFUNC(FNAME) luananovg[#FNAME + 3] = function(&FNAME)
 	NANOVG_LUA_REGFUNC(nvgBeginFrame);
