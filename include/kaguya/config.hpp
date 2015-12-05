@@ -67,6 +67,7 @@ namespace kaguya
 		using boost::shared_ptr;
 		using boost::get;
 		using boost::is_enum;
+		using std::is_arithmetic;
 #if BOOST_VERSION >= 104800
 		using boost::forward;
 #else
@@ -86,6 +87,7 @@ namespace kaguya
 		using std::to_string;
 		using std::get;
 		using std::is_enum;
+		using std::is_arithmetic;
 		using std::forward;
 #endif
 	}

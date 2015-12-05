@@ -117,6 +117,9 @@ namespace selector_test
 			int getInt() const {
 				return intmember;
 			}
+			void setInt(const int& n)  {
+				intmember = n;
+			}
 			std::string getString()const {
 				return stringmember;
 			}
@@ -169,6 +172,7 @@ namespace selector_test
 				.addConstructor<const std::string&, int>()
 				.addMember("getString", &ABC::getString)
 				.addMember("getInt", &ABC::getInt)
+				.addMember("setInt", &ABC::setInt)
 				);
 
 			if (!state("value = assert(ABC.new(32))")) { return false; }
@@ -181,6 +185,9 @@ namespace selector_test
 			if (!state("value = assert(ABC.new(64,\"string_value3\"))")) { return false; }
 			if (!state("assert(value:getString() == \"string_value3\")")) { return false; }
 			if (!state("assert(value:getInt() == 64)")) { return false; }
+
+			if (!state("value:setInt(33)")) { return false; }
+			if (!state("assert(value:getInt() == 33)")) { return false; }
 			return true;
 		};
 		bool copy_constructor(kaguya::State& state)

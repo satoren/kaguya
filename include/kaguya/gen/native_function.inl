@@ -34,15 +34,15 @@ struct StdFunInvoker1:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     Ret r = func_(t1);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -66,16 +66,16 @@ struct StdFunInvoker2:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     Ret r = func_(t1,t2);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -99,17 +99,17 @@ struct StdFunInvoker3:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     Ret r = func_(t1,t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -133,18 +133,18 @@ struct StdFunInvoker4:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     Ret r = func_(t1,t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -168,19 +168,19 @@ struct StdFunInvoker5:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     Ret r = func_(t1,t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -204,20 +204,20 @@ struct StdFunInvoker6:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -241,21 +241,21 @@ struct StdFunInvoker7:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -279,22 +279,22 @@ struct StdFunInvoker8:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -318,23 +318,23 @@ struct StdFunInvoker9:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -378,15 +378,15 @@ struct VoidStdFunInvoker1:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     func_(t1);
     return 0;
   }
@@ -407,16 +407,16 @@ struct VoidStdFunInvoker2:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     func_(t1,t2);
     return 0;
   }
@@ -437,17 +437,17 @@ struct VoidStdFunInvoker3:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     func_(t1,t2,t3);
     return 0;
   }
@@ -468,18 +468,18 @@ struct VoidStdFunInvoker4:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     func_(t1,t2,t3,t4);
     return 0;
   }
@@ -500,19 +500,19 @@ struct VoidStdFunInvoker5:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     func_(t1,t2,t3,t4,t5);
     return 0;
   }
@@ -533,20 +533,20 @@ struct VoidStdFunInvoker6:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     func_(t1,t2,t3,t4,t5,t6);
     return 0;
   }
@@ -567,21 +567,21 @@ struct VoidStdFunInvoker7:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7);
     return 0;
   }
@@ -602,22 +602,22 @@ struct VoidStdFunInvoker8:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
@@ -638,23 +638,23 @@ struct VoidStdFunInvoker9:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
@@ -702,15 +702,15 @@ struct FunInvoker1:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     Ret r = func_(t1);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -734,16 +734,16 @@ struct FunInvoker2:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     Ret r = func_(t1,t2);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -767,17 +767,17 @@ struct FunInvoker3:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     Ret r = func_(t1,t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -801,18 +801,18 @@ struct FunInvoker4:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     Ret r = func_(t1,t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -836,19 +836,19 @@ struct FunInvoker5:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     Ret r = func_(t1,t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -872,20 +872,20 @@ struct FunInvoker6:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -909,21 +909,21 @@ struct FunInvoker7:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -947,22 +947,22 @@ struct FunInvoker8:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -986,23 +986,23 @@ struct FunInvoker9:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
@@ -1046,15 +1046,15 @@ struct VoidFunInvoker1:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     func_(t1);
     return 0;
   }
@@ -1075,16 +1075,16 @@ struct VoidFunInvoker2:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     func_(t1,t2);
     return 0;
   }
@@ -1105,17 +1105,17 @@ struct VoidFunInvoker3:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     func_(t1,t2,t3);
     return 0;
   }
@@ -1136,18 +1136,18 @@ struct VoidFunInvoker4:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     func_(t1,t2,t3,t4);
     return 0;
   }
@@ -1168,19 +1168,19 @@ struct VoidFunInvoker5:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     func_(t1,t2,t3,t4,t5);
     return 0;
   }
@@ -1201,20 +1201,20 @@ struct VoidFunInvoker6:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     func_(t1,t2,t3,t4,t5,t6);
     return 0;
   }
@@ -1235,21 +1235,21 @@ struct VoidFunInvoker7:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7);
     return 0;
   }
@@ -1270,22 +1270,22 @@ struct VoidFunInvoker8:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
@@ -1306,23 +1306,23 @@ struct VoidFunInvoker9:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
@@ -1403,15 +1403,15 @@ struct MemFunInvoker1:BaseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
@@ -1438,15 +1438,15 @@ struct constMemFunInvoker1:BaseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
@@ -1473,16 +1473,16 @@ struct MemFunInvoker2:BaseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
@@ -1509,16 +1509,16 @@ struct constMemFunInvoker2:BaseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
@@ -1545,17 +1545,17 @@ struct MemFunInvoker3:BaseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
@@ -1582,17 +1582,17 @@ struct constMemFunInvoker3:BaseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
@@ -1619,18 +1619,18 @@ struct MemFunInvoker4:BaseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
@@ -1657,18 +1657,18 @@ struct constMemFunInvoker4:BaseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
@@ -1695,19 +1695,19 @@ struct MemFunInvoker5:BaseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -1734,19 +1734,19 @@ struct constMemFunInvoker5:BaseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -1773,20 +1773,20 @@ struct MemFunInvoker6:BaseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -1813,20 +1813,20 @@ struct constMemFunInvoker6:BaseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -1853,21 +1853,21 @@ struct MemFunInvoker7:BaseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -1894,21 +1894,21 @@ struct constMemFunInvoker7:BaseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -1935,22 +1935,22 @@ struct MemFunInvoker8:BaseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -1977,22 +1977,22 @@ struct constMemFunInvoker8:BaseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -2019,23 +2019,23 @@ struct MemFunInvoker9:BaseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())||!types::strictCheckType(state,10,types::typetag<T10>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::strictCheckType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())||!types::checkType(state,10,types::typetag<T10>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::checkType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
-    T10 t10 = types::get(state,10,types::typetag<T10>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
+    typename traits::arg_get_type<T10>::type t10 = types::get(state,10,types::typetag<typename traits::arg_get_type<T10>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -2062,23 +2062,23 @@ struct constMemFunInvoker9:BaseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())||!types::strictCheckType(state,10,types::typetag<T10>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::strictCheckType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())||!types::checkType(state,10,types::typetag<T10>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::checkType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
-    T10 t10 = types::get(state,10,types::typetag<T10>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
+    typename traits::arg_get_type<T10>::type t10 = types::get(state,10,types::typetag<typename traits::arg_get_type<T10>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -2156,15 +2156,15 @@ struct VoidMemFunInvoker1:BaseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2);
@@ -2188,15 +2188,15 @@ struct constVoidMemFunInvoker1:BaseInvoker{
     if(lua_gettop(state) != 2){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2);
@@ -2220,16 +2220,16 @@ struct VoidMemFunInvoker2:BaseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
@@ -2253,16 +2253,16 @@ struct constVoidMemFunInvoker2:BaseInvoker{
     if(lua_gettop(state) != 3){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
@@ -2286,17 +2286,17 @@ struct VoidMemFunInvoker3:BaseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
@@ -2320,17 +2320,17 @@ struct constVoidMemFunInvoker3:BaseInvoker{
     if(lua_gettop(state) != 4){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
@@ -2354,18 +2354,18 @@ struct VoidMemFunInvoker4:BaseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
@@ -2389,18 +2389,18 @@ struct constVoidMemFunInvoker4:BaseInvoker{
     if(lua_gettop(state) != 5){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
@@ -2424,19 +2424,19 @@ struct VoidMemFunInvoker5:BaseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -2460,19 +2460,19 @@ struct constVoidMemFunInvoker5:BaseInvoker{
     if(lua_gettop(state) != 6){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -2496,20 +2496,20 @@ struct VoidMemFunInvoker6:BaseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -2533,20 +2533,20 @@ struct constVoidMemFunInvoker6:BaseInvoker{
     if(lua_gettop(state) != 7){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -2570,21 +2570,21 @@ struct VoidMemFunInvoker7:BaseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -2608,21 +2608,21 @@ struct constVoidMemFunInvoker7:BaseInvoker{
     if(lua_gettop(state) != 8){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -2646,22 +2646,22 @@ struct VoidMemFunInvoker8:BaseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -2685,22 +2685,22 @@ struct constVoidMemFunInvoker8:BaseInvoker{
     if(lua_gettop(state) != 9){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -2724,23 +2724,23 @@ struct VoidMemFunInvoker9:BaseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())||!types::strictCheckType(state,10,types::typetag<T10>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::strictCheckType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())||!types::checkType(state,10,types::typetag<T10>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::checkType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
-    T10 t10 = types::get(state,10,types::typetag<T10>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
+    typename traits::arg_get_type<T10>::type t10 = types::get(state,10,types::typetag<typename traits::arg_get_type<T10>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -2764,23 +2764,23 @@ struct constVoidMemFunInvoker9:BaseInvoker{
     if(lua_gettop(state) != 10){return false;}
 if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())||!types::strictCheckType(state,10,types::typetag<T10>())){return false;}
+      if(!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::strictCheckType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }else{
-      if(!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())||!types::checkType(state,10,types::typetag<T10>())){return false;}
+      if(!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())||!types::checkType(state,10,types::typetag<typename traits::arg_get_type<T10>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
-    T10 t10 = types::get(state,10,types::typetag<T10>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
+    typename traits::arg_get_type<T10>::type t10 = types::get(state,10,types::typetag<typename traits::arg_get_type<T10>::type>());
   T1* ptr = types::get(state, 1, types::typetag<T1*>());
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -2816,15 +2816,15 @@ struct ConstructorInvoker1:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2837,16 +2837,16 @@ struct ConstructorInvoker2:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2859,17 +2859,17 @@ struct ConstructorInvoker3:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2882,18 +2882,18 @@ struct ConstructorInvoker4:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2906,19 +2906,19 @@ struct ConstructorInvoker5:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2931,20 +2931,20 @@ struct ConstructorInvoker6:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2957,21 +2957,21 @@ struct ConstructorInvoker7:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -2984,22 +2984,22 @@ struct ConstructorInvoker8:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
@@ -3012,23 +3012,23 @@ struct ConstructorInvoker9:BaseInvoker{
   virtual bool checktype(lua_State *state,bool strictcheck){
     if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
-      if(!types::strictCheckType(state,1,types::typetag<T1>())||!types::strictCheckType(state,2,types::typetag<T2>())||!types::strictCheckType(state,3,types::typetag<T3>())||!types::strictCheckType(state,4,types::typetag<T4>())||!types::strictCheckType(state,5,types::typetag<T5>())||!types::strictCheckType(state,6,types::typetag<T6>())||!types::strictCheckType(state,7,types::typetag<T7>())||!types::strictCheckType(state,8,types::typetag<T8>())||!types::strictCheckType(state,9,types::typetag<T9>())){return false;}
+      if(!types::strictCheckType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::strictCheckType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::strictCheckType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::strictCheckType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::strictCheckType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::strictCheckType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::strictCheckType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::strictCheckType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::strictCheckType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }else{
-      if(!types::checkType(state,1,types::typetag<T1>())||!types::checkType(state,2,types::typetag<T2>())||!types::checkType(state,3,types::typetag<T3>())||!types::checkType(state,4,types::typetag<T4>())||!types::checkType(state,5,types::typetag<T5>())||!types::checkType(state,6,types::typetag<T6>())||!types::checkType(state,7,types::typetag<T7>())||!types::checkType(state,8,types::typetag<T8>())||!types::checkType(state,9,types::typetag<T9>())){return false;}
+      if(!types::checkType(state,1,types::typetag<typename traits::arg_get_type<T1>::type>())||!types::checkType(state,2,types::typetag<typename traits::arg_get_type<T2>::type>())||!types::checkType(state,3,types::typetag<typename traits::arg_get_type<T3>::type>())||!types::checkType(state,4,types::typetag<typename traits::arg_get_type<T4>::type>())||!types::checkType(state,5,types::typetag<typename traits::arg_get_type<T5>::type>())||!types::checkType(state,6,types::typetag<typename traits::arg_get_type<T6>::type>())||!types::checkType(state,7,types::typetag<typename traits::arg_get_type<T7>::type>())||!types::checkType(state,8,types::typetag<typename traits::arg_get_type<T8>::type>())||!types::checkType(state,9,types::typetag<typename traits::arg_get_type<T9>::type>())){return false;}
   }
     return true;
   }
   virtual int invoke(lua_State *state)
   {
-    T1 t1 = types::get(state,1,types::typetag<T1>());
-    T2 t2 = types::get(state,2,types::typetag<T2>());
-    T3 t3 = types::get(state,3,types::typetag<T3>());
-    T4 t4 = types::get(state,4,types::typetag<T4>());
-    T5 t5 = types::get(state,5,types::typetag<T5>());
-    T6 t6 = types::get(state,6,types::typetag<T6>());
-    T7 t7 = types::get(state,7,types::typetag<T7>());
-    T8 t8 = types::get(state,8,types::typetag<T8>());
-    T9 t9 = types::get(state,9,types::typetag<T9>());
+    typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
+    typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
+    typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
+    typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
+    typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
+    typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
+    typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
+    typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
+    typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8,t9);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());

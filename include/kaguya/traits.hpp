@@ -37,6 +37,22 @@ namespace kaguya
 		struct remove_cv {
 			typedef typename remove_volatile<typename remove_const<T>::type>::type type;
 		};
+		template<bool B, class T, class F>
+		struct conditional { typedef T type; };
+
+		template<class T, class F>
+		struct conditional<false, T, F> { typedef F type; };
+
+
+		template< typename T >
+		struct remove_const_reference {
+			typedef typename remove_const<typename remove_reference<T>::type>::type type;
+		};
+
+		template< typename T >
+		struct arg_get_type {
+			typedef typename conditional<standard::is_arithmetic<typename remove_reference<T>::type >::value|| standard::is_enum<typename remove_reference<T>::type>::value, typename remove_const_reference<T>::type,T>::type type;
+		};
 	}
 
 };

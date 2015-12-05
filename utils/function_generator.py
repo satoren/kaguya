@@ -9,8 +9,7 @@ def args(out,arg_num,name,argoffset=0):
 
 def get_call(out,arg_num,offset=0):
 	for i in range (offset + 1,arg_num + 1):
-		out.write('    T'+str(i) +' t' +str(i) +' = types::get(state,' + str(i) + ',types::typetag<T'+ str(i) + '>());\n')
-
+		out.write('    typename traits::arg_get_type<T'+str(i) +'>::type t' +str(i) +' = types::get(state,' + str(i) + ',types::typetag<typename traits::arg_get_type<T'+ str(i) + '>::type>());\n')
 
 def strictCheckType(out,arg_num,offset=0,customcheck=""):
 	out.write('  virtual bool checktype(lua_State *state,bool strictcheck){\n')
@@ -23,14 +22,14 @@ def strictCheckType(out,arg_num,offset=0,customcheck=""):
 		for i in range (offset+1,arg_num+1):
 			if i>offset+1:
 				out.write('||')
-			out.write('!types::strictCheckType(state,' + str(i) + ',types::typetag<T'+ str(i) + '>())')
+			out.write('!types::strictCheckType(state,' + str(i) + ',types::typetag<typename traits::arg_get_type<T'+ str(i) + '>::type>())')
 		out.write('){return false;}\n')
 		out.write('  }else{\n')	
 		out.write('      if(')
 		for i in range (offset+1,arg_num+1):
 			if i>offset+1:
 				out.write('||')
-			out.write('!types::checkType(state,' + str(i) + ',types::typetag<T'+ str(i) + '>())')
+			out.write('!types::checkType(state,' + str(i) + ',types::typetag<typename traits::arg_get_type<T'+ str(i) + '>::type>())')
 		out.write('){return false;}\n')
 		out.write('  }\n')
 	out.write('    return true;\n')

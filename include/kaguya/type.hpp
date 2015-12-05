@@ -371,54 +371,6 @@ namespace kaguya
 
 
 
-		template<typename T>
-		inline T get(lua_State* l, int index, typetag<T> tag = typetag<T>())
-		{
-			if (standard::is_enum<T>())
-			{
-				return getEnum(l, index, typetag<T>());
-			}
-			else
-			{
-				T* pointer = get_pointer(l, index, typetag<T>());
-				if (!pointer)
-				{
-					throw LuaTypeMismatch("type mismatch!!");
-				}
-				return *pointer;
-			}
-		}
-		template<typename T>
-		inline const T& get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
-		{
-			if (standard::is_enum<T>())
-			{
-				throw LuaTypeMismatch("type mismatch!!");
-			}
-			T* pointer = get_pointer(l, index, typetag<T>());
-			if (!pointer)
-			{
-				throw LuaTypeMismatch("type mismatch!!");
-			}
-			return *pointer;
-		}
-		template<typename T>
-		inline T& get(lua_State* l, int index, typetag<T&> tag = typetag<T&>())
-		{
-			T* pointer = get_pointer(l, index, typetag<T>());
-			if (!pointer)
-			{
-				throw std::invalid_argument("type mismatch!!");//can not comeback from error
-			}
-			return *pointer;
-		}
-		template<typename T>
-		inline T* get(lua_State* l, int index, typetag<T*> tag = typetag<T*>())
-		{
-			return get_pointer(l, index, typetag<T>());
-		}
-
-
 		inline lua_State* get(lua_State* l, int index, typetag<lua_State*> tag = typetag<lua_State*>())
 		{
 			return lua_tothread(l, index);
@@ -518,6 +470,54 @@ namespace kaguya
 		{
 			throw LuaTypeMismatch("type mismatch!!");
 			return *(T*)(0);
+		}
+
+
+		template<typename T>
+		inline T get(lua_State* l, int index, typetag<T> tag = typetag<T>())
+		{
+			if (standard::is_enum<T>())
+			{
+				return getEnum(l, index, typetag<T>());
+			}
+			else
+			{
+				T* pointer = get_pointer(l, index, typetag<T>());
+				if (!pointer)
+				{
+					throw LuaTypeMismatch("type mismatch!!");
+				}
+				return *pointer;
+			}
+		}
+		template<typename T>
+		inline const T& get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
+		{
+			if (standard::is_enum<T>())
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			T* pointer = get_pointer(l, index, typetag<T>());
+			if (!pointer)
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return *pointer;
+		}
+		template<typename T>
+		inline T& get(lua_State* l, int index, typetag<T&> tag = typetag<T&>())
+		{
+			T* pointer = get_pointer(l, index, typetag<T>());
+			if (!pointer)
+			{
+				throw std::invalid_argument("type mismatch!!");//can not comeback from error
+			}
+			return *pointer;
+		}
+		template<typename T>
+		inline T* get(lua_State* l, int index, typetag<T*> tag = typetag<T*>())
+		{
+			return get_pointer(l, index, typetag<T>());
 		}
 
 

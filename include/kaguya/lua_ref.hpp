@@ -269,29 +269,29 @@ namespace kaguya
 		}
 
 		template<typename T>
-		T get(types::typetag<T>)const
+		typename traits::arg_get_type<T>::type get(types::typetag<T>)const
 		{
 			return get<T>();
 		}
-
 		std::string get(types::typetag<const std::string&>)const
 		{
 			return get<std::string>();
 		}
 		template<typename T>
-		T get()const
+		typename traits::arg_get_type<T>::type get()const
 		{
 			if (state_ == 0 || ref_ == LUA_REFNIL)
 			{
 				throw LuaTypeMismatch("is nil");
 			}
+			typedef typename traits::arg_get_type<T>::type get_type;
 			util::ScopedSavedStack save(state_);
 			push(state_);
-			if (!types::checkType(state_, -1, types::typetag<T>()))
+			if (!types::checkType(state_, -1, types::typetag<get_type>()))
 			{
 				throw LuaTypeMismatch(typeName() + std::string("is not ") + typeid(T).name());
 			}
-			return types::get(state_, -1, types::typetag<T>());
+			return types::get(state_, -1, types::typetag<get_type>());
 		}
 
 		template<typename T>
