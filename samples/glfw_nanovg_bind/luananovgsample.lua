@@ -11,8 +11,9 @@ end
         glfw.Terminate();
         return -1;
     end
-    drawpath={}
-    glfw.SetCursorPosCallback(window,function(x,y) table.insert(drawpath,{x,y}) end)
+    local drawpathx={}
+    local drawpathy={}
+    glfw.SetCursorPosCallback(window,function(x,y) table.insert(drawpathx,x);table.insert(drawpathy,y) end)
     glfw.SetWindowPosCallback(window,function(x,y) end)
     glfw.SetWindowCloseCallback(window,function() print("window closed!") end)
 
@@ -24,11 +25,11 @@ end
         local red = nvg.RGB(255,0,0);
         nvg.StrokeColor(context,red);
         nvg.BeginPath(context);        
-        for i,var in ipairs(drawpath) do   
+        for i in ipairs(drawpathx) do   
           if i==1 then
-            nvg.MoveTo(context,var[1],var[2]);
+            nvg.MoveTo(context,drawpathx[i],drawpathy[i]);
           end
-        nvg.LineTo(context,var[1],var[2]);
+        nvg.LineTo(context,drawpathx[i],drawpathy[i]);
         end
         nvg.StrokeWidth(context,5);
         nvg.Stroke(context);

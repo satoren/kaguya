@@ -6,18 +6,18 @@ if glfw.Init() == false then
 end
 
     -- Create a windowed mode window and its OpenGL context
-    window = glfw.window.new(640, 480, "Hello World");
---    window = glfw.CreateWindow(640, 480, "Hello World", 0, 0);
+    local window = glfw.window.new(640, 480, "Hello World");
     if (window == nil) then
         glfw.Terminate();
         return -1;
     end
-    drawpath={}
-    window:setCursorPosCallback(function(x,y) table.insert(drawpath,{x,y}) end)
+    local drawpathx={}
+    local drawpathy={}
+    window:setCursorPosCallback(function(x,y) table.insert(drawpathx,x);table.insert(drawpathy,y) end)
     window:setWindowCloseCallback(function(x,y) print("window closed!") end)
     
     window:makeContextCurrent();
-    context = nvg.Create(0);
+    local context = nvg.Create(0);
     
     local red = nvg.RGB(255,0,0);
     while (window:windowShouldClose() == 0) do
@@ -25,11 +25,11 @@ end
         nvg.BeginFrame(context,width, height,1);
         nvg.StrokeColor(context,red);
         nvg.BeginPath(context);        
-        for i,var in ipairs(drawpath) do   
+        for i in ipairs(drawpathx) do   
           if i==1 then
-            nvg.MoveTo(context,var[1],var[2]);
+            nvg.MoveTo(context,drawpathx[i],drawpathy[i]);
           end
-        nvg.LineTo(context,var[1],var[2]);
+        nvg.LineTo(context,drawpathx[i],drawpathy[i]);
         end
         nvg.StrokeWidth(context,5);
         nvg.Stroke(context);
@@ -41,6 +41,5 @@ end
         -- Poll for and process events 
         glfw.PollEvents();
     end
-    
     glfw.Terminate();
     return 0;
