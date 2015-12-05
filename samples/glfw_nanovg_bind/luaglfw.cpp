@@ -62,6 +62,16 @@ namespace
 
 	struct Window
 	{
+		Window(int width, int height, const char* title)
+		{
+			window_ = glfwCreateWindow(width, height, title, 0, 0);
+			glfwSetWindowUserPointer(window_, this);
+		}
+		Window(int width, int height, const char* title, GLFWmonitor* monitor, Window* share)
+		{
+			window_ = glfwCreateWindow(width, height, title, monitor, share->window_);
+			glfwSetWindowUserPointer(window_, this);
+		}
 		Window(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share)
 		{
 			window_ = glfwCreateWindow(width, height, title, monitor, share);
@@ -73,7 +83,7 @@ namespace
 			glfwSetWindowUserPointer(window_, 0);
 			glfwDestroyWindow(window_);
 		}
-		GLFWwindow* pointer() { return window_; }
+		GLFWwindow* native_pointer() { return window_; }
 
 
 		LuaRef SetWindowPosCallback(LuaRef function)
@@ -316,14 +326,43 @@ namespace
 	GLFWwindow* CreateWindow(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share)
 	{
 		Window* w = new Window(width, height, title, monitor, share);
-		return w->pointer();
+		return w->native_pointer();
 	}
-
-
 	void DestroyWindow(GLFWwindow* window)
 	{
 		Window* w = (Window*)glfwGetWindowUserPointer(window);
 		delete w;
+	}
+	standard::tuple<int, int> GetWindowSize(GLFWwindow* window)
+	{
+		int width = 0;
+		int height = 0;
+		glfwGetWindowSize(window, &width, &height);
+		return standard::tuple<int, int>(width, height);	
+	}
+	standard::tuple<int, int> GetFramebufferSize(GLFWwindow* window)
+	{
+		int width = 0;
+		int height = 0;
+		glfwGetFramebufferSize(window, &width, &height);
+		return standard::tuple<int, int>(width, height);
+	}
+	standard::tuple<int, int, int, int> GetWindowFrameSize(GLFWwindow* window)
+	{
+		int left = 0;
+		int right = 0;
+		int top = 0;
+		int bottom = 0;
+		glfwGetWindowFrameSize(window, &left, &right, &top, &bottom);
+		return standard::tuple<int, int, int, int>(left, right, top, bottom);
+	}
+
+	standard::tuple<double, double> GetCursorPos(GLFWwindow* window)
+	{
+		double xpos = 0;
+		double ypos = 0;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		return standard::tuple<double, double>(xpos, ypos);
 	}
 
 	namespace WindowCallbacks
@@ -432,11 +471,29 @@ int luaopen_luaglfw(lua_State *L)
 
 	//	GLFW_LUA_REGFUNC(glfwSetErrorCallback);
 	luaglfw["SetErrorCallback"] = function(&global_callbacks::SetErrorCallback);
-
-
-	GLFW_LUA_REGFUNC(glfwGetMonitors);
+	
+	luaglfw["GetMonitors"] = function([]() {
+		int count = 0;
+		GLFWmonitor** mon = glfwGetMonitors( &count);
+		std::vector<GLFWmonitor*> result;
+		for (int i = 0; i < count; ++i)
+		{
+			result.push_back(mon[i]);
+		}
+		return result;
+	});
 	GLFW_LUA_REGFUNC(glfwGetPrimaryMonitor);
+
+
 	GLFW_LUA_REGFUNC(glfwGetMonitorPos);
+
+	luaglfw["GetMonitorPos"] = function([](GLFWmonitor* monitor) {
+		int xpos = 0;
+		int ypos = 0;
+		glfwGetMonitorPos(monitor,&xpos,&ypos);
+		return standard::tuple<int, int>(xpos, ypos);
+	});
+
 	GLFW_LUA_REGFUNC(glfwGetMonitorPhysicalSize);
 	GLFW_LUA_REGFUNC(glfwGetMonitorName);
 
@@ -486,26 +543,9 @@ int luaopen_luaglfw(lua_State *L)
 	GLFW_LUA_REGFUNC(glfwSetWindowPos);
 	GLFW_LUA_REGFUNC(glfwSetWindowSize);
 
-	luaglfw["GetWindowSize"] = function([](GLFWwindow* window) {
-		int width = 0;
-		int height = 0;
-		glfwGetWindowSize(window, &width, &height);
-		return standard::tuple<int, int>(width, height);
-	});
-	luaglfw["GetFramebufferSize"] = function([](GLFWwindow* window) {
-		int width = 0;
-		int height = 0;
-		glfwGetFramebufferSize(window, &width, &height);
-		return standard::tuple<int, int>(width, height);
-	});
-	luaglfw["GetWindowFrameSize"] = function([](GLFWwindow* window) {
-		int left = 0;
-		int right = 0;
-		int top = 0;
-		int bottom = 0;
-		glfwGetWindowFrameSize(window, &left, &right, &top, &bottom);
-		return standard::tuple<int, int, int, int>(left, right, top, bottom);
-	});
+	luaglfw["GetWindowSize"] = function(&GetWindowSize);
+	luaglfw["GetFramebufferSize"] = function(&GetFramebufferSize);
+	luaglfw["GetWindowFrameSize"] = function(GetWindowFrameSize);
 
 
 	GLFW_LUA_REGFUNC(glfwIconifyWindow);
@@ -530,15 +570,10 @@ int luaopen_luaglfw(lua_State *L)
 	GLFW_LUA_REGFUNC(glfwPostEmptyEvent);
 	GLFW_LUA_REGFUNC(glfwGetInputMode);
 	GLFW_LUA_REGFUNC(glfwSetInputMode);
-
-
-
 	GLFW_LUA_REGFUNC(glfwGetKey);
 	GLFW_LUA_REGFUNC(glfwGetMouseButton);
-	GLFW_LUA_REGFUNC(glfwGetCursorPos);
+	GLFW_LUA_REGFUNC(GetCursorPos);
 	GLFW_LUA_REGFUNC(glfwSetCursorPos);
-
-
 	GLFW_LUA_REGFUNC(glfwCreateCursor);
 	GLFW_LUA_REGFUNC(glfwCreateStandardCursor);
 	GLFW_LUA_REGFUNC(glfwDestroyCursor);
@@ -552,15 +587,6 @@ int luaopen_luaglfw(lua_State *L)
 	luaglfw["SetCursorEnterCallback"] = function(&WindowCallbacks::SetCursorEnterCallback);
 	luaglfw["SetScrollCallback"] = function(&WindowCallbacks::SetScrollCallback);
 	luaglfw["SetDropCallback"] = function(&WindowCallbacks::SetDropCallback);
-
-
-	//	GLFW_LUA_REGFUNC(glfwSetCharModsCallback);
-	//	GLFW_LUA_REGFUNC(glfwSetMouseButtonCallback);
-	//	GLFW_LUA_REGFUNC(glfwSetCursorPosCallback);
-	//	GLFW_LUA_REGFUNC(glfwSetCursorEnterCallback);
-	//	GLFW_LUA_REGFUNC(glfwSetScrollCallback);
-	//	GLFW_LUA_REGFUNC(glfwSetDropCallback);
-
 
 	GLFW_LUA_REGFUNC(glfwJoystickPresent);
 
@@ -598,234 +624,287 @@ int luaopen_luaglfw(lua_State *L)
 	GLFW_LUA_REGFUNC(glfwExtensionSupported);
 	//	GLFW_LUA_REGFUNC(glfwGetProcAddress);//procaddress cant use in lua
 
-	luaglfw["VERSION_MAJOR"] = 3;
-	luaglfw["VERSION_MINOR"] = 1;
-	luaglfw["VERSION_REVISION"] = 2;
-	luaglfw["RELEASE"] = 0;
-	luaglfw["PRESS"] = 1;
-	luaglfw["REPEAT"] = 2;
-	luaglfw["KEY_UNKNOWN"] = -1;
-	luaglfw["KEY_SPACE"] = 32;
-	luaglfw["KEY_APOSTROPHE"] = 39;
-	luaglfw["KEY_COMMA"] = 44;
-	luaglfw["KEY_MINUS"] = 45;
-	luaglfw["KEY_PERIOD"] = 46;
-	luaglfw["KEY_SLASH"] = 47;
-	luaglfw["KEY_0"] = 48;
-	luaglfw["KEY_1"] = 49;
-	luaglfw["KEY_2"] = 50;
-	luaglfw["KEY_3"] = 51;
-	luaglfw["KEY_4"] = 52;
-	luaglfw["KEY_5"] = 53;
-	luaglfw["KEY_6"] = 54;
-	luaglfw["KEY_7"] = 55;
-	luaglfw["KEY_8"] = 56;
-	luaglfw["KEY_9"] = 57;
-	luaglfw["KEY_SEMICOLON"] = 59;
-	luaglfw["KEY_EQUAL"] = 61;
-	luaglfw["KEY_A"] = 65;
-	luaglfw["KEY_B"] = 66;
-	luaglfw["KEY_C"] = 67;
-	luaglfw["KEY_D"] = 68;
-	luaglfw["KEY_E"] = 69;
-	luaglfw["KEY_F"] = 70;
-	luaglfw["KEY_G"] = 71;
-	luaglfw["KEY_H"] = 72;
-	luaglfw["KEY_I"] = 73;
-	luaglfw["KEY_J"] = 74;
-	luaglfw["KEY_K"] = 75;
-	luaglfw["KEY_L"] = 76;
-	luaglfw["KEY_M"] = 77;
-	luaglfw["KEY_N"] = 78;
-	luaglfw["KEY_O"] = 79;
-	luaglfw["KEY_P"] = 80;
-	luaglfw["KEY_Q"] = 81;
-	luaglfw["KEY_R"] = 82;
-	luaglfw["KEY_S"] = 83;
-	luaglfw["KEY_T"] = 84;
-	luaglfw["KEY_U"] = 85;
-	luaglfw["KEY_V"] = 86;
-	luaglfw["KEY_W"] = 87;
-	luaglfw["KEY_X"] = 88;
-	luaglfw["KEY_Y"] = 89;
-	luaglfw["KEY_Z"] = 90;
-	luaglfw["KEY_LEFT_BRACKET"] = 91;
-	luaglfw["KEY_BACKSLASH"] = 92;
-	luaglfw["KEY_RIGHT_BRACKET"] = 93;
-	luaglfw["KEY_GRAVE_ACCENT"] = 96;
-	luaglfw["KEY_WORLD_1"] = 161;
-	luaglfw["KEY_WORLD_2"] = 162;
-	luaglfw["KEY_ESCAPE"] = 256;
-	luaglfw["KEY_ENTER"] = 257;
-	luaglfw["KEY_TAB"] = 258;
-	luaglfw["KEY_BACKSPACE"] = 259;
-	luaglfw["KEY_INSERT"] = 260;
-	luaglfw["KEY_DELETE"] = 261;
-	luaglfw["KEY_RIGHT"] = 262;
-	luaglfw["KEY_LEFT"] = 263;
-	luaglfw["KEY_DOWN"] = 264;
-	luaglfw["KEY_UP"] = 265;
-	luaglfw["KEY_PAGE_UP"] = 266;
-	luaglfw["KEY_PAGE_DOWN"] = 267;
-	luaglfw["KEY_HOME"] = 268;
-	luaglfw["KEY_END"] = 269;
-	luaglfw["KEY_CAPS_LOCK"] = 280;
-	luaglfw["KEY_SCROLL_LOCK"] = 281;
-	luaglfw["KEY_NUM_LOCK"] = 282;
-	luaglfw["KEY_PRINT_SCREEN"] = 283;
-	luaglfw["KEY_PAUSE"] = 284;
-	luaglfw["KEY_F1"] = 290;
-	luaglfw["KEY_F2"] = 291;
-	luaglfw["KEY_F3"] = 292;
-	luaglfw["KEY_F4"] = 293;
-	luaglfw["KEY_F5"] = 294;
-	luaglfw["KEY_F6"] = 295;
-	luaglfw["KEY_F7"] = 296;
-	luaglfw["KEY_F8"] = 297;
-	luaglfw["KEY_F9"] = 298;
-	luaglfw["KEY_F10"] = 299;
-	luaglfw["KEY_F11"] = 300;
-	luaglfw["KEY_F12"] = 301;
-	luaglfw["KEY_F13"] = 302;
-	luaglfw["KEY_F14"] = 303;
-	luaglfw["KEY_F15"] = 304;
-	luaglfw["KEY_F16"] = 305;
-	luaglfw["KEY_F17"] = 306;
-	luaglfw["KEY_F18"] = 307;
-	luaglfw["KEY_F19"] = 308;
-	luaglfw["KEY_F20"] = 309;
-	luaglfw["KEY_F21"] = 310;
-	luaglfw["KEY_F22"] = 311;
-	luaglfw["KEY_F23"] = 312;
-	luaglfw["KEY_F24"] = 313;
-	luaglfw["KEY_F25"] = 314;
-	luaglfw["KEY_KP_0"] = 320;
-	luaglfw["KEY_KP_1"] = 321;
-	luaglfw["KEY_KP_2"] = 322;
-	luaglfw["KEY_KP_3"] = 323;
-	luaglfw["KEY_KP_4"] = 324;
-	luaglfw["KEY_KP_5"] = 325;
-	luaglfw["KEY_KP_6"] = 326;
-	luaglfw["KEY_KP_7"] = 327;
-	luaglfw["KEY_KP_8"] = 328;
-	luaglfw["KEY_KP_9"] = 329;
-	luaglfw["KEY_KP_DECIMAL"] = 330;
-	luaglfw["KEY_KP_DIVIDE"] = 331;
-	luaglfw["KEY_KP_MULTIPLY"] = 332;
-	luaglfw["KEY_KP_SUBTRACT"] = 333;
-	luaglfw["KEY_KP_ADD"] = 334;
-	luaglfw["KEY_KP_ENTER"] = 335;
-	luaglfw["KEY_KP_EQUAL"] = 336;
-	luaglfw["KEY_LEFT_SHIFT"] = 340;
-	luaglfw["KEY_LEFT_CONTROL"] = 341;
-	luaglfw["KEY_LEFT_ALT"] = 342;
-	luaglfw["KEY_LEFT_SUPER"] = 343;
-	luaglfw["KEY_RIGHT_SHIFT"] = 344;
-	luaglfw["KEY_RIGHT_CONTROL"] = 345;
-	luaglfw["KEY_RIGHT_ALT"] = 346;
-	luaglfw["KEY_RIGHT_SUPER"] = 347;
-	luaglfw["KEY_MENU"] = 348;
-	luaglfw["KEY_LAST"] = luaglfw["KEY_MENU"];
-	luaglfw["MOD_SHIFT"] = 0x0001;
-	luaglfw["MOD_CONTROL"] = 0x0002;
-	luaglfw["MOD_ALT"] = 0x0004;
-	luaglfw["MOD_SUPER"] = 0x0008;
-	luaglfw["MOUSE_BUTTON_1"] = 0;
-	luaglfw["MOUSE_BUTTON_2"] = 1;
-	luaglfw["MOUSE_BUTTON_3"] = 2;
-	luaglfw["MOUSE_BUTTON_4"] = 3;
-	luaglfw["MOUSE_BUTTON_5"] = 4;
-	luaglfw["MOUSE_BUTTON_6"] = 5;
-	luaglfw["MOUSE_BUTTON_7"] = 6;
-	luaglfw["MOUSE_BUTTON_8"] = 7;
-	luaglfw["MOUSE_BUTTON_LAST"] = luaglfw["MOUSE_BUTTON_8"];
-	luaglfw["MOUSE_BUTTON_LEFT"] = luaglfw["MOUSE_BUTTON_1"];
-	luaglfw["MOUSE_BUTTON_RIGHT"] = luaglfw["MOUSE_BUTTON_2"];
-	luaglfw["MOUSE_BUTTON_MIDDLE"] = luaglfw["MOUSE_BUTTON_3"];
-	luaglfw["JOYSTICK_1"] = 0;
-	luaglfw["JOYSTICK_2"] = 1;
-	luaglfw["JOYSTICK_3"] = 2;
-	luaglfw["JOYSTICK_4"] = 3;
-	luaglfw["JOYSTICK_5"] = 4;
-	luaglfw["JOYSTICK_6"] = 5;
-	luaglfw["JOYSTICK_7"] = 6;
-	luaglfw["JOYSTICK_8"] = 7;
-	luaglfw["JOYSTICK_9"] = 8;
-	luaglfw["JOYSTICK_10"] = 9;
-	luaglfw["JOYSTICK_11"] = 10;
-	luaglfw["JOYSTICK_12"] = 11;
-	luaglfw["JOYSTICK_13"] = 12;
-	luaglfw["JOYSTICK_14"] = 13;
-	luaglfw["JOYSTICK_15"] = 14;
-	luaglfw["JOYSTICK_16"] = 15;
-	luaglfw["JOYSTICK_LAST"] = luaglfw["JOYSTICK_16"];
-	luaglfw["NOT_INITIALIZED"] = 0x00010001;
-	luaglfw["NO_CURRENT_CONTEXT"] = 0x00010002;
-	luaglfw["INVALID_ENUM"] = 0x00010003;
-	luaglfw["INVALID_VALUE"] = 0x00010004;
-	luaglfw["OUT_OF_MEMORY"] = 0x00010005;
-	luaglfw["API_UNAVAILABLE"] = 0x00010006;
-	luaglfw["VERSION_UNAVAILABLE"] = 0x00010007;
-	luaglfw["PLATFORM_ERROR"] = 0x00010008;
-	luaglfw["FORMAT_UNAVAILABLE"] = 0x00010009;
-	luaglfw["FOCUSED"] = 0x00020001;
-	luaglfw["ICONIFIED"] = 0x00020002;
-	luaglfw["RESIZABLE"] = 0x00020003;
-	luaglfw["VISIBLE"] = 0x00020004;
-	luaglfw["DECORATED"] = 0x00020005;
-	luaglfw["AUTO_ICONIFY"] = 0x00020006;
-	luaglfw["FLOATING"] = 0x00020007;
-	luaglfw["RED_BITS"] = 0x00021001;
-	luaglfw["GREEN_BITS"] = 0x00021002;
-	luaglfw["BLUE_BITS"] = 0x00021003;
-	luaglfw["ALPHA_BITS"] = 0x00021004;
-	luaglfw["DEPTH_BITS"] = 0x00021005;
-	luaglfw["STENCIL_BITS"] = 0x00021006;
-	luaglfw["ACCUM_RED_BITS"] = 0x00021007;
-	luaglfw["ACCUM_GREEN_BITS"] = 0x00021008;
-	luaglfw["ACCUM_BLUE_BITS"] = 0x00021009;
-	luaglfw["ACCUM_ALPHA_BITS"] = 0x0002100a;
-	luaglfw["AUX_BUFFERS"] = 0x0002100b;
-	luaglfw["STEREO"] = 0x0002100c;
-	luaglfw["SAMPLES"] = 0x0002100d;
-	luaglfw["SRGB_CAPABLE"] = 0x0002100e;
-	luaglfw["REFRESH_RATE"] = 0x0002100f;
-	luaglfw["DOUBLEBUFFER"] = 0x00021010;
-	luaglfw["CLIENT_API"] = 0x00022001;
-	luaglfw["CONTEXT_VERSION_MAJOR"] = 0x00022002;
-	luaglfw["CONTEXT_VERSION_MINOR"] = 0x00022003;
-	luaglfw["CONTEXT_REVISION"] = 0x00022004;
-	luaglfw["CONTEXT_ROBUSTNESS"] = 0x00022005;
-	luaglfw["OPENGL_FORWARD_COMPAT"] = 0x00022006;
-	luaglfw["OPENGL_DEBUG_CONTEXT"] = 0x00022007;
-	luaglfw["OPENGL_PROFILE"] = 0x00022008;
-	luaglfw["CONTEXT_RELEASE_BEHAVIOR"] = 0x00022009;
-	luaglfw["OPENGL_API"] = 0x00030001;
-	luaglfw["OPENGL_ES_API"] = 0x00030002;
-	luaglfw["NO_ROBUSTNESS"] = 0;
-	luaglfw["NO_RESET_NOTIFICATION"] = 0x00031001;
-	luaglfw["LOSE_CONTEXT_ON_RESET"] = 0x00031002;
-	luaglfw["OPENGL_ANY_PROFILE"] = 0;
-	luaglfw["OPENGL_CORE_PROFILE"] = 0x00032001;
-	luaglfw["OPENGL_COMPAT_PROFILE"] = 0x00032002;
-	luaglfw["CURSOR"] = 0x00033001;
-	luaglfw["STICKY_KEYS"] = 0x00033002;
-	luaglfw["STICKY_MOUSE_BUTTONS"] = 0x00033003;
-	luaglfw["CURSOR_NORMAL"] = 0x00034001;
-	luaglfw["CURSOR_HIDDEN"] = 0x00034002;
-	luaglfw["CURSOR_DISABLED"] = 0x00034003;
-	luaglfw["ANY_RELEASE_BEHAVIOR"] = 0;
-	luaglfw["RELEASE_BEHAVIOR_FLUSH"] = 0x00035001;
-	luaglfw["RELEASE_BEHAVIOR_NONE"] = 0x00035002;
-	luaglfw["ARROW_CURSOR"] = 0x00036001;
-	luaglfw["IBEAM_CURSOR"] = 0x00036002;
-	luaglfw["CROSSHAIR_CURSOR"] = 0x00036003;
-	luaglfw["HAND_CURSOR"] = 0x00036004;
-	luaglfw["HRESIZE_CURSOR"] = 0x00036005;
-	luaglfw["VRESIZE_CURSOR"] = 0x00036006;
-	luaglfw["CONNECTED"] = 0x00040001;
-	luaglfw["DISCONNECTED"] = 0x00040002;
-	luaglfw["DONT_CARE"] = -1;
+#define GLFW_LUA_REGDEF(NAME) luaglfw[#NAME + 5] = NAME
+	GLFW_LUA_REGDEF(GLFW_VERSION_MAJOR);
+	GLFW_LUA_REGDEF(GLFW_VERSION_MINOR);
+	GLFW_LUA_REGDEF(GLFW_VERSION_REVISION);
+	GLFW_LUA_REGDEF(GLFW_RELEASE);
+	GLFW_LUA_REGDEF(GLFW_PRESS);
+	GLFW_LUA_REGDEF(GLFW_REPEAT);
+	GLFW_LUA_REGDEF(GLFW_KEY_UNKNOWN);
+	GLFW_LUA_REGDEF(GLFW_KEY_SPACE);
+	GLFW_LUA_REGDEF(GLFW_KEY_APOSTROPHE);
+	GLFW_LUA_REGDEF(GLFW_KEY_COMMA);
+	GLFW_LUA_REGDEF(GLFW_KEY_MINUS);
+	GLFW_LUA_REGDEF(GLFW_KEY_PERIOD);
+	GLFW_LUA_REGDEF(GLFW_KEY_SLASH);
+	GLFW_LUA_REGDEF(GLFW_KEY_0);
+	GLFW_LUA_REGDEF(GLFW_KEY_1);
+	GLFW_LUA_REGDEF(GLFW_KEY_2);
+	GLFW_LUA_REGDEF(GLFW_KEY_3);
+	GLFW_LUA_REGDEF(GLFW_KEY_4);
+	GLFW_LUA_REGDEF(GLFW_KEY_5);
+	GLFW_LUA_REGDEF(GLFW_KEY_6);
+	GLFW_LUA_REGDEF(GLFW_KEY_7);
+	GLFW_LUA_REGDEF(GLFW_KEY_8);
+	GLFW_LUA_REGDEF(GLFW_KEY_9);
+	GLFW_LUA_REGDEF(GLFW_KEY_SEMICOLON);
+	GLFW_LUA_REGDEF(GLFW_KEY_EQUAL);
+	GLFW_LUA_REGDEF(GLFW_KEY_A);
+	GLFW_LUA_REGDEF(GLFW_KEY_B);
+	GLFW_LUA_REGDEF(GLFW_KEY_C);
+	GLFW_LUA_REGDEF(GLFW_KEY_D);
+	GLFW_LUA_REGDEF(GLFW_KEY_E);
+	GLFW_LUA_REGDEF(GLFW_KEY_F);
+	GLFW_LUA_REGDEF(GLFW_KEY_G);
+	GLFW_LUA_REGDEF(GLFW_KEY_H);
+	GLFW_LUA_REGDEF(GLFW_KEY_I);
+	GLFW_LUA_REGDEF(GLFW_KEY_J);
+	GLFW_LUA_REGDEF(GLFW_KEY_K);
+	GLFW_LUA_REGDEF(GLFW_KEY_L);
+	GLFW_LUA_REGDEF(GLFW_KEY_M);
+	GLFW_LUA_REGDEF(GLFW_KEY_N);
+	GLFW_LUA_REGDEF(GLFW_KEY_O);
+	GLFW_LUA_REGDEF(GLFW_KEY_P);
+	GLFW_LUA_REGDEF(GLFW_KEY_Q);
+	GLFW_LUA_REGDEF(GLFW_KEY_R);
+	GLFW_LUA_REGDEF(GLFW_KEY_S);
+	GLFW_LUA_REGDEF(GLFW_KEY_T);
+	GLFW_LUA_REGDEF(GLFW_KEY_U);
+	GLFW_LUA_REGDEF(GLFW_KEY_V);
+	GLFW_LUA_REGDEF(GLFW_KEY_W);
+	GLFW_LUA_REGDEF(GLFW_KEY_X);
+	GLFW_LUA_REGDEF(GLFW_KEY_Y);
+	GLFW_LUA_REGDEF(GLFW_KEY_Z);
+	GLFW_LUA_REGDEF(GLFW_KEY_LEFT_BRACKET);
+	GLFW_LUA_REGDEF(GLFW_KEY_BACKSLASH);
+	GLFW_LUA_REGDEF(GLFW_KEY_RIGHT_BRACKET);
+	GLFW_LUA_REGDEF(GLFW_KEY_GRAVE_ACCENT);
+	GLFW_LUA_REGDEF(GLFW_KEY_WORLD_1);
+	GLFW_LUA_REGDEF(GLFW_KEY_WORLD_2);
+	GLFW_LUA_REGDEF(GLFW_KEY_ESCAPE);
+	GLFW_LUA_REGDEF(GLFW_KEY_ENTER);
+	GLFW_LUA_REGDEF(GLFW_KEY_TAB);
+	GLFW_LUA_REGDEF(GLFW_KEY_BACKSPACE);
+	GLFW_LUA_REGDEF(GLFW_KEY_INSERT);
+	GLFW_LUA_REGDEF(GLFW_KEY_DELETE);
+	GLFW_LUA_REGDEF(GLFW_KEY_RIGHT);
+	GLFW_LUA_REGDEF(GLFW_KEY_LEFT);
+	GLFW_LUA_REGDEF(GLFW_KEY_DOWN);
+	GLFW_LUA_REGDEF(GLFW_KEY_UP);
+	GLFW_LUA_REGDEF(GLFW_KEY_PAGE_UP);
+	GLFW_LUA_REGDEF(GLFW_KEY_PAGE_DOWN);
+	GLFW_LUA_REGDEF(GLFW_KEY_HOME);
+	GLFW_LUA_REGDEF(GLFW_KEY_END);
+	GLFW_LUA_REGDEF(GLFW_KEY_CAPS_LOCK);
+	GLFW_LUA_REGDEF(GLFW_KEY_SCROLL_LOCK);
+	GLFW_LUA_REGDEF(GLFW_KEY_NUM_LOCK);
+	GLFW_LUA_REGDEF(GLFW_KEY_PRINT_SCREEN);
+	GLFW_LUA_REGDEF(GLFW_KEY_PAUSE);
+	GLFW_LUA_REGDEF(GLFW_KEY_F1);
+	GLFW_LUA_REGDEF(GLFW_KEY_F2);
+	GLFW_LUA_REGDEF(GLFW_KEY_F3);
+	GLFW_LUA_REGDEF(GLFW_KEY_F4);
+	GLFW_LUA_REGDEF(GLFW_KEY_F5);
+	GLFW_LUA_REGDEF(GLFW_KEY_F6);
+	GLFW_LUA_REGDEF(GLFW_KEY_F7);
+	GLFW_LUA_REGDEF(GLFW_KEY_F8);
+	GLFW_LUA_REGDEF(GLFW_KEY_F9);
+	GLFW_LUA_REGDEF(GLFW_KEY_F10);
+	GLFW_LUA_REGDEF(GLFW_KEY_F11);
+	GLFW_LUA_REGDEF(GLFW_KEY_F12);
+	GLFW_LUA_REGDEF(GLFW_KEY_F13);
+	GLFW_LUA_REGDEF(GLFW_KEY_F14);
+	GLFW_LUA_REGDEF(GLFW_KEY_F15);
+	GLFW_LUA_REGDEF(GLFW_KEY_F16);
+	GLFW_LUA_REGDEF(GLFW_KEY_F17);
+	GLFW_LUA_REGDEF(GLFW_KEY_F18);
+	GLFW_LUA_REGDEF(GLFW_KEY_F19);
+	GLFW_LUA_REGDEF(GLFW_KEY_F20);
+	GLFW_LUA_REGDEF(GLFW_KEY_F21);
+	GLFW_LUA_REGDEF(GLFW_KEY_F22);
+	GLFW_LUA_REGDEF(GLFW_KEY_F23);
+	GLFW_LUA_REGDEF(GLFW_KEY_F24);
+	GLFW_LUA_REGDEF(GLFW_KEY_F25);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_0);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_1);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_2);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_3);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_4);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_5);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_6);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_7);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_8);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_9);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_DECIMAL);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_DIVIDE);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_MULTIPLY);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_SUBTRACT);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_ADD);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_ENTER);
+	GLFW_LUA_REGDEF(GLFW_KEY_KP_EQUAL);
+	GLFW_LUA_REGDEF(GLFW_KEY_LEFT_SHIFT);
+	GLFW_LUA_REGDEF(GLFW_KEY_LEFT_CONTROL);
+	GLFW_LUA_REGDEF(GLFW_KEY_LEFT_ALT);
+	GLFW_LUA_REGDEF(GLFW_KEY_LEFT_SUPER);
+	GLFW_LUA_REGDEF(GLFW_KEY_RIGHT_SHIFT);
+	GLFW_LUA_REGDEF(GLFW_KEY_RIGHT_CONTROL);
+	GLFW_LUA_REGDEF(GLFW_KEY_RIGHT_ALT);
+	GLFW_LUA_REGDEF(GLFW_KEY_RIGHT_SUPER);
+	GLFW_LUA_REGDEF(GLFW_KEY_MENU);
+	GLFW_LUA_REGDEF(GLFW_KEY_LAST);
+	GLFW_LUA_REGDEF(GLFW_MOD_SHIFT);
+	GLFW_LUA_REGDEF(GLFW_MOD_CONTROL);
+	GLFW_LUA_REGDEF(GLFW_MOD_ALT);
+	GLFW_LUA_REGDEF(GLFW_MOD_SUPER);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_1);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_2);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_3);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_4);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_5);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_6);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_7);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_8);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_LAST);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_LEFT);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_RIGHT);
+	GLFW_LUA_REGDEF(GLFW_MOUSE_BUTTON_MIDDLE);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_1);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_2);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_3);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_4);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_5);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_6);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_7);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_8);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_9);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_10);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_11);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_12);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_13);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_14);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_15);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_16);
+	GLFW_LUA_REGDEF(GLFW_JOYSTICK_LAST);
+	GLFW_LUA_REGDEF(GLFW_NOT_INITIALIZED);
+	GLFW_LUA_REGDEF(GLFW_NO_CURRENT_CONTEXT);
+	GLFW_LUA_REGDEF(GLFW_INVALID_ENUM);
+	GLFW_LUA_REGDEF(GLFW_INVALID_VALUE);
+	GLFW_LUA_REGDEF(GLFW_OUT_OF_MEMORY);
+	GLFW_LUA_REGDEF(GLFW_API_UNAVAILABLE);
+	GLFW_LUA_REGDEF(GLFW_VERSION_UNAVAILABLE);
+	GLFW_LUA_REGDEF(GLFW_PLATFORM_ERROR);
+	GLFW_LUA_REGDEF(GLFW_FORMAT_UNAVAILABLE);
+	GLFW_LUA_REGDEF(GLFW_FOCUSED);
+	GLFW_LUA_REGDEF(GLFW_ICONIFIED);
+	GLFW_LUA_REGDEF(GLFW_RESIZABLE);
+	GLFW_LUA_REGDEF(GLFW_VISIBLE);
+	GLFW_LUA_REGDEF(GLFW_DECORATED);
+	GLFW_LUA_REGDEF(GLFW_AUTO_ICONIFY);
+	GLFW_LUA_REGDEF(GLFW_FLOATING);
+	GLFW_LUA_REGDEF(GLFW_RED_BITS);
+	GLFW_LUA_REGDEF(GLFW_GREEN_BITS);
+	GLFW_LUA_REGDEF(GLFW_BLUE_BITS);
+	GLFW_LUA_REGDEF(GLFW_ALPHA_BITS);
+	GLFW_LUA_REGDEF(GLFW_DEPTH_BITS);
+	GLFW_LUA_REGDEF(GLFW_STENCIL_BITS);
+	GLFW_LUA_REGDEF(GLFW_ACCUM_RED_BITS);
+	GLFW_LUA_REGDEF(GLFW_ACCUM_GREEN_BITS);
+	GLFW_LUA_REGDEF(GLFW_ACCUM_BLUE_BITS);
+	GLFW_LUA_REGDEF(GLFW_ACCUM_ALPHA_BITS);
+	GLFW_LUA_REGDEF(GLFW_AUX_BUFFERS);
+	GLFW_LUA_REGDEF(GLFW_STEREO);
+	GLFW_LUA_REGDEF(GLFW_SAMPLES);
+	GLFW_LUA_REGDEF(GLFW_SRGB_CAPABLE);
+	GLFW_LUA_REGDEF(GLFW_REFRESH_RATE);
+	GLFW_LUA_REGDEF(GLFW_DOUBLEBUFFER);
+	GLFW_LUA_REGDEF(GLFW_CLIENT_API);
+	GLFW_LUA_REGDEF(GLFW_CONTEXT_VERSION_MAJOR);
+	GLFW_LUA_REGDEF(GLFW_CONTEXT_VERSION_MINOR);
+	GLFW_LUA_REGDEF(GLFW_CONTEXT_REVISION);
+	GLFW_LUA_REGDEF(GLFW_CONTEXT_ROBUSTNESS);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_FORWARD_COMPAT);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_DEBUG_CONTEXT);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_PROFILE);
+	GLFW_LUA_REGDEF(GLFW_CONTEXT_RELEASE_BEHAVIOR);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_API);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_ES_API);
+	GLFW_LUA_REGDEF(GLFW_NO_ROBUSTNESS);
+	GLFW_LUA_REGDEF(GLFW_NO_RESET_NOTIFICATION);
+	GLFW_LUA_REGDEF(GLFW_LOSE_CONTEXT_ON_RESET);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_ANY_PROFILE);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_CORE_PROFILE);
+	GLFW_LUA_REGDEF(GLFW_OPENGL_COMPAT_PROFILE);
+	GLFW_LUA_REGDEF(GLFW_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_STICKY_KEYS);
+	GLFW_LUA_REGDEF(GLFW_STICKY_MOUSE_BUTTONS);
+	GLFW_LUA_REGDEF(GLFW_CURSOR_NORMAL);
+	GLFW_LUA_REGDEF(GLFW_CURSOR_HIDDEN);
+	GLFW_LUA_REGDEF(GLFW_CURSOR_DISABLED);
+	GLFW_LUA_REGDEF(GLFW_ANY_RELEASE_BEHAVIOR);
+	GLFW_LUA_REGDEF(GLFW_RELEASE_BEHAVIOR_FLUSH);
+	GLFW_LUA_REGDEF(GLFW_RELEASE_BEHAVIOR_NONE);
+	GLFW_LUA_REGDEF(GLFW_ARROW_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_IBEAM_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_CROSSHAIR_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_HAND_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_HRESIZE_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_VRESIZE_CURSOR);
+	GLFW_LUA_REGDEF(GLFW_CONNECTED);
+	GLFW_LUA_REGDEF(GLFW_DISCONNECTED);
+	GLFW_LUA_REGDEF(GLFW_DONT_CARE);
 
+	luaglfw["window"].setClass(ClassMetatable<MetaPointerWrapper<GLFWwindow> >()
+		.addStaticMember("new", [](int w, int h, const char* title) {return CreateWindow(w, h, title, 0, 0); })
+		.addStaticMember("new", &CreateWindow)
+		.addStaticMember("__gc", &DestroyWindow)
+		.addStaticMember("iconify", &glfwIconifyWindow)
+		.addStaticMember("restore", &glfwRestoreWindow)
+		.addStaticMember("show", &glfwShowWindow)
+		.addStaticMember("hide", &glfwHideWindow)
+		.addStaticMember("getMonitor", &glfwGetWindowMonitor)
+		.addStaticMember("getAttrib", &glfwGetWindowAttrib)
+		.addStaticMember("makeContextCurrent", &glfwMakeContextCurrent)
+		.addStaticMember("setWindowShouldClose", &glfwSetWindowShouldClose)
+		.addStaticMember("windowShouldClose", &glfwWindowShouldClose)
+		.addStaticMember("swapBuffers", &glfwSwapBuffers)
+		.addStaticMember("getWindowSize", &GetWindowSize)
+		.addStaticMember("getFramebufferSize", &GetFramebufferSize)
+		.addStaticMember("getWindowFrameSize", &GetWindowFrameSize)
+
+		.addStaticMember("setClipboardString", &glfwSetClipboardString)
+		.addStaticMember("getClipboardString", &glfwGetClipboardString)
+
+
+		.addStaticMember("getInputMode", &glfwGetInputMode)
+		.addStaticMember("setInputMode", &glfwSetInputMode)
+		.addStaticMember("getKey", &glfwGetKey)
+		.addStaticMember("getMouseButton", &glfwGetMouseButton)
+		.addStaticMember("getCursorPos", &GetCursorPos)
+		.addStaticMember("setCursorPos", &glfwSetCursorPos)
+
+		.addStaticMember("setCursor", &glfwSetCursor)
+
+		.addStaticMember("setWindowPosCallback", &WindowCallbacks::SetWindowPosCallback)
+		.addStaticMember("setWindowSizeCallback", &WindowCallbacks::SetWindowSizeCallback)
+		.addStaticMember("setWindowCloseCallback", &WindowCallbacks::SetWindowCloseCallback)
+		.addStaticMember("setWindowRefreshCallback", &WindowCallbacks::SetWindowRefreshCallback)
+		.addStaticMember("setWindowFocusCallback", &WindowCallbacks::SetWindowFocusCallback)
+		.addStaticMember("setWindowIconifyCallback", &WindowCallbacks::SetWindowIconifyCallback)
+		.addStaticMember("setKeyCallback", &WindowCallbacks::SetKeyCallback)
+		.addStaticMember("setCharCallback", &WindowCallbacks::SetCharCallback)
+		.addStaticMember("setCharModsCallback", &WindowCallbacks::SetCharModsCallback)
+		.addStaticMember("setMouseButtonCallback", &WindowCallbacks::SetMouseButtonCallback)
+		.addStaticMember("setCursorPosCallback", &WindowCallbacks::SetCursorPosCallback)
+		.addStaticMember("setCursorEnterCallback", &WindowCallbacks::SetCursorEnterCallback)
+		.addStaticMember("setScrollCallback", &WindowCallbacks::SetScrollCallback)
+		.addStaticMember("setDropCallback", &WindowCallbacks::SetDropCallback)
+		);
+
+	luaglfw["cursor"].setClass(ClassMetatable<MetaPointerWrapper<GLFWcursor> >()
+		.addStaticMember("new", &glfwCreateCursor)
+		.addStaticMember("new", &glfwCreateStandardCursor)
+		.addStaticMember("__gc", &glfwDestroyCursor)
+		);
 	return 1;
 }

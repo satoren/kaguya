@@ -76,7 +76,7 @@ namespace utfconv
 				while (size)
 				{
 					size_t bitlen = 6;
-					char bin = bitrange(c, start, start - bitlen);
+					char bin = 0xFF & bitrange(c, start, start - bitlen);
 					result.push_back(0x80 + bin);
 					start = start - bitlen;
 					size--;
