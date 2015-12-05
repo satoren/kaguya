@@ -61,7 +61,7 @@ namespace kaguya
 
 			static_cast<LuaRef&>(*this) = parent_.getField(key_);
 
-			(*this)["ptr_wrapper"].set_meta_table(Metatable(types::metatableName<types::MetaPointerWrapper<T> >(), reg.name()));
+			(*this)["ptr_wrapper"].set_meta_table(Metatable(types::metatableName<MetaPointerWrapper<T> >(), reg.name()));
 			if (auto_reg_shared_ptr)
 			{
 				(*this)["shared_ptr"].set_meta_table(ClassMetatable<standard::shared_ptr<T> >(reg.name()));

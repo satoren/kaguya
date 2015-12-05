@@ -18,25 +18,19 @@ namespace kaguya
 	struct NewThread {};
 	struct GlobalTable {};
 
+	template<class T>
+	struct MetaPointerWrapper {
+		MetaPointerWrapper(T* p) :ptr(p) {}
+		T* ptr;
+	};
+
 	namespace types
 	{
 		template<typename T>
 		struct typetag {};
 
 
-		template<class T>
-		struct MetaPointerWrapper {
-			MetaPointerWrapper(T* p) :ptr(p) {}
-			T* ptr;
-		};
 
-
-		bool available_metatable(lua_State* l, const char* t)
-		{
-			util::ScopedSavedStack save(l);
-			luaL_getmetatable(l, t);
-			return LUA_TNIL != lua_type(l, -1);
-		}
 
 		namespace nodirectuse {
 #ifdef NDEBUG
@@ -103,6 +97,20 @@ namespace kaguya
 			typedef typename traits::remove_reference<noncvpointer_type>::type noncvpointerref_type;
 			return nodirectuse::metatableNameDispatch(typetag<noncvpointerref_type>());
 		}
+
+		bool available_metatable(lua_State* l, const char* t)
+		{
+			util::ScopedSavedStack save(l);
+			luaL_getmetatable(l, t);
+			return LUA_TNIL != lua_type(l, -1);
+		}
+		template<typename T>
+		bool available_metatable(lua_State* l, typetag<T> type= typetag<T>())
+		{
+			return available_metatable(l, metatableName<T>().c_str())
+				|| available_metatable(l, metatableName<MetaPointerWrapper<T> >().c_str());
+		}
+
 
 		template<class T>
 		T* get_pointer(lua_State* l, int index, typetag<T> tag)
@@ -239,24 +247,25 @@ namespace kaguya
 		{
 			return (standard::is_enum<T>::value && checkType(l, index, typetag<int>()))
 				|| lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| !available_metatable(l, metatableName<T>().c_str())
-				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
+				|| !available_metatable<T>(l)
+				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
+				|| luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str())
+				|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str());
 		}
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<const T&> tag)
 		{
-			return (standard::is_enum<T>::value && checkType(l, index, typetag<int>()))
-				|| lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| !available_metatable(l, metatableName<T>().c_str())
-				|| checkType(l, index, typetag<T>());
+			return checkType(l, index, typetag<T>());
 		}
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<T&> tag)
 		{
 			return (standard::is_enum<T>::value && checkType(l, index, typetag<int>()))
 				|| lua_type(l, index) == LUA_TLIGHTUSERDATA
-				|| !available_metatable(l, metatableName<T>().c_str())
-				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
+				|| !available_metatable<T>(l)
+				|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
+				|| luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str())
+				|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str());
 		}
 		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<T*> tag)
@@ -264,7 +273,7 @@ namespace kaguya
 			return lua_type(l, index) == LUA_TLIGHTUSERDATA
 				|| lua_type(l, index) == LUA_TTABLE //allow table for __gc
 				|| lua_topointer(l, index) == 0
-				|| !available_metatable(l, metatableName<T>().c_str())
+				|| !available_metatable<T>(l)
 				|| luaL_testudata(l, index, metatableName<T>().c_str())
 				|| luaL_testudata(l, index, metatableName<standard::shared_ptr<T> >().c_str())
 				|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<T> >().c_str());
@@ -643,7 +652,7 @@ namespace kaguya
 			{
 				return pushEnum(l, v);
 			}
-			else if (!available_metatable(l, metatableName<T>().c_str()))
+			else if (!available_metatable<T>(l))
 			{
 				lua_pushlightuserdata(l, &v);
 			}
@@ -659,7 +668,7 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, T* v)
 		{
-			if (!available_metatable(l, metatableName<T>().c_str()))
+			if (!available_metatable<T>(l))
 			{
 				lua_pushlightuserdata(l, v);
 			}
@@ -675,7 +684,7 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, const T* v)
 		{
-			if (!available_metatable(l, metatableName<T>().c_str()))
+			if (!available_metatable<T>(l))
 			{
 				lua_pushlightuserdata(l, const_cast<T*>(v));
 			}
