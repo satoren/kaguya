@@ -33,6 +33,9 @@ namespace kaguya
 				Ret r = func_(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
+			virtual std::string argmentTypeNames() {
+				return "VariadicArg";
+			}
 		};
 		template<typename Ret>
 		FunctorType create(Ret(*fun)(VariadicArgType))
@@ -57,6 +60,10 @@ namespace kaguya
 				}
 				func_(args);
 				return 0;
+			}
+
+			virtual std::string argmentTypeNames() {
+				return "VariadicArg";
 			}
 		};
 		FunctorType create(void(*fun)(VariadicArgType))
@@ -87,6 +94,14 @@ namespace kaguya
 				Ret r = (t->*func_)(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
+
+
+			virtual std::string argmentTypeNames() {
+				std::string result;
+				result += typeid(T).name();
+				result += ",VariadicArg";
+				return result;
+			}
 		};
 		template <typename Ret, typename T>
 		FunctorType create(Ret(T::*fun)(VariadicArgType))
@@ -116,6 +131,12 @@ namespace kaguya
 
 				(t->*func_)(args);
 				return 0;
+			}
+			virtual std::string argmentTypeNames() {
+				std::string result;
+				result += typeid(T).name();
+				result += ",VariadicArg";
+				return result;
 			}
 		};
 		template <typename T>
@@ -148,6 +169,12 @@ namespace kaguya
 				Ret r = (t->*func_)(args);
 				return types::push(state, standard::forward <Ret>(r));
 			}
+			virtual std::string argmentTypeNames() {
+				std::string result;
+				result += typeid(T).name();
+				result += ",VariadicArg";
+				return result;
+			}
 		};
 		template <typename Ret, typename T>
 		FunctorType create(Ret(T::*fun)(VariadicArgType)const)
@@ -177,6 +204,12 @@ namespace kaguya
 				(t->*func_)(args);
 				return 0;
 			}
+			virtual std::string argmentTypeNames() {
+				std::string result;
+				result += typeid(T).name();
+				result += ",VariadicArg";
+				return result;
+			}
 		};
 		template <typename T>
 		FunctorType create(void (T::*fun)(VariadicArgType)const)
@@ -204,6 +237,9 @@ namespace kaguya
 				Ret r = func_(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
+			virtual std::string argmentTypeNames() {
+				return "VariadicArg";
+			}
 		};
 		template<typename Ret>
 		FunctorType create(standard::function<Ret(VariadicArgType)> fun)
@@ -228,6 +264,9 @@ namespace kaguya
 				}
 				func_(args);
 				return 0;
+			}
+			virtual std::string argmentTypeNames() {
+				return "VariadicArg";
 			}
 		};
 		FunctorType create(standard::function<void(VariadicArgType)> fun)
@@ -254,6 +293,9 @@ namespace kaguya
 				types::constructor<CLASS>(storage, args);
 				luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
 				return 1;
+			}
+			virtual std::string argmentTypeNames() {
+				return "VariadicArg";
 			}
 		};
 	}

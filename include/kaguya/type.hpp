@@ -44,16 +44,16 @@ namespace kaguya
 			template<typename T>
 			inline metatableName_t metatableNameNonCV(typetag<T> )
 			{
+				static const char* METATABLE_POST_FIX = "_kaguya_type\0";
 				metatableName_t result;
 				//hash_code is c++11 because use name ptr
-				intptr_t ptrvalue = intptr_t(typeid(T*).name());
+				uintptr_t  ptrvalue = uintptr_t(typeid(T*).name());
 				size_t pos =0;
-				for (size_t s = 0; s < sizeof(intptr_t) * 8; s+=7, pos++)
+				for (size_t s = 0; s < sizeof(uintptr_t) * 8; s+=7, pos++)
 				{
 					result.metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
 				}
-				memcpy(&result.metaname[pos], "_kaguya_type", strlen("_kaguya_type"));
-				result.metaname[pos+ strlen("_kaguya_type")] = '\0';
+				memcpy(&result.metaname[pos], METATABLE_POST_FIX, strlen(METATABLE_POST_FIX)+1);
 				return result;
 			}
 #else

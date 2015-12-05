@@ -18,6 +18,7 @@ namespace kaguya
 		{
 			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
+			virtual std::string argmentTypeNames() = 0;
 			virtual ~BaseInvoker() {}
 		};
 
@@ -77,7 +78,18 @@ namespace kaguya
 			}
 			else
 			{
-				std::string message = "argment not matched:" + util::argmentTypes(l);
+				std::string message = "argment not matching" + util::argmentTypes(l) + "\t candidated\n";
+			
+				int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
+				for (int i = 0; i < overloadnum; ++i)
+				{
+					FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
+					if (!fun || !(*fun))
+					{
+						continue;
+					}
+					message += std::string("\t\t") + (*fun)->argmentTypeNames() + "\n";
+				}
 				util::traceBack(l, message.c_str());
 			}
 			return lua_error(l);
@@ -135,6 +147,13 @@ namespace kaguya
 				}
 
 				return types::push(state, standard::forward<MemType>(ptr->*data_));
+			}
+
+			virtual std::string argmentTypeNames() {
+				std::string result;
+				result += typeid(ClassType).name();
+				result += std::string("[opt]")+ typeid(MemType).name();
+				return result;
 			}
 		};
 		template< class ClassType, class MemType>

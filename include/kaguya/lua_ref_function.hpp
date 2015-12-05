@@ -45,12 +45,12 @@ namespace kaguya
 		}
 
 		template<typename T>
-		T get()const
+		typename traits::arg_get_type<T>::type get()const
 		{
 			evaluate(1);
 			if (eval_info_ && !eval_info_->results.empty())
 			{
-				return eval_info_->results.back().get<T>();
+				return eval_info_->results.back().get<typename traits::arg_get_type<T>::type>();
 			}
 			return LuaRef(state_);//method invoke error
 		}

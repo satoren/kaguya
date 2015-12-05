@@ -35,8 +35,20 @@ def strictCheckType(out,arg_num,offset=0,customcheck=""):
 	out.write('    return true;\n')
 	out.write('  }\n')
 
+def arg_typenames(arg_num):
+	result ='  virtual std::string argmentTypeNames(){\n'
+	result +='    std::string result;\n'
+	for i in range (1,arg_num+1):
+		result +='    result+='
+		if i>1:
+			result +='std::string(",")+'
+		result +='typeid(T'+ str(i)+').name();\n'
+	result +='    return result;\n'
+	result +='  }\n'
+	return result
+	
 
-def generate(out,classname,basename,template_arg,func_type,checktype_fun,invoke_code):
+def generate(out,classname,basename,template_arg,func_type,checktype_fn,invoke_code,typename_fn):
 	if len(template_arg) > 0:
 		out.write('template'+template_arg + '\n')
 	out.write('struct ' + classname + ':' + basename)
@@ -47,12 +59,15 @@ def generate(out,classname,basename,template_arg,func_type,checktype_fun,invoke_
 	#constructor
 	out.write('  ' + classname + '(func_type fun):func_(fun){}\n')
 	
-	out.write(checktype_fun)
+	out.write(checktype_fn)	
 	
 	out.write('  virtual int invoke(lua_State *state)\n')
 	out.write('  {\n')
 	out.write(invoke_code)
 	out.write('  }\n')
+	
+	out.write(typename_fn)	
+	
 	out.write('};\n')
 
 	#typedef factory method
@@ -117,7 +132,7 @@ def standard_function(out,arg_num,with_state = False):
 	invoke_code += ');\n'
 	invoke_code += '    return types::push(state,standard::forward<Ret>(r));\n'
 	
-	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code)
+	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
 
 def void_standard_function(out,arg_num,with_state=False):
@@ -141,7 +156,7 @@ def void_standard_function(out,arg_num,with_state=False):
 	invoke_code += ');\n'
 	invoke_code += '    return 0;\n'
 	
-	generate(out,classname,basename,void_template_str(arg_num),function_type,checkType_str(arg_num),invoke_code)
+	generate(out,classname,basename,void_template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 	
 def tepmlate_function(out,arg_num,with_state=False):
 	basename = 'BaseInvoker'
@@ -164,7 +179,7 @@ def tepmlate_function(out,arg_num,with_state=False):
 	invoke_code += ');\n'
 	invoke_code += '    return types::push(state,standard::forward<Ret>(r));\n'
 	
-	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code)
+	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
 
 def void_tepmlate_function(out,arg_num,with_state=False):
@@ -188,7 +203,7 @@ def void_tepmlate_function(out,arg_num,with_state=False):
 	invoke_code += ');\n'
 	invoke_code += '    return 0;\n'
 	
-	generate(out,classname,basename,void_template_str(arg_num),function_type,checkType_str(arg_num),invoke_code)
+	generate(out,classname,basename,void_template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
 def tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	basename = 'BaseInvoker'
@@ -216,7 +231,7 @@ def tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	
 	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}\n')
 	
-	generate(out,classname,basename,template_str(arg_num+ 1),function_type,checktype_fun,invoke_code)
+	generate(out,classname,basename,template_str(arg_num+ 1),function_type,checktype_fun,invoke_code,arg_typenames(arg_num))
 
 def void_tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	basename = 'BaseInvoker'
@@ -245,7 +260,7 @@ def void_tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	
 	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}\n')
 
-	generate(out,classname,basename,void_template_str(arg_num+ 1),function_type,checktype_fun,invoke_code)
+	generate(out,classname,basename,void_template_str(arg_num+ 1),function_type,checktype_fun,invoke_code,arg_typenames(arg_num))
 	
 
 def constructor_function(out,arg_num):
@@ -273,6 +288,7 @@ def constructor_function(out,arg_num):
 	out.write('    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());\n')
 	out.write('    return 1;\n')
 	out.write('  }\n')
+	out.write(arg_typenames(arg_num))
 	out.write('};\n')
 
 

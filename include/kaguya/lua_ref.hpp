@@ -269,15 +269,6 @@ namespace kaguya
 		}
 
 		template<typename T>
-		typename traits::arg_get_type<T>::type get(types::typetag<T>)const
-		{
-			return get<T>();
-		}
-		std::string get(types::typetag<const std::string&>)const
-		{
-			return get<std::string>();
-		}
-		template<typename T>
 		typename traits::arg_get_type<T>::type get()const
 		{
 			if (state_ == 0 || ref_ == LUA_REFNIL)
@@ -418,7 +409,6 @@ namespace kaguya
 			{
 				return;
 			}
-			std::vector<LuaRef> res;
 			util::ScopedSavedStack save(state_);
 			push(state_);
 			int t = (value_type)lua_type(state_, -1);
@@ -532,17 +522,11 @@ namespace kaguya
 	{
 		try
 		{
-			return lhs.get(types::typetag<const T&>()) == rhs;
+			return lhs.get<const T&>() == rhs;
 		}
 		catch (const LuaTypeMismatch&)
 		{
-		}
-		try
-		{
-			return lhs.get(types::typetag<T>()) == rhs;
-		}
-		catch (const LuaTypeMismatch&)
-		{
+			return false;
 		}
 		return false;
 	}
@@ -558,17 +542,11 @@ namespace kaguya
 	{
 		try
 		{
-			return lhs == rhs.get(types::typetag<const T&>());
+			return lhs == rhs.get<const T&>();
 		}
 		catch (const LuaTypeMismatch&)
 		{
-		}
-		try
-		{
-			return lhs == rhs.get(types::typetag<T>());
-		}
-		catch (const LuaTypeMismatch&)
-		{
+			return false;
 		}
 		return false;
 	}

@@ -14,6 +14,10 @@ struct StdFunInvoker0:BaseInvoker{
     Ret r = func_();
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
+  }
 };
 template<typename Ret>
 
@@ -45,6 +49,11 @@ struct StdFunInvoker1:BaseInvoker{
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     Ret r = func_(t1);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
   }
 };
 template<typename Ret,typename T1>
@@ -78,6 +87,12 @@ struct StdFunInvoker2:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     Ret r = func_(t1,t2);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -113,6 +128,13 @@ struct StdFunInvoker3:BaseInvoker{
     Ret r = func_(t1,t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
@@ -147,6 +169,14 @@ struct StdFunInvoker4:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     Ret r = func_(t1,t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -184,6 +214,15 @@ struct StdFunInvoker5:BaseInvoker{
     Ret r = func_(t1,t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
@@ -220,6 +259,16 @@ struct StdFunInvoker6:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -259,6 +308,17 @@ struct StdFunInvoker7:BaseInvoker{
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
@@ -297,6 +357,18 @@ struct StdFunInvoker8:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -338,6 +410,19 @@ struct StdFunInvoker9:BaseInvoker{
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
@@ -361,6 +446,10 @@ struct VoidStdFunInvoker0:BaseInvoker{
   {
     func_();
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
   }
 };
 FunctorType create(standard::function<void()> fun)
@@ -389,6 +478,11 @@ struct VoidStdFunInvoker1:BaseInvoker{
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     func_(t1);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
   }
 };
 template<typename T1>
@@ -419,6 +513,12 @@ struct VoidStdFunInvoker2:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     func_(t1,t2);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
   }
 };
 template<typename T1,typename T2>
@@ -451,6 +551,13 @@ struct VoidStdFunInvoker3:BaseInvoker{
     func_(t1,t2,t3);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3>
 FunctorType create(standard::function<void(T1,T2,T3)> fun)
@@ -482,6 +589,14 @@ struct VoidStdFunInvoker4:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     func_(t1,t2,t3,t4);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
@@ -516,6 +631,15 @@ struct VoidStdFunInvoker5:BaseInvoker{
     func_(t1,t2,t3,t4,t5);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 FunctorType create(standard::function<void(T1,T2,T3,T4,T5)> fun)
@@ -549,6 +673,16 @@ struct VoidStdFunInvoker6:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     func_(t1,t2,t3,t4,t5,t6);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -585,6 +719,17 @@ struct VoidStdFunInvoker7:BaseInvoker{
     func_(t1,t2,t3,t4,t5,t6,t7);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7)> fun)
@@ -620,6 +765,18 @@ struct VoidStdFunInvoker8:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -658,6 +815,19 @@ struct VoidStdFunInvoker9:BaseInvoker{
     func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
@@ -681,6 +851,10 @@ struct FunInvoker0:BaseInvoker{
   {
     Ret r = func_();
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
   }
 };
 template<typename Ret>
@@ -714,6 +888,11 @@ struct FunInvoker1:BaseInvoker{
     Ret r = func_(t1);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1>
 
@@ -746,6 +925,12 @@ struct FunInvoker2:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     Ret r = func_(t1,t2);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -781,6 +966,13 @@ struct FunInvoker3:BaseInvoker{
     Ret r = func_(t1,t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
@@ -815,6 +1007,14 @@ struct FunInvoker4:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     Ret r = func_(t1,t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -852,6 +1052,15 @@ struct FunInvoker5:BaseInvoker{
     Ret r = func_(t1,t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
@@ -888,6 +1097,16 @@ struct FunInvoker6:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -927,6 +1146,17 @@ struct FunInvoker7:BaseInvoker{
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
@@ -965,6 +1195,18 @@ struct FunInvoker8:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -1006,6 +1248,19 @@ struct FunInvoker9:BaseInvoker{
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
@@ -1029,6 +1284,10 @@ struct VoidFunInvoker0:BaseInvoker{
   {
     func_();
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
   }
 };
 FunctorType create(void (*fun)())
@@ -1057,6 +1316,11 @@ struct VoidFunInvoker1:BaseInvoker{
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     func_(t1);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
   }
 };
 template<typename T1>
@@ -1087,6 +1351,12 @@ struct VoidFunInvoker2:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     func_(t1,t2);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
   }
 };
 template<typename T1,typename T2>
@@ -1119,6 +1389,13 @@ struct VoidFunInvoker3:BaseInvoker{
     func_(t1,t2,t3);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3>
 FunctorType create(void (*fun)(T1,T2,T3))
@@ -1150,6 +1427,14 @@ struct VoidFunInvoker4:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     func_(t1,t2,t3,t4);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
@@ -1184,6 +1469,15 @@ struct VoidFunInvoker5:BaseInvoker{
     func_(t1,t2,t3,t4,t5);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 FunctorType create(void (*fun)(T1,T2,T3,T4,T5))
@@ -1217,6 +1511,16 @@ struct VoidFunInvoker6:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     func_(t1,t2,t3,t4,t5,t6);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -1253,6 +1557,17 @@ struct VoidFunInvoker7:BaseInvoker{
     func_(t1,t2,t3,t4,t5,t6,t7);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7))
@@ -1288,6 +1603,18 @@ struct VoidFunInvoker8:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -1326,6 +1653,19 @@ struct VoidFunInvoker9:BaseInvoker{
     func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
@@ -1352,6 +1692,10 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)();
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
   }
 };
 template<typename Ret,typename T1>
@@ -1381,6 +1725,10 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)();
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
   }
 };
 template<typename Ret,typename T1>
@@ -1417,6 +1765,11 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2>
 
@@ -1451,6 +1804,11 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2>
@@ -1488,6 +1846,12 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
@@ -1523,6 +1887,12 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
@@ -1561,6 +1931,13 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
 
@@ -1597,6 +1974,13 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
@@ -1636,6 +2020,14 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
@@ -1673,6 +2065,14 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
@@ -1713,6 +2113,15 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 
@@ -1751,6 +2160,15 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -1792,6 +2210,16 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
@@ -1831,6 +2259,16 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
@@ -1873,6 +2311,17 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 
@@ -1913,6 +2362,17 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -1956,6 +2416,18 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
@@ -1997,6 +2469,18 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return types::push(state,standard::forward<Ret>(r));
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
@@ -2041,6 +2525,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 
@@ -2084,6 +2581,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return types::push(state,standard::forward<Ret>(r));
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 
@@ -2112,6 +2622,10 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)();
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
+  }
 };
 template<typename T1>
 FunctorType create(void (T1::*fun)() )
@@ -2137,6 +2651,10 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)();
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
   }
 };
 template<typename T1>
@@ -2170,6 +2688,11 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
+  }
 };
 template<typename T1,typename T2>
 FunctorType create(void (T1::*fun)(T2) )
@@ -2201,6 +2724,11 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
   }
 };
 template<typename T1,typename T2>
@@ -2235,6 +2763,12 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3>
 FunctorType create(void (T1::*fun)(T2,T3) )
@@ -2267,6 +2801,12 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3>
@@ -2302,6 +2842,13 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4>
 FunctorType create(void (T1::*fun)(T2,T3,T4) )
@@ -2335,6 +2882,13 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
@@ -2371,6 +2925,14 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5) )
@@ -2405,6 +2967,14 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
@@ -2442,6 +3012,15 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) )
@@ -2477,6 +3056,15 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -2515,6 +3103,16 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) )
@@ -2551,6 +3149,16 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
@@ -2590,6 +3198,17 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
@@ -2627,6 +3246,17 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -2667,6 +3297,18 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
@@ -2705,6 +3347,18 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
@@ -2746,6 +3400,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
@@ -2786,6 +3453,19 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
     return 0;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
+  }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
@@ -2809,6 +3489,10 @@ struct ConstructorInvoker0:BaseInvoker{
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    return result;
+  }
 };
 template<typename CLASS,typename T1>
 struct ConstructorInvoker1:BaseInvoker{
@@ -2829,6 +3513,11 @@ struct ConstructorInvoker1:BaseInvoker{
     types::constructor<CLASS>(storage,t1);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    return result;
   }
 };
 template<typename CLASS,typename T1,typename T2>
@@ -2852,6 +3541,12 @@ struct ConstructorInvoker2:BaseInvoker{
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    return result;
+  }
 };
 template<typename CLASS,typename T1,typename T2,typename T3>
 struct ConstructorInvoker3:BaseInvoker{
@@ -2874,6 +3569,13 @@ struct ConstructorInvoker3:BaseInvoker{
     types::constructor<CLASS>(storage,t1,t2,t3);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    return result;
   }
 };
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4>
@@ -2899,6 +3601,14 @@ struct ConstructorInvoker4:BaseInvoker{
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    return result;
+  }
 };
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5>
 struct ConstructorInvoker5:BaseInvoker{
@@ -2923,6 +3633,15 @@ struct ConstructorInvoker5:BaseInvoker{
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    return result;
   }
 };
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
@@ -2950,6 +3669,16 @@ struct ConstructorInvoker6:BaseInvoker{
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    return result;
+  }
 };
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 struct ConstructorInvoker7:BaseInvoker{
@@ -2976,6 +3705,17 @@ struct ConstructorInvoker7:BaseInvoker{
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    return result;
   }
 };
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
@@ -3005,6 +3745,18 @@ struct ConstructorInvoker8:BaseInvoker{
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
   }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    return result;
+  }
 };
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 struct ConstructorInvoker9:BaseInvoker{
@@ -3033,5 +3785,18 @@ struct ConstructorInvoker9:BaseInvoker{
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8,t9);
     luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
     return 1;
+  }
+  virtual std::string argmentTypeNames(){
+    std::string result;
+    result+=typeid(T1).name();
+    result+=std::string(",")+typeid(T2).name();
+    result+=std::string(",")+typeid(T3).name();
+    result+=std::string(",")+typeid(T4).name();
+    result+=std::string(",")+typeid(T5).name();
+    result+=std::string(",")+typeid(T6).name();
+    result+=std::string(",")+typeid(T7).name();
+    result+=std::string(",")+typeid(T8).name();
+    result+=std::string(",")+typeid(T9).name();
+    return result;
   }
 };

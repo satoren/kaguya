@@ -53,6 +53,14 @@ namespace kaguya
 		struct arg_get_type {
 			typedef typename conditional<standard::is_arithmetic<typename remove_reference<T>::type >::value|| standard::is_enum<typename remove_reference<T>::type>::value, typename remove_const_reference<T>::type,T>::type type;
 		};
+		template< >
+		struct arg_get_type<std::string&> {
+			typedef std::string type;
+		};
+		template< >
+		struct arg_get_type<const std::string&> {
+			typedef std::string type;
+		};
 	}
 
 };
