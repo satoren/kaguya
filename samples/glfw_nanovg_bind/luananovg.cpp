@@ -45,7 +45,14 @@ namespace
 		nvgDeleteGL3(context);
 	}
 #endif
+
+	void myglViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+	{
+		glViewport(x,y,width,height);
+	}
 }
+
+
 
 extern "C"
 #ifdef _MSC_VER
@@ -57,7 +64,7 @@ int luaopen_luananovg(lua_State *L)
 	LuaRef luananovg = state.newLib();
 	
 	//not nanovg but need
-	luananovg["glViewport"] = function(glViewport);
+	luananovg["glViewport"] = function(myglViewport);
 	
 	
 	luananovg["Create"] = function(create);
@@ -156,5 +163,35 @@ int luaopen_luananovg(lua_State *L)
 	NANOVG_LUA_REGFUNC(nvgTextGlyphPositions);
 	NANOVG_LUA_REGFUNC(nvgTextMetrics);
 	NANOVG_LUA_REGFUNC(nvgTextBreakLines);
+
+
+#define NANOVG_LUA_REGENUM(NAME) luananovg[#NAME + 4] =NAME
+	NANOVG_LUA_REGENUM(NVG_CCW);
+	NANOVG_LUA_REGENUM(NVG_CW);
+	NANOVG_LUA_REGENUM(NVG_SOLID);
+	NANOVG_LUA_REGENUM(NVG_HOLE);
+	NANOVG_LUA_REGENUM(NVG_BUTT);
+	NANOVG_LUA_REGENUM(NVG_ROUND);
+	NANOVG_LUA_REGENUM(NVG_SQUARE);
+	NANOVG_LUA_REGENUM(NVG_BEVEL);
+	NANOVG_LUA_REGENUM(NVG_MITER);
+
+	NANOVG_LUA_REGENUM(NVG_ALIGN_LEFT);
+	NANOVG_LUA_REGENUM(NVG_ALIGN_CENTER);
+	NANOVG_LUA_REGENUM(NVG_ALIGN_RIGHT);
+	NANOVG_LUA_REGENUM(NVG_ALIGN_TOP);
+	NANOVG_LUA_REGENUM(NVG_ALIGN_MIDDLE);
+	NANOVG_LUA_REGENUM(NVG_ALIGN_BOTTOM);
+	NANOVG_LUA_REGENUM(NVG_ALIGN_BASELINE);
+
+
+	NANOVG_LUA_REGENUM(NVG_IMAGE_GENERATE_MIPMAPS);
+	NANOVG_LUA_REGENUM(NVG_IMAGE_REPEATX);
+	NANOVG_LUA_REGENUM(NVG_IMAGE_REPEATY);
+	NANOVG_LUA_REGENUM(NVG_IMAGE_FLIPY);
+	NANOVG_LUA_REGENUM(NVG_IMAGE_PREMULTIPLIED);
+
+	NANOVG_LUA_REGENUM(NVG_ANTIALIAS);
+	NANOVG_LUA_REGENUM(NVG_STENCIL_STROKES);
 	return 1;
 }

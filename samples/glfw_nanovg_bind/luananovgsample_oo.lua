@@ -13,7 +13,7 @@ end
     end
     local drawpathx={}
     local drawpathy={}
-    window:setCursorPosCallback(function(x,y) table.insert(drawpathx,x);table.insert(drawpathy,y) end)
+    window:setCursorPosCallback(function(x,y) if window:getMouseButton(glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS then  table.insert(drawpathx,x);table.insert(drawpathy,y) end end)
     window:setWindowCloseCallback(function(x,y) print("window closed!") end)
     
     window:makeContextCurrent();

@@ -19,8 +19,7 @@ namespace Easing
 		if (time==duration) return end;	
 		float progress = (duration - time) / duration;
 		T diff = start - end;
-		
-		
+
 		return f(progress) * diff + end;
 	}
 	template<typename InFun,typename OutFun,class T>
@@ -28,8 +27,8 @@ namespace Easing
 	{
 		if (time==0) return start;	
 		if (time==duration) return end;	
-		T center = T((end - start) *0.5) + start;
-		float halfd = duration*0.5;
+		T center = T((end - start) *0.5f) + start;
+		float halfd = duration*0.5f;
 		if(time < halfd)
 		{
 			return In(in_fn,time,start,center,halfd);
@@ -37,6 +36,54 @@ namespace Easing
 		else
 		{
 			return Out(out_fn,(time - halfd),center, end,halfd);
+		}
+	}
+	template<typename InFun, typename OutFun, class T>
+	T OutIn(InFun in_fn, OutFun out_fn, float time, const T& start, const T& end, float duration = 1)
+	{
+		if (time == 0) return start;
+		if (time == duration) return end;
+		T center = T((end - start) *0.5f) + start;
+		float halfd = duration*0.5f;
+		if (time < halfd)
+		{
+			return Out(in_fn, time, start, center, halfd);
+		}
+		else
+		{
+			return In(out_fn, (time - halfd), center, end, halfd);
+		}
+	}
+	template<typename InFun, typename OutFun, class T>
+	T InIn(InFun in_fn, OutFun out_fn, float time, const T& start, const T& end, float duration = 1)
+	{
+		if (time == 0) return start;
+		if (time == duration) return end;
+		T center = T((end - start) *0.5f) + start;
+		float halfd = duration*0.5f;
+		if (time < halfd)
+		{
+			return In(in_fn, time, start, center, halfd);
+		}
+		else
+		{
+			return In(out_fn, (time - halfd), center, end, halfd);
+		}
+	}
+	template<typename InFun, typename OutFun, class T>
+	T OutOut(InFun in_fn, OutFun out_fn, float time, const T& start, const T& end, float duration = 1)
+	{
+		if (time == 0) return start;
+		if (time == duration) return end;
+		T center = T((end - start) *0.5f) + start;
+		float halfd = duration*0.5f;
+		if (time < halfd)
+		{
+			return Out(in_fn, time, start, center, halfd);
+		}
+		else
+		{
+			return Out(out_fn, (time - halfd), center, end, halfd);
 		}
 	}
 	
@@ -54,7 +101,7 @@ namespace Easing
 	
 	float Sine(float progress)
 	{
-		const float PI = 3.1415926535;
+		const float PI = 3.1415926535f;
 		return -1 * cos(progress* (PI/2)) +1;
 	}
 	template<class T>
@@ -218,11 +265,11 @@ namespace Easing
 		return InOut(&Back,&Back,time,start,end,duration);
 	}
 	
-	
 	float Elastic(float progress)
-	{	
-		const float PI = 3.;
-		return sin(13 * PI * progress) * pow(2, 10 * (progress - 1));
+	{
+		const float PI = 3.1415926535f;
+
+		return float(sin(12 * PI * progress) * pow(2, 10 * (progress - 1)));
 	}
 	template<class T>
 	T InElastic(float time,const T& start,const T& end,float duration=1)
@@ -247,11 +294,11 @@ namespace Easing
 		if (progress < (1/2.75f)) {
 			return 1-(7.5625f*progress*progress);
 		} else if (progress < (2/2.75f)) {
-			return 1-((9.075 * progress * progress) - (9.9 * progress) + 3.4);
+			return 1-((9.075f * progress * progress) - (9.9f * progress) + 3.4f);
 		} else if (progress < (2.5/2.75)) {
-			return 1-((4356/361.0 * progress * progress) - (35442/1805.0 * progress) + 16061/1805.0);
+			return 1-((4356/361.0f * progress * progress) - (35442/1805.0f * progress) + 16061/1805.0f);
 		} else {
-			return 1-((54/5.0 * progress * progress) - (513/25.0 * progress) + 268/25.0);
+			return 1-((54/5.0f * progress * progress) - (513/25.0f * progress) + 268/25.0f);
 		}
 	}
 	template<class T>

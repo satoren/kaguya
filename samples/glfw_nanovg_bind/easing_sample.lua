@@ -9,12 +9,11 @@ end
 	ANIM_TIME=1,
 	DISP_TIME=2,
 	progress=0,
-	COUNT=100,
+	COUNT=200,
 	background_color = nvg.RGB(55,55,55),
 	frame_color = nvg.RGB(255,255,255),
 	path_color = nvg.RGB(255,0,0),
-    easingfunctionname = {"Liner","InSine","OutSine","InOutSine","InQuad","OutQuad","InOutQuad","InCubic","OutCubic","InOutCubic","InQuart","OutQuart","InOutQuart","InQuint","OutQuint","InOutQuint","InExpo","OutExpo","InOutExpo","InCirc","OutCirc","InOutCirc","InBack","OutBack","InOutBack",
-"InElastic","OutElastic","InOutElastic","InBounce","OutBounce","InOutBounce"},
+    easingfunctionname = {"Liner","InSine","OutSine","InOutSine","InQuad","OutQuad","InOutQuad","InCubic","OutCubic","InOutCubic","InQuart","OutQuart","InOutQuart","InQuint","OutQuint","InOutQuint","InExpo","OutExpo","InOutExpo","InCirc","OutCirc","InOutCirc","InBack","OutBack","InOutBack","InElastic","OutElastic","InOutElastic","InBounce","OutBounce","InOutBounce"},
     current_function = "",
     
 	draw_graph = function(self,ctx,x,y,w,h,t,window)
@@ -31,7 +30,7 @@ end
         nvg.StrokeColor(ctx,self.frame_color);
         nvg.Stroke(ctx);
         self.progress = self.progress + t
-        if(self.current_function == "" or self.progress > self.ANIM_TIME + self.DISP_TIME)then
+        if(self.current_function == "" or self.progress > self.ANIM_TIME + self.DISP_TIME)then        
             self.current_function = self.easingfunctionname[math.floor(math.random(1,#self.easingfunctionname))]
             print(self.current_function)
             window:setWindowTitle(self.current_function)
@@ -68,7 +67,9 @@ end
 	N=50
     drawpath={}
     window:makeContextCurrent();
-    context = nvg.Create(0);
+    context = nvg.Create(nvg.ANTIALIAS + nvg.STENCIL_STROKES);
+    nvg.LineJoin(context,nvg.ROUND)
+    nvg.LineCap(context,nvg.ROUND)
     local prevtime = os.clock();
 	local black = nvg.RGB(0,0,0);
     while (window:windowShouldClose() == 0) do

@@ -39,7 +39,7 @@ int luaopen_luaeasing(lua_State *L)
 	EASING_LUA_REGFUNC(InOutCirc);
 	EASING_LUA_REGFUNC(InBack);
 	EASING_LUA_REGFUNC(OutBack);
-	EASING_LUA_REGFUNC(InOutBack);	
+	EASING_LUA_REGFUNC(InOutBack);
 	EASING_LUA_REGFUNC(InElastic);
 	EASING_LUA_REGFUNC(OutElastic);
 	EASING_LUA_REGFUNC(InOutElastic);
