@@ -39,7 +39,7 @@ namespace kaguya
 		{
 			std::vector<LuaRef>& v_;
 			gettablekey(std::vector<LuaRef>&v) :v_(v) {}
-			void operator ()(LuaRef key, LuaRef value)
+			void operator ()(LuaRef key, const LuaRef& )
 			{
 				v_.push_back(key);
 			}
@@ -48,7 +48,7 @@ namespace kaguya
 		{
 			std::vector<LuaRef>& v_;
 			gettablevalue(std::vector<LuaRef>&v) :v_(v) {}
-			void operator ()(LuaRef key, LuaRef value)
+			void operator ()(const LuaRef&, LuaRef value)
 			{
 				v_.push_back(value);
 			}

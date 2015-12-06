@@ -342,6 +342,7 @@ namespace selector_test
 		private:
 			NoncopyableClass();
 			NoncopyableClass(const NoncopyableClass&);
+			NoncopyableClass& operator=(const NoncopyableClass&);
 			int member;
 		};
 		bool noncopyable_class_test(kaguya::State& state)
@@ -831,8 +832,8 @@ typedef std::map<std::string, test_function_t> test_function_map_t;
 bool execute_test(const test_function_map_t& testmap)
 {
 	bool fail = false;
-	int testcount = testmap.size();
-	int testindex = 1;
+	size_t testcount = testmap.size();
+	size_t testindex = 1;
 
 	std::vector<std::string> pass_tests;
 	std::vector<std::string> fail_tests;

@@ -149,7 +149,7 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, const std::vector<T>& ref)
 		{
-			LuaRef table(l, NewTable(ref.size(), 0));
+			LuaRef table(l, NewTable(int(ref.size()), 0));
 
 			int count = 1;//array is 1 origin in Lua
 			for (typename std::vector<T>::const_iterator it = ref.begin(); it != ref.end(); ++it)
@@ -196,7 +196,7 @@ namespace kaguya
 		template<typename K, typename V>
 		inline int push(lua_State* l, const std::map<K, V>& ref)
 		{
-			LuaRef table(l, NewTable(ref.size(), 0));
+			LuaRef table(l, NewTable(0, int(ref.size())));
 			for (typename std::map<K,V>::const_iterator it = ref.begin(); it != ref.end(); ++it)
 			{
 				table[it->first] = it->second;

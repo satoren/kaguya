@@ -93,10 +93,11 @@ namespace kaguya
 					{
 						args[i].push(state_);
 					}
+					int argnum = int(args.size());
 #if LUA_VERSION_NUM >= 502
-					int result = lua_resume(state_, 0, args.size()? args.size()-1:0);
+					int result = lua_resume(state_, 0, argnum > 0 ? argnum - 1 : 0);
 #else
-					int result = lua_resume(state_, args.size() ? args.size() - 1 : 0);
+					int result = lua_resume(state_, argnum > 0 ? argnum - 1 : 0);
 #endif
 					except::checkErrorAndThrow(result, state_);
 					for (int i = 0; i < resultnum; ++i)
@@ -113,7 +114,7 @@ namespace kaguya
 					{
 						args[i].push(state_);
 					}
-					int result = lua_pcall(state_, eval_info_->args.size(), resultnum, 0);
+					int result = lua_pcall(state_, int(args.size()), resultnum, 0);
 
 					except::checkErrorAndThrow(result, state_);
 					for (int i = 0; i < resultnum; ++i)
@@ -127,7 +128,7 @@ namespace kaguya
 
 		struct eval
 		{
-			eval() :invoked(false), coroutine(false), owner(0){}
+			eval() :invoked(false), coroutine(false), owner(0) {}
 			LuaRef fun;
 			std::vector<LuaRef> args;
 			std::vector<LuaRef> results;

@@ -121,15 +121,16 @@ namespace kaguya
 		}
 		void registerFunction(lua_State* state, const char* name, const FuncArrayType& func_array)const
 		{
-			if (func_array.empty()) { return; }
-			lua_pushnumber(state, func_array.size());
+			int funcnum = int(func_array.size());
+			if (funcnum==0) { return; }
+			types::push(state, funcnum);
 			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
 			{
 				void *storage = lua_newuserdata(state, sizeof(FunctorType));
 				new(storage) FunctorType(*f);
 				luaL_setmetatable(state, KAGUYA_FUNCTOR_METATABLE);
 			}
-			lua_pushcclosure(state, &nativefunction::functor_dispatcher, func_array.size() + 1);
+			lua_pushcclosure(state, &nativefunction::functor_dispatcher, funcnum + 1);
 			lua_setfield(state, -2, name);
 		}
 		void registerField(lua_State* state, const char* name, const ValueType& value)const
