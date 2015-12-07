@@ -2,6 +2,7 @@ sudo: false
 language: cpp
 
 compiler:
+  - clang
   - g++
 install:
   - if [ "$CXX" = "g++" ] && [ "$CXX_FLAGS" = "-std=c++11" ]; then export CXX="g++-4.8"; fi
@@ -12,17 +13,12 @@ addons:
     packages:
     - liblua5.2-dev
     - libboost-all-dev
-    - g++-4.4
     - g++-4.8
     - cmake
 env:
-  - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 CXX = clang++
-  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++03 CXX = clang++
-  - BUILD_TYPE=Release CXX_FLAGS=-std=c++11 CXX = clang++
-  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++11 CXX = clang++
-  - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 CXX = g++-4.4
-  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++03 CXX = g++-4.4
-  - BUILD_TYPE=Release CXX_FLAGS=-std=c++11 CXX = g++4.8
-  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++11 CXX = g++4.8
+  - BUILD_TYPE=Release CXX_FLAGS=-std=c++03
+  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++03
+  - BUILD_TYPE=Release CXX_FLAGS=-std=c++11
+  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++11
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && ./test_runner
