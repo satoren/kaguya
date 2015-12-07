@@ -2,7 +2,6 @@ sudo: false
 language: cpp
 
 compiler:
-  - clang
   - g++
 install:
   - if [ "$CXX" = "g++" ] && [ "$CXX_FLAGS" = "-std=c++11" ]; then export CXX="g++-4.8"; fi
