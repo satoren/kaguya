@@ -32,7 +32,7 @@ namespace selector_test
 		{
 			state("value={out=32,str=\"gjgj\"}");
 			state("value[\"in\"] = \"test\"");
-			kaguya::Selector value = state["value"];
+			kaguya::LuaRef value = state["value"];
 			return value["str"] == "gjgj" && value["in"] == "test" &&  value["out"] == 32;
 		};
 
@@ -77,6 +77,59 @@ namespace selector_test
 			state("value = 1");
 			return state["value"] == Bar;
 		};
+
+		template<class T, class T2> bool setget_eq(kaguya::State& state, T setvalue, T2 condvalue)
+		{
+			return state.newRef(setvalue) == condvalue;
+		}
+
+		bool setget_test(kaguya::State& state)
+		{
+			if (!setget_eq(state, 0, 0)) { return false; }
+			if (!setget_eq(state, "", "")) { return false; }
+			if (!setget_eq(state, "false", std::string("false"))) { return false; }
+			if (!setget_eq(state, std::string(""), std::string(""))) { return false; }
+			if (!setget_eq(state, 1, 1)) { return false; }
+			if (!setget_eq(state, kaguya::LuaRef(), kaguya::LuaRef())) { return false; }
+			if (!setget_eq(state, Foo, Foo)) { return false; }
+			if (!setget_eq(state, Bar, Bar)) { return false; }
+
+			if (!setget_eq(state, kaguya::LuaRef(), false)) { return false; }
+			if (!setget_eq(state, (void*)0, false)) { return false; }
+			if (!setget_eq(state, 0, true)) { return false; }
+			if (!setget_eq(state, "", true)) { return false; }
+			if (!setget_eq(state, "false", true)) { return false; }
+			if (!setget_eq(state, std::string(""), true)) { return false; }
+			if (!setget_eq(state, 1, true)) { return false; }
+			if (!setget_eq(state, 1, state.newRef(1))) { return false; }
+			if (!setget_eq(state, "test", state.newRef("test"))) { return false; }
+			if (!setget_eq(state, false, state.newRef(false))) { return false; }
+			if (!setget_eq(state, 5.674f, state.newRef(5.674f))) { return false; }
+			if (!setget_eq(state, 5.674, state.newRef(5.674))) { return false; }
+			{
+				std::map<std::string, int> setmap;
+				setmap["3"] = 23232;
+				setmap["4"] = 232;
+				setmap["5"] = 23;
+				std::map<std::string, int> copy = setmap;
+				if (!setget_eq(state, setmap, copy)) { return false; }
+			}
+			{
+				std::vector<std::string> setvec;
+				setvec.push_back("342");
+				setvec.push_back("32");
+				std::vector<std::string> copy = setvec;
+				if (!setget_eq(state, setvec, copy)) { return false; }
+			}
+			{
+				std::vector<std::vector<std::string> > setvec;
+				setvec.push_back(std::vector<std::string>(12, "332"));
+				setvec.push_back(std::vector<std::string>(42, "3232"));
+				std::vector<std::vector<std::string> > copy = setvec;
+				if (!setget_eq(state, setvec, copy)) { return false; }
+				return true;
+			}
+		};
 	}
 
 	namespace t_02_classreg
@@ -88,7 +141,7 @@ namespace selector_test
 
 			ABC() :intmember(0) {}
 			ABC(int a) :intmember(a) { }
-			ABC(const char* a) :intmember(0),stringmember(a) { }
+			ABC(const char* a) :intmember(0), stringmember(a) { }
 			ABC(std::string a) :intmember(0), stringmember(a) { }
 			ABC(int intmem, const std::string& strmem) :intmember(intmem), stringmember(strmem) { }
 			ABC(const std::string& strmem, int intmem) :intmember(intmem), stringmember(strmem) { }
@@ -117,7 +170,7 @@ namespace selector_test
 			int getInt() const {
 				return intmember;
 			}
-			void setInt(const int& n)  {
+			void setInt(const int& n) {
 				intmember = n;
 			}
 			std::string getString()const {
@@ -394,7 +447,7 @@ namespace selector_test
 				.addCodeChunkResult("luafunc", "return function(a,b) return a*b end")
 				);
 			Foo foo;
-			kaguya::Selector lfoo = state["Foo"];
+			kaguya::LuaRef lfoo = state["Foo"];
 			lfoo["bar"] = kaguya::function(&Foo::setBar);
 			lfoo["bar"](&foo, "bar");
 			if (foo.bar != "bar") { return false; }
@@ -496,7 +549,7 @@ namespace selector_test
 			if (!state("print(v[0])assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)")) { return false; }
 
 
-			std::map<std::string,double> m; m["a"]=4; m["b"] = 32; m["c"] = 24;
+			std::map<std::string, double> m; m["a"] = 4; m["b"] = 32; m["c"] = 24;
 			state["m"] = m;
 			if (!state("assert(m['a'] == 4 and m['b'] == 32 and m['c'] == 24)")) { return false; }
 
@@ -752,13 +805,15 @@ namespace selector_test
 			(state["callback"]->*"callCallback")(454);
 			std::vector<int> callback_data = state["receive_data"];
 
-			if (!(callback_data.size() == 3 && callback_data[0] == 54 
-				&& callback_data[1] == 24 && callback_data[2] == 454)) { return false; }
+			if (!(callback_data.size() == 3 && callback_data[0] == 54
+				&& callback_data[1] == 24 && callback_data[2] == 454)) {
+				return false;
+			}
 
 			return true;
 		}
 
-		
+
 	}
 
 	namespace t_05_error_handler
@@ -940,6 +995,9 @@ int main()
 
 		ADD_TEST(selector_test::t_01_primitive::enum_set);
 		ADD_TEST(selector_test::t_01_primitive::enum_get);
+		ADD_TEST(selector_test::t_01_primitive::setget_test);
+
+
 
 		ADD_TEST(selector_test::t_02_classreg::default_constructor);
 		ADD_TEST(selector_test::t_02_classreg::int_constructor);

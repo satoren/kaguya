@@ -678,7 +678,11 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, T* v)
 		{
-			if (!available_metatable<T>(l))
+			if (!v)
+			{
+				lua_pushnil(l);
+			}
+			else if (!available_metatable<T>(l))
 			{
 				lua_pushlightuserdata(l, v);
 			}
@@ -694,7 +698,11 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, const T* v)
 		{
-			if (!available_metatable<T>(l))
+			if (!v)
+			{
+				lua_pushnil(l);
+			}
+			else if (!available_metatable<T>(l))
 			{
 				lua_pushlightuserdata(l, const_cast<T*>(v));
 			}

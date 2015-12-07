@@ -68,6 +68,15 @@ namespace kaguya
 		using boost::get;
 		using boost::is_enum;
 		using boost::is_arithmetic;
+		using boost::is_integral;
+		using boost::is_floating_point;
+		using boost::integral_constant;
+		using boost::remove_reference;
+		using boost::remove_pointer;
+		using boost::remove_cv;
+		using boost::remove_const;
+		using boost::conditional;
+		using boost::is_same;
 #if BOOST_VERSION >= 104800
 		using boost::forward;
 #else
@@ -88,6 +97,15 @@ namespace kaguya
 		using std::get;
 		using std::is_enum;
 		using std::is_arithmetic;
+		using std::is_integral;
+		using std::is_floating_point;
+		using std::integral_constant;
+		using std::remove_reference;
+		using std::remove_pointer;
+		using std::remove_cv;
+		using std::remove_const;
+		using std::conditional;
+		using std::is_same;
 		using std::forward;
 #endif
 	}

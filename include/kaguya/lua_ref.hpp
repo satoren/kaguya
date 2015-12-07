@@ -271,10 +271,6 @@ namespace kaguya
 		template<typename T>
 		typename traits::arg_get_type<T>::type get()const
 		{
-			if (state_ == 0 || ref_ == LUA_REFNIL)
-			{
-				throw LuaTypeMismatch("is nil");
-			}
 			typedef typename traits::arg_get_type<T>::type get_type;
 			util::ScopedSavedStack save(state_);
 			push(state_);
@@ -586,5 +582,15 @@ namespace kaguya
 			ref.push(l);
 			return 1;
 		}
+	}
+
+	namespace traits
+	{
+
+		template<>
+		struct arg_get_type<const LuaRef& > {
+			typedef LuaRef type;
+		};
+
 	}
 }

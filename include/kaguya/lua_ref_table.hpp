@@ -210,4 +210,15 @@ namespace kaguya
 			return push(l, const_cast<const std::map<K, V>&>(ref));
 		}
 	}
+	namespace traits
+	{
+		template<class V >
+		struct arg_get_type<const std::vector<V>& > {
+			typedef std::vector<V> type;
+		};
+		template<class K, class V >
+		struct arg_get_type<const std::map<K, V>& > {
+			typedef std::map<K, V> type;
+		};
+	}
 }
