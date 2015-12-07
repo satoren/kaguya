@@ -5,7 +5,7 @@ compiler:
   - clang
   - g++-4.8
 install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
+  - if [ "$CXX" = "g++" ]&& ["$CXX_FLAGS" = -std=c++11" ]; then export CXX="g++-4.8"; fi
 addons:
   apt:
     sources:
