@@ -119,6 +119,21 @@ namespace kaguya
 	
 		//vector and map to Lua table 
 		template<typename T>
+		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >)
+		{
+			LuaRef table = get(l, index, typetag<LuaRef>());
+			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				if (!it->first.typeTest<size_t>() || !it->second.typeTest<T>())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		template<typename T>
 		inline bool checkType(lua_State* l, int index, typetag<std::vector<T> >)
 		{
 			LuaRef table = get(l, index, typetag<LuaRef>());
@@ -166,6 +181,21 @@ namespace kaguya
 		}
 
 		//std::map
+		template<typename K, typename V>
+		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >)
+		{
+			LuaRef table = get(l, index, typetag<LuaRef>());
+			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				if (!it->first.typeTest<K>() || !it->second.typeTest<V>())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 		template<typename K, typename V>
 		inline bool checkType(lua_State* l, int index, typetag<std::map<K, V> >)
 		{
