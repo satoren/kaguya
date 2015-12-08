@@ -185,11 +185,16 @@ namespace kaguya
 
 	typedef nativefunction::FunctorType FunctorType;
 	template<typename T>
-	inline FunctorType function(T f)
+	inline FunctorType lua_function(T f)
 	{
 		return FunctorType(nativefunction::create(standard::forward<T>(f)));
 	}
 
+	template<typename T>
+	inline FunctorType function(T f)
+	{
+		return lua_function(standard::forward<T>(f));
+	}
 	namespace types
 	{
 		template<>

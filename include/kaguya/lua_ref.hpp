@@ -461,6 +461,7 @@ namespace kaguya
 			value_type other_type = other.type();
 			value_type this_type = type();
 			if (other_type != this_type) { return false; }
+			if (other_type == TYPE_NIL) { return true; }
 			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push();
@@ -475,6 +476,7 @@ namespace kaguya
 			value_type other_type = other.type();
 			value_type this_type = type();
 			if (other_type != this_type) { return this_type < other_type; }
+			if (other_type == TYPE_NIL) { return false; }
 			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push(state_);
@@ -489,6 +491,7 @@ namespace kaguya
 			value_type other_type = other.type();
 			value_type this_type = type();
 			if (other_type != this_type) { return this_type < other_type; }
+			if (other_type == TYPE_NIL) { return true; }
 			util::ScopedSavedStack save(state_);
 			other.push(state_);
 			push();
