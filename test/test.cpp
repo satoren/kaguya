@@ -10,7 +10,7 @@ namespace selector_test
 	std::string to_string(int n)
 	{
 		char buffer[32];
-		snprintf(buffer,32,"%d",n);
+		sprintf(buffer,"%d",n);
 		return buffer;
 	}
 	 
