@@ -318,7 +318,7 @@ namespace kaguya
 			if (type() != TYPE_FUNCTION)
 			{
 				except::typeMismatchError(state_, "this is not function" + typeName());
-				return false;
+				return LuaRef(state_);
 			}
 			push();
 			lua_getupvalue(state_, -1, 1);
