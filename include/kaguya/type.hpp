@@ -17,6 +17,7 @@ namespace kaguya
 	};
 	struct NewThread {};
 	struct GlobalTable {};
+	struct NilValue {};
 
 	template<class T>
 	struct MetaPointerWrapper {
@@ -608,6 +609,13 @@ namespace kaguya
 			lua_newthread(l);
 			return 1;
 		}
+
+		inline int push(lua_State* l, NilValue)
+		{
+			lua_pushnil(l);
+			return 1;
+		}
+		
 
 
 		inline int push(lua_State* l, GlobalTable)

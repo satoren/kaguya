@@ -290,6 +290,41 @@ namespace kaguya
 			return !isNilref() && get<bool>() == true;
 		}
 
+		bool setFunctionEnv(const LuaRef& env)
+		{
+			util::ScopedSavedStack save(state_);
+			if (env.type() != TYPE_TABLE)
+			{
+				except::typeMismatchError(state_, "env is not table:" + typeName());
+				return false;
+			}
+			if(type() != TYPE_FUNCTION)
+			{
+				except::typeMismatchError(state_, "this is not function" + typeName());
+				return false;
+			}
+			push();
+			env.push();
+			lua_setupvalue(state_, -2, 1);
+			return true;
+		}
+		bool setFunctionEnv(NewTable env)
+		{
+			return setFunctionEnv(LuaRef(state_,env));
+		}
+		LuaRef getFunctionEnv()
+		{
+			util::ScopedSavedStack save(state_);
+			if (type() != TYPE_FUNCTION)
+			{
+				except::typeMismatchError(state_, "this is not function" + typeName());
+				return false;
+			}
+			push();
+			lua_getupvalue(state_, -1, 1);
+			return LuaRef(state_, StackTop());
+		}
+
 #include "kaguya/gen/luaref_fun_def.inl"
 
 		mem_fun_binder operator->*(const char* key);

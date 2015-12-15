@@ -104,11 +104,11 @@ namespace kaguya
 			return LuaRef(state_, StackTop());
 		}
 
-		bool dofile(const std::string& file)
+		bool dofile(const std::string& file, const LuaRef& env = LuaRef())
 		{
-			return dofile(file.c_str());
+			return dofile(file.c_str(), env);
 		}
-		bool dofile(const char* file)
+		bool dofile(const char* file, const LuaRef& env= LuaRef())
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -119,6 +119,13 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
+
+			if (env.type() == LuaRef::TYPE_TABLE)
+			{
+				env.push();
+				lua_setupvalue(state_, -2, 1);
+			}
+
 			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
 			{
@@ -127,8 +134,16 @@ namespace kaguya
 			}
 			return true;
 		}
+		bool dofile(const char* str, NewTable table)
+		{
+			return dofile(str, newRef(table));
+		}
+		bool dofile(const std::string& str, NewTable table)
+		{
+			return dofile(str.c_str(), newRef(table));
+		}
 
-		bool dostring(const char* str)
+		bool dostring(const char* str, const LuaRef& env = LuaRef())
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -138,7 +153,11 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
-
+			if (env.type() == LuaRef::TYPE_TABLE)
+			{
+				env.push();
+				lua_setupvalue(state_, -2, 1);
+			}
 			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
 			{
@@ -147,9 +166,17 @@ namespace kaguya
 			}
 			return true;
 		}
-		bool dostring(const std::string& str)
+		bool dostring(const std::string& str, const LuaRef& env = LuaRef())
 		{
-			return dostring(str.c_str());
+			return dostring(str.c_str(), env);
+		}
+		bool dostring(const char* str, NewTable table)
+		{
+			return dostring(str, newRef(table));
+		}
+		bool dostring(const std::string& str, NewTable table)
+		{
+			return dostring(str.c_str(), newRef(table));
 		}
 		bool operator()(const std::string& str)
 		{

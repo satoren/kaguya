@@ -740,6 +740,17 @@ namespace selector_test
 
 		}
 
+		void function_env(kaguya::State& state)
+		{
+			kaguya::LuaRef fun = state.loadstring("foo='bar'");
+
+			fun.setFunctionEnv(kaguya::NewTable());
+			fun();
+
+			TEST_CHECK("assert(foo == nil)");
+			state["functionEnv"] = fun.getFunctionEnv();
+			TEST_CHECK("assert(functionEnv.foo == 'bar')");
+		}
 
 	}
 
@@ -797,6 +808,19 @@ namespace selector_test
 			state.setErrorHandler(ignore_error_fun);
 			kaguya::LuaRef errorref = state.loadstring("function() e");//syntax error
 			TEST_CHECK (!errorref) ;
+		}
+
+
+		void load_with_other_env(kaguya::State& state)
+		{
+			state.dostring("foo = 'bar'");
+
+			state["otherEnv"] = state.newRef(kaguya::NewTable());
+			state.dostring("foo = 'dar'", state["otherEnv"]);
+
+			TEST_CHECK(state("assert(foo == 'bar')"));
+
+			TEST_CHECK(state("assert(otherEnv.foo == 'dar')"));
 		}
 	}
 
@@ -1060,12 +1084,17 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::operator_equal_test);
 		ADD_TEST(selector_test::t_04_lua_ref::typetest);
 		ADD_TEST(selector_test::t_04_lua_ref::luafun_callback);
+		ADD_TEST(selector_test::t_04_lua_ref::function_env);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);
 
 		ADD_TEST(selector_test::t_06_state::other_state);
 		ADD_TEST(selector_test::t_06_state::load_string);
+
+		ADD_TEST(selector_test::t_06_state::load_with_other_env);
+
+		
 
 		ADD_TEST(selector_test::t_07_any_type_test::any_type_test);
 
