@@ -194,7 +194,7 @@ namespace kaguya
 		}
 
 #include "gen/add_constructor.inl"
-		//variadic argment constructor(receive const std::vector<LuaRef>&)
+		//variadic arguments constructor(receive const std::vector<LuaRef>&)
 //		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
 		ClassMetatable& addConstructorVariadicArg()
 		{

@@ -36,7 +36,7 @@ def strictCheckType(out,arg_num,offset=0,customcheck=""):
 	out.write('  }\n')
 
 def arg_typenames(arg_num):
-	result ='  virtual std::string argmentTypeNames(){\n'
+	result ='  virtual std::string argumentTypeNames(){\n'
 	result +='    std::string result;\n'
 	for i in range (1,arg_num+1):
 		result +='    result+='

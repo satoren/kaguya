@@ -33,7 +33,7 @@ namespace kaguya
 				Ret r = func_(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				return "VariadicArg";
 			}
 		};
@@ -62,7 +62,7 @@ namespace kaguya
 				return 0;
 			}
 
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				return "VariadicArg";
 			}
 		};
@@ -96,7 +96,7 @@ namespace kaguya
 			}
 
 
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				std::string result;
 				result += typeid(T).name();
 				result += ",VariadicArg";
@@ -132,7 +132,7 @@ namespace kaguya
 				(t->*func_)(args);
 				return 0;
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				std::string result;
 				result += typeid(T).name();
 				result += ",VariadicArg";
@@ -169,7 +169,7 @@ namespace kaguya
 				Ret r = (t->*func_)(args);
 				return types::push(state, standard::forward <Ret>(r));
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				std::string result;
 				result += typeid(T).name();
 				result += ",VariadicArg";
@@ -204,7 +204,7 @@ namespace kaguya
 				(t->*func_)(args);
 				return 0;
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				std::string result;
 				result += typeid(T).name();
 				result += ",VariadicArg";
@@ -237,7 +237,7 @@ namespace kaguya
 				Ret r = func_(args);
 				return types::push(state, standard::forward<Ret>(r));
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				return "VariadicArg";
 			}
 		};
@@ -265,7 +265,7 @@ namespace kaguya
 				func_(args);
 				return 0;
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				return "VariadicArg";
 			}
 		};
@@ -294,7 +294,7 @@ namespace kaguya
 				luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
 				return 1;
 			}
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				return "VariadicArg";
 			}
 		};

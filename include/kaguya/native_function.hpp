@@ -18,7 +18,7 @@ namespace kaguya
 		{
 			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
-			virtual std::string argmentTypeNames() = 0;
+			virtual std::string argumentTypeNames() = 0;
 			virtual ~BaseInvoker() {}
 		};
 
@@ -78,7 +78,7 @@ namespace kaguya
 			}
 			else
 			{
-				std::string message = "argment not matching" + util::argmentTypes(l) + "\t candidated\n";
+				std::string message = "argument not matching" + util::argmentTypes(l) + "\t candidated\n";
 			
 				int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 				for (int i = 0; i < overloadnum; ++i)
@@ -88,7 +88,7 @@ namespace kaguya
 					{
 						continue;
 					}
-					message += std::string("\t\t") + (*fun)->argmentTypeNames() + "\n";
+					message += std::string("\t\t") + (*fun)->argumentTypeNames() + "\n";
 				}
 				util::traceBack(l, message.c_str());
 			}
@@ -149,7 +149,7 @@ namespace kaguya
 				return types::push(state, standard::forward<MemType>(ptr->*data_));
 			}
 
-			virtual std::string argmentTypeNames() {
+			virtual std::string argumentTypeNames() {
 				std::string result;
 				result += typeid(ClassType).name();
 				result += std::string("[opt]")+ typeid(MemType).name();
