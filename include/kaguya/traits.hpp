@@ -12,7 +12,7 @@ namespace kaguya
 
 		template<bool B, class T = void>struct enable_if {};
 		template<class T>struct enable_if<true, T> { typedef T type; };
-		
+
 
 		template< typename T >
 		struct remove_const_reference {
@@ -32,10 +32,10 @@ namespace kaguya
 			is_same<T, const char*>::value> {};
 
 		template< class T >
-		struct is_convertible_lua_number:integral_constant<bool,
+		struct is_convertible_lua_number :integral_constant<bool,
 			is_floating_point<typename remove_const_reference<T>::type>::value ||
 			is_integral<typename remove_const_reference<T>::type>::value ||
-			is_enum<typename remove_const_reference<T>::type>::value>{};
+			is_enum<typename remove_const_reference<T>::type>::value> {};
 
 #if LUA_VERSION_NUM >= 503
 		template< class T >
@@ -65,7 +65,7 @@ namespace kaguya
 				//, T
 				//, typename conditional<is_same<T, bool>::value,bool, typename lua_number_type<T>::type>::type
 			//	>::type type;
-				
+
 		};
 		template< typename T >
 		struct arg_get_type {
@@ -80,7 +80,7 @@ namespace kaguya
 		template< >
 		struct arg_get_type<const std::string&> {
 			typedef std::string type;
-		};		
+		};
 	}
 
 };

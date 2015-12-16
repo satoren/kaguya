@@ -80,7 +80,7 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return LuaRef(state_);
 			}
-			return LuaRef(state_,StackTop());
+			return LuaRef(state_, StackTop());
 		}
 
 
@@ -108,7 +108,7 @@ namespace kaguya
 		{
 			return dofile(file.c_str(), env);
 		}
-		bool dofile(const char* file, const LuaRef& env= LuaRef())
+		bool dofile(const char* file, const LuaRef& env = LuaRef())
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -232,7 +232,7 @@ namespace kaguya
 			}
 			void restart() { enable(); }
 			void stop() { disable(); }
-			int count()const { return lua_gc(state_, LUA_GCCOUNT, 0);}
+			int count()const { return lua_gc(state_, LUA_GCCOUNT, 0); }
 			int steppause(int value) { return lua_gc(state_, LUA_GCSETPAUSE, value); }
 			int setstepmul(int value) { return lua_gc(state_, LUA_GCSETSTEPMUL, value); }
 			void enable()

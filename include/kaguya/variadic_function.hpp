@@ -20,7 +20,7 @@ namespace kaguya
 			typedef Ret(*func_type)(VariadicArgType);
 			func_type func_;
 			VariadicArgInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				std::vector<LuaRef> args;
@@ -48,7 +48,7 @@ namespace kaguya
 			typedef void(*func_type)(VariadicArgType);
 			func_type func_;
 			VariadicArgVoidInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				std::vector<LuaRef> args;
@@ -77,7 +77,7 @@ namespace kaguya
 			typedef Ret(T::*func_type)(VariadicArgType);
 			func_type func_;
 			VariadicArgMemFunInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				T* t = types::get(state, 1, types::typetag<T*>());
@@ -115,7 +115,7 @@ namespace kaguya
 			typedef void (T::*func_type)(VariadicArgType);
 			func_type func_;
 			VariadicArgMemVoidFunInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				T* t = types::get(state, 1, types::typetag<T*>());
@@ -152,7 +152,7 @@ namespace kaguya
 			typedef Ret(T::*func_type)(VariadicArgType)const;
 			func_type func_;
 			VariadicArgConstMemFunInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				T* t = types::get(state, 1, types::typetag<T*>());
@@ -160,7 +160,7 @@ namespace kaguya
 
 				std::vector<LuaRef> args;
 				int top = lua_gettop(state);
-				args.reserve(top-1);
+				args.reserve(top - 1);
 				for (int i = 2; i <= top; ++i)
 				{
 					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
@@ -188,14 +188,14 @@ namespace kaguya
 			typedef void (T::*func_type)(VariadicArgType)const;
 			func_type func_;
 			VariadicArgConstMemVoidFunInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				T* t = types::get(state, 1, types::typetag<T*>());
 				if (!t) { return 0; }
 				std::vector<LuaRef> args;
 				int top = lua_gettop(state);
-				args.reserve(top-1);
+				args.reserve(top - 1);
 				for (int i = 2; i <= top; ++i)
 				{
 					args.push_back(types::get(state, i, types::typetag<LuaRef>()));
@@ -224,7 +224,7 @@ namespace kaguya
 			typedef standard::function<Ret(VariadicArgType)> func_type;
 			func_type func_;
 			VariadicArgFunInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				std::vector<LuaRef> args;
@@ -252,7 +252,7 @@ namespace kaguya
 			typedef standard::function<void(VariadicArgType)> func_type;
 			func_type func_;
 			VariadicArgVoidFunInvoker(func_type fun) :func_(fun) {}
-			virtual bool checktype(lua_State *state,bool) { return true; }
+			virtual bool checktype(lua_State *state, bool) { return true; }
 			virtual int invoke(lua_State *state)
 			{
 				std::vector<LuaRef> args;

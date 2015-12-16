@@ -110,13 +110,13 @@ namespace kaguya
 	{
 		return TableKeyReference(*this, LuaRef(state_, index));
 	}
-	
-	
-	
-	
+
+
+
+
 	namespace types
 	{
-	
+
 		//vector and map to Lua table 
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >)
@@ -227,7 +227,7 @@ namespace kaguya
 		inline int push(lua_State* l, const std::map<K, V>& ref)
 		{
 			LuaRef table(l, NewTable(0, int(ref.size())));
-			for (typename std::map<K,V>::const_iterator it = ref.begin(); it != ref.end(); ++it)
+			for (typename std::map<K, V>::const_iterator it = ref.begin(); it != ref.end(); ++it)
 			{
 				table[it->first] = it->second;
 			}

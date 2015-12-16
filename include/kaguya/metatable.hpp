@@ -107,7 +107,7 @@ namespace kaguya
 			}
 		}
 	protected:
-		bool has_key(const std::string& key,bool exclude_function=false)
+		bool has_key(const std::string& key, bool exclude_function = false)
 		{
 			if (!exclude_function && function_map_.find(key) != function_map_.end())
 			{
@@ -122,7 +122,7 @@ namespace kaguya
 		void registerFunction(lua_State* state, const char* name, const FuncArrayType& func_array)const
 		{
 			int funcnum = int(func_array.size());
-			if (funcnum==0) { return; }
+			if (funcnum == 0) { return; }
 			types::push(state, funcnum);
 			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
 			{
@@ -233,7 +233,7 @@ namespace kaguya
 		template<typename Fun>
 		ClassMetatable& addStaticMember(const char* name, Fun f)
 		{
-			if (has_key(name,true))
+			if (has_key(name, true))
 			{
 				//already registerd
 				return *this;

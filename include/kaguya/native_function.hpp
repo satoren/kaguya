@@ -70,7 +70,7 @@ namespace kaguya
 					return (*fun)->invoke(l);
 				}
 				catch (std::exception & e) {
-					util::traceBack(l,e.what());
+					util::traceBack(l, e.what());
 				}
 				catch (...) {
 					util::traceBack(l, "Unknown exception");
@@ -79,7 +79,7 @@ namespace kaguya
 			else
 			{
 				std::string message = "argument not matching" + util::argmentTypes(l) + "\t candidated\n";
-			
+
 				int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 				for (int i = 0; i < overloadnum; ++i)
 				{
@@ -152,7 +152,7 @@ namespace kaguya
 			virtual std::string argumentTypeNames() {
 				std::string result;
 				result += typeid(ClassType).name();
-				result += std::string("[opt]")+ typeid(MemType).name();
+				result += std::string("[opt]") + typeid(MemType).name();
 				return result;
 			}
 		};
@@ -170,7 +170,7 @@ namespace kaguya
 
 		template <typename T, typename Ret, typename... Args>
 		struct lambda_fun<Ret(T::*)(Args...) const> {
-			typedef standard::function<Ret (Args...)> type;
+			typedef standard::function<Ret(Args...)> type;
 		};
 
 		//for lambda or bind

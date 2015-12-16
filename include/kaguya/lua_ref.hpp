@@ -39,7 +39,7 @@ namespace kaguya
 		{
 			std::vector<LuaRef>& v_;
 			gettablekey(std::vector<LuaRef>&v) :v_(v) {}
-			void operator ()(LuaRef key, const LuaRef& )
+			void operator ()(LuaRef key, const LuaRef&)
 			{
 				v_.push_back(key);
 			}
@@ -115,7 +115,7 @@ namespace kaguya
 			}
 			return true;
 		}
-		
+
 	public:
 		int thread_status()const
 		{
@@ -258,7 +258,7 @@ namespace kaguya
 		{
 			util::ScopedSavedStack save(state_);
 			push();//push to stack
-			return types::strictCheckType(state_,-1,types::typetag<T>());
+			return types::strictCheckType(state_, -1, types::typetag<T>());
 		}
 		template<typename T>
 		bool weakTypeTest()const
@@ -298,7 +298,7 @@ namespace kaguya
 				except::typeMismatchError(state_, "env is not table:" + typeName());
 				return false;
 			}
-			if(type() != TYPE_FUNCTION)
+			if (type() != TYPE_FUNCTION)
 			{
 				except::typeMismatchError(state_, "this is not function" + typeName());
 				return false;
@@ -310,7 +310,7 @@ namespace kaguya
 		}
 		bool setFunctionEnv(NewTable env)
 		{
-			return setFunctionEnv(LuaRef(state_,env));
+			return setFunctionEnv(LuaRef(state_, env));
 		}
 		LuaRef getFunctionEnv()
 		{
@@ -552,7 +552,7 @@ namespace kaguya
 	};
 
 	template<typename T>
-	bool operator == (const LuaRef& lhs,const T& rhs)
+	bool operator == (const LuaRef& lhs, const T& rhs)
 	{
 		try
 		{
@@ -585,11 +585,11 @@ namespace kaguya
 		return false;
 	}
 	template<typename T>
-	bool operator != (const T& lhs,const LuaRef& rhs)
+	bool operator != (const T& lhs, const LuaRef& rhs)
 	{
 		return !(lhs == rhs);
 	}
-	bool operator == (const char* lhs,const LuaRef& rhs) { return lhs == rhs.get<std::string>(); }
+	bool operator == (const char* lhs, const LuaRef& rhs) { return lhs == rhs.get<std::string>(); }
 
 
 

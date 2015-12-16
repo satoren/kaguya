@@ -10,8 +10,8 @@
 namespace kaguya
 {
 	struct NewTable {
-		NewTable():reserve_array_(0), reserve_record_(0){}
-		NewTable(int reserve_array,int reserve_record_) :reserve_array_(reserve_array), reserve_record_(reserve_record_) {}
+		NewTable() :reserve_array_(0), reserve_record_(0) {}
+		NewTable(int reserve_array, int reserve_record_) :reserve_array_(reserve_array), reserve_record_(reserve_record_) {}
 		int reserve_array_;
 		int reserve_record_;
 	};
@@ -43,18 +43,18 @@ namespace kaguya
 				operator std::string()const { return metaname; }
 			};
 			template<typename T>
-			inline metatableName_t metatableNameNonCV(typetag<T> )
+			inline metatableName_t metatableNameNonCV(typetag<T>)
 			{
 				static const char* METATABLE_POST_FIX = "_kaguya_type\0";
 				metatableName_t result;
 				//hash_code is c++11 because use name ptr
 				uintptr_t  ptrvalue = uintptr_t(typeid(T*).name());
-				size_t pos =0;
-				for (size_t s = 0; s < sizeof(uintptr_t) * 8; s+=7, pos++)
+				size_t pos = 0;
+				for (size_t s = 0; s < sizeof(uintptr_t) * 8; s += 7, pos++)
 				{
 					result.metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
 				}
-				memcpy(&result.metaname[pos], METATABLE_POST_FIX, strlen(METATABLE_POST_FIX)+1);
+				memcpy(&result.metaname[pos], METATABLE_POST_FIX, strlen(METATABLE_POST_FIX) + 1);
 				return result;
 			}
 #else
@@ -106,7 +106,7 @@ namespace kaguya
 			return LUA_TNIL != lua_type(l, -1);
 		}
 		template<typename T>
-		bool available_metatable(lua_State* l, typetag<T> type= typetag<T>())
+		bool available_metatable(lua_State* l, typetag<T> type = typetag<T>())
 		{
 			return available_metatable(l, metatableName<T>().c_str())
 				|| available_metatable(l, metatableName<MetaPointerWrapper<T> >().c_str());
@@ -615,7 +615,7 @@ namespace kaguya
 			lua_pushnil(l);
 			return 1;
 		}
-		
+
 
 
 		inline int push(lua_State* l, GlobalTable)
@@ -723,7 +723,7 @@ namespace kaguya
 			}
 			return 1;
 		}
-		
+
 		//vector
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >);

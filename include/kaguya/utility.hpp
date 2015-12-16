@@ -51,7 +51,7 @@ namespace kaguya
 			}
 			return result;
 		}
-		inline void traceBack(lua_State* state,const char* message,int level=0)
+		inline void traceBack(lua_State* state, const char* message, int level = 0)
 		{
 #if LUA_VERSION_NUM >= 502
 			luaL_traceback(state, state, message, level);
@@ -81,7 +81,7 @@ namespace kaguya
 				case LUA_TUSERDATA:
 					if (luaL_getmetafield(L, i, "__name") == LUA_TSTRING)
 					{
-						printf("userdata:%s",lua_tostring(L, -1));
+						printf("userdata:%s", lua_tostring(L, -1));
 						lua_pop(L, 1);
 						break;
 					}
