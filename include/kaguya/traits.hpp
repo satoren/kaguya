@@ -64,7 +64,7 @@ namespace kaguya
 		{
 			typedef typename conditional<is_convertible_lua_number<typename remove_reference<T>::type >::value
 				, typename lua_number_type<typename remove_const_reference<T>::type >::type
-				, typename T>::type type;
+				, T>::type type;
 		};
 		template< >
 		struct lua_push_type<std::string&> {
@@ -88,7 +88,7 @@ namespace kaguya
 		struct arg_get_type {
 			typedef typename conditional<is_convertible_lua_number<typename remove_const_reference<T>::type >::value
 				, typename remove_const_reference<T>::type
-				, typename T>::type type;
+				, T>::type type;
 		};
 		template< >
 		struct arg_get_type<std::string&> {
@@ -111,7 +111,7 @@ namespace kaguya
 		template< typename T >
 		struct arg_get_type_dispatch {
 			typedef typename conditional<is_enum<typename remove_const_reference<T>::type >::value
-				, typename enum_dispatch_type<T>
+				, enum_dispatch_type<T>
 				, typename conditional<is_convertible_lua_number<typename remove_const_reference<T>::type >::value
 				, typename lua_number_type<typename remove_const_reference<T>::type >::type
 				, typename arg_get_type<T>::type>::type
