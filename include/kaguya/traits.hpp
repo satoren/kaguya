@@ -37,41 +37,58 @@ namespace kaguya
 			is_integral<typename remove_const_reference<T>::type>::value ||
 			is_enum<typename remove_const_reference<T>::type>::value> {};
 
+
+
+		template< class T >
+		struct lua_number_type
+		{
+			typedef typename conditional<is_same<T, bool>::value,
+				bool,
 #if LUA_VERSION_NUM >= 503
-		template< class T >
-		struct lua_number_type
-		{
-			typedef typename conditional<is_floating_point<T>::value, lua_Number, lua_Integer>::type type;
-		};
+				typename conditional<is_floating_point<T>::value, lua_Number, lua_Integer>::type
 #else
-		template< class T >
-		struct lua_number_type
-		{
-			typedef lua_Number type;
-		};
+				lua_Number
 #endif
+			>::type type;
+		};
+
 
 		template< class T >
-		struct lua_type
+		struct is_convertible_duk_string :integral_constant<bool,
+			is_same<typename remove_const_reference<T>::type, std::string>::value ||
+			is_same<T, const char*>::value> {};
+
+
+		template< class T >
+		struct lua_push_type
 		{
-			typedef typename remove_cv<typename remove_reference<typename remove_pointer<T>::type>::type>::type* type;
+			typedef typename conditional<is_convertible_lua_number<typename remove_reference<T>::type >::value
+				, typename lua_number_type<typename remove_const_reference<T>::type >::type
+				, typename T>::type type;
+		};
+		template< >
+		struct lua_push_type<std::string&> {
+			typedef std::string type;
+		};
+		template< >
+		struct lua_push_type<const std::string&> {
+			typedef std::string type;
+		};
+		template<int N>
+		struct lua_push_type<const char[N]> {
+			typedef std::string type;
+		};
+		template< >
+		struct lua_push_type<const char*> {
+			typedef std::string type;
 		};
 
-		template< typename T >
-		struct arg_get_type_convertible_lua_number {
-			typedef T type;
-			// much warning int64_t to int
-			//typedef typename conditional<is_enum<T>::value
-				//, T
-				//, typename conditional<is_same<T, bool>::value,bool, typename lua_number_type<T>::type>::type
-			//	>::type type;
 
-		};
 		template< typename T >
 		struct arg_get_type {
-			typedef typename conditional<is_convertible_lua_number<typename remove_reference<T>::type >::value
-				, typename arg_get_type_convertible_lua_number<typename remove_const_reference<T>::type >::type
-				, T>::type type;
+			typedef typename conditional<is_convertible_lua_number<typename remove_const_reference<T>::type >::value
+				, typename remove_const_reference<T>::type
+				, typename T>::type type;
 		};
 		template< >
 		struct arg_get_type<std::string&> {
@@ -80,6 +97,25 @@ namespace kaguya
 		template< >
 		struct arg_get_type<const std::string&> {
 			typedef std::string type;
+		};
+		template<int N>
+		struct arg_get_type<const char[N]> {
+			typedef std::string type;
+		};
+
+		template< typename T >
+		struct enum_dispatch_type {
+			typedef typename remove_const_reference<T>::type type;
+		};
+
+		template< typename T >
+		struct arg_get_type_dispatch {
+			typedef typename conditional<is_enum<typename remove_const_reference<T>::type >::value
+				, typename enum_dispatch_type<T>
+				, typename conditional<is_convertible_lua_number<typename remove_const_reference<T>::type >::value
+				, typename lua_number_type<typename remove_const_reference<T>::type >::type
+				, typename arg_get_type<T>::type>::type
+			>::type type;
 		};
 	}
 
