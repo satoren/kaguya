@@ -614,12 +614,6 @@ namespace kaguya
 			ref.push(l);
 			return 1;
 		}
-		template<>
-		inline int push(lua_State* l, LuaRef& ref)
-		{
-			ref.push(l);
-			return 1;
-		}
 	}
 
 	namespace traits

@@ -68,19 +68,19 @@ namespace kaguya
 		};
 		template< >
 		struct lua_push_type<std::string&> {
-			typedef std::string type;
+			typedef const std::string& type;
 		};
 		template< >
 		struct lua_push_type<const std::string&> {
-			typedef std::string type;
+			typedef const std::string& type;
 		};
 		template<int N>
 		struct lua_push_type<const char[N]> {
-			typedef std::string type;
+			typedef const const char* type;
 		};
 		template< >
 		struct lua_push_type<const char*> {
-			typedef std::string type;
+			typedef const const char* type;
 		};
 
 

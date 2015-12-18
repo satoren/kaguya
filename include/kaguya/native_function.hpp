@@ -212,16 +212,6 @@ namespace kaguya
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}
-		template<>
-		inline int push(lua_State* l, nativefunction::FunctorType& f)
-		{
-			lua_pushnumber(l, 1);//no overload
-			void *storage = lua_newuserdata(l, sizeof(nativefunction::FunctorType));
-			new(storage) nativefunction::FunctorType(f);
-			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
-			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
-			return 1;
-		}
 #if KAGUYA_USE_RVALUE_REFERENCE
 		inline int push(lua_State* l, nativefunction::FunctorType&& f)
 		{

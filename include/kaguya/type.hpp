@@ -178,6 +178,11 @@ namespace kaguya
 				return lua_type(l, index) == LUA_TSTRING;
 			}
 			template<>
+			inline bool strictCheckType(lua_State* l, int index, typetag<const char*> tag)
+			{
+				return lua_type(l, index) == LUA_TSTRING;
+			}
+			template<>
 			inline bool strictCheckType(lua_State* l, int index, typetag<lua_State*> tag)
 			{
 				return lua_isthread(l, index);
@@ -188,6 +193,16 @@ namespace kaguya
 			inline bool checkType(lua_State* l, int index, typetag<T> tag)
 			{
 				return lua_type(l, index) == LUA_TLIGHTUSERDATA
+					|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
+					|| luaL_testudata(l, index, metatableName<standard::shared_ptr<typename traits::remove_const_reference<T>::type> >().c_str()) != 0
+					|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<typename traits::remove_const_reference<T>::type> >().c_str()) != 0;
+			}
+
+			template<typename T>
+			inline bool checkType(lua_State* l, int index, typetag<T*> tag)
+			{
+				return lua_type(l, index) == LUA_TLIGHTUSERDATA
+					|| lua_topointer(l, index) == 0 //allow zero for nullptr
 					|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
 					|| luaL_testudata(l, index, metatableName<standard::shared_ptr<typename traits::remove_const_reference<T>::type> >().c_str()) != 0
 					|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<typename traits::remove_const_reference<T>::type> >().c_str()) != 0;
@@ -212,6 +227,11 @@ namespace kaguya
 			}
 			template<>
 			inline bool checkType(lua_State* l, int index, typetag<std::string> tag)
+			{
+				return lua_isstring(l, index) != 0;
+			}
+			template<>
+			inline bool checkType(lua_State* l, int index, typetag<const char*> tag)
 			{
 				return lua_isstring(l, index) != 0;
 			}
@@ -287,6 +307,98 @@ namespace kaguya
 			}
 
 
+			template<typename T>
+			inline int push(lua_State* l,T& v)
+			{
+				if (!available_metatable<T>(l))
+				{
+					lua_pushlightuserdata(l, &v);
+				}
+				else
+				{
+					typedef MetaPointerWrapper<T> wrapper_type;
+					void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+					new(storage) wrapper_type(&v);
+					luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
+				}
+				return 1;
+			}
+			inline int push(lua_State* l, bool v)
+			{
+				lua_pushboolean(l, v);
+				return 1;
+			}
+			inline int push(lua_State* l, lua_Number v)
+			{
+				lua_pushnumber(l, v);
+				return 1;
+			}
+#if LUA_VERSION_NUM >= 503
+			inline int push(lua_State* l, lua_Integer v)
+			{
+				lua_pushinteger(l, v);
+				return 1;
+			}
+#endif
+			inline int push(lua_State* l, const std::string& s)
+			{
+				lua_pushlstring(l, s.c_str(), s.size());
+				return 1;
+			}
+			inline int push(lua_State* l, const char* s)
+			{
+				lua_pushstring(l, s);
+				return 1;
+			}
+			template<typename T>
+			inline int push(lua_State* l, const T& v)
+			{
+				void *storage = lua_newuserdata(l, sizeof(T));
+				new(storage) T(v);
+				luaL_setmetatable(l, types::metatableName<T>().c_str());
+				return 1;
+			}
+
+			template<typename T>
+			inline int push(lua_State* l, T* v)
+			{
+				if (!v)
+				{
+					lua_pushnil(l);
+				}
+				else if (!available_metatable<T>(l))
+				{
+					lua_pushlightuserdata(l, v);
+				}
+				else
+				{
+					typedef MetaPointerWrapper<T> wrapper_type;
+					void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+					new(storage) wrapper_type(v);
+					luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
+				}
+				return 1;
+			}
+			template<typename T>
+			inline int push(lua_State* l, const T* v)
+			{
+				if (!v)
+				{
+					lua_pushnil(l);
+				}
+				else if (!available_metatable<T>(l))
+				{
+					lua_pushlightuserdata(l, const_cast<T*>(v));
+				}
+				else
+				{
+					typedef MetaPointerWrapper<T> wrapper_type;
+					void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+					new(storage) wrapper_type(v);
+					luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
+				}
+				return 1;
+			}
 		}
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
@@ -305,105 +417,36 @@ namespace kaguya
 			return detail::get(l, index, typetag<typename traits::arg_get_type_dispatch<T>::type>());
 		}
 
-
-
-		inline int push(lua_State* l, bool v)
+		template<typename T>
+		inline int push(lua_State* l,const T& v)
 		{
-			lua_pushboolean(l, v);
+			detail::push(l, static_cast<typename traits::lua_push_type<T>::type>(v));
 			return 1;
-		}
-		inline int push(lua_State* l, float v)
-		{
-			lua_pushnumber(l, v);
-			return 1;
-		}
-		inline int push(lua_State* l, double v)
-		{
-			lua_pushnumber(l, v);
-			return 1;
-		}
-		inline int push(lua_State* l, long long v)
-		{
-#if LUA_VERSION_NUM >= 503
-			lua_pushinteger(l, v);
-#else
-			lua_pushnumber(l, lua_Number(v));
-#endif
-			return 1;
-		}
-		inline int push(lua_State* l, unsigned long long v)
-		{
-			return push(l, (long long)(v));
 		}
 
-		inline int push(lua_State* l, long v)
-		{
-			return push(l, (long long)(v));
-		}
-		inline int push(lua_State* l, unsigned long v)
-		{
-			return push(l, (long long)(v));
-		}
-		inline int push(lua_State* l, int v)
-		{
-			return push(l, (long long)(v));
-		}
-		inline int push(lua_State* l, unsigned int v)
-		{
-			return push(l, (long long)(v));
-		}
-		inline int push(lua_State* l, short v)
-		{
-			return push(l, int(v));
-		}
-		inline int push(lua_State* l, unsigned short v)
-		{
-			return push(l, int(v));
-		}
-		inline int push(lua_State* l, signed char v)
-		{
-			return push(l, int(v));
-		}
-		inline int push(lua_State* l, unsigned char v)
-		{
-			return push(l, int(v));
-		}
-		inline int push(lua_State* l, const char* v)
-		{
-			lua_pushstring(l, v);
-			return 1;
-		}
-		inline int push(lua_State* l, std::string& s)
-		{
-			lua_pushlstring(l, s.c_str(), s.size());
-			return 1;
-		}
-		inline int push(lua_State* l, const std::string& s)
-		{
-			lua_pushlstring(l, s.c_str(), s.size());
-			return 1;
-		}
-		inline int push(lua_State* l, NewTable table)
+		template<>
+		inline int push(lua_State* l, const NewTable& table)
 		{
 			lua_createtable(l, table.reserve_array_, table.reserve_record_);
 			return 1;
 		}
 
-		inline int push(lua_State* l, NewThread)
+		template<>
+		inline int push(lua_State* l, const NewThread&)
 		{
 			lua_newthread(l);
 			return 1;
 		}
 
-		inline int push(lua_State* l, NilValue)
+		template<>
+		inline int push(lua_State* l, const NilValue&)
 		{
 			lua_pushnil(l);
 			return 1;
 		}
 
-
-
-		inline int push(lua_State* l, GlobalTable)
+		template<>
+		inline int push(lua_State* l, const  GlobalTable&)
 		{
 #if LUA_VERSION_NUM >= 502
 			lua_pushglobaltable(l);
@@ -413,101 +456,7 @@ namespace kaguya
 			return 1;
 		}
 
-#if KAGUYA_USE_RVALUE_REFERENCE
-		inline int push(lua_State* l, std::string&& s)
-		{
-			lua_pushlstring(l, s.data(), s.size());
-			return 1;
-		}
-#endif
 
-		template<typename T>
-		typename traits::enable_if< standard::is_enum<T>::value, int>::type
-			pushEnum(lua_State* l, const T& v)
-		{
-			return push(l, (long long)(v));
-		}
-		template<typename T>
-		typename traits::enable_if< !standard::is_enum<T>::value, int>::type
-			pushEnum(lua_State* l, const T& v)
-		{
-			assert(false);
-			return 0;
-		}
-
-		template<typename T>
-		inline int push(lua_State* l, const T& v)
-		{
-			if (standard::is_enum<T>::value)
-			{
-				return pushEnum(l, v);
-			}
-			void *storage = lua_newuserdata(l, sizeof(T));
-			new(storage) T(v);
-			luaL_setmetatable(l, types::metatableName<T>().c_str());
-			return 1;
-		}
-
-		template<typename T>
-		inline int push(lua_State* l, T& v)
-		{
-			if (standard::is_enum<T>::value)
-			{
-				return pushEnum(l, v);
-			}
-			else if (!available_metatable<T>(l))
-			{
-				lua_pushlightuserdata(l, &v);
-			}
-			else
-			{
-				typedef MetaPointerWrapper<T> wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(&v);
-				luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
-			}
-			return 1;
-		}
-		template<typename T>
-		inline int push(lua_State* l, T* v)
-		{
-			if (!v)
-			{
-				lua_pushnil(l);
-			}
-			else if (!available_metatable<T>(l))
-			{
-				lua_pushlightuserdata(l, v);
-			}
-			else
-			{
-				typedef MetaPointerWrapper<T> wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(v);
-				luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
-			}
-			return 1;
-		}
-		template<typename T>
-		inline int push(lua_State* l, const T* v)
-		{
-			if (!v)
-			{
-				lua_pushnil(l);
-			}
-			else if (!available_metatable<T>(l))
-			{
-				lua_pushlightuserdata(l, const_cast<T*>(v));
-			}
-			else
-			{
-				typedef MetaPointerWrapper<T> wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(v);
-				luaL_setmetatable(l, metatableName<wrapper_type>().c_str());
-			}
-			return 1;
-		}
 		//vector
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >);
@@ -517,8 +466,6 @@ namespace kaguya
 		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag);
 		template<typename T>
 		inline int push(lua_State* l, const std::vector<T>& ref);
-		template<typename T>
-		inline int push(lua_State* l, std::vector<T>& ref);
 		//std::map
 		template<typename K, typename V>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >);
@@ -528,8 +475,6 @@ namespace kaguya
 		inline std::map<K, V> get(lua_State* l, int index, typetag<std::map<K, V> > tag);
 		template<typename K, typename V>
 		inline int push(lua_State* l, const std::map<K, V>& ref);
-		template<typename K, typename V>
-		inline int push(lua_State* l, std::map<K, V>& ref);
 #include "kaguya/gen/push_tuple.inl"
 
 
@@ -542,8 +487,6 @@ namespace kaguya
 				pointer->~T();
 			}
 		}
-
-
 	}
 
 };

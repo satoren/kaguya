@@ -553,6 +553,23 @@ namespace selector_test
 				TEST_CHECK((yieldnum == 10)) ;
 			}
 		}
+
+		void pointerfun(VariFoo* pointer)
+		{
+			TEST_CHECK(pointer == 0);
+		}
+		void const_pointerfun(VariFoo* pointer)
+		{
+			TEST_CHECK(pointer == 0);
+		}
+		void zero_to_nullpointer(kaguya::State& state)
+		{
+			state["pointerfun"] = kaguya::function(pointerfun);
+			TEST_CHECK(state("pointerfun(0)"));
+			state["const_pointerfun"] = kaguya::function(const_pointerfun);
+			TEST_CHECK(state("const_pointerfun(0)"));
+		}
+
 #if KAGUYA_USE_DECLTYPE
 		void lambdafun(kaguya::State& state)
 		{
@@ -1071,6 +1088,7 @@ int main()
 		ADD_TEST(selector_test::t_03_function::vector_and_map_from_table_mapping);
 		ADD_TEST(selector_test::t_03_function::vector_and_map_to_table_mapping);
 		ADD_TEST(selector_test::t_03_function::coroutine);
+		ADD_TEST(selector_test::t_03_function::zero_to_nullpointer);
 #if KAGUYA_USE_DECLTYPE
 		ADD_TEST(selector_test::t_03_function::lambdafun);
 

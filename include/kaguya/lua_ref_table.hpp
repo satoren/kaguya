@@ -174,11 +174,6 @@ namespace kaguya
 			table.push(l);
 			return 1;
 		}
-		template<typename T>
-		inline int push(lua_State* l, std::vector<T>& ref)
-		{
-			return push(l, const_cast<const std::vector<T>&>(ref));
-		}
 
 		//std::map
 		template<typename K, typename V>
@@ -233,11 +228,6 @@ namespace kaguya
 			}
 			table.push(l);
 			return 1;
-		}
-		template<typename K, typename V>
-		inline int push(lua_State* l, std::map<K, V>& ref)
-		{
-			return push(l, const_cast<const std::map<K, V>&>(ref));
 		}
 	}
 	namespace traits
