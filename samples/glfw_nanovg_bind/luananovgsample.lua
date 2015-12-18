@@ -1,3 +1,4 @@
+package.cpath = package.cpath .. ";?.dylib"
 glfw=require("luaglfw")
 nvg=require("luananovg")
 

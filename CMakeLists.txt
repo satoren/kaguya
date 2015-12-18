@@ -4,6 +4,7 @@ project(Kaguya)
 include(cmake/FindLua.cmake)
   
 include_directories(${LUA_INCLUDE_DIRS})
+link_directories(${LUA_LIBRARY_DIRS})
 include_directories("include")
 
 file(GLOB headers RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -19,8 +20,6 @@ if(NOT MSVC)#-Wall nonsense on MSVC
 add_definitions("-Wall")
 #add_definitions("-std=c++11")
 endif(NOT MSVC)
-
-
 
 link_directories(${LUA_LIBRARY_DIRS})
 add_executable(test_runner test/test.cpp ${testSources} ${headers})

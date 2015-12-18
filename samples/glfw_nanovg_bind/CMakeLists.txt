@@ -5,6 +5,7 @@ project (samplenanovgbind)
 include(../../cmake/FindLua.cmake)
 
 include_directories(${LUA_INCLUDE_DIRS})
+link_directories(${LUA_LIBRARY_DIRS})
 include_directories("../../include")#include kaguya dir
 
 
@@ -23,7 +24,7 @@ target_link_libraries(luaglfw glfw ${GLFW_LIBRARIES})
 SET_TARGET_PROPERTIES(luaglfw PROPERTIES OUTPUT_NAME luaglfw)
 SET_TARGET_PROPERTIES(luaglfw PROPERTIES PREFIX "")
 
-add_definitions("-std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include_directories(${GLAD_INCLUDE_DIRS})
 include_directories(nanovg/src)

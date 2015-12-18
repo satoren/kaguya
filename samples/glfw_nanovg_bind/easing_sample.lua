@@ -1,3 +1,4 @@
+package.cpath = package.cpath .. ";?.dylib"
 glfw=require("luaglfw")
 nvg=require("luananovg")
 easing=require("luaeasing")
@@ -30,6 +31,7 @@ end
         nvg.StrokeColor(ctx,self.frame_color);
         nvg.Stroke(ctx);
         self.progress = self.progress + t
+        
         if(self.current_function == "" or self.progress > self.ANIM_TIME + self.DISP_TIME)then        
             self.current_function = self.easingfunctionname[math.floor(math.random(1,#self.easingfunctionname))]
             print(self.current_function)
@@ -73,7 +75,6 @@ end
     local prevtime = os.clock();
 	local black = nvg.RGB(0,0,0);
     while (window:windowShouldClose() == 0) do
-        local currenttime = os.clock();
         local width,height = window:getFramebufferSize();
         nvg.glViewport(0,0,width,height);
         nvg.BeginFrame(context,width, height,1);
@@ -83,15 +84,13 @@ end
         
         nvg.FillColor(context,black);
         nvg.Fill(context);
-		graph:draw_graph(context,width*0.1,height*0.1,width*0.8,height*0.8,currenttime-prevtime,window)
+		graph:draw_graph(context,width*0.1,height*0.1,width*0.8,height*0.8,0.02,window)
         nvg.EndFrame(context);
         
         -- Swap front and back buffers 
         window:swapBuffers();
-
         -- Poll for and process events 
         glfw.PollEvents();
-        prevtime = currenttime;
     end
 
     glfw.Terminate();

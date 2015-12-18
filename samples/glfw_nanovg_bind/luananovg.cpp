@@ -12,10 +12,9 @@
 #ifdef USE_GLES2
 #define NANOVG_GLES2_IMPLEMENTATION
 #else
-#define NANOVG_GL3_IMPLEMENTATION
+#define NANOVG_GL2_IMPLEMENTATION
 #endif
 #include "nanovg_gl.h"
-#include "nanovg_gl_utils.h"
 
 
 using namespace kaguya;
@@ -38,11 +37,11 @@ namespace
 			exit(-1);
 		}
 //		printf("OpenGL Version %d.%d loaded", GLVersion.major, GLVersion.minor);
-		return nvgCreateGL3(flag);
+		return nvgCreateGL2(flag);
 	}
 	void Delete(NVGcontext* context)
 	{
-		nvgDeleteGL3(context);
+		nvgDeleteGL2(context);
 	}
 #endif
 
