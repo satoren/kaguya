@@ -76,11 +76,11 @@ namespace kaguya
 		};
 		template<int N>
 		struct lua_push_type<const char[N]> {
-			typedef const const char* type;
+			typedef const char* type;
 		};
 		template< >
 		struct lua_push_type<const char*> {
-			typedef const const char* type;
+			typedef const char* type;
 		};
 
 
