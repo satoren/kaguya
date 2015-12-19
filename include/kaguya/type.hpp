@@ -34,37 +34,13 @@ namespace kaguya
 
 
 		namespace nodirectuse {
-#ifdef NDEBUG
-			//faster but no human readable
-			struct metatableName_t
-			{
-				char metaname[16 + sizeof(intptr_t) * 2];//XXXXXXXX(ptrlen*(8/7))_kaguya_type
-				const char* c_str()const { return metaname; }
-				operator std::string()const { return metaname; }
-			};
+			typedef const std::string& metatableName_t;
 			template<typename T>
 			inline metatableName_t metatableNameNonCV(typetag<T>)
 			{
-				static const char* METATABLE_POST_FIX = "_kaguya_type\0";
-				metatableName_t result;
-				//hash_code is c++11 because use name ptr
-				uintptr_t  ptrvalue = uintptr_t(typeid(T*).name());
-				size_t pos = 0;
-				for (size_t s = 0; s < sizeof(uintptr_t) * 8; s += 7, pos++)
-				{
-					result.metaname[pos] = 0x80 | ((ptrvalue >> s) & 0x7F);
-				}
-				memcpy(&result.metaname[pos], METATABLE_POST_FIX, strlen(METATABLE_POST_FIX) + 1);
-				return result;
+				static const std::string v = typeid(T*).name() + std::string("_kaguya_type");
+				return v;
 			}
-#else
-			typedef std::string metatableName_t;
-			template<typename T>
-			inline metatableName_t metatableNameNonCV(typetag<T>)
-			{
-				return typeid(T*).name() + std::string("_kaguya_type");
-			}
-#endif
 			template<typename T>
 			inline metatableName_t metatableNameDispatch(typetag<T>)
 			{
