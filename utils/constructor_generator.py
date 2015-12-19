@@ -31,5 +31,6 @@ def generate_constructor_function(out,arg_num):
 
 if __name__ == "__main__":
 	import sys
+	sys.stdout.write('//generated header by ' + __file__ + "\n")
 	for i in range(10):
 		generate_constructor_function(sys.stdout,i)
