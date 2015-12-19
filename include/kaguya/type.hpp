@@ -391,7 +391,7 @@ namespace kaguya
 		template<typename T>
 		inline typename traits::arg_get_type<T>::type get(lua_State* l, int index, typetag<T> tag)
 		{
-			return detail::get(l, index, typetag<typename traits::arg_get_type_dispatch<T>::type>());
+			return static_cast<typename traits::arg_get_type<T>::type>(detail::get(l, index, typetag<typename traits::arg_get_type_dispatch<T>::type>()));
 		}
 
 		template<typename T>
