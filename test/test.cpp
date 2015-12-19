@@ -562,12 +562,19 @@ namespace selector_test
 		{
 			TEST_CHECK(pointer == 0);
 		}
+		void ignore_error_fun(int status, const char* message)
+		{
+		}
 		void zero_to_nullpointer(kaguya::State& state)
 		{
 			state["pointerfun"] = kaguya::function(pointerfun);
 			TEST_CHECK(state("pointerfun(0)"));
 			state["const_pointerfun"] = kaguya::function(const_pointerfun);
 			TEST_CHECK(state("const_pointerfun(0)"));
+
+			state.setErrorHandler(ignore_error_fun);
+			TEST_CHECK(!state("pointerfun(32)"));// is error
+
 		}
 
 #if KAGUYA_USE_DECLTYPE

@@ -201,8 +201,9 @@ namespace kaguya
 			template<typename T>
 			inline bool checkType(lua_State* l, int index, typetag<T*> tag)
 			{
-				return lua_type(l, index) == LUA_TLIGHTUSERDATA
-					|| lua_topointer(l, index) == 0 //allow zero for nullptr
+				int type = lua_type(l, index);
+				return type == LUA_TLIGHTUSERDATA
+					|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0) //allow zero for nullptr
 					|| luaL_testudata(l, index, metatableName<T>().c_str()) != 0
 					|| luaL_testudata(l, index, metatableName<standard::shared_ptr<typename traits::remove_const_reference<T>::type> >().c_str()) != 0
 					|| luaL_testudata(l, index, metatableName<MetaPointerWrapper<typename traits::remove_const_reference<T>::type> >().c_str()) != 0;
