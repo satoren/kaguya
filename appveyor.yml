@@ -20,4 +20,4 @@ build:
   project: Kaguya.sln
   verbosity: minimal
 test_script:
-- ps: Invoke-Expression ($env:Configuration+"\test_runner.exe")
+- ctest -V
