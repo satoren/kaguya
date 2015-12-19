@@ -57,7 +57,22 @@ namespace kaguya
 			}
 			return weak_match;
 		}
+		std::string build_arg_error_message(lua_State *l)
+		{
+			std::string message = "argument not matching" + util::argmentTypes(l) + "\t candidated\n";
 
+			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
+			for (int i = 0; i < overloadnum; ++i)
+			{
+				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
+				if (!fun || !(*fun))
+				{
+					continue;
+				}
+				message += std::string("\t\t") + (*fun)->argumentTypeNames() + "\n";
+			}
+			return message;
+		}
 		inline int functor_dispatcher(lua_State *l)
 		{
 			FunctorType* fun = pick_match_function(l);
@@ -75,19 +90,7 @@ namespace kaguya
 			}
 			else
 			{
-				std::string message = "argument not matching" + util::argmentTypes(l) + "\t candidated\n";
-
-				int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
-				for (int i = 0; i < overloadnum; ++i)
-				{
-					FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
-					if (!fun || !(*fun))
-					{
-						continue;
-					}
-					message += std::string("\t\t") + (*fun)->argumentTypeNames() + "\n";
-				}
-				util::traceBack(l, message.c_str());
+				util::traceBack(l, build_arg_error_message(l).c_str());
 			}
 			return lua_error(l);
 		}
