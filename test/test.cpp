@@ -358,6 +358,27 @@ namespace selector_test
 			const NoncopyableClass* noncpyref = state["noncopy"];
 			TEST_CHECK(noncpyref == &noncopy) ;
 		}
+
+		void registering_object_instance(kaguya::State& state)
+		{
+			state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
+				.addConstructor<int>()
+				.addMember("get_value", &ABC::getInt)
+				);
+
+			ABC abc(43);
+			//register object pointer
+			state["abc"] = &abc;
+			state("assert(43 == abc:get_value())");
+			//or copy instance
+			state["copy_abc"] = abc;
+			state("assert(43 == copy_abc:get_value())");
+			//or registering shared pointer
+			state["shared_abc"] = kaguya::standard::shared_ptr<ABC>(new ABC(43));//kaguya::standard::shared_ptr is std::shared_ptr or boost::shared_ptr.
+			state("assert(43 == shared_abc:get_value())");
+		}
+
+		
 	}
 
 	namespace t_03_function
@@ -921,8 +942,13 @@ namespace selector_test
 			TEST_CHECK(test(state, 1, state.newRef(1))) ;
 			TEST_CHECK(test(state, "test", state.newRef("test"))) ;
 			TEST_CHECK(test(state, false, state.newRef(false))) ;
-			TEST_CHECK(test(state, 5.674f, state.newRef(5.674f))) ;
-			TEST_CHECK(test(state, 5.674, state.newRef(5.674))) ;
+			TEST_CHECK(test(state, 5.674f, state.newRef(5.674f)));
+			TEST_CHECK(test(state, 5.674, state.newRef(5.674)));
+			TEST_CHECK(test(state, state.newRef(5.674f), 5.674f));
+			TEST_CHECK(test(state, state.newRef(5.674), 5.674));
+			TEST_CHECK(test(state, state.newRef(short(5)), short(5)));
+			TEST_CHECK(test(state, state.newRef(long(5)), long(5)));
+
 			{
 				std::map<std::string, int> setmap;
 				setmap["3"] = 23232;
@@ -1033,24 +1059,6 @@ bool execute_test(const test_function_map_t& testmap)
 	return !fail;
 }
 
-void ignore_error_handler(int status, const char* message)
-{
-}
-bool microbenchmark(const test_function_map_t& testmap)
-{
-	kaguya::State state; state.openlibs();
-	state.setErrorHandler(ignore_error_handler);
-	for (int i = 0; i < 10000; ++i)
-	{
-		for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it)
-		{
-			it->second(state);
-		}
-	}
-
-	return true;
-}
-
 int main()
 {
 	bool test_result = false;
@@ -1084,6 +1092,7 @@ int main()
 		ADD_TEST(selector_test::t_02_classreg::add_field);
 		ADD_TEST(selector_test::t_02_classreg::copyable_class_test);
 		ADD_TEST(selector_test::t_02_classreg::noncopyable_class_test);
+		ADD_TEST(selector_test::t_02_classreg::registering_object_instance);
 
 
 
@@ -1124,8 +1133,6 @@ int main()
 		ADD_TEST(selector_test::t_07_any_type_test::any_type_test);
 
 		test_result = execute_test(testmap);
-
-		//		microbenchmark(testmap);
 	}
 	return test_result ? 0 : -1;
 }

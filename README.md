@@ -12,7 +12,7 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
 
 ## Introduction
-Kaguya is Lua binding library for C++ 
+Kaguya is Lua binding library for C++
 - header-file only
 - can use for lua module system
 
@@ -62,12 +62,12 @@ extern "C" int luaopen_modulename(lua_State *L)
   state("a = \"test\"");
   std::string a_value = state["a"];
   assert(a_value == "test");
-  
+
   state["tbl"] = kaguya::NewTable();//tbl ={};
   state["tbl"]["value"] = 1;//tbl.value = 1 in lua
-  
+
   state("assert(tbl.value == 1)");
-  
+
 ```
 
 
@@ -109,8 +109,15 @@ state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 	.addMember("set_value", &ABC::setValue)
 	);
 	ABC abc(43);
+  //register object pointer
 	state["abc"] = &abc;
-	state("assert(43 == abc:get_value())")
+	state("assert(43 == abc:get_value())");
+  //or copy instance
+	state["copy_abc"] = abc;
+	state("assert(43 == copy_abc:get_value())");
+  //or registering shared instance
+	state["shared_abc"] = kaguya::standard::shared_ptr<ABC>(new ABC(43));//kaguya::standard::shared_ptr is std::shared_ptr or boost::shared_ptr.
+	state("assert(43 == shared_abc:get_value())");
 ```
 
 #### Registering function
