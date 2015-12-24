@@ -120,4 +120,53 @@ namespace kaguya
 			return 0;
 		}
 	};
+
+	namespace except
+	{
+		void OtherError(lua_State *state, const std::string& message)
+		{
+			ErrorHandler::instance().handle(message.c_str(), state);
+#if !KAGUYA_ERROR_NO_THROW
+			throw LuaKaguyaError(message);
+#endif
+		}
+		void typeMismatchError(lua_State *state, const std::string& message)
+		{
+			ErrorHandler::instance().handle(message.c_str(), state);
+#if !KAGUYA_ERROR_NO_THROW
+			throw LuaTypeMismatch(message);
+#endif
+		}
+		bool checkErrorAndThrow(int status, lua_State *state)
+		{
+			if (status != 0 && status != LUA_YIELD)
+			{
+				ErrorHandler::instance().handle(status, state);
+#if !KAGUYA_ERROR_NO_THROW
+				const char* message = 0;
+				switch (status)
+				{
+				case LUA_ERRSYNTAX:
+					message = lua_tostring(state, -1);
+					throw LuaSyntaxError(status, message ? std::string(message) : "unknown syntax error");
+				case LUA_ERRRUN:
+					message = lua_tostring(state, -1);
+					throw LuaRuntimeError(status, message ? std::string(message) : "unknown runtime error");
+				case LUA_ERRMEM:
+					throw LuaMemoryError(status, "lua memory allocation error");
+				case LUA_ERRERR:
+					message = lua_tostring(state, -1);
+					throw LuaRunningError(status, message ? std::string(message) : "unknown error");
+				case LUA_ERRGCMM:
+					message = lua_tostring(state, -1);
+					throw LuaGCError(status, message ? std::string(message) : "unknown gc error");
+				default:
+					throw LuaUnknownError(status, "lua unknown error");
+				}
+#endif
+				return false;
+			}
+			return true;
+		}
+	}
 };

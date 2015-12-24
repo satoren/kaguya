@@ -4,7 +4,7 @@
 #include <map>
 #include <cassert>
 #include "kaguya/config.hpp"
-#include "kaguya/exception.hpp"
+#include "kaguya/error_handler.hpp"
 #include "kaguya/type.hpp"
 #include "kaguya/utility.hpp"
 

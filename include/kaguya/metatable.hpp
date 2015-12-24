@@ -191,15 +191,15 @@ namespace kaguya
 		}
 		void registerMember(lua_State* state)const
 		{
-			for (FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
+			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
 			{
 				registerFunction(state, it->first.c_str(), it->second);
 			}
-			for (ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
+			for (typename ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
 			{
 				registerField(state, it->first.c_str(), it->second);
 			}
-			for (CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
+			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
 			{
 				registerCodeChunk(state, it->first.c_str(), it->second);
 			}

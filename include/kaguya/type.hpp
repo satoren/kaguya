@@ -85,7 +85,8 @@ namespace kaguya
 		{
 			template<typename T>bool get_metatable(lua_State* l)
 			{
-				return luaL_getmetatable(l, metatableName<T>().c_str());
+				luaL_getmetatable(l, metatableName<T>().c_str());
+				return LUA_TNIL != lua_type(l, -1);
 			}
 			template<typename T>bool available_metatable(lua_State* l)
 			{
@@ -140,7 +141,7 @@ namespace kaguya
 				}
 				if (!ptr)
 				{
-					standard::shared_ptr<T>* shared_ptr = class_userdata::test_userdata<standard::shared_ptr<T>>(l, index);
+					standard::shared_ptr<T>* shared_ptr = class_userdata::test_userdata<standard::shared_ptr<T> >(l, index);
 					if (shared_ptr) { ptr = shared_ptr->get(); }
 				}
 
