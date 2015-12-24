@@ -3486,7 +3486,7 @@ struct ConstructorInvoker0:BaseInvoker{
   {
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3511,7 +3511,7 @@ struct ConstructorInvoker1:BaseInvoker{
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3538,7 +3538,7 @@ struct ConstructorInvoker2:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3567,7 +3567,7 @@ struct ConstructorInvoker3:BaseInvoker{
     typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3598,7 +3598,7 @@ struct ConstructorInvoker4:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3631,7 +3631,7 @@ struct ConstructorInvoker5:BaseInvoker{
     typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3666,7 +3666,7 @@ struct ConstructorInvoker6:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3703,7 +3703,7 @@ struct ConstructorInvoker7:BaseInvoker{
     typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3742,7 +3742,7 @@ struct ConstructorInvoker8:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){
@@ -3783,7 +3783,7 @@ struct ConstructorInvoker9:BaseInvoker{
     typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
   void *storage = lua_newuserdata(state, sizeof(CLASS));
     types::constructor<CLASS>(storage,t1,t2,t3,t4,t5,t6,t7,t8,t9);
-    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+    types::class_userdata::setmetatable<CLASS>(state);
     return 1;
   }
   virtual std::string argumentTypeNames(){

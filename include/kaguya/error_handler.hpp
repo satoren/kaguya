@@ -3,6 +3,7 @@
 #include <string>
 
 #include "kaguya/config.hpp"
+#include "kaguya/type.hpp"
 
 
 #define KAGUYA_ERROR_HANDLER_METATABLE "error_handler_kaguya_metatype"
@@ -65,7 +66,7 @@ namespace kaguya
 			{
 				util::ScopedSavedStack save(state);
 				lua_pushlightuserdata(state, this);
-				if (luaL_newmetatable(state, KAGUYA_ERROR_HANDLER_METATABLE))//register error handler destructor to Lua state
+				if (types::class_userdata::newmetatable<function_type>(state))//register error handler destructor to Lua state
 				{
 					lua_pushcclosure(state, &error_handler_cleanner, 0);
 					lua_setfield(state, -2, "__gc");
@@ -74,7 +75,7 @@ namespace kaguya
 					if (!ptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 					function_type* funptr = new(ptr) function_type();
 					if (!funptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
-					luaL_setmetatable(state, KAGUYA_ERROR_HANDLER_METATABLE);
+					types::class_userdata::setmetatable<function_type>(state);
 					lua_settable(state, LUA_REGISTRYINDEX);
 					*funptr = f;
 				}

@@ -54,22 +54,17 @@ namespace kaguya
 			return *this;
 		}
 
-		template<typename T>
-		void setClass(const ClassMetatable<T>& reg, bool auto_reg_shared_ptr = true)
+		template<typename T,typename P>
+		void setClass(const ClassMetatable<T,P>& reg, bool auto_reg_shared_ptr = true)
 		{
-			set_meta_table(reg);
-
+			set_class(reg);
 			static_cast<LuaRef&>(*this) = parent_.getField(key_);
 
-			(*this)["ptr_wrapper"].set_meta_table(Metatable(types::metatableName<MetaPointerWrapper<T> >(), reg.name()));
+			(*this)["ptr_wrapper"].set_class(ClassMetatable<MetaPointerWrapper<T>,T>());
 			if (auto_reg_shared_ptr)
 			{
-				(*this)["shared_ptr"].set_meta_table(ClassMetatable<standard::shared_ptr<T> >(reg.name()));
+				(*this)["shared_ptr"].set_class(ClassMetatable<standard::shared_ptr<T>,T >());
 			}
-		}
-		void setMetatable(const Metatable& reg)
-		{
-			set_meta_table(reg);
 		}
 
 		template<typename T>
@@ -78,13 +73,13 @@ namespace kaguya
 			parent_.setField(key_, nativefunction::FunctorType(nativefunction::create(f)));
 		}
 	private:
-
-		void set_meta_table(const Metatable& reg)
+		template<typename T,typename P>
+		void set_class(const ClassMetatable<T,P>& reg)
 		{
 			util::ScopedSavedStack save(state_);
 			parent_.push(state_);
 			key_.push(state_);
-			reg.registerTable(state_);
+			reg.registerClass(state_);
 
 			lua_settable(state_, -3);
 		}
@@ -117,7 +112,7 @@ namespace kaguya
 	namespace types
 	{
 
-		//vector and map to Lua table 
+		//vector and map to Lua table
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >)
 		{

@@ -7,14 +7,7 @@
 
 namespace selector_test
 {
-	std::string to_string(int n)
-	{
-		char buffer[32];
-		sprintf(buffer,"%d",n);
-		return buffer;
-	}
-	 
-#define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + to_string(__LINE__) + "\nCHECKCODE:" #B );
+#define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #B );
 	namespace t_01_primitive
 	{
 		void bool_get(kaguya::State& state)
@@ -595,6 +588,7 @@ namespace selector_test
 
 			state.setErrorHandler(ignore_error_fun);
 			TEST_CHECK(!state("pointerfun(32)"));// is error
+			TEST_CHECK(!state("pointerfun('232')"));// is error
 
 		}
 

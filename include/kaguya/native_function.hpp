@@ -9,7 +9,6 @@
 #include "kaguya/lua_ref.hpp"
 
 
-#define KAGUYA_FUNCTOR_METATABLE "functor_kaguya_metatype"
 namespace kaguya
 {
 	namespace nativefunction
@@ -97,13 +96,16 @@ namespace kaguya
 
 		inline int functor_destructor(lua_State *state)
 		{
-			FunctorType* f = (FunctorType*)luaL_checkudata(state, 1, KAGUYA_FUNCTOR_METATABLE);
-			f->~FunctorType();
+			FunctorType* f = types::class_userdata::test_userdata<FunctorType>(state, 1);
+			if (f)
+			{
+				f->~FunctorType();
+			}
 			return 0;
 		}
 		inline void reg_functor_destructor(lua_State* state)
 		{
-			if (luaL_newmetatable(state, KAGUYA_FUNCTOR_METATABLE))
+			if (types::class_userdata::newmetatable<FunctorType>(state))
 			{
 				lua_pushcclosure(state, &functor_destructor, 0);
 				lua_setfield(state, -2, "__gc");
@@ -200,7 +202,12 @@ namespace kaguya
 		template<>
 		inline nativefunction::FunctorType get(lua_State* l, int index, typetag<nativefunction::FunctorType> tag)
 		{
-			return *(static_cast<nativefunction::FunctorType*>(luaL_checkudata(l, index, KAGUYA_FUNCTOR_METATABLE)));
+			nativefunction::FunctorType* ptr = types::class_userdata::test_userdata<nativefunction::FunctorType>(l, index);
+			if (ptr)
+			{
+				return *ptr;
+			}
+			return nativefunction::FunctorType();
 		}
 		template<>
 		inline int push(lua_State* l, const nativefunction::FunctorType& f)
@@ -208,7 +215,7 @@ namespace kaguya
 			lua_pushnumber(l, 1);//no overload
 			void *storage = lua_newuserdata(l, sizeof(nativefunction::FunctorType));
 			new(storage) nativefunction::FunctorType(f);
-			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
+			types::class_userdata::setmetatable<FunctorType>(l);
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}
@@ -218,7 +225,7 @@ namespace kaguya
 			lua_pushnumber(l, 1);//no overload
 			void *storage = lua_newuserdata(l, sizeof(nativefunction::FunctorType));
 			new(storage) nativefunction::FunctorType(standard::forward<nativefunction::FunctorType>(f));
-			luaL_setmetatable(l, KAGUYA_FUNCTOR_METATABLE);
+			types::class_userdata::setmetatable<FunctorType>(l);
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;
 		}

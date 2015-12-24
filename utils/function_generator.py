@@ -285,7 +285,7 @@ def constructor_function(out,arg_num):
 		out.write(',')
 		args(out,arg_num,'t')
 	out.write(');\n')
-	out.write('    luaL_setmetatable(state, types::metatableName<CLASS>().c_str());\n')
+	out.write('    types::class_userdata::setmetatable<CLASS>(state);\n')
 	out.write('    return 1;\n')
 	out.write('  }\n')
 	out.write(arg_typenames(arg_num))

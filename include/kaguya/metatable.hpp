@@ -12,7 +12,8 @@
 namespace kaguya
 {
 
-	struct Metatable
+	template<typename class_type,typename parent_type = void>
+	struct ClassMetatable
 	{
 		struct ValueType
 		{
@@ -37,160 +38,29 @@ namespace kaguya
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
 
-
-		Metatable(std::string name) :metatableName_(name)
+		ClassMetatable()
 		{
-		}
-		Metatable(std::string name, std::string parent_name) :metatableName_(name), parent_metatableName_(parent_name)
-		{
+			FunctorType dtor(kaguya::nativefunction::create(&types::destructor<class_type>));
+			function_map_["__gc"].push_back(dtor);
 		}
 
-		const std::string name()const { return metatableName_; }
-
-
-		template<typename Fun>
-		Metatable& addFunction(const char* name, Fun f)
+		void registerClass(lua_State* state)const
 		{
-			FunctorType fun(kaguya::nativefunction::create(f));
-			function_map_[name].push_back(fun);
-			return *this;
-		}
-
-		Metatable& addField(const char* name, const std::string& str)
-		{
-			return addField(name, str.c_str());
-		}
-		Metatable& addField(const char* name, const char* str)
-		{
-			value_map_[name] = ValueType(str);
-			return *this;
-		}
-		Metatable& addField(const char* name, double v)
-		{
-			value_map_[name] = ValueType(v);
-			return *this;
-		}
-		Metatable& addField(const char* name, long long v)
-		{
-			value_map_[name] = ValueType(v);
-			return *this;
-		}
-		Metatable& addField(const char* name, int v)
-		{
-			value_map_[name] = ValueType(v);
-			return *this;
-		}
-
-		Metatable& addCodeChunkResult(const char* name, const std::string& lua_code_chunk)
-		{
-			code_chunk_map_[name] = lua_code_chunk;
-			return *this;
-		}
-
-
-		void registerTable(lua_State* state)const
-		{
-			if (luaL_newmetatable(state, metatableName_.c_str()))
+			if (types::class_userdata::newmetatable<class_type>(state))
 			{
 				registerMember(state);
 				lua_pushvalue(state, -1);
 				lua_setfield(state, -1, "__index");
 
-				if (!parent_metatableName_.empty())
+				if ( !traits::is_void<parent_type>::value)
 				{
-					luaL_setmetatable(state, parent_metatableName_.c_str());
+					types::class_userdata::setmetatable<parent_type>(state);
 				}
 			}
 			else
 			{
-				except::OtherError(state, metatableName_ + " is already registered");
+				except::OtherError(state,typeid(class_type).name() +  std::string("is already registered"));
 			}
-		}
-	protected:
-		bool has_key(const std::string& key, bool exclude_function = false)
-		{
-			if (!exclude_function && function_map_.find(key) != function_map_.end())
-			{
-				return true;
-			}
-			if (value_map_.find(key) != value_map_.end())
-			{
-				return true;
-			}
-			return false;
-		}
-		void registerFunction(lua_State* state, const char* name, const FuncArrayType& func_array)const
-		{
-			int funcnum = int(func_array.size());
-			if (funcnum == 0) { return; }
-			types::push(state, funcnum);
-			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
-			{
-				void *storage = lua_newuserdata(state, sizeof(FunctorType));
-				new(storage) FunctorType(*f);
-				luaL_setmetatable(state, KAGUYA_FUNCTOR_METATABLE);
-			}
-			lua_pushcclosure(state, &nativefunction::functor_dispatcher, funcnum + 1);
-			lua_setfield(state, -2, name);
-		}
-		void registerField(lua_State* state, const char* name, const ValueType& value)const
-		{
-			if (value.type == ValueType::str_value)
-			{
-				types::push(state, value.strvalue);
-			}
-			else if (value.type == ValueType::int_value)
-			{
-				types::push(state, value.ivalue);
-			}
-			else if (value.type == ValueType::double_value)
-			{
-				types::push(state, value.dvalue);
-			}
-			else
-			{
-				assert(false);
-			}
-			lua_setfield(state, -2, name);
-		}
-		void registerCodeChunk(lua_State* state, const char* name, std::string value)const
-		{
-			util::ScopedSavedStack save(state);
-			int status = luaL_loadstring(state, value.c_str());
-			if (!except::checkErrorAndThrow(status, state)) { return; }
-			status = lua_pcall(state, 0, 1, 0);
-			if (!except::checkErrorAndThrow(status, state)) { return; }
-			lua_setfield(state, -2, name);
-		}
-		void registerMember(lua_State* state)const
-		{
-			for (FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
-			{
-				registerFunction(state, it->first.c_str(), it->second);
-			}
-			for (ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
-			{
-				registerField(state, it->first.c_str(), it->second);
-			}
-			for (CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
-			{
-				registerCodeChunk(state, it->first.c_str(), it->second);
-			}
-		}
-		FuncMapType function_map_;
-		ValueMapType value_map_;
-		CodeChunkMapType code_chunk_map_;
-		std::string metatableName_;
-		std::string parent_metatableName_;
-	};
-
-	template<typename class_type>
-	struct ClassMetatable :Metatable
-	{
-		ClassMetatable(std::string parent_metatable = "") :Metatable(types::metatableName<class_type>(), parent_metatable)
-		{
-			FunctorType dtor(kaguya::nativefunction::create(&types::destructor<class_type>));
-			function_map_["__gc"].push_back(dtor);
 		}
 
 #include "gen/add_constructor.inl"
@@ -245,7 +115,7 @@ namespace kaguya
 		//add field to 
 		ClassMetatable& addCodeChunkResult(const char* name, const std::string& lua_code_chunk)
 		{
-			Metatable::addCodeChunkResult(name, lua_code_chunk);
+			code_chunk_map_[name] = lua_code_chunk;
 			return *this;
 		}
 
@@ -261,5 +131,113 @@ namespace kaguya
 			addField(name, f);
 			return *this;
 		}
+
+	private:
+
+		bool has_key(const std::string& key, bool exclude_function = false)
+		{
+			if (!exclude_function && function_map_.find(key) != function_map_.end())
+			{
+				return true;
+			}
+			if (value_map_.find(key) != value_map_.end())
+			{
+				return true;
+			}
+			return false;
+		}
+		void registerFunction(lua_State* state, const char* name, const FuncArrayType& func_array)const
+		{
+			int funcnum = int(func_array.size());
+			if (funcnum == 0) { return; }
+			types::push(state, funcnum);
+			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
+			{
+				void *storage = lua_newuserdata(state, sizeof(FunctorType));
+				new(storage) FunctorType(*f);
+				types::class_userdata::setmetatable<FunctorType>(state);
+			}
+			lua_pushcclosure(state, &nativefunction::functor_dispatcher, funcnum + 1);
+			lua_setfield(state, -2, name);
+		}
+		void registerField(lua_State* state, const char* name, const ValueType& value)const
+		{
+			if (value.type == ValueType::str_value)
+			{
+				types::push(state, value.strvalue);
+			}
+			else if (value.type == ValueType::int_value)
+			{
+				types::push(state, value.ivalue);
+			}
+			else if (value.type == ValueType::double_value)
+			{
+				types::push(state, value.dvalue);
+			}
+			else
+			{
+				assert(false);
+			}
+			lua_setfield(state, -2, name);
+		}
+		void registerCodeChunk(lua_State* state, const char* name, std::string value)const
+		{
+			util::ScopedSavedStack save(state);
+			int status = luaL_loadstring(state, value.c_str());
+			if (!except::checkErrorAndThrow(status, state)) { return; }
+			status = lua_pcall(state, 0, 1, 0);
+			if (!except::checkErrorAndThrow(status, state)) { return; }
+			lua_setfield(state, -2, name);
+		}
+		void registerMember(lua_State* state)const
+		{
+			for (FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
+			{
+				registerFunction(state, it->first.c_str(), it->second);
+			}
+			for (ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
+			{
+				registerField(state, it->first.c_str(), it->second);
+			}
+			for (CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
+			{
+				registerCodeChunk(state, it->first.c_str(), it->second);
+			}
+		}
+		ClassMetatable& addField(const char* name, const std::string& str)
+		{
+			return addField(name, str.c_str());
+		}
+		ClassMetatable& addField(const char* name, const char* str)
+		{
+			value_map_[name] = ValueType(str);
+			return *this;
+		}
+		ClassMetatable& addField(const char* name, double v)
+		{
+			value_map_[name] = ValueType(v);
+			return *this;
+		}
+		ClassMetatable& addField(const char* name, long long v)
+		{
+			value_map_[name] = ValueType(v);
+			return *this;
+		}
+		ClassMetatable& addField(const char* name, int v)
+		{
+			value_map_[name] = ValueType(v);
+			return *this;
+		}
+		template<typename Fun>
+		ClassMetatable& addFunction(const char* name, Fun f)
+		{
+			FunctorType fun(kaguya::nativefunction::create(f));
+			function_map_[name].push_back(fun);
+			return *this;
+		}
+
+		FuncMapType function_map_;
+		ValueMapType value_map_;
+		CodeChunkMapType code_chunk_map_;
 	};
 };

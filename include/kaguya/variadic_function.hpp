@@ -291,7 +291,7 @@ namespace kaguya
 				}
 				void *storage = lua_newuserdata(state, sizeof(CLASS));
 				types::constructor<CLASS>(storage, args);
-				luaL_setmetatable(state, types::metatableName<CLASS>().c_str());
+				types::class_userdata::setmetatable<CLASS>(state);
 				return 1;
 			}
 			virtual std::string argumentTypeNames() {

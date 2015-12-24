@@ -1,3 +1,4 @@
+//generated header by constructor_generator.py
 template<typename CLASS>
 CLASS* constructor(void* pointer)
 {

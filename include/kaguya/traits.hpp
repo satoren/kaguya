@@ -15,6 +15,16 @@ namespace kaguya
 
 
 		template< typename T >
+		struct is_void :integral_constant<bool, false>
+		{
+		};
+		template<>
+		struct is_void<void> :integral_constant<bool, true>
+		{
+		};
+		
+
+		template< typename T >
 		struct remove_const_reference {
 			typedef typename remove_const<typename remove_reference<T>::type>::type type;
 		};
