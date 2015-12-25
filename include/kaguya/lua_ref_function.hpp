@@ -224,10 +224,10 @@ namespace kaguya
 
 		void evaluate(int resultnum)const
 		{
-			util::ScopedSavedStack save(state_,0);
 
 			if (eval_info_&& eval_info_->owner == this && !eval_info_->invoked)
 			{
+				util::ScopedSavedStack save(state_, 0);
 				eval_info_->invoked = true;
 				const std::vector<LuaRef>& args = eval_info_->args;
 				if (eval_info_->coroutine)
