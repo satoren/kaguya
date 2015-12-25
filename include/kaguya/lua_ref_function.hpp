@@ -13,6 +13,149 @@
 
 namespace kaguya
 {
+
+	class LuaFunction :private LuaRef
+	{
+	public:
+		LuaFunction() :LuaRef()
+		{
+		}
+		LuaFunction(const LuaRef& ref) :LuaRef(ref)
+		{
+			if (ref.type() != TYPE_FUNCTION)
+			{
+				except::typeMismatchError(state_, "not function");
+				LuaRef::unref();
+			}
+		}
+		using LuaRef::operator();
+		using LuaRef::setFunctionEnv;
+		using LuaRef::getFunctionEnv;
+		using LuaRef::isNilref;
+		using LuaRef::push;
+
+		bool operator==(const LuaFunction& other)const
+		{
+			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
+		}
+		bool operator!=(const LuaFunction& other)const
+		{
+			return !(*this == other);
+		}
+		bool operator<=(const LuaFunction& other)const
+		{
+			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
+		}
+		bool operator<(const LuaFunction& other)const
+		{
+			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
+		}
+		bool operator>=(const LuaFunction& other)const
+		{
+			return other <= *this;
+		}
+		bool operator>(const LuaFunction& other)const
+		{
+			return other < *this;
+		}
+	};
+	class LuaThread:private LuaRef
+	{
+	public:
+		LuaThread() :LuaRef()
+		{
+		}
+		LuaThread(lua_State* state) :LuaRef(state, NewThread())
+		{
+		}
+		LuaThread(const LuaRef& ref) :LuaRef(ref)
+		{
+			if (ref.type() != TYPE_THREAD)
+			{
+				except::typeMismatchError(state_, "not lua thread");
+				LuaRef::unref();
+			}
+		}
+		using LuaRef::operator();
+		using LuaRef::isNilref;
+		using LuaRef::push;
+		using LuaRef::threadStatus;
+		using LuaRef::isThreadDead;
+
+		bool operator==(const LuaThread& other)const
+		{
+			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
+		}
+		bool operator!=(const LuaThread& other)const
+		{
+			return !(*this == other);
+		}
+		bool operator<=(const LuaThread& other)const
+		{
+			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
+		}
+		bool operator<(const LuaThread& other)const
+		{
+			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
+		}
+		bool operator>=(const LuaThread& other)const
+		{
+			return other <= *this;
+		}
+		bool operator>(const LuaThread& other)const
+		{
+			return other < *this;
+		}
+	};
+
+	namespace types
+	{
+		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaThread>)
+		{
+			return lua_isthread(l, index);
+		}
+		template<>
+		inline bool checkType(lua_State* l, int index, typetag<LuaThread>)
+		{
+			return lua_isthread(l, index);
+		}
+		template<>
+		inline LuaThread get(lua_State* l, int index, typetag<LuaThread> tag)
+		{
+			lua_pushvalue(l, index);
+			return LuaRef(l, StackTop());
+		}
+		template<>
+		inline int push(lua_State* l, const LuaThread& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+
+		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaFunction>)
+		{
+			return lua_isfunction(l, index);
+		}
+		template<>
+		inline bool checkType(lua_State* l, int index, typetag<LuaFunction>)
+		{
+			return lua_isfunction(l, index);
+		}
+		template<>
+		inline LuaFunction get(lua_State* l, int index, typetag<LuaFunction> tag)
+		{
+			lua_pushvalue(l, index);
+			return LuaRef(l, StackTop());
+		}
+		template<>
+		inline int push(lua_State* l, const LuaFunction& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+	}
 	class FunEvaluator
 	{
 	public:
@@ -81,7 +224,7 @@ namespace kaguya
 
 		void evaluate(int resultnum)const
 		{
-			util::ScopedSavedStack save(state_);
+			util::ScopedSavedStack save(state_,0);
 
 			if (eval_info_&& eval_info_->owner == this && !eval_info_->invoked)
 			{
@@ -93,7 +236,7 @@ namespace kaguya
 					{
 						args[i].push(state_);
 					}
-					int argnum = int(args.size());
+					int argnum = lua_gettop(state_);
 #if LUA_VERSION_NUM >= 502
 					int result = lua_resume(state_, 0, argnum > 0 ? argnum - 1 : 0);
 #else

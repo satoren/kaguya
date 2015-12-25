@@ -527,10 +527,24 @@ namespace selector_test
 				int r2 = cor();
 				int r3 = cor();
 				TEST_CHECK((r1 == 32 && r2 == 53 && r3 == 2)) ;
+
+				TEST_CHECK(state("cor3 = coroutine.create( function(arg)"
+					"coroutine.yield(arg) "
+					"coroutine.yield(arg*2) "
+					"coroutine.yield(arg*3) "
+					"return arg*4 "
+					" end)"));
+
+				kaguya::LuaThread cor3 = state["cor3"];
+				std::vector<int> results;
+				while(!cor3.isThreadDead())
+				{
+					results.push_back(cor3(3));
+				}
+				TEST_CHECK((results.size() == 4 && results[0] == 3 && results[1] == 6 && results[2] == 9 && results[3] == 12));
 			}
 			{
-				state["cor2"] = kaguya::NewThread();
-				kaguya::LuaRef cor2 = state["cor2"];
+				kaguya::LuaThread cor2 = state.newRef(kaguya::NewThread());
 				TEST_CHECK(state("corfun = function(arg)"
 					"coroutine.yield(arg) "
 					"coroutine.yield(arg*2) "
@@ -538,7 +552,7 @@ namespace selector_test
 					"return arg*4 "
 					" end")) ;
 
-				kaguya::LuaRef corfun = state["corfun"];
+				kaguya::LuaFunction corfun = state["corfun"];
 				int r1 = cor2(corfun, 3);
 				int r2 = cor2();
 				int r3 = cor2();
@@ -558,7 +572,7 @@ namespace selector_test
 				kaguya::LuaRef corfun = state["corfun"];
 				cor2(corfun, 10);
 				int yieldnum = 0;
-				while (cor2.thread_status() == LUA_YIELD)
+				while (cor2.threadStatus() == LUA_YIELD)
 				{
 					cor2();
 					yieldnum++;
@@ -671,7 +685,7 @@ namespace selector_test
 
 		void callfunction(kaguya::State& state)
 		{
-			kaguya::LuaRef globalTable = state.globalTable();
+			kaguya::LuaTable globalTable = state.globalTable();
 			globalTable["tbl"] = kaguya::NewTable();
 			kaguya::LuaRef tbl = globalTable["tbl"];
 
@@ -781,7 +795,7 @@ namespace selector_test
 
 		void function_env(kaguya::State& state)
 		{
-			kaguya::LuaRef fun = state.loadstring("foo='bar'");
+			kaguya::LuaFunction fun = state.loadstring("foo='bar'");
 
 			fun.setFunctionEnv(kaguya::NewTable());
 			fun();
@@ -791,6 +805,28 @@ namespace selector_test
 			TEST_CHECK("assert(functionEnv.foo == 'bar')");
 		}
 
+
+		void lua_table_get(kaguya::State& state)
+		{
+			state("value={out=32,str=\"gjgj\"}");
+			state("value[\"in\"] = \"test\"");
+			kaguya::LuaTable table = state["value"];
+
+			TEST_CHECK(table["str"] == "gjgj" && table["in"] == "test" &&  table["out"] == 32);
+
+			table.isNilref();
+		}
+
+		void lua_table_set(kaguya::State& state)
+		{
+			kaguya::LuaTable globalTable = state.globalTable();
+			state["value"] = kaguya::NewTable();
+			state["value"]["abc"] = kaguya::NewTable();
+			state["value"]["abc"]["def"] = 7;
+			state["value"]["abc"]["bbb"] = "test";
+			TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")"));
+		}		
+		
 	}
 
 	namespace t_05_error_handler
@@ -1113,6 +1149,8 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::typetest);
 		ADD_TEST(selector_test::t_04_lua_ref::luafun_callback);
 		ADD_TEST(selector_test::t_04_lua_ref::function_env);
+		ADD_TEST(selector_test::t_04_lua_ref::lua_table_get);
+		ADD_TEST(selector_test::t_04_lua_ref::lua_table_set);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);

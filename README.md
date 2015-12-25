@@ -14,7 +14,9 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 ## Introduction
 Kaguya is Lua binding library for C++
 - header-file only
+- seamless access to lua elements
 - can use for lua module system
+
 
 ## run test
 ```
@@ -140,18 +142,26 @@ state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
 
 #### Coroutine
 ```c++
-state["cor"] = kaguya::NewThread();//create coroutine
-kaguya::LuaRef cor = state["cor"];
+kaguya::LuaThread cor = state.newThread();
 state("corfun = function(arg)"
 "coroutine.yield(arg) "
 "coroutine.yield(arg*2) "
 "coroutine.yield(arg*3) "
 "return arg*4 "
 " end");//define corouine function
-kaguya::LuaRef corfun = state["corfun"];//function get
+
+kaguya::LuaFunction corfun = state["corfun"];//lua function get
+
 //exec coroutine with function and argment
 std::cout << int(cor(corfun, 3)) << std::endl;//3
 std::cout << int(cor()) << std::endl;//6
 std::cout << int(cor()) << std::endl;//9
 std::cout << int(cor()) << std::endl;//12
+
+kaguya::LuaThread cor2 = state.newThread();
+//3,6,9,12,
+while(!cor2.isThreadDead())
+{
+    std::cout << int(cor2(corfun, 3)) << ",";
+}
 ```

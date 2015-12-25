@@ -9,10 +9,131 @@
 
 namespace kaguya
 {
+	struct LuaUserData :private LuaRef
+	{
+		LuaUserData() :LuaRef()
+		{
+		}
+		LuaUserData(const LuaRef& ref) :LuaRef(ref)
+		{
+			if (ref.type() != TYPE_USERDATA)
+			{
+				except::typeMismatchError(state_, "not user data");
+				LuaRef::unref();
+			}
+		}
+		using LuaRef::getField;
+		using LuaRef::keys;
+		using LuaRef::values;
+		using LuaRef::map;
+
+		LuaRef operator[](const LuaRef& key)const
+		{
+			return LuaRef::operator[](key);
+		}
+		LuaRef operator[](const char* key)const
+		{
+			return LuaRef::operator[](key);
+		}
+		LuaRef operator[](const std::string& key)const
+		{
+			return LuaRef::operator[](key);
+		}
+		LuaRef operator[](int index)const
+		{
+			return LuaRef::operator[](index);
+		}
+
+		using LuaRef::foreach_table;
+		using LuaRef::operator->*;
+		using LuaRef::isNilref;
+		using LuaRef::push;
+
+		bool operator==(const LuaUserData& other)const
+		{
+			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
+		}
+		bool operator!=(const LuaUserData& other)const
+		{
+			return !(*this == other);
+		}
+		bool operator<=(const LuaUserData& other)const
+		{
+			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
+		}
+		bool operator<(const LuaUserData& other)const
+		{
+			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
+		}
+		bool operator>=(const LuaUserData& other)const
+		{
+			return other <= *this;
+		}
+		bool operator>(const LuaUserData& other)const
+		{
+			return other < *this;
+		}
+	};
+	struct LuaTable :private LuaRef
+	{
+		LuaTable() :LuaRef()
+		{
+		}
+		LuaTable(lua_State* state) :LuaRef(state, NewTable())
+		{
+		}
+		LuaTable(lua_State* state,StackTop top) :LuaRef(state, top)
+		{
+		}
+		LuaTable(const LuaRef& ref) :LuaRef(ref)
+		{
+			if (ref.type() != TYPE_TABLE)
+			{
+				except::typeMismatchError(state_, "not table");
+				LuaRef::unref();
+			}
+		}
+		using LuaRef::getField;
+		using LuaRef::setField;
+		using LuaRef::keys;
+		using LuaRef::values;
+		using LuaRef::map;
+		using LuaRef::operator[];
+		using LuaRef::foreach_table;
+		using LuaRef::operator->*;
+		using LuaRef::isNilref;
+		using LuaRef::push;
+
+		bool operator==(const LuaTable& other)const
+		{
+			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
+		}
+		bool operator!=(const LuaTable& other)const
+		{
+			return !(*this == other);
+		}
+		bool operator<=(const LuaTable& other)const
+		{
+			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
+		}
+		bool operator<(const LuaTable& other)const
+		{
+			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
+		}
+		bool operator>=(const LuaTable& other)const
+		{
+			return other <= *this;
+		}
+		bool operator>(const LuaTable& other)const
+		{
+			return other < *this;
+		}
+	};
+
 	class TableKeyReference :public LuaRef
 	{
 	public:
-		TableKeyReference(LuaRef parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
+		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
 		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
@@ -84,10 +205,40 @@ namespace kaguya
 			lua_settable(state_, -3);
 		}
 
-		LuaRef parent_;
+		LuaTable parent_;
 		LuaRef key_;
 	};
 
+	inline bool LuaRef::setFunctionEnv(const LuaTable& env)
+	{
+		util::ScopedSavedStack save(state_);
+		if (type() != TYPE_FUNCTION)
+		{
+			except::typeMismatchError(state_, "this is not function" + typeName());
+			return false;
+		}
+		push();
+		env.push();
+		lua_setupvalue(state_, -2, 1);
+		return true;
+	}
+	inline bool LuaRef::setFunctionEnv(NewTable env)
+	{
+		return setFunctionEnv(LuaTable(state_));
+	}
+
+	inline LuaTable LuaRef::getFunctionEnv()
+	{
+		util::ScopedSavedStack save(state_);
+		if (type() != TYPE_FUNCTION)
+		{
+			except::typeMismatchError(state_, "this is not function" + typeName());
+			return LuaRef(state_);
+		}
+		push();
+		lua_getupvalue(state_, -1, 1);
+		return LuaTable(state_, StackTop());
+	}
 
 	inline TableKeyReference LuaRef::operator[](const LuaRef& key)
 	{
@@ -111,6 +262,51 @@ namespace kaguya
 
 	namespace types
 	{
+		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaUserData>)
+		{
+			return lua_type(l, index) == LUA_TUSERDATA;
+		}
+		template<>
+		inline bool checkType(lua_State* l, int index, typetag<LuaUserData>)
+		{
+			return lua_type(l, index) == LUA_TUSERDATA;
+		}
+		template<>
+		inline LuaUserData get(lua_State* l, int index, typetag<LuaUserData> tag)
+		{
+			lua_pushvalue(l, index);
+			return LuaRef(l, StackTop());
+		}
+		template<>
+		inline int push(lua_State* l, const LuaUserData& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaTable>)
+		{
+			return lua_istable(l, index);
+		}
+		template<>
+		inline bool checkType(lua_State* l, int index, typetag<LuaTable>)
+		{
+			return lua_istable(l, index);
+		}
+		template<>
+		inline LuaTable get(lua_State* l, int index, typetag<LuaTable> tag)
+		{
+			lua_pushvalue(l, index);
+			return LuaRef(l, StackTop());
+		}
+		template<>
+		inline int push(lua_State* l, const LuaTable& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+
 
 		//vector and map to Lua table
 		template<typename T>

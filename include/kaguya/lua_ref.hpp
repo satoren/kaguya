@@ -13,7 +13,7 @@ namespace kaguya
 {
 	struct StackTop {};
 
-
+	struct LuaTable;
 	class TableKeyReference;
 	class FunEvaluator;
 	class mem_fun_binder;
@@ -21,7 +21,7 @@ namespace kaguya
 
 	class LuaRef
 	{
-		friend class TableKeyReference;
+	protected:
 		lua_State *state_;
 		int ref_;
 
@@ -117,23 +117,6 @@ namespace kaguya
 		}
 
 	public:
-		int thread_status()const
-		{
-			if (isNilref())
-			{
-				except::typeMismatchError(state_, "is nil");
-				return LUA_ERRRUN;
-			}
-			util::ScopedSavedStack save(state_);
-			lua_State* thread = get<lua_State*>();
-
-			if (!thread)
-			{
-				except::typeMismatchError(state_, "is not thread");
-				return LUA_ERRRUN;
-			}
-			return lua_status(thread);
-		}
 
 		struct NoMainCheck {};
 		bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
@@ -290,42 +273,57 @@ namespace kaguya
 			return !isNilref() && get<bool>() == true;
 		}
 
-		bool setFunctionEnv(const LuaRef& env)
-		{
-			util::ScopedSavedStack save(state_);
-			if (env.type() != TYPE_TABLE)
-			{
-				except::typeMismatchError(state_, "env is not table:" + typeName());
-				return false;
-			}
-			if (type() != TYPE_FUNCTION)
-			{
-				except::typeMismatchError(state_, "this is not function" + typeName());
-				return false;
-			}
-			push();
-			env.push();
-			lua_setupvalue(state_, -2, 1);
-			return true;
-		}
-		bool setFunctionEnv(NewTable env)
-		{
-			return setFunctionEnv(LuaRef(state_, env));
-		}
-		LuaRef getFunctionEnv()
-		{
-			util::ScopedSavedStack save(state_);
-			if (type() != TYPE_FUNCTION)
-			{
-				except::typeMismatchError(state_, "this is not function" + typeName());
-				return LuaRef(state_);
-			}
-			push();
-			lua_getupvalue(state_, -1, 1);
-			return LuaRef(state_, StackTop());
-		}
+		bool setFunctionEnv(const LuaTable& env);
+		bool setFunctionEnv(NewTable env);
+		LuaTable getFunctionEnv();
+
 
 #include "kaguya/gen/luaref_fun_def.inl"
+
+		int threadStatus()const
+		{
+			if (isNilref())
+			{
+				except::typeMismatchError(state_, "is nil");
+				return LUA_ERRRUN;
+			}
+			util::ScopedSavedStack save(state_);
+			lua_State* thread = get<lua_State*>();
+
+			if (!thread)
+			{
+				except::typeMismatchError(state_, "is not thread");
+				return LUA_ERRRUN;
+			}
+			return lua_status(thread);
+		}
+		int thread_status()const
+		{
+			return threadStatus();
+		}
+		bool isThreadDead()const
+		{
+			int threadstatus = threadStatus();
+			if (threadstatus == LUA_OK)
+			{
+				lua_State* thread = get<lua_State*>();
+				if (lua_gettop(thread) == 0)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else if (threadstatus == LUA_YIELD)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
 
 		mem_fun_binder operator->*(const char* key);
 
@@ -334,19 +332,19 @@ namespace kaguya
 		TableKeyReference operator[](const std::string& str);
 		TableKeyReference operator[](int index);
 
-		const LuaRef operator[](const LuaRef& key)const
+		LuaRef operator[](const LuaRef& key)const
 		{
 			return getField(key);
 		}
-		const LuaRef operator[](const char* str)const
+		LuaRef operator[](const char* str)const
 		{
 			return getField(str);
 		}
-		const LuaRef operator[](const std::string& str)const
+		LuaRef operator[](const std::string& str)const
 		{
 			return getField(str);
 		}
-		const LuaRef operator[](int index)const
+		LuaRef operator[](int index)const
 		{
 			return getField(index);
 		}
@@ -598,6 +596,11 @@ namespace kaguya
 	namespace types
 	{
 		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaRef>)
+		{
+			return false;
+		}
+		template<>
 		inline bool checkType(lua_State* l, int index, typetag<LuaRef>)
 		{
 			return true;
@@ -615,6 +618,7 @@ namespace kaguya
 			return 1;
 		}
 	}
+
 
 	namespace traits
 	{

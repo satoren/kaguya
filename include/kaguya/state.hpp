@@ -9,6 +9,7 @@
 #include "kaguya/error_handler.hpp"
 
 #include "kaguya/lua_ref_table.hpp"
+#include "kaguya/lua_ref_function.hpp"
 
 namespace kaguya
 {
@@ -203,14 +204,24 @@ namespace kaguya
 		}
 
 		//return new Lua reference
-		//example:
-		// LuaRef table = state.newRef(NewTable());//return new table
-		// LuaRef coroutine = state.newRef(NewThread());//return new thread (coroutine)
 		template<typename T>
 		LuaRef newRef(T value)
 		{
 			return LuaRef(state_, value);
 		}
+
+		//return new Lua table
+		LuaTable newTable()
+		{
+			return LuaTable(state_);
+		}
+
+		//return new Lua thread
+		LuaThread newThread()
+		{
+			return LuaThread(state_);
+		}
+
 		//push to Lua stack
 		template<typename T>
 		void pushToStack(T value)
