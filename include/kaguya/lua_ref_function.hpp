@@ -107,6 +107,19 @@ namespace kaguya
 			return other < *this;
 		}
 	};
+	namespace traits
+	{
+		template<>
+		struct arg_get_type<const LuaFunction& > {
+			typedef LuaFunction type;
+		};
+
+		template<>
+		struct arg_get_type<const LuaThread& > {
+			typedef LuaThread type;
+		};
+
+	}
 
 	namespace types
 	{

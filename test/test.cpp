@@ -712,16 +712,26 @@ namespace selector_test
 		};
 		void test_operator_bool(kaguya::State& state)
 		{
-			kaguya::LuaRef globalTable = state.globalTable();
-			TEST_CHECK(ob() != globalTable);
+			kaguya::LuaRef table1 = state.newRef(kaguya::NewTable());
+			TEST_CHECK(ob() != table1);
+			kaguya::LuaTable newTable2 = state.newRef(kaguya::NewTable());
+			kaguya::LuaTable tabl1_ref_copy = table1;
+			TEST_CHECK(newTable2 != table1);
+			TEST_CHECK(!(newTable2 == table1));
+			TEST_CHECK(table1 == tabl1_ref_copy);
 		}
 		void typetest_function(kaguya::State& state)
 		{
-			kaguya::LuaRef globalTable = state.globalTable();
+			kaguya::LuaRef newTable = state.newRef(kaguya::NewTable());
+
+			kaguya::LuaRef function = state.newRef(kaguya::function(&free_standing_function));
+			kaguya::LuaRef function2 = function;
+			TEST_CHECK(function != newTable);
+			TEST_CHECK(function == function2);
 		}
 		void operator_equal_test(kaguya::State& state)
 		{
-			kaguya::LuaRef globalTable = state.globalTable();
+			kaguya::LuaTable globalTable = state.globalTable();
 
 			TEST_CHECK(!(globalTable != state.globalTable())) ;
 			TEST_CHECK(globalTable == state.globalTable()) ;

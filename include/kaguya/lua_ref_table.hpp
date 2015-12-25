@@ -260,6 +260,19 @@ namespace kaguya
 
 
 
+	namespace traits
+	{
+		template<>
+		struct arg_get_type<const LuaUserData& > {
+			typedef LuaUserData type;
+		};
+
+		template<>
+		struct arg_get_type<const LuaTable& > {
+			typedef LuaTable type;
+		};
+
+	}
 	namespace types
 	{
 		template<>

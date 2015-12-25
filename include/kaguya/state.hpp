@@ -198,7 +198,7 @@ namespace kaguya
 		}
 
 		//return global table
-		LuaRef globalTable()
+		LuaTable globalTable()
 		{
 			return newRef(GlobalTable());
 		}
