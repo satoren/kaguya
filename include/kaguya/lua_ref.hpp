@@ -680,6 +680,17 @@ explicit CLASSNAME(const LuaRef& ref) :LuaRef(ref)\
 CLASSNAME(lua_State* state, StackTop top) :LuaRef(state, top)\
 {\
 }\
+CLASSNAME& operator=(const LuaRef& ref)\
+{\
+	static_cast<LuaRef&>(*this) = static_cast<const LuaRef&>(ref);\
+	typecheck();\
+	return *this;\
+}\
+CLASSNAME& operator=(const CLASSNAME& ref)\
+{\
+	static_cast<LuaRef&>(*this) = static_cast<const LuaRef&>(ref);\
+	return *this;\
+}\
 bool operator==(const CLASSNAME& other)const\
 {\
 	return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);\
