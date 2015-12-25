@@ -11,101 +11,73 @@
 #include "kaguya/utility.hpp"
 
 
+#include "kaguya/lua_ref_table.hpp"
 namespace kaguya
 {
 
-	class LuaFunction :private LuaRef
+	class LuaFunction :public LuaRef
 	{
-	public:
-		LuaFunction() :LuaRef()
+		void typecheck()
 		{
-		}
-		LuaFunction(const LuaRef& ref) :LuaRef(ref)
-		{
-			if (ref.type() != TYPE_FUNCTION)
+			if (type() != TYPE_FUNCTION)
 			{
 				except::typeMismatchError(state_, "not function");
 				LuaRef::unref();
 			}
 		}
+		//hide other type functions
+		using LuaRef::threadStatus;
+		using LuaRef::isThreadDead;
+
+		using LuaRef::getField;
+		using LuaRef::setField;
+		using LuaRef::keys;
+		using LuaRef::values;
+		using LuaRef::map;
+		using LuaRef::operator[];
+		using LuaRef::foreach_table;
+		using LuaRef::operator->*;
+		using LuaRef::costatus;
+	public:
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction);
+
 		using LuaRef::operator();
 		using LuaRef::setFunctionEnv;
 		using LuaRef::getFunctionEnv;
-		using LuaRef::isNilref;
-		using LuaRef::push;
 
-		bool operator==(const LuaFunction& other)const
-		{
-			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
-		}
-		bool operator!=(const LuaFunction& other)const
-		{
-			return !(*this == other);
-		}
-		bool operator<=(const LuaFunction& other)const
-		{
-			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
-		}
-		bool operator<(const LuaFunction& other)const
-		{
-			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
-		}
-		bool operator>=(const LuaFunction& other)const
-		{
-			return other <= *this;
-		}
-		bool operator>(const LuaFunction& other)const
-		{
-			return other < *this;
-		}
 	};
-	class LuaThread:private LuaRef
+	class LuaThread:public LuaRef
 	{
-	public:
-		LuaThread() :LuaRef()
+		void typecheck()
 		{
-		}
-		LuaThread(lua_State* state) :LuaRef(state, NewThread())
-		{
-		}
-		LuaThread(const LuaRef& ref) :LuaRef(ref)
-		{
-			if (ref.type() != TYPE_THREAD)
+			if (type() != TYPE_THREAD)
 			{
 				except::typeMismatchError(state_, "not lua thread");
 				LuaRef::unref();
 			}
 		}
+		//hide other type functions
+		using LuaRef::setFunctionEnv;
+		using LuaRef::getFunctionEnv;
+		using LuaRef::getField;
+		using LuaRef::setField;
+		using LuaRef::keys;
+		using LuaRef::values;
+		using LuaRef::map;
+		using LuaRef::operator[];
+		using LuaRef::foreach_table;
+		using LuaRef::operator->*;
+	public:
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread);
+		LuaThread(lua_State* state) :LuaRef(state, NewThread())
+		{
+		}
 		using LuaRef::operator();
-		using LuaRef::isNilref;
-		using LuaRef::push;
 		using LuaRef::threadStatus;
 		using LuaRef::isThreadDead;
-
-		bool operator==(const LuaThread& other)const
-		{
-			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
-		}
-		bool operator!=(const LuaThread& other)const
-		{
-			return !(*this == other);
-		}
-		bool operator<=(const LuaThread& other)const
-		{
-			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
-		}
-		bool operator<(const LuaThread& other)const
-		{
-			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
-		}
-		bool operator>=(const LuaThread& other)const
-		{
-			return other <= *this;
-		}
-		bool operator>(const LuaThread& other)const
-		{
-			return other < *this;
-		}
+		using LuaRef::costatus;
 	};
 	namespace traits
 	{
@@ -118,7 +90,6 @@ namespace kaguya
 		struct arg_get_type<const LuaThread& > {
 			typedef LuaThread type;
 		};
-
 	}
 
 	namespace types
@@ -131,13 +102,13 @@ namespace kaguya
 		template<>
 		inline bool checkType(lua_State* l, int index, typetag<LuaThread>)
 		{
-			return lua_isthread(l, index);
+			return lua_isthread(l, index) || lua_isnil(l, index);
 		}
 		template<>
 		inline LuaThread get(lua_State* l, int index, typetag<LuaThread> tag)
 		{
 			lua_pushvalue(l, index);
-			return LuaRef(l, StackTop());
+			return LuaThread(l, StackTop());
 		}
 		template<>
 		inline int push(lua_State* l, const LuaThread& ref)
@@ -154,13 +125,13 @@ namespace kaguya
 		template<>
 		inline bool checkType(lua_State* l, int index, typetag<LuaFunction>)
 		{
-			return lua_isfunction(l, index);
+			return lua_isfunction(l, index) || lua_isnil(l, index);
 		}
 		template<>
 		inline LuaFunction get(lua_State* l, int index, typetag<LuaFunction> tag)
 		{
 			lua_pushvalue(l, index);
-			return LuaRef(l, StackTop());
+			return LuaFunction(LuaRef(l, StackTop()));
 		}
 		template<>
 		inline int push(lua_State* l, const LuaFunction& ref)
@@ -304,16 +275,14 @@ namespace kaguya
 	{
 	public:
 		template<class T>
-		mem_fun_binder(LuaRef self, T key)
+		mem_fun_binder(LuaRef self, T key):self_(self), fun_(self_.getField(key))
 		{
-			std::swap(self, self_);
-			fun_ = self_.getField(key);
 		}
 
 #include "kaguya/gen/luaref_mem_fun_def.inl"
 	private:
-		LuaRef self_;
-		LuaRef fun_;
+		LuaRef self_;//Table or Userdata
+		LuaFunction fun_;
 	};
 
 	mem_fun_binder LuaRef::operator->*(const char* key)

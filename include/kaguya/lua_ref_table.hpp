@@ -9,19 +9,28 @@
 
 namespace kaguya
 {
-	struct LuaUserData :private LuaRef
+	class  LuaUserData :public LuaRef
 	{
-		LuaUserData() :LuaRef()
+		void typecheck()
 		{
-		}
-		LuaUserData(const LuaRef& ref) :LuaRef(ref)
-		{
-			if (ref.type() != TYPE_USERDATA)
+			if (type() != TYPE_USERDATA)
 			{
 				except::typeMismatchError(state_, "not user data");
 				LuaRef::unref();
 			}
 		}
+		//hide other type functions
+		using LuaRef::setField;
+		using LuaRef::setFunctionEnv;
+		using LuaRef::getFunctionEnv;
+		using LuaRef::operator();
+		using LuaRef::threadStatus;
+		using LuaRef::isThreadDead;
+		using LuaRef::costatus;
+	public:
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData);
+
 		using LuaRef::getField;
 		using LuaRef::keys;
 		using LuaRef::values;
@@ -46,53 +55,33 @@ namespace kaguya
 
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
-		using LuaRef::isNilref;
-		using LuaRef::push;
-
-		bool operator==(const LuaUserData& other)const
-		{
-			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
-		}
-		bool operator!=(const LuaUserData& other)const
-		{
-			return !(*this == other);
-		}
-		bool operator<=(const LuaUserData& other)const
-		{
-			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
-		}
-		bool operator<(const LuaUserData& other)const
-		{
-			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
-		}
-		bool operator>=(const LuaUserData& other)const
-		{
-			return other <= *this;
-		}
-		bool operator>(const LuaUserData& other)const
-		{
-			return other < *this;
-		}
 	};
-	struct LuaTable :private LuaRef
+	class LuaTable :public LuaRef
 	{
-		LuaTable() :LuaRef()
+		void typecheck()
 		{
-		}
-		LuaTable(lua_State* state) :LuaRef(state, NewTable())
-		{
-		}
-		LuaTable(lua_State* state,StackTop top) :LuaRef(state, top)
-		{
-		}
-		LuaTable(const LuaRef& ref) :LuaRef(ref)
-		{
-			if (ref.type() != TYPE_TABLE)
+			if (type() != TYPE_TABLE)
 			{
 				except::typeMismatchError(state_, "not table");
 				LuaRef::unref();
 			}
 		}
+
+		//hide other type functions
+		using LuaRef::setFunctionEnv;
+		using LuaRef::getFunctionEnv;
+		using LuaRef::operator();
+		using LuaRef::threadStatus;
+		using LuaRef::isThreadDead;
+		using LuaRef::costatus;
+	public:
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable);
+
+		LuaTable(lua_State* state) :LuaRef(state, NewTable())
+		{
+		}
+
 		using LuaRef::getField;
 		using LuaRef::setField;
 		using LuaRef::keys;
@@ -101,33 +90,6 @@ namespace kaguya
 		using LuaRef::operator[];
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
-		using LuaRef::isNilref;
-		using LuaRef::push;
-
-		bool operator==(const LuaTable& other)const
-		{
-			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
-		}
-		bool operator!=(const LuaTable& other)const
-		{
-			return !(*this == other);
-		}
-		bool operator<=(const LuaTable& other)const
-		{
-			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
-		}
-		bool operator<(const LuaTable& other)const
-		{
-			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
-		}
-		bool operator>=(const LuaTable& other)const
-		{
-			return other <= *this;
-		}
-		bool operator>(const LuaTable& other)const
-		{
-			return other < *this;
-		}
 	};
 
 	class TableKeyReference :public LuaRef
@@ -283,13 +245,13 @@ namespace kaguya
 		template<>
 		inline bool checkType(lua_State* l, int index, typetag<LuaUserData>)
 		{
-			return lua_type(l, index) == LUA_TUSERDATA;
+			return lua_type(l, index) == LUA_TUSERDATA || lua_isnil(l, index);
 		}
 		template<>
 		inline LuaUserData get(lua_State* l, int index, typetag<LuaUserData> tag)
 		{
 			lua_pushvalue(l, index);
-			return LuaRef(l, StackTop());
+			return LuaUserData(l, StackTop());
 		}
 		template<>
 		inline int push(lua_State* l, const LuaUserData& ref)
@@ -305,13 +267,13 @@ namespace kaguya
 		template<>
 		inline bool checkType(lua_State* l, int index, typetag<LuaTable>)
 		{
-			return lua_istable(l, index);
+			return lua_istable(l, index) || lua_isnil(l, index);
 		}
 		template<>
 		inline LuaTable get(lua_State* l, int index, typetag<LuaTable> tag)
 		{
 			lua_pushvalue(l, index);
-			return LuaRef(l, StackTop());
+			return LuaTable(l, StackTop());
 		}
 		template<>
 		inline int push(lua_State* l, const LuaTable& ref)

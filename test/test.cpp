@@ -578,6 +578,7 @@ namespace selector_test
 					yieldnum++;
 				}
 
+
 				TEST_CHECK((yieldnum == 10)) ;
 			}
 		}
@@ -666,7 +667,7 @@ namespace selector_test
 		}
 		void newtable(kaguya::State& state)
 		{
-			kaguya::LuaRef ref(state.state(), kaguya::NewTable());
+			kaguya::LuaTable ref = state.newTable();
 
 			ref["tbl"] = kaguya::NewTable();
 			kaguya::LuaRef othertable = ref["tbl"];
@@ -712,9 +713,9 @@ namespace selector_test
 		};
 		void test_operator_bool(kaguya::State& state)
 		{
-			kaguya::LuaRef table1 = state.newRef(kaguya::NewTable());
+			kaguya::LuaRef table1 = state.newTable();
 			TEST_CHECK(ob() != table1);
-			kaguya::LuaTable newTable2 = state.newRef(kaguya::NewTable());
+			kaguya::LuaTable newTable2 = state.newTable();
 			kaguya::LuaTable tabl1_ref_copy = table1;
 			TEST_CHECK(newTable2 != table1);
 			TEST_CHECK(!(newTable2 == table1));
@@ -722,7 +723,7 @@ namespace selector_test
 		}
 		void typetest_function(kaguya::State& state)
 		{
-			kaguya::LuaRef newTable = state.newRef(kaguya::NewTable());
+			kaguya::LuaRef newTable = state.newTable();
 
 			kaguya::LuaRef function = state.newRef(kaguya::function(&free_standing_function));
 			kaguya::LuaRef function2 = function;

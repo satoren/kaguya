@@ -13,7 +13,7 @@ namespace kaguya
 {
 	struct StackTop {};
 
-	struct LuaTable;
+	class LuaTable;
 	class TableKeyReference;
 	class FunEvaluator;
 	class mem_fun_binder;
@@ -301,27 +301,61 @@ namespace kaguya
 		{
 			return threadStatus();
 		}
-		bool isThreadDead()const
+
+		enum coroutine_status
 		{
-			int threadstatus = threadStatus();
-			if (threadstatus == LUA_OK)
+			COSTAT_RUNNING,
+			COSTAT_SUSPENDED,
+			COSTAT_NORMAL,
+			COSTAT_DEAD,
+		};
+
+		coroutine_status costatus(lua_State *l=0)const
+		{
+			if (isNilref())
 			{
-				lua_State* thread = get<lua_State*>();
-				if (lua_gettop(thread) == 0)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-			else if (threadstatus == LUA_YIELD)
-			{
-				return false;
+				except::typeMismatchError(state_, "is nil");
+				return COSTAT_DEAD;
 			}
 
-			return true;
+			lua_State* thread = get<lua_State*>();
+			if (!thread)
+			{
+				except::typeMismatchError(state_, "is not thread");
+				return COSTAT_DEAD;
+			}
+			else if (thread == l)
+			{
+				return COSTAT_RUNNING;
+			}
+			else
+			{
+				switch (lua_status(thread))
+				{
+				case LUA_YIELD:
+					return COSTAT_SUSPENDED;
+				case LUA_OK:
+				{
+					if (lua_gettop(thread) == 0)
+					{
+						return COSTAT_DEAD;
+					}
+					else
+					{
+						return COSTAT_SUSPENDED;
+					}
+				}
+				default:
+					break;
+				}
+			}
+			return COSTAT_DEAD;
+
+		}
+
+		bool isThreadDead()const
+		{
+			return costatus() == COSTAT_DEAD;
 		}
 
 
@@ -630,3 +664,69 @@ namespace kaguya
 
 	}
 }
+
+
+#define KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(CLASSNAME) \
+CLASSNAME() :LuaRef()\
+{\
+}\
+CLASSNAME(const CLASSNAME& ref) :LuaRef(ref)\
+{\
+}\
+explicit CLASSNAME(const LuaRef& ref) :LuaRef(ref)\
+{\
+	typecheck();\
+}\
+CLASSNAME(lua_State* state, StackTop top) :LuaRef(state, top)\
+{\
+}\
+bool operator==(const CLASSNAME& other)const\
+{\
+	return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);\
+}\
+bool operator!=(const CLASSNAME& other)const\
+{\
+	return !(*this == other);\
+}\
+bool operator<=(const CLASSNAME& other)const\
+{\
+	return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);\
+}\
+bool operator<(const CLASSNAME& other)const\
+{\
+	return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);\
+}\
+bool operator>=(const CLASSNAME& other)const\
+{\
+	return other <= *this;\
+}\
+bool operator>(const CLASSNAME& other)const\
+{\
+	return other < *this;\
+}
+
+
+#if KAGUYA_USE_RVALUE_REFERENCE
+
+#define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME) \
+explicit CLASSNAME(LuaRef&& src)throw() :LuaRef(standard::forward<LuaRef>(src))\
+{\
+	typecheck(); \
+}\
+CLASSNAME& operator =(LuaRef&& src)throw()\
+{\
+	static_cast<LuaRef&>(*this) = standard::forward<LuaRef>(src);\
+	typecheck(); \
+	return *this;\
+}\
+CLASSNAME(CLASSNAME&& src)throw() :LuaRef(standard::forward<LuaRef>(src))\
+{\
+}\
+CLASSNAME& operator =(CLASSNAME&& src)throw()\
+{\
+static_cast<LuaRef&>(*this) = standard::forward<LuaRef>(src); \
+return *this; \
+}
+#else
+#define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME) 
+#endif
