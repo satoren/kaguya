@@ -124,7 +124,11 @@ namespace kaguya
 			if (env.type() == LuaRef::TYPE_TABLE)
 			{
 				env.push();
+#if LUA_VERSION_NUM >= 502
 				lua_setupvalue(state_, -2, 1);
+#else
+				lua_setfenv(state_, -2);
+#endif
 			}
 
 			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
@@ -157,7 +161,11 @@ namespace kaguya
 			if (env.type() == LuaRef::TYPE_TABLE)
 			{
 				env.push();
+#if LUA_VERSION_NUM >= 502
 				lua_setupvalue(state_, -2, 1);
+#else
+				lua_setfenv(state_, -2);
+#endif
 			}
 			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)

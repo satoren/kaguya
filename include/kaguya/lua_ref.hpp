@@ -334,7 +334,7 @@ namespace kaguya
 				{
 				case LUA_YIELD:
 					return COSTAT_SUSPENDED;
-				case LUA_OK:
+				case 0://LUA_OK
 				{
 					if (lua_gettop(thread) == 0)
 					{

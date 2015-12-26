@@ -269,7 +269,7 @@ namespace kaguya
 			template<typename T>
 			inline T get(lua_State* l, int index, typetag<typename traits::enum_dispatch_type<T> > tag)
 			{
-				return T(lua_tonumber(l, index));
+				return T(int64_t(lua_tonumber(l, index)));
 			}
 #endif
 			template<typename T>

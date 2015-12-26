@@ -181,7 +181,11 @@ namespace kaguya
 		}
 		push();
 		env.push();
+#if LUA_VERSION_NUM >= 502
 		lua_setupvalue(state_, -2, 1);
+#else
+		lua_setfenv(state_, -2);
+#endif
 		return true;
 	}
 	inline bool LuaRef::setFunctionEnv(NewTable env)

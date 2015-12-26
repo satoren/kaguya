@@ -13,17 +13,17 @@ endif()
 
 if(NOT LUA_INCLUDE_DIRS)
   find_package(PkgConfig)
-  set(LUA_SEARCHVERS lua5.3 lua5.2 luajit lua5.1)
+  set(LUA_SEARCHVERS lua5.3 lua5.2 luajit lua5.1 lua)
   foreach(modulename ${LUA_SEARCHVERS})
     pkg_search_module(LUA ${modulename})
   endforeach(modulename)
 endif(NOT LUA_INCLUDE_DIRS)
 
 if(NOT LUA_INCLUDE_DIRS)
- message(SEND_ERROR "Can't find lua library")
+# message(SEND_ERROR "Can't find lua library")
 endif(NOT LUA_INCLUDE_DIRS)
 
 
 if(NOT EXISTS ${LUA_INCLUDE_DIRS}/lua.h)
-  message(SEND_ERROR "Can't find lua.h in ${LUA_INCLUDE_DIRS}")
+  message(SEND_STATUS "Can't find lua.h in ${LUA_INCLUDE_DIRS}")
 endif()
