@@ -83,7 +83,7 @@ namespace kaguya
 		template<typename T>T forward(T v) { return v; }
 #endif
 
-		std::string to_string(int v)
+		inline std::string to_string(int v)
 		{
 			char buffer[128] = { 0 };
 			snprintf(buffer, sizeof(buffer), "%d", v);
