@@ -213,6 +213,8 @@ namespace kaguya
 			{
 				util::ScopedSavedStack save(state_, 0);
 				eval_info_->invoked = true;
+
+				eval_info_->results.reserve(resultnum);
 				const std::vector<LuaRef>& args = eval_info_->args;
 				if (eval_info_->coroutine)
 				{
