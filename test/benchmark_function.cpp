@@ -60,10 +60,21 @@
 	{
 		state("lua_function=function(i)return i;end");
 
+		kaguya::LuaRef lua_function = state["lua_function"];
 		for (int i = 0; i < 1000000; i++)
 		{
-			int r = state["lua_function"](i);
+			int r = lua_function(i);
 			if (r != i) { throw std::logic_error(""); }
 		}
-
+	}
+	void lua_table_access(kaguya::State& state)
+	{
+		state("lua_table={value=0}");
+		kaguya::LuaRef lua_table = state["lua_table"];
+		for (int i = 0; i < 1000000; i++)
+		{
+			lua_table["value"] = i;
+			int v = lua_table["value"];
+			if (v != i) { throw std::logic_error(""); }
+		}
 	}

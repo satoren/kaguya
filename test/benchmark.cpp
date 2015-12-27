@@ -40,6 +40,7 @@ int main()
 	ADD_BENCHMARK(simple_get_set);
 	ADD_BENCHMARK(object_pointer_register_get_set);
 	ADD_BENCHMARK(call_lua_function);
+	ADD_BENCHMARK(lua_table_access);
 
 	
 
