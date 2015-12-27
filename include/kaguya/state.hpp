@@ -66,11 +66,11 @@ namespace kaguya
 
 		//If there are no errors,compiled file as a Lua function and return
 		//Otherwise send error message to error handler and return nil reference 
-		LuaRef loadfile(const std::string& file)
+		LuaFunction loadfile(const std::string& file)
 		{
 			return loadfile(file.c_str());
 		}
-		LuaRef loadfile(const char* file)
+		LuaFunction loadfile(const char* file)
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -81,17 +81,17 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return LuaRef(state_);
 			}
-			return LuaRef(state_, StackTop());
+			return LuaFunction(state_, StackTop());
 		}
 
 
 		//If there are no errors,compiled string as a Lua function and return
 		//Otherwise send error message to error handler and return nil reference 
-		LuaRef loadstring(const std::string& str)
+		LuaFunction loadstring(const std::string& str)
 		{
 			return loadstring(str.c_str());
 		}
-		LuaRef loadstring(const char* str)
+		LuaFunction loadstring(const char* str)
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -102,14 +102,14 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return LuaRef(state_);
 			}
-			return LuaRef(state_, StackTop());
+			return LuaFunction(state_, StackTop());
 		}
 
-		bool dofile(const std::string& file, const LuaRef& env = LuaRef())
+		bool dofile(const std::string& file, const LuaTable& env = LuaTable())
 		{
 			return dofile(file.c_str(), env);
 		}
-		bool dofile(const char* file, const LuaRef& env = LuaRef())
+		bool dofile(const char* file, const LuaTable& env = LuaTable())
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -121,7 +121,7 @@ namespace kaguya
 				return false;
 			}
 
-			if (env.type() == LuaRef::TYPE_TABLE)
+			if (!env.isNilref())
 			{
 				env.push();
 #if LUA_VERSION_NUM >= 502
@@ -139,16 +139,8 @@ namespace kaguya
 			}
 			return true;
 		}
-		bool dofile(const char* str, NewTable table)
-		{
-			return dofile(str, newRef(table));
-		}
-		bool dofile(const std::string& str, NewTable table)
-		{
-			return dofile(str.c_str(), newRef(table));
-		}
 
-		bool dostring(const char* str, const LuaRef& env = LuaRef())
+		bool dostring(const char* str, const LuaTable& env = LuaTable())
 		{
 			util::ScopedSavedStack save(state_);
 
@@ -158,7 +150,7 @@ namespace kaguya
 				ErrorHandler::instance().handle(status, state_);
 				return false;
 			}
-			if (env.type() == LuaRef::TYPE_TABLE)
+			if (!env.isNilref())
 			{
 				env.push();
 #if LUA_VERSION_NUM >= 502
@@ -175,17 +167,9 @@ namespace kaguya
 			}
 			return true;
 		}
-		bool dostring(const std::string& str, const LuaRef& env = LuaRef())
+		bool dostring(const std::string& str, const LuaTable& env = LuaTable())
 		{
 			return dostring(str.c_str(), env);
-		}
-		bool dostring(const char* str, NewTable table)
-		{
-			return dostring(str, newRef(table));
-		}
-		bool dostring(const std::string& str, NewTable table)
-		{
-			return dostring(str.c_str(), newRef(table));
 		}
 		bool operator()(const std::string& str)
 		{
@@ -223,7 +207,7 @@ namespace kaguya
 		{
 			return LuaTable(state_);
 		}
-		LuaTable newTable(int reserve_array,int reserve_record)
+		LuaTable newTable(int reserve_array, int reserve_record)
 		{
 			return LuaTable(state_, NewTable(reserve_array, reserve_record));
 		}

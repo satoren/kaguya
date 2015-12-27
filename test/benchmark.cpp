@@ -17,17 +17,21 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 	{
 		const std::string& test_name = it->first;
 
-		kaguya::State state; state.openlibs();
 
 		double total_time = 0;
-		double start = state["os"]["clock"]();
+		static const int N = 4;
+		for (int i = 0; i < N; ++i)
+		{
+			kaguya::State state; state.openlibs();
+			double start = state["os"]["clock"]();
 
-		it->second(state);
+			it->second(state);
 
-		double end = state["os"]["clock"]();
-		total_time += end - start;
+			double end = state["os"]["clock"]();
+			total_time += end - start;
+		}
 
-		std::cout << test_name << " time:" << total_time << std::endl;
+		std::cout << test_name << " avegrage time:" << total_time/N << std::endl;
 	}
 }
 
