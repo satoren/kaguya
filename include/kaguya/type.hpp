@@ -75,7 +75,7 @@ namespace kaguya
 			return nodirectuse::metatableNameDispatch(typetag<noncvpointerref_type>());
 		}
 
-		bool available_metatable(lua_State* l, const char* t)
+		inline bool available_metatable(lua_State* l, const char* t)
 		{
 			util::ScopedSavedStack save(l);
 			luaL_getmetatable(l, t);

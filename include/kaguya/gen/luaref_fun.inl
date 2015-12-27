@@ -1,5 +1,5 @@
 //generated header by luaref_function_call_generator.py
-FunEvaluator LuaRef::operator()()
+inline FunEvaluator LuaRef::operator()()
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -7,7 +7,7 @@ FunEvaluator LuaRef::operator()()
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1>
-FunEvaluator LuaRef::operator()(T1 t1)
+inline FunEvaluator LuaRef::operator()(T1 t1)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -16,7 +16,7 @@ FunEvaluator LuaRef::operator()(T1 t1)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -26,7 +26,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -37,7 +37,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3,typename T4>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -49,7 +49,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -62,7 +62,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -76,7 +76,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -91,7 +91,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
@@ -107,7 +107,7 @@ FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8)
   return FunEvaluator(state_,*this,args);
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8,T9 t9)
+inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8,T9 t9)
 {
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}

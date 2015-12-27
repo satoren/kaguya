@@ -19,7 +19,7 @@ def generate_fun_args(out,arg_num):
 
 def generate_push_tuple(out,arg_num):
 	generate_template(out,arg_num)
-	out.write("int push(lua_State* l,const standard::tuple<")
+	out.write("inline int push(lua_State* l,const standard::tuple<")
 	generate_args(out,arg_num,"T")
 	out.write(">& v)\n")
 	out.write("{\n")

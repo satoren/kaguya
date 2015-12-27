@@ -66,7 +66,7 @@ namespace kaguya
 				return "VariadicArg";
 			}
 		};
-		FunctorType create(void(*fun)(VariadicArgType))
+		inline FunctorType create(void(*fun)(VariadicArgType))
 		{
 			typedef VariadicArgVoidInvoker caller_type;
 			return FunctorType(new caller_type(fun));
@@ -269,7 +269,7 @@ namespace kaguya
 				return "VariadicArg";
 			}
 		};
-		FunctorType create(standard::function<void(VariadicArgType)> fun)
+		inline FunctorType create(standard::function<void(VariadicArgType)> fun)
 		{
 			typedef VariadicArgVoidFunInvoker caller_type;
 			return FunctorType(new caller_type(fun));

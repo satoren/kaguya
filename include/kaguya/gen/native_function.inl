@@ -21,7 +21,7 @@ struct StdFunInvoker0:BaseInvoker{
 };
 template<typename Ret>
 
-FunctorType create(standard::function<Ret()> fun)
+inline FunctorType create(standard::function<Ret()> fun)
 {
   typedef StdFunInvoker0<Ret>
  InvokerType;
@@ -58,7 +58,7 @@ struct StdFunInvoker1:BaseInvoker{
 };
 template<typename Ret,typename T1>
 
-FunctorType create(standard::function<Ret(T1)> fun)
+inline FunctorType create(standard::function<Ret(T1)> fun)
 {
   typedef StdFunInvoker1<Ret,T1>
  InvokerType;
@@ -97,7 +97,7 @@ struct StdFunInvoker2:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2>
 
-FunctorType create(standard::function<Ret(T1,T2)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2)> fun)
 {
   typedef StdFunInvoker2<Ret,T1,T2>
  InvokerType;
@@ -138,7 +138,7 @@ struct StdFunInvoker3:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
-FunctorType create(standard::function<Ret(T1,T2,T3)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3)> fun)
 {
   typedef StdFunInvoker3<Ret,T1,T2,T3>
  InvokerType;
@@ -181,7 +181,7 @@ struct StdFunInvoker4:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
 
-FunctorType create(standard::function<Ret(T1,T2,T3,T4)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3,T4)> fun)
 {
   typedef StdFunInvoker4<Ret,T1,T2,T3,T4>
  InvokerType;
@@ -226,7 +226,7 @@ struct StdFunInvoker5:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
-FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5)> fun)
 {
   typedef StdFunInvoker5<Ret,T1,T2,T3,T4,T5>
  InvokerType;
@@ -273,7 +273,7 @@ struct StdFunInvoker6:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 
-FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6)> fun)
 {
   typedef StdFunInvoker6<Ret,T1,T2,T3,T4,T5,T6>
  InvokerType;
@@ -322,7 +322,7 @@ struct StdFunInvoker7:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
-FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7)> fun)
 {
   typedef StdFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7>
  InvokerType;
@@ -373,7 +373,7 @@ struct StdFunInvoker8:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 
-FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
 {
   typedef StdFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
  InvokerType;
@@ -426,7 +426,7 @@ struct StdFunInvoker9:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
-FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
+inline FunctorType create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
 {
   typedef StdFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
  InvokerType;
@@ -452,7 +452,7 @@ struct VoidStdFunInvoker0:BaseInvoker{
     return result;
   }
 };
-FunctorType create(standard::function<void()> fun)
+inline FunctorType create(standard::function<void()> fun)
 {
   typedef VoidStdFunInvoker0 InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -486,7 +486,7 @@ struct VoidStdFunInvoker1:BaseInvoker{
   }
 };
 template<typename T1>
-FunctorType create(standard::function<void(T1)> fun)
+inline FunctorType create(standard::function<void(T1)> fun)
 {
   typedef VoidStdFunInvoker1<T1> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -522,7 +522,7 @@ struct VoidStdFunInvoker2:BaseInvoker{
   }
 };
 template<typename T1,typename T2>
-FunctorType create(standard::function<void(T1,T2)> fun)
+inline FunctorType create(standard::function<void(T1,T2)> fun)
 {
   typedef VoidStdFunInvoker2<T1,T2> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -560,7 +560,7 @@ struct VoidStdFunInvoker3:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3>
-FunctorType create(standard::function<void(T1,T2,T3)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3)> fun)
 {
   typedef VoidStdFunInvoker3<T1,T2,T3> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -600,7 +600,7 @@ struct VoidStdFunInvoker4:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-FunctorType create(standard::function<void(T1,T2,T3,T4)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3,T4)> fun)
 {
   typedef VoidStdFunInvoker4<T1,T2,T3,T4> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -642,7 +642,7 @@ struct VoidStdFunInvoker5:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-FunctorType create(standard::function<void(T1,T2,T3,T4,T5)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3,T4,T5)> fun)
 {
   typedef VoidStdFunInvoker5<T1,T2,T3,T4,T5> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -686,7 +686,7 @@ struct VoidStdFunInvoker6:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6)> fun)
 {
   typedef VoidStdFunInvoker6<T1,T2,T3,T4,T5,T6> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -732,7 +732,7 @@ struct VoidStdFunInvoker7:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7)> fun)
 {
   typedef VoidStdFunInvoker7<T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -780,7 +780,7 @@ struct VoidStdFunInvoker8:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
 {
   typedef VoidStdFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -830,7 +830,7 @@ struct VoidStdFunInvoker9:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
+inline FunctorType create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
 {
   typedef VoidStdFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -859,7 +859,7 @@ struct FunInvoker0:BaseInvoker{
 };
 template<typename Ret>
 
-FunctorType create(Ret (*fun)())
+inline FunctorType create(Ret (*fun)())
 {
   typedef FunInvoker0<Ret>
  InvokerType;
@@ -896,7 +896,7 @@ struct FunInvoker1:BaseInvoker{
 };
 template<typename Ret,typename T1>
 
-FunctorType create(Ret (*fun)(T1))
+inline FunctorType create(Ret (*fun)(T1))
 {
   typedef FunInvoker1<Ret,T1>
  InvokerType;
@@ -935,7 +935,7 @@ struct FunInvoker2:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2>
 
-FunctorType create(Ret (*fun)(T1,T2))
+inline FunctorType create(Ret (*fun)(T1,T2))
 {
   typedef FunInvoker2<Ret,T1,T2>
  InvokerType;
@@ -976,7 +976,7 @@ struct FunInvoker3:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
-FunctorType create(Ret (*fun)(T1,T2,T3))
+inline FunctorType create(Ret (*fun)(T1,T2,T3))
 {
   typedef FunInvoker3<Ret,T1,T2,T3>
  InvokerType;
@@ -1019,7 +1019,7 @@ struct FunInvoker4:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
 
-FunctorType create(Ret (*fun)(T1,T2,T3,T4))
+inline FunctorType create(Ret (*fun)(T1,T2,T3,T4))
 {
   typedef FunInvoker4<Ret,T1,T2,T3,T4>
  InvokerType;
@@ -1064,7 +1064,7 @@ struct FunInvoker5:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
-FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5))
+inline FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5))
 {
   typedef FunInvoker5<Ret,T1,T2,T3,T4,T5>
  InvokerType;
@@ -1111,7 +1111,7 @@ struct FunInvoker6:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 
-FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6))
+inline FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6))
 {
   typedef FunInvoker6<Ret,T1,T2,T3,T4,T5,T6>
  InvokerType;
@@ -1160,7 +1160,7 @@ struct FunInvoker7:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
-FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7))
+inline FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7))
 {
   typedef FunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7>
  InvokerType;
@@ -1211,7 +1211,7 @@ struct FunInvoker8:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 
-FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
+inline FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
 {
   typedef FunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
  InvokerType;
@@ -1264,7 +1264,7 @@ struct FunInvoker9:BaseInvoker{
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
-FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
+inline FunctorType create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
 {
   typedef FunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
  InvokerType;
@@ -1290,7 +1290,7 @@ struct VoidFunInvoker0:BaseInvoker{
     return result;
   }
 };
-FunctorType create(void (*fun)())
+inline FunctorType create(void (*fun)())
 {
   typedef VoidFunInvoker0 InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1324,7 +1324,7 @@ struct VoidFunInvoker1:BaseInvoker{
   }
 };
 template<typename T1>
-FunctorType create(void (*fun)(T1))
+inline FunctorType create(void (*fun)(T1))
 {
   typedef VoidFunInvoker1<T1> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1360,7 +1360,7 @@ struct VoidFunInvoker2:BaseInvoker{
   }
 };
 template<typename T1,typename T2>
-FunctorType create(void (*fun)(T1,T2))
+inline FunctorType create(void (*fun)(T1,T2))
 {
   typedef VoidFunInvoker2<T1,T2> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1398,7 +1398,7 @@ struct VoidFunInvoker3:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3>
-FunctorType create(void (*fun)(T1,T2,T3))
+inline FunctorType create(void (*fun)(T1,T2,T3))
 {
   typedef VoidFunInvoker3<T1,T2,T3> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1438,7 +1438,7 @@ struct VoidFunInvoker4:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-FunctorType create(void (*fun)(T1,T2,T3,T4))
+inline FunctorType create(void (*fun)(T1,T2,T3,T4))
 {
   typedef VoidFunInvoker4<T1,T2,T3,T4> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1480,7 +1480,7 @@ struct VoidFunInvoker5:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-FunctorType create(void (*fun)(T1,T2,T3,T4,T5))
+inline FunctorType create(void (*fun)(T1,T2,T3,T4,T5))
 {
   typedef VoidFunInvoker5<T1,T2,T3,T4,T5> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1524,7 +1524,7 @@ struct VoidFunInvoker6:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6))
+inline FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6))
 {
   typedef VoidFunInvoker6<T1,T2,T3,T4,T5,T6> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1570,7 +1570,7 @@ struct VoidFunInvoker7:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7))
+inline FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7))
 {
   typedef VoidFunInvoker7<T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1618,7 +1618,7 @@ struct VoidFunInvoker8:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
+inline FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
 {
   typedef VoidFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1668,7 +1668,7 @@ struct VoidFunInvoker9:BaseInvoker{
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
+inline FunctorType create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
 {
   typedef VoidFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -1700,7 +1700,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1>
 
-FunctorType create(Ret (T1::*fun)() )
+inline FunctorType create(Ret (T1::*fun)() )
 {
   typedef MemFunInvoker0<Ret,T1>
  InvokerType;
@@ -1733,7 +1733,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1>
 
-FunctorType create(Ret (T1::*fun)() const)
+inline FunctorType create(Ret (T1::*fun)() const)
 {
   typedef constMemFunInvoker0<Ret,T1>
  InvokerType;
@@ -1773,7 +1773,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2>
 
-FunctorType create(Ret (T1::*fun)(T2) )
+inline FunctorType create(Ret (T1::*fun)(T2) )
 {
   typedef MemFunInvoker1<Ret,T1,T2>
  InvokerType;
@@ -1813,7 +1813,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2>
 
-FunctorType create(Ret (T1::*fun)(T2) const)
+inline FunctorType create(Ret (T1::*fun)(T2) const)
 {
   typedef constMemFunInvoker1<Ret,T1,T2>
  InvokerType;
@@ -1855,7 +1855,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
-FunctorType create(Ret (T1::*fun)(T2,T3) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3) )
 {
   typedef MemFunInvoker2<Ret,T1,T2,T3>
  InvokerType;
@@ -1897,7 +1897,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3>
 
-FunctorType create(Ret (T1::*fun)(T2,T3) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3) const)
 {
   typedef constMemFunInvoker2<Ret,T1,T2,T3>
  InvokerType;
@@ -1941,7 +1941,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4) )
 {
   typedef MemFunInvoker3<Ret,T1,T2,T3,T4>
  InvokerType;
@@ -1985,7 +1985,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4) const)
 {
   typedef constMemFunInvoker3<Ret,T1,T2,T3,T4>
  InvokerType;
@@ -2031,7 +2031,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5) )
 {
   typedef MemFunInvoker4<Ret,T1,T2,T3,T4,T5>
  InvokerType;
@@ -2077,7 +2077,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5) const)
 {
   typedef constMemFunInvoker4<Ret,T1,T2,T3,T4,T5>
  InvokerType;
@@ -2125,7 +2125,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6) )
 {
   typedef MemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6>
  InvokerType;
@@ -2173,7 +2173,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6) const)
 {
   typedef constMemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6>
  InvokerType;
@@ -2223,7 +2223,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) )
 {
   typedef MemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7>
  InvokerType;
@@ -2273,7 +2273,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
 {
   typedef constMemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7>
  InvokerType;
@@ -2325,7 +2325,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
 {
   typedef MemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
  InvokerType;
@@ -2377,7 +2377,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
 {
   typedef constMemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
  InvokerType;
@@ -2431,7 +2431,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
 {
   typedef MemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
  InvokerType;
@@ -2485,7 +2485,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
 {
   typedef constMemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
  InvokerType;
@@ -2541,7 +2541,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
 {
   typedef MemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
  InvokerType;
@@ -2597,7 +2597,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
 
-FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
+inline FunctorType create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
 {
   typedef constMemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
  InvokerType;
@@ -2628,7 +2628,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1>
-FunctorType create(void (T1::*fun)() )
+inline FunctorType create(void (T1::*fun)() )
 {
   typedef VoidMemFunInvoker0<T1> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2658,7 +2658,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1>
-FunctorType create(void (T1::*fun)() const)
+inline FunctorType create(void (T1::*fun)() const)
 {
   typedef constVoidMemFunInvoker0<T1> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2695,7 +2695,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2>
-FunctorType create(void (T1::*fun)(T2) )
+inline FunctorType create(void (T1::*fun)(T2) )
 {
   typedef VoidMemFunInvoker1<T1,T2> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2732,7 +2732,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2>
-FunctorType create(void (T1::*fun)(T2) const)
+inline FunctorType create(void (T1::*fun)(T2) const)
 {
   typedef constVoidMemFunInvoker1<T1,T2> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2771,7 +2771,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3>
-FunctorType create(void (T1::*fun)(T2,T3) )
+inline FunctorType create(void (T1::*fun)(T2,T3) )
 {
   typedef VoidMemFunInvoker2<T1,T2,T3> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2810,7 +2810,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3>
-FunctorType create(void (T1::*fun)(T2,T3) const)
+inline FunctorType create(void (T1::*fun)(T2,T3) const)
 {
   typedef constVoidMemFunInvoker2<T1,T2,T3> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2851,7 +2851,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-FunctorType create(void (T1::*fun)(T2,T3,T4) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4) )
 {
   typedef VoidMemFunInvoker3<T1,T2,T3,T4> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2892,7 +2892,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4>
-FunctorType create(void (T1::*fun)(T2,T3,T4) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4) const)
 {
   typedef constVoidMemFunInvoker3<T1,T2,T3,T4> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2935,7 +2935,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5) )
 {
   typedef VoidMemFunInvoker4<T1,T2,T3,T4,T5> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -2978,7 +2978,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5) const)
 {
   typedef constVoidMemFunInvoker4<T1,T2,T3,T4,T5> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3023,7 +3023,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) )
 {
   typedef VoidMemFunInvoker5<T1,T2,T3,T4,T5,T6> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3068,7 +3068,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6) const)
 {
   typedef constVoidMemFunInvoker5<T1,T2,T3,T4,T5,T6> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3115,7 +3115,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) )
 {
   typedef VoidMemFunInvoker6<T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3162,7 +3162,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
 {
   typedef constVoidMemFunInvoker6<T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3211,7 +3211,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
 {
   typedef VoidMemFunInvoker7<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3260,7 +3260,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
 {
   typedef constVoidMemFunInvoker7<T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3311,7 +3311,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
 {
   typedef VoidMemFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3362,7 +3362,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
 {
   typedef constVoidMemFunInvoker8<T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3415,7 +3415,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
 {
   typedef VoidMemFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
   return FunctorType(new InvokerType(fun));
@@ -3468,7 +3468,7 @@ if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}
   }
 };
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
+inline FunctorType create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
 {
   typedef constVoidMemFunInvoker9<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
   return FunctorType(new InvokerType(fun));

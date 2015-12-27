@@ -285,7 +285,7 @@ namespace kaguya
 		LuaFunction fun_;
 	};
 
-	mem_fun_binder LuaRef::operator->*(const char* key)
+	inline mem_fun_binder LuaRef::operator->*(const char* key)
 	{
 		return mem_fun_binder(*this, key);
 	}

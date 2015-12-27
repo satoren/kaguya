@@ -19,7 +19,7 @@ def generate_fun_args(out,arg_num):
 
 def generate(out,arg_num):
 	generate_template(out,arg_num)
-	out.write('FunEvaluator operator()(')
+	out.write('inline FunEvaluator operator()(')
 	generate_fun_args(out,arg_num)
 	out.write(')\n')
 	out.write('{\n')

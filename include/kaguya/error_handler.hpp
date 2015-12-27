@@ -11,7 +11,7 @@
 namespace kaguya
 {
 
-	const char* get_error_message(lua_State *state)
+	inline const char* get_error_message(lua_State *state)
 	{
 		return lua_tostring(state, -1);
 	}
@@ -123,21 +123,21 @@ namespace kaguya
 
 	namespace except
 	{
-		void OtherError(lua_State *state, const std::string& message)
+		inline void OtherError(lua_State *state, const std::string& message)
 		{
 			ErrorHandler::instance().handle(message.c_str(), state);
 #if !KAGUYA_ERROR_NO_THROW
 			throw LuaKaguyaError(message);
 #endif
 		}
-		void typeMismatchError(lua_State *state, const std::string& message)
+		inline void typeMismatchError(lua_State *state, const std::string& message)
 		{
 			ErrorHandler::instance().handle(message.c_str(), state);
 #if !KAGUYA_ERROR_NO_THROW
 			throw LuaTypeMismatch(message);
 #endif
 		}
-		bool checkErrorAndThrow(int status, lua_State *state)
+		inline bool checkErrorAndThrow(int status, lua_State *state)
 		{
 			if (status != 0 && status != LUA_YIELD)
 			{

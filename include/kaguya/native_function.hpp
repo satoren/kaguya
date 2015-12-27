@@ -56,7 +56,7 @@ namespace kaguya
 			}
 			return weak_match;
 		}
-		std::string build_arg_error_message(lua_State *l)
+		inline std::string build_arg_error_message(lua_State *l)
 		{
 			std::string message = "argument not matching" + util::argmentTypes(l) + "\t candidated\n";
 

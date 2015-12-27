@@ -25,7 +25,9 @@ link_directories(${LUA_LIBRARY_DIRS})
 add_executable(test_runner test/test.cpp ${testSources} ${headers})
 target_link_libraries(test_runner ${LUA_LIBRARIES})
 
-add_executable(benchmark test/benchmark.cpp ${headers})
+set(BENCHMARK_SRCS test/benchmark.cpp test/benchmark_function.cpp)
+
+add_executable(benchmark ${BENCHMARK_SRCS} ${headers})
 target_link_libraries(benchmark ${LUA_LIBRARIES})
 
 enable_testing()
