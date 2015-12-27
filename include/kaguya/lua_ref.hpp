@@ -673,7 +673,7 @@ CLASSNAME() :LuaRef()\
 CLASSNAME(const CLASSNAME& ref) :LuaRef(ref)\
 {\
 }\
-explicit CLASSNAME(const LuaRef& ref) :LuaRef(ref)\
+CLASSNAME(const LuaRef& ref) :LuaRef(ref)\
 {\
 	typecheck();\
 }\
@@ -720,7 +720,7 @@ bool operator>(const CLASSNAME& other)const\
 #if KAGUYA_USE_RVALUE_REFERENCE
 
 #define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME) \
-explicit CLASSNAME(LuaRef&& src)throw() :LuaRef(standard::forward<LuaRef>(src))\
+CLASSNAME(LuaRef&& src)throw() :LuaRef(standard::forward<LuaRef>(src))\
 {\
 	typecheck(); \
 }\

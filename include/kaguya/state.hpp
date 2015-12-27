@@ -223,6 +223,10 @@ namespace kaguya
 		{
 			return LuaTable(state_);
 		}
+		LuaTable newTable(int reserve_array,int reserve_record)
+		{
+			return LuaTable(state_, NewTable(reserve_array, reserve_record));
+		}
 
 		//return new Lua thread
 		LuaThread newThread()

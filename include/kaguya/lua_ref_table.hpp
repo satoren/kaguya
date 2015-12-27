@@ -81,6 +81,9 @@ namespace kaguya
 		LuaTable(lua_State* state) :LuaRef(state, NewTable())
 		{
 		}
+		LuaTable(lua_State* state,const NewTable& newtable) :LuaRef(state, newtable)
+		{
+		}
 
 		using LuaRef::getField;
 		using LuaRef::setField;
