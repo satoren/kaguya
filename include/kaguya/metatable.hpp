@@ -30,7 +30,6 @@ namespace kaguya
 			enum { str_value, int_value, double_value } type;
 		};
 
-		typedef nativefunction::FunctorType FunctorType;
 		typedef std::vector<FunctorType> FuncArrayType;
 		typedef std::map<std::string, FuncArrayType> FuncMapType;
 

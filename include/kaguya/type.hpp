@@ -403,6 +403,11 @@ namespace kaguya
 				}
 				return 1;
 			}
+
+			inline int push(lua_State* l, const FunctorType& f);
+#if KAGUYA_USE_RVALUE_REFERENCE
+			inline int push(lua_State* l, FunctorType&& f);
+#endif
 		}
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)

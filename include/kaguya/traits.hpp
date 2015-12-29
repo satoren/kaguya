@@ -10,6 +10,7 @@ namespace kaguya
 	{
 		struct FunctorType;
 	}
+	typedef nativefunction::FunctorType FunctorType;
 	namespace traits
 	{
 		using namespace kaguya::standard;
