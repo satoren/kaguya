@@ -24,12 +24,11 @@ def generate_add_constructor_function(out,arg_num):
 	out.write(")\n")
 	out.write("{\n")
 
-	out.write("  FunctorType fun(new kaguya::nativefunction::ConstructorInvoker" + str(arg_num)+"<class_type")
+	out.write('  function_map_["new"].push_back(FunctorType::ConstructorInvoker<class_type')
 	if arg_num > 0:
 		out.write(",")
 		generate_args(out,arg_num,"T")
 	out.write(">());\n")
-	out.write('  function_map_["new"].push_back(fun);\n')
 	out.write("return *this;\n")
 
 	out.write("}\n")

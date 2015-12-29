@@ -484,9 +484,6 @@ namespace kaguya
 		inline int push(lua_State* l, const std::map<K, V>& ref);
 #include "kaguya/gen/push_tuple.inl"
 
-
-#include "kaguya/gen/constructor.inl"
-
 		template<typename T>inline void destructor(T* pointer)
 		{
 			if (pointer)

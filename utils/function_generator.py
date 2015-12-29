@@ -73,11 +73,11 @@ def generate(out,classname,basename,template_arg,func_type,checktype_fn,invoke_c
 	#typedef factory method
 	if len(template_arg) > 0:
 		out.write('template'+template_arg + '\n')
-	out.write('inline FunctorType create(' + func_type.replace('#FUNC_NAME#','fun')+')\n')
+	out.write('inline base_ptr_ create(' + func_type.replace('#FUNC_NAME#','fun')+')\n')
 	out.write('{\n')
 
 	out.write('  typedef ' + classname + template_arg.replace('typename ','') + ' InvokerType;\n')
-	out.write('  return FunctorType(new InvokerType(fun));\n')
+	out.write('  return base_ptr_(new InvokerType(fun));\n')
 	out.write('}\n\n\n')
 
 
@@ -280,9 +280,8 @@ def constructor_function(out,arg_num):
 	out.write('  {\n')
 	get_call(out,arg_num)
 	out.write('  void *storage = lua_newuserdata(state, sizeof(CLASS));\n')
-	out.write('    types::constructor<CLASS>(storage')
+	out.write('    new(storage) CLASS(')
 	if arg_num > 0:
-		out.write(',')
 		args(out,arg_num,'t')
 	out.write(');\n')
 	out.write('    types::class_userdata::setmetatable<CLASS>(state);\n')

@@ -40,7 +40,7 @@ namespace kaguya
 
 		ClassMetatable()
 		{
-			FunctorType dtor(kaguya::nativefunction::create(&types::destructor<class_type>));
+			FunctorType dtor(&types::destructor<class_type>);
 			function_map_["__gc"].push_back(dtor);
 		}
 
@@ -68,8 +68,7 @@ namespace kaguya
 //		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
 		ClassMetatable& addConstructorVariadicArg()
 		{
-			FunctorType fun(new kaguya::nativefunction::VariadicArgConstructorInvoker<class_type>());
-			function_map_["new"].push_back(fun);
+			function_map_["new"].push_back(FunctorType::VariadicConstructorInvoker<class_type>());
 			return *this;
 		}
 
@@ -231,8 +230,7 @@ namespace kaguya
 		template<typename Fun>
 		ClassMetatable& addFunction(const char* name, Fun f)
 		{
-			FunctorType fun(kaguya::nativefunction::create(f));
-			function_map_[name].push_back(fun);
+			function_map_[name].push_back(f);
 			return *this;
 		}
 
