@@ -125,7 +125,7 @@ state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 #### Registering function
 ```c++
 void c_free_standing_function(int v){std::cout <<"c_free_standing_function called:" << v << std::endl}
-state["fun"] = kaguya::function(&c_free_standing_function);
+state["fun"] = &c_free_standing_function;
 state["fun"](54); //c_free_standing_function called:54
 state("fun(22)");//c_free_standing_function called:22
 

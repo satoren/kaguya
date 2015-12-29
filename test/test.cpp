@@ -388,9 +388,9 @@ namespace selector_test
 
 		void free_standing_function_test(kaguya::State& state)
 		{
-			state["ABC"] = kaguya::function(&free_standing_function);
+			state["ABC"] = &free_standing_function;
 			state["ABC"](54);
-			state["free2"] = kaguya::function(&free_standing_function2);
+			state["free2"] = &free_standing_function2;
 			TEST_CHECK( result == 54 && state["free2"]() == 12.0);
 		}
 
@@ -425,6 +425,9 @@ namespace selector_test
 #if __cplusplus >= 201103L || defined(__cpp_lambdas)
 			lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
 			TEST_CHECK(state("Foo.bar(\"test\")")) ;
+			TEST_CHECK(foo.bar == "test");
+			lfoo["bar"] = kaguya::function([&foo](std::string str) { foo.bar = str; });
+			TEST_CHECK(state("Foo.bar(\"test\")"));
 			TEST_CHECK(foo.bar == "test");
 #else
 #endif

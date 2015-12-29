@@ -77,6 +77,7 @@ namespace kaguya
 		using boost::remove_const;
 		using boost::conditional;
 		using boost::is_same;
+		using boost::is_function;
 #if BOOST_VERSION >= 104800
 		using boost::forward;
 #else
@@ -106,6 +107,7 @@ namespace kaguya
 		using std::remove_const;
 		using std::conditional;
 		using std::is_same;
+		using std::is_function;
 		using std::forward;
 #endif
 	}

@@ -156,7 +156,7 @@ namespace kaguya
 		template<typename T>
 		void setFunction(T f)
 		{
-			parent_.setField(key_, nativefunction::FunctorType(nativefunction::create(f)));
+			parent_.setField(key_, nativefunction::FunctorType(f));
 		}
 	private:
 		template<typename T,typename P>
