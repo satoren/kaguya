@@ -501,6 +501,29 @@ namespace kaguya
 	}
 	namespace types
 	{
+		namespace detail {
+
+			inline int push(lua_State* l, const FunctorType& f)
+			{
+				lua_pushnumber(l, 1);//no overload
+				void *storage = lua_newuserdata(l, sizeof(FunctorType));
+				new(storage) FunctorType(f);
+				types::class_userdata::setmetatable<FunctorType>(l);
+				lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
+				return 1;
+			}
+#if KAGUYA_USE_RVALUE_REFERENCE
+			inline int push(lua_State* l, FunctorType&& f)
+			{
+				lua_pushnumber(l, 1);//no overload
+				void *storage = lua_newuserdata(l, sizeof(FunctorType));
+				new(storage) FunctorType(standard::forward<FunctorType>(f));
+				types::class_userdata::setmetatable<FunctorType>(l);
+				lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
+				return 1;
+			}
+#endif
+		}
 		template<>
 		inline FunctorType get(lua_State* l, int index, typetag<FunctorType> tag)
 		{
@@ -514,28 +537,7 @@ namespace kaguya
 		template<>
 		inline int push(lua_State* l, const FunctorType& f)
 		{
-			lua_pushnumber(l, 1);//no overload
-			void *storage = lua_newuserdata(l, sizeof(FunctorType));
-			new(storage) FunctorType(f);
-			types::class_userdata::setmetatable<FunctorType>(l);
-			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
-			return 1;
+			return detail::push(l,f);
 		}
-		template<typename F>
-		inline int push_native_function(lua_State* l, const F& f)
-		{
-			return push(l, FunctorType(f));
-		}
-#if KAGUYA_USE_RVALUE_REFERENCE
-		inline int push(lua_State* l, FunctorType&& f)
-		{
-			lua_pushnumber(l, 1);//no overload
-			void *storage = lua_newuserdata(l, sizeof(FunctorType));
-			new(storage) FunctorType(standard::forward<FunctorType>(f));
-			types::class_userdata::setmetatable<FunctorType>(l);
-			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
-			return 1;
-		}
-#endif
 	}
 };

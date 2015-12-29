@@ -30,11 +30,6 @@ namespace kaguya
 		template<typename T>
 		struct typetag {};
 
-
-		template<typename F>
-		inline int push_native_function(lua_State* l, const F& f);
-
-
 		namespace nodirectuse {
 			typedef const std::string& metatableName_t;
 			template<typename T>
@@ -394,10 +389,6 @@ namespace kaguya
 				if (!v)
 				{
 					lua_pushnil(l);
-				}
-				else if (standard::is_function<T>::value)
-				{
-					push_native_function(l, v);
 				}
 				else if (!available_metatable<T>(l))
 				{

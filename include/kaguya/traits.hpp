@@ -6,6 +6,10 @@
 
 namespace kaguya
 {
+	namespace nativefunction
+	{
+		struct FunctorType;
+	}
 	namespace traits
 	{
 		using namespace kaguya::standard;
@@ -68,13 +72,13 @@ namespace kaguya
 			is_same<typename remove_const_reference<T>::type, std::string>::value ||
 			is_same<T, const char*>::value> {};
 
-
 		template< class T >
 		struct lua_push_type
 		{
-			typedef typename conditional<is_convertible_lua_number<typename remove_reference<T>::type >::value
+			typedef typename conditional<
+				is_function<typename remove_pointer<T>::type>::value, nativefunction::FunctorType, typename conditional<is_convertible_lua_number<typename remove_reference<T>::type >::value
 				, typename lua_number_type<typename remove_const_reference<T>::type >::type
-				, T>::type type;
+				, T>::type>::type type;
 		};
 		template< >
 		struct lua_push_type<std::string&> {
