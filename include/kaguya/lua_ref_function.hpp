@@ -15,6 +15,9 @@
 namespace kaguya
 {
 
+	/**
+	* Reference of Lua function.
+	*/
 	class LuaFunction :public LuaRef
 	{
 		void typecheck()
@@ -39,14 +42,24 @@ namespace kaguya
 		using LuaRef::operator->*;
 		using LuaRef::costatus;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction);
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction);
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction)
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction)
 
+		/**
+		* @name operator()
+		* @brief call lua function.
+		* @param arg... function args
+		*/
 		using LuaRef::operator();
 		using LuaRef::setFunctionEnv;
 		using LuaRef::getFunctionEnv;
 
 	};
+
+
+	/**
+	* Reference of Lua thread(==coroutine).
+	*/
 	class LuaThread:public LuaRef
 	{
 		void typecheck()
@@ -57,6 +70,7 @@ namespace kaguya
 				LuaRef::unref();
 			}
 		}
+
 		//hide other type functions
 		using LuaRef::setFunctionEnv;
 		using LuaRef::getFunctionEnv;
@@ -69,14 +83,40 @@ namespace kaguya
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread);
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread);
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread)
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread)
+
+
+		/**
+		* create new thread.
+		* @param state lua_State pointer
+		*/
 		LuaThread(lua_State* state) :LuaRef(state, NewThread())
 		{
 		}
+
+		/**
+		* resume lua thread.
+		* @param arg... function args
+		*/
 		using LuaRef::operator();
+
+		/**
+		* resume lua thread.
+		* @return threadStatus
+		*/
 		using LuaRef::threadStatus;
+
+		/**
+		* resume lua thread.
+		* @return if thread can resume,return true.Otherwise return false.
+		*/
 		using LuaRef::isThreadDead;
+
+		/**
+		* resume lua thread.
+		* @return coroutine status.
+		*/
 		using LuaRef::costatus;
 	};
 	namespace traits

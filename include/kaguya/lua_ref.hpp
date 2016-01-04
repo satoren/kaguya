@@ -13,15 +13,26 @@ namespace kaguya
 {
 	struct StackTop {};
 
+	class LuaUserData;
 	class LuaTable;
+	class LuaFunction;
+	class LuaThread;
 	class TableKeyReference;
 	class FunEvaluator;
 	class mem_fun_binder;
 
 
+	/**
+	* Reference of Lua any type value.
+	*/
 	class LuaRef
 	{
-	protected:
+		friend class LuaUserData;
+		friend class LuaTable;
+		friend class LuaFunction;
+		friend class LuaThread;
+		friend class TableKeyReference;
+	private:
 		lua_State *state_;
 		int ref_;
 
@@ -120,17 +131,19 @@ namespace kaguya
 
 		struct NoMainCheck {};
 		bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
+
+		//! value type of Lua Reference
 		enum value_type
 		{
-			TYPE_NIL = LUA_TNIL,
-			TYPE_BOOL = LUA_TBOOLEAN,
-			TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,
-			TYPE_NUMBER = LUA_TNUMBER,
-			TYPE_STRING = LUA_TSTRING,
-			TYPE_TABLE = LUA_TTABLE,
-			TYPE_FUNCTION = LUA_TFUNCTION,
-			TYPE_USERDATA = LUA_TUSERDATA,
-			TYPE_THREAD = LUA_TTHREAD,
+			TYPE_NIL = LUA_TNIL,//!< nil type
+			TYPE_BOOL = LUA_TBOOLEAN,//!< boolean type
+			TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,//!< light userdata type
+			TYPE_NUMBER = LUA_TNUMBER,//!< number type
+			TYPE_STRING = LUA_TSTRING,//!< string type
+			TYPE_TABLE = LUA_TTABLE,//!< table type
+			TYPE_FUNCTION = LUA_TFUNCTION,//!< function type
+			TYPE_USERDATA = LUA_TUSERDATA,//!< userdata type
+			TYPE_THREAD = LUA_TTHREAD,//!< thread(coroutine) type
 		};
 
 		LuaRef(const LuaRef& src) :state_(src.state_)
@@ -273,13 +286,44 @@ namespace kaguya
 			return !isNilref() && get<bool>() == true;
 		}
 
+		/**
+		* @name function type
+		*/
+		//@{
+
+		/**
+		* set function environment table
+		*/
 		bool setFunctionEnv(const LuaTable& env);
+		/**
+		* set function environment to new table
+		*/
 		bool setFunctionEnv(NewTable env);
+		/**
+		* get function environment table
+		*/
 		LuaTable getFunctionEnv();
 
+		//@}
 
+		/**
+		* @name operator()
+		* @brief If type is function, call lua function.
+		   If type is lua thread,start or resume lua thread.
+		   Otherwise send error message to error handler 
+		* @param arg... function args 
+		*/
+		//@{
 #include "kaguya/gen/luaref_fun_def.inl"
+		//@}
 
+		/**
+		* @name coroutine type
+		*/
+		//@{
+		/**
+		* @return state status
+		*/
 		int threadStatus()const
 		{
 			if (isNilref())
@@ -297,19 +341,27 @@ namespace kaguya
 			}
 			return lua_status(thread);
 		}
+
+		//! deprecate
 		int thread_status()const
 		{
 			return threadStatus();
 		}
 
+		/**
+		* status of coroutine
+		*/
 		enum coroutine_status
 		{
-			COSTAT_RUNNING,
-			COSTAT_SUSPENDED,
-			COSTAT_NORMAL,
-			COSTAT_DEAD,
+			COSTAT_RUNNING,//!< coroutine is running
+			COSTAT_SUSPENDED,//!< coroutine is suspended
+			COSTAT_NORMAL,//!<
+			COSTAT_DEAD,//!< coroutine is dead
 		};
 
+		/**
+		* @return coroutine status
+		*/
 		coroutine_status costatus(lua_State *l=0)const
 		{
 			if (isNilref())
@@ -353,36 +405,95 @@ namespace kaguya
 
 		}
 
+		/**
+		* @return if coroutine status is dead, return true. Otherwise return false
+		*/
 		bool isThreadDead()const
 		{
 			return costatus() == COSTAT_DEAD;
 		}
+		//@}
 
 
-		mem_fun_binder operator->*(const char* key);
+		/**
+		* @name table type
+		*/
+		//@{
 
+		/**
+		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
+		* @param function_name function_name in table
+		*/
+		mem_fun_binder operator->*(const char* function_name);
+
+
+		/**
+		* @brief value = table[key];or table[key] = value;
+		* @param key key of table
+		* @return reference of field value
+		*/
 		TableKeyReference operator[](const LuaRef& key);
-		TableKeyReference operator[](const char* str);
-		TableKeyReference operator[](const std::string& str);
+		/**
+		* @brief value = table[key];or table[key] = value;
+		* @param key key of table
+		* @return reference of field value
+		*/
+		TableKeyReference operator[](const char* key);
+		/**
+		* @brief value = table[key];or table[key] = value;
+		* @param key key of table
+		* @return reference of field value
+		*/
+		TableKeyReference operator[](const std::string& key);
+		/**
+		* @brief value = table[index];or table[index] = value;
+		* @param index index of table
+		* @return reference of field value
+		*/
 		TableKeyReference operator[](int index);
 
+		/**
+		* @brief value = table[key];
+		* @param key key of table
+		* @return reference of field value
+		*/
 		LuaRef operator[](const LuaRef& key)const
 		{
 			return getField(key);
 		}
-		LuaRef operator[](const char* str)const
+		/**
+		* @brief value = table[key];
+		* @param key key of table
+		* @return reference of field value
+		*/
+		LuaRef operator[](const char* key)const
 		{
-			return getField(str);
+			return getField(key);
 		}
-		LuaRef operator[](const std::string& str)const
+		/**
+		* @brief value = table[key];
+		* @param key key of table
+		* @return reference of field value
+		*/
+		LuaRef operator[](const std::string& key)const
 		{
-			return getField(str);
+			return getField(key);
 		}
+		/**
+		* @brief value = table[key];
+		* @param index index of table 
+		* @return reference of field value
+		*/
 		LuaRef operator[](int index)const
 		{
 			return getField(index);
 		}
 
+		/**
+		* @brief value = table[key];
+		* @param key key of table 
+		* @return reference of field value
+		*/
 		LuaRef getField(const LuaRef& key)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -402,6 +513,11 @@ namespace kaguya
 			lua_gettable(state_, -2);
 			return LuaRef(state_, StackTop(), NoMainCheck());
 		}
+		/**
+		* @brief value = table[key];
+		* @param key key of table 
+		* @return reference of field value
+		*/
 		LuaRef getField(const char* str)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -421,10 +537,20 @@ namespace kaguya
 			lua_gettable(state_, -2);
 			return LuaRef(state_, StackTop());
 		}
+		/**
+		* @brief value = table[key];
+		* @param key key of table 
+		* @return reference of field value
+		*/
 		LuaRef getField(const std::string& str)const
 		{
 			return getField(str.c_str());
 		}
+		/**
+		* @brief value = table[key];
+		* @param key key of table 
+		* @return reference of field value
+		*/
 		LuaRef getField(int index)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -444,28 +570,44 @@ namespace kaguya
 			lua_gettable(state_, -2);
 			return LuaRef(state_, StackTop(), NoMainCheck());
 		}
+		/**
+		* @brief table[key] = value;
+		*/
 		template<typename T>
 		void setField(int key, T value)
 		{
 			setFieldImpl<int, T>(key, value);
 		}
 
+		/**
+		* @brief table[key] = value;
+		*/
 		template<typename T>
 		void setField(const char* key, T value)
 		{
 			setFieldImpl<const char*, T>(key, value);
 		}
+		/**
+		* @brief table[key] = value;
+		*/
 		template<typename T>
 		void setField(const std::string& key, T value)
 		{
 			setField(key.c_str(), value);
 		}
+
+		/**
+		* @brief table[key] = value;
+		*/
 		template<typename T>
 		void setField(const LuaRef& key, T value)
 		{
 			setFieldImpl<LuaRef, T>(key, value);
 		}
 
+		/**
+		* @brief foreach table fields
+		*/
 		template<class Fun>void foreach_table(Fun f)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -489,24 +631,39 @@ namespace kaguya
 				f(key, value);
 			}
 		}
+
+
+		/**
+		* @brief If type is table or userdata, return keys.
+		* @return field keys
+		*/
 		std::vector<LuaRef> keys()const
 		{
 			std::vector<LuaRef> res;
 			foreach_table(gettablekey(res));
 			return res;
 		}
+		/**
+		* @brief If type is table or userdata, return values.
+		* @return field value
+		*/
 		std::vector<LuaRef> values()const
 		{
 			std::vector<LuaRef> res;
 			foreach_table(gettablevalue(res));
 			return res;
 		}
+		/**
+		* @brief If type is table or userdata, return key value pair.
+		* @return key value pair
+		*/
 		std::map<LuaRef, LuaRef> map()const
 		{
 			std::map<LuaRef, LuaRef> res;
 			foreach_table(gettablemap(res));
 			return res;
 		}
+		//@}
 
 		enum value_type type() const
 		{

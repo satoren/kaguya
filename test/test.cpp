@@ -904,7 +904,8 @@ namespace selector_test
 		{
 			state.dostring("foo = 'bar'");
 
-			state["otherEnv"] = state.newRef(kaguya::NewTable());
+			state["otherEnv"] = kaguya::NewTable
+				();
 			state.dostring("foo = 'dar'", state["otherEnv"]);
 
 			TEST_CHECK(state("assert(foo == 'bar')"));

@@ -78,12 +78,15 @@ namespace kaguya
 			luaL_openlibs(state_);
 		}
 
+		//! load lua library
 		void openlib(const LoadLib& lib)
 		{
 			util::ScopedSavedStack save(state_);
 
 			luaL_requiref(state_, lib.first.c_str(), lib.second, 1);
 		}
+
+		//! load lua libraries
 		void openlibs(const LoadLibs& libs)
 		{
 			for (LoadLibs::const_iterator it = libs.begin(); it != libs.end(); ++it)
@@ -92,8 +95,14 @@ namespace kaguya
 			}
 		}
 
-		//If there are no errors,compiled file as a Lua function and return
-		//Otherwise send error message to error handler and return nil reference 
+		/**
+		* @name loadfile
+		* @brief If there are no errors,compiled file as a Lua function and return.
+		*  Otherwise send error message to error handler and return nil reference 
+		* @param file  file path of lua script
+		* @return reference of lua function 
+		*/
+		//@{
 		LuaFunction loadfile(const std::string& file)
 		{
 			return loadfile(file.c_str());
@@ -111,10 +120,17 @@ namespace kaguya
 			}
 			return LuaFunction(state_, StackTop());
 		}
+		//@}
 
 
-		//If there are no errors,compiled string as a Lua function and return
-		//Otherwise send error message to error handler and return nil reference 
+		/**
+		* @name loadstring
+		* @brief If there are no errors,compiled string as a Lua function and return.
+		*  Otherwise send error message to error handler and return nil reference
+		* @param str lua code
+		* @return reference of lua function 
+		*/
+		//@{
 		LuaFunction loadstring(const std::string& str)
 		{
 			return loadstring(str.c_str());
@@ -132,7 +148,16 @@ namespace kaguya
 			}
 			return LuaFunction(state_, StackTop());
 		}
+		//@}
 
+		/**
+		* @name dofile
+		* @brief Loads and runs the given file.
+		* @param file file path of lua script
+		* @param env execute env table
+		* @return If there are no errors, returns true.Otherwise return false
+		*/
+		//@{
 		bool dofile(const std::string& file, const LuaTable& env = LuaTable())
 		{
 			return dofile(file.c_str(), env);
@@ -167,7 +192,15 @@ namespace kaguya
 			}
 			return true;
 		}
+		//@}
 
+		/**
+		* @name dostring
+		* @brief Loads and runs the given string.
+		* @param str lua script cpde
+		* @param env execute env table
+		* @return If there are no errors, returns true.Otherwise return false
+		*/
 		bool dostring(const char* str, const LuaTable& env = LuaTable())
 		{
 			util::ScopedSavedStack save(state_);
@@ -207,40 +240,45 @@ namespace kaguya
 		{
 			return dostring(str);
 		}
+		//@}
+
+		//! return element reference from global table
 		TableKeyReference operator[](const std::string& str)
 		{
 			return TableKeyReference(globalTable(), LuaRef(state_, str));
 		}
 
+		//! return element reference from global table
 		TableKeyReference operator[](const char* str)
 		{
 			return TableKeyReference(globalTable(), LuaRef(state_, str));
 		}
 
-		//return global table
+		//! return global table
 		LuaTable globalTable()
 		{
 			return newRef(GlobalTable());
 		}
 
-		//return new Lua reference
+		//! return new Lua reference from argument value
 		template<typename T>
 		LuaRef newRef(T value)
 		{
 			return LuaRef(state_, value);
 		}
 
-		//return new Lua table
+		//! return new Lua table
 		LuaTable newTable()
 		{
 			return LuaTable(state_);
 		}
+		//! return new Lua table
 		LuaTable newTable(int reserve_array, int reserve_record)
 		{
 			return LuaTable(state_, NewTable(reserve_array, reserve_record));
 		}
 
-		//return new Lua thread
+		//! return new Lua thread
 		LuaThread newThread()
 		{
 			return LuaThread(state_);
@@ -253,33 +291,79 @@ namespace kaguya
 			types::push(state_, value);
 		}
 
+		//! Garbage Collection of Lua 
 		struct GCType
 		{
 			GCType(lua_State* state) :state_(state) {}
 
+			/**
+			* Performs a full garbage-collection cycle.
+			*/
 			void collect()
 			{
 				lua_gc(state_, LUA_GCCOLLECT, 0);
 			}
+			/** Performs an incremental step of garbage collection.
+			* @return If returns true,the step finished a collection cycle.
+			*/
 			bool step()
 			{
 				return lua_gc(state_, LUA_GCSTEP, 0) == 1;
 			}
+			/**
+			* Performs an incremental step of garbage collection.
+			* @args the collector will perform as if that amount of memory (in KBytes) had been allocated by Lua. 
+			*/
+			bool step(int size)
+			{
+				return lua_gc(state_, LUA_GCSTEP, size) == 1;
+			}
+			/**
+			* enable gc
+			*/
 			void restart() { enable(); }
+			/**
+			* disable gc
+			*/
 			void stop() { disable(); }
+
+			/**
+			* returns the total memory in use by Lua in Kbytes.
+			*/
 			int count()const { return lua_gc(state_, LUA_GCCOUNT, 0); }
+
+			/**
+			* sets arg as the new value for the pause of the collector. Returns the previous value for pause.
+			*/
 			int steppause(int value) { return lua_gc(state_, LUA_GCSETPAUSE, value); }
+			/**
+			*  sets arg as the new value for the step multiplier of the collector. Returns the previous value for step.
+			*/
 			int setstepmul(int value) { return lua_gc(state_, LUA_GCSETSTEPMUL, value); }
+
+			/**
+			* enable gc
+			*/
 			void enable()
 			{
 				lua_gc(state_, LUA_GCRESTART, 0);
 			}
+
+			/**
+			* disable gc
+			*/
 			void disable()
 			{
 				lua_gc(state_, LUA_GCSTOP, 0);
 			}
 #if LUA_VERSION_NUM >= 502
+			/**
+			* returns a boolean that tells whether the collector is running
+			*/
 			bool isrunning()const { return isenabled(); }
+			/**
+			* returns a boolean that tells whether the collector is running
+			*/
 			bool isenabled()const
 			{
 				return lua_gc(state_, LUA_GCISRUNNING, 0) != 0;
@@ -290,31 +374,41 @@ namespace kaguya
 			lua_State* state_;
 		};
 
+		//! return Garbage collection interface.
 		GCType gc()const
 		{
 			return GCType(state_);
 		}
-		//performs a full garbage-collection cycle.
+		//! performs a full garbage-collection cycle.
 		void garbageCollect()
 		{
 			gc().collect();
 		}
 
-		//returns the current amount of memory (in Kbytes) in use by Lua.
+		//! returns the current amount of memory (in Kbytes) in use by Lua.
 		size_t useKBytes()const
 		{
 			return size_t(gc().count());
 		}
 
 
-		//for Lua module
+
+		/**
+		* @brief create Table and push to stack.
+		* using for Lua module
+		* @return return Lua Table Reference
+		*/
 		LuaRef newLib()
 		{
-			LuaRef newtable(state_, NewTable());
+			LuaTable newtable = newTable();
 			newtable.push(state_);
 			return newtable;
 		}
 
+		/**
+		* @brief return lua_State*.
+		* @return lua_State*
+		*/
 		lua_State *state() { return state_; };
 	};
 };

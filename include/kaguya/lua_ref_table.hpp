@@ -28,8 +28,8 @@ namespace kaguya
 		using LuaRef::isThreadDead;
 		using LuaRef::costatus;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData);
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData);
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData)
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData)
 
 		using LuaRef::getField;
 		using LuaRef::keys;
@@ -75,8 +75,8 @@ namespace kaguya
 		using LuaRef::isThreadDead;
 		using LuaRef::costatus;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable);
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable);
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable)
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable)
 
 		LuaTable(lua_State* state) :LuaRef(state, NewTable())
 		{
@@ -98,8 +98,13 @@ namespace kaguya
 	class TableKeyReference :public LuaRef
 	{
 	public:
+		//! create reference from table and table key
 		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
+
+		//! copy constructor
 		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
+
+		//! copy operator
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
 			static_cast<LuaRef&>(*this) = src;
@@ -109,10 +114,12 @@ namespace kaguya
 		}
 
 #if KAGUYA_USE_RVALUE_REFERENCE
+		//! move constructor
 		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
 		{
 			swap(src);
 		}
+		//! move operator
 		TableKeyReference& operator=(TableKeyReference&& src)throw()
 		{
 			swap(src);
@@ -126,12 +133,15 @@ namespace kaguya
 			std::swap(key_, other.key_);
 		}
 
+		//! assign from LuaRef
 		TableKeyReference& operator=(const LuaRef& src)
 		{
 			parent_.setField(key_, src);
 			static_cast<LuaRef&>(*this) = src;
 			return *this;
 		}
+
+		//! assign from T
 		template<typename T>
 		TableKeyReference& operator=(T src)
 		{
@@ -140,6 +150,7 @@ namespace kaguya
 			return *this;
 		}
 
+		//! register class metatable to lua and set to table
 		template<typename T,typename P>
 		void setClass(const ClassMetatable<T,P>& reg, bool auto_reg_shared_ptr = true)
 		{
@@ -153,6 +164,7 @@ namespace kaguya
 			}
 		}
 
+		//! set function 
 		template<typename T>
 		void setFunction(T f)
 		{
