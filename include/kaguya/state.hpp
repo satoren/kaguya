@@ -13,6 +13,9 @@
 
 namespace kaguya
 {
+	typedef std::pair<std::string, lua_CFunction> LoadLib;
+	typedef std::vector<LoadLib> LoadLibs;
+	inline LoadLibs NoLoadLib() { return LoadLibs(); };
 	class State
 	{
 		lua_State *state_;
@@ -36,9 +39,19 @@ namespace kaguya
 		}
 
 	public:
+
+		//! create Lua state with lua standard library
 		State() :state_(luaL_newstate()), created_(true)
 		{
 			init();
+			openlibs();
+		}
+
+		//! create Lua state with(or without) library
+		State(const LoadLibs& libs) :state_(luaL_newstate()), created_(true)
+		{
+			init();
+			openlibs(libs);
 		}
 		State(lua_State* lua) :state_(lua), created_(false)
 		{
@@ -58,10 +71,25 @@ namespace kaguya
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
 		}
 
+		//! load all lua standard library
 		void openlibs()
 		{
 			util::ScopedSavedStack save(state_);
 			luaL_openlibs(state_);
+		}
+
+		void openlib(const LoadLib& lib)
+		{
+			util::ScopedSavedStack save(state_);
+
+			luaL_requiref(state_, lib.first.c_str(), lib.second, 1);
+		}
+		void openlibs(const LoadLibs& libs)
+		{
+			for (LoadLibs::const_iterator it = libs.begin(); it != libs.end(); ++it)
+			{
+				openlib(*it);
+			}
 		}
 
 		//If there are no errors,compiled file as a Lua function and return

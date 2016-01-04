@@ -114,11 +114,11 @@ namespace kaguya
 
 	//compatibility for Lua5.1
 #if LUA_VERSION_NUM < 502
-	void luaL_setmetatable(lua_State *L, const char *tname) {
+	inline void luaL_setmetatable(lua_State *L, const char *tname) {
 		luaL_getmetatable(L, tname);
 		lua_setmetatable(L, -2);
 	}
-	void *luaL_testudata(lua_State *L, int index, const char *tname) {
+	inline void *luaL_testudata(lua_State *L, int index, const char *tname) {
 		void *p = lua_touserdata(L, index);
 		if (p == NULL)
 		{
@@ -135,6 +135,18 @@ namespace kaguya
 			return p;
 		}
 		return 0;
+	}
+	inline void luaL_requiref(lua_State *L, const char *modname,
+		lua_CFunction openf, int glb) {
+
+		lua_pushcfunction(L, openf);
+		lua_pushstring(L, modname);
+		lua_call(L, 1, 1);
+
+		if (glb) {
+			lua_pushvalue(L, -1);
+			lua_setglobal(L, modname);
+		}
 	}
 #endif
 }

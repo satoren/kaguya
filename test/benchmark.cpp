@@ -22,7 +22,7 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 		static const int N = 4;
 		for (int i = 0; i < N; ++i)
 		{
-			kaguya::State state; state.openlibs();
+			kaguya::State state;
 			double start = state["os"]["clock"]();
 
 			it->second(state);

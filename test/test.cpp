@@ -911,6 +911,30 @@ namespace selector_test
 
 			TEST_CHECK(state("assert(otherEnv.foo == 'dar')"));
 		}
+		void no_standard_lib(kaguya::State&)
+		{
+			kaguya::State state(kaguya::NoLoadLib());
+			TEST_CHECK(!state("assert(true)"));//can not call assert
+		}
+		void load_lib_constructor(kaguya::State&)
+		{
+			{
+				kaguya::LoadLibs libs;
+				libs.push_back(kaguya::LoadLib("_G", luaopen_base));
+				libs.push_back(kaguya::LoadLib(LUA_MATHLIBNAME, luaopen_math));
+
+				kaguya::State state(libs);
+				TEST_CHECK(state("assert(true)"));
+				TEST_CHECK(state("assert(math.abs(-2) == 2)"));
+			}
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER>=1800)
+			{//use c++11 initializer list
+				kaguya::State state({ { "_G", luaopen_base },{ LUA_MATHLIBNAME, luaopen_math } });
+				TEST_CHECK(state("assert(true)"));
+				TEST_CHECK(state("assert(math.abs(-2) == 2)"));
+			}
+#endif
+		}
 	}
 
 	namespace t_07_any_type_test
@@ -1037,7 +1061,7 @@ bool execute_test(const test_function_map_t& testmap)
 	std::vector<std::string> fail_tests;
 	for (test_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it, ++testindex)
 	{
-		kaguya::State state; state.openlibs();
+		kaguya::State state;
 
 		state.setErrorHandler(test_error_handler);
 
@@ -1173,7 +1197,9 @@ int main()
 		ADD_TEST(selector_test::t_06_state::load_string);
 
 		ADD_TEST(selector_test::t_06_state::load_with_other_env);
-
+		ADD_TEST(selector_test::t_06_state::no_standard_lib);
+		ADD_TEST(selector_test::t_06_state::load_lib_constructor);
+		
 		
 
 		ADD_TEST(selector_test::t_07_any_type_test::any_type_test);

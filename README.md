@@ -34,7 +34,6 @@ make
 int main()
 {
   kaguya::State state;
-  state.openlibs();//open lua standard library
   state.dofile("/path/to/script.lua")
 }
 ```
@@ -53,14 +52,14 @@ extern "C" int luaopen_modulename(lua_State *L)
 
 ### Runnig Lua code
 ```c++
-  kaguya::State state;state.openlibs();
+  kaguya::State state;
   state("a = \"test\"");//from string
   state.loadFile("path/to/luascript.lua");//from file
 ```
 
 ### Accessing values
 ```c++
-  kaguya::State state;state.openlibs();
+  kaguya::State state;
   state("a = \"test\"");
   std::string a_value = state["a"];
   assert(a_value == "test");
