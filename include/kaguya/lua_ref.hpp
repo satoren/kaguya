@@ -310,8 +310,8 @@ namespace kaguya
 		* @name operator()
 		* @brief If type is function, call lua function.
 		   If type is lua thread,start or resume lua thread.
-		   Otherwise send error message to error handler 
-		* @param arg... function args 
+		   Otherwise send error message to error handler
+		* @param arg... function args
 		*/
 		//@{
 #include "kaguya/gen/luaref_fun_def.inl"
@@ -362,7 +362,7 @@ namespace kaguya
 		/**
 		* @return coroutine status
 		*/
-		coroutine_status costatus(lua_State *l=0)const
+		coroutine_status costatus(lua_State *l = 0)const
 		{
 			if (isNilref())
 			{
@@ -481,7 +481,7 @@ namespace kaguya
 		}
 		/**
 		* @brief value = table[key];
-		* @param index index of table 
+		* @param index index of table
 		* @return reference of field value
 		*/
 		LuaRef operator[](int index)const
@@ -491,7 +491,7 @@ namespace kaguya
 
 		/**
 		* @brief value = table[key];
-		* @param key key of table 
+		* @param key key of table
 		* @return reference of field value
 		*/
 		LuaRef getField(const LuaRef& key)const
@@ -515,7 +515,7 @@ namespace kaguya
 		}
 		/**
 		* @brief value = table[key];
-		* @param key key of table 
+		* @param key key of table
 		* @return reference of field value
 		*/
 		LuaRef getField(const char* str)const
@@ -539,7 +539,7 @@ namespace kaguya
 		}
 		/**
 		* @brief value = table[key];
-		* @param key key of table 
+		* @param key key of table
 		* @return reference of field value
 		*/
 		LuaRef getField(const std::string& str)const
@@ -548,7 +548,7 @@ namespace kaguya
 		}
 		/**
 		* @brief value = table[key];
-		* @param key key of table 
+		* @param key key of table
 		* @return reference of field value
 		*/
 		LuaRef getField(int index)const
@@ -679,7 +679,11 @@ namespace kaguya
 		{
 			return lua_typename(state_, type());
 		}
-
+		/**
+		* @name relational operators
+		* @brief
+		*/
+		//@{
 		bool operator==(const LuaRef& other)const
 		{
 			value_type other_type = other.type();
@@ -737,7 +741,7 @@ namespace kaguya
 		{
 			return !(other == *this);
 		}
-
+		//@}
 	};
 
 	template<typename T>

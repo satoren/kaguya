@@ -11,6 +11,7 @@ namespace kaguya
 {
 	class State;
 
+	//! Reference to Lua userdata
 	class  LuaUserData :public LuaRef
 	{
 		void typecheck()
@@ -31,13 +32,19 @@ namespace kaguya
 		using LuaRef::costatus;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData)
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData)
+			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData)
 
-		using LuaRef::getField;
+			using LuaRef::getField;
 		using LuaRef::keys;
 		using LuaRef::values;
 		using LuaRef::map;
-
+		/**
+		* @name operator[]
+		* @brief value = table[key];
+		* @param key key of table
+		* @return reference of field value
+		*/
+		//@{
 		LuaRef operator[](const LuaRef& key)const
 		{
 			return LuaRef::operator[](key);
@@ -54,10 +61,13 @@ namespace kaguya
 		{
 			return LuaRef::operator[](index);
 		}
+		//@}
 
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
 	};
+
+	//! Reference to Lua table
 	class LuaTable :public LuaRef
 	{
 		void typecheck()
@@ -78,12 +88,12 @@ namespace kaguya
 		using LuaRef::costatus;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable)
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable)
+			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable)
 
-		LuaTable(lua_State* state) :LuaRef(state, NewTable())
+			LuaTable(lua_State* state) :LuaRef(state, NewTable())
 		{
 		}
-		LuaTable(lua_State* state,const NewTable& newtable) :LuaRef(state, newtable)
+		LuaTable(lua_State* state, const NewTable& newtable) :LuaRef(state, newtable)
 		{
 		}
 
@@ -128,16 +138,16 @@ namespace kaguya
 		}
 
 		//! register class metatable to lua and set to table
-		template<typename T,typename P>
-		void setClass(const ClassMetatable<T,P>& reg, bool auto_reg_shared_ptr = true)
+		template<typename T, typename P>
+		void setClass(const ClassMetatable<T, P>& reg, bool auto_reg_shared_ptr = true)
 		{
 			set_class(reg);
 			static_cast<LuaRef&>(*this) = parent_.getField(key_);
 
-			(*this)["ptr_wrapper"].set_class(ClassMetatable<MetaPointerWrapper<T>,T>());
+			(*this)["ptr_wrapper"].set_class(ClassMetatable<MetaPointerWrapper<T>, T>());
 			if (auto_reg_shared_ptr)
 			{
-				(*this)["shared_ptr"].set_class(ClassMetatable<standard::shared_ptr<T>,T >());
+				(*this)["shared_ptr"].set_class(ClassMetatable<standard::shared_ptr<T>, T >());
 			}
 		}
 
@@ -148,8 +158,8 @@ namespace kaguya
 			parent_.setField(key_, FunctorType(f));
 		}
 	private:
-		template<typename T,typename P>
-		void set_class(const ClassMetatable<T,P>& reg)
+		template<typename T, typename P>
+		void set_class(const ClassMetatable<T, P>& reg)
 		{
 			util::ScopedSavedStack save(state_);
 			parent_.push(state_);
@@ -200,7 +210,7 @@ namespace kaguya
 	inline bool LuaRef::setFunctionEnv(NewTable env)
 	{
 		return setFunctionEnv(LuaTable(state_));
-	}
+}
 
 	inline LuaTable LuaRef::getFunctionEnv()
 	{

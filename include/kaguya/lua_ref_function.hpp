@@ -43,14 +43,14 @@ namespace kaguya
 		using LuaRef::costatus;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction)
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction)
+			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction)
 
-		/**
-		* @name operator()
-		* @brief call lua function.
-		* @param arg... function args
-		*/
-		using LuaRef::operator();
+			/**
+			* @name operator()
+			* @brief call lua function.
+			* @param arg... function args
+			*/
+			using LuaRef::operator();
 		using LuaRef::setFunctionEnv;
 		using LuaRef::getFunctionEnv;
 
@@ -60,7 +60,7 @@ namespace kaguya
 	/**
 	* Reference of Lua thread(==coroutine).
 	*/
-	class LuaThread:public LuaRef
+	class LuaThread :public LuaRef
 	{
 		void typecheck()
 		{
@@ -84,14 +84,14 @@ namespace kaguya
 		using LuaRef::operator->*;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread)
-		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread)
+			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread)
 
 
-		/**
-		* create new thread.
-		* @param state lua_State pointer
-		*/
-		LuaThread(lua_State* state) :LuaRef(state, NewThread())
+			/**
+			* create new thread.
+			* @param state lua_State pointer
+			*/
+			LuaThread(lua_State* state) :LuaRef(state, NewThread())
 		{
 		}
 
@@ -180,6 +180,7 @@ namespace kaguya
 			return 1;
 		}
 	}
+	//! execute Lua function (or resume coroutine) and get result
 	class FunEvaluator
 	{
 	public:
@@ -312,16 +313,26 @@ namespace kaguya
 		standard::shared_ptr<eval> eval_info_;
 	};
 
-
+	/**
+	* @brief table and function binder.
+	* state["table"]->*"fun"() is table:fun() in Lua
+	* @param arg... function args
+	*/
 	class mem_fun_binder
 	{
 	public:
 		template<class T>
-		mem_fun_binder(LuaRef self, T key):self_(self), fun_(self_.getField(key))
+		mem_fun_binder(LuaRef self, T key) :self_(self), fun_(self_.getField(key))
 		{
 		}
-
+		/**
+		* @name operator()
+		* @brief call function with self.
+		* @param arg... function args
+		*/
+		//@{
 #include "kaguya/gen/luaref_mem_fun_def.inl"
+		//@}
 	private:
 		LuaRef self_;//Table or Userdata
 		LuaFunction fun_;
