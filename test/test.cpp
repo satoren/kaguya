@@ -840,6 +840,17 @@ namespace selector_test
 			state["value"]["abc"]["bbb"] = "test";
 			TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")"));
 		}		
+
+		void lua_table_reference(kaguya::State& state)
+		{
+			kaguya::LuaTable globalTable = state.globalTable();
+			state["value"] = kaguya::NewTable();
+			state["value"]["abc"] = kaguya::NewTable();
+			state["value"]["abc"]["def"] = 7;
+			state["value"]["abc"]["bbb"] = "test";
+			state["value"]["abc"]["ccc"] = state["value"]["abc"]["bbb"];
+			TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test' and value.abc.ccc == 'test')"));
+		}
 		
 	}
 
@@ -1190,6 +1201,7 @@ int main()
 		ADD_TEST(selector_test::t_04_lua_ref::function_env);
 		ADD_TEST(selector_test::t_04_lua_ref::lua_table_get);
 		ADD_TEST(selector_test::t_04_lua_ref::lua_table_set);
+		ADD_TEST(selector_test::t_04_lua_ref::lua_table_reference);
 
 		ADD_TEST(selector_test::t_05_error_handler::set_error_function);
 		ADD_TEST(selector_test::t_05_error_handler::function_call_error);

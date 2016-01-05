@@ -9,6 +9,8 @@
 
 namespace kaguya
 {
+	class State;
+
 	class  LuaUserData :public LuaRef
 	{
 		void typecheck()
@@ -94,43 +96,18 @@ namespace kaguya
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
 	};
-
 	class TableKeyReference :public LuaRef
 	{
 	public:
-		//! create reference from table and table key
-		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
+		friend LuaRef;
+		friend State;
 
-		//! copy constructor
-		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
-
-		//! copy operator
+		//! this is not copy.same assign from LuaRef.
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
+			parent_.setField(key_, src);
 			static_cast<LuaRef&>(*this) = src;
-			parent_ = src.parent_;
-			key_ = src.key_;
 			return *this;
-		}
-
-#if KAGUYA_USE_RVALUE_REFERENCE
-		//! move constructor
-		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
-		{
-			swap(src);
-		}
-		//! move operator
-		TableKeyReference& operator=(TableKeyReference&& src)throw()
-		{
-			swap(src);
-			return *this;
-		}
-#endif
-		void swap(TableKeyReference& other)throw()
-		{
-			std::swap(static_cast<LuaRef&>(*this), static_cast<LuaRef&>(other));
-			std::swap(parent_, other.parent_);
-			std::swap(key_, other.key_);
 		}
 
 		//! assign from LuaRef
@@ -181,6 +158,23 @@ namespace kaguya
 
 			lua_settable(state_, -3);
 		}
+
+		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
+
+		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
+
+		void swap(TableKeyReference& other)throw()
+		{
+			std::swap(static_cast<LuaRef&>(*this), static_cast<LuaRef&>(other));
+			std::swap(parent_, other.parent_);
+			std::swap(key_, other.key_);
+		}
+#if KAGUYA_USE_RVALUE_REFERENCE
+		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
+		{
+			swap(src);
+		}
+#endif
 
 		LuaTable parent_;
 		LuaRef key_;
@@ -296,6 +290,12 @@ namespace kaguya
 		}
 		template<>
 		inline int push(lua_State* l, const LuaTable& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+		template<>
+		inline int push(lua_State* l, const TableKeyReference& ref)
 		{
 			ref.push(l);
 			return 1;
