@@ -81,8 +81,7 @@ namespace kaguya
 #if BOOST_VERSION >= 104800
 		using boost::forward;
 #else
-		template<typename T>T& forward(T& v) { return v; }
-		template<typename T>const T& forward(const T& v) { return v; }
+		template<typename T>T forward(T v) { return v; }
 #endif
 
 		inline std::string to_string(int v)
