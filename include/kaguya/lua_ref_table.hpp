@@ -109,8 +109,8 @@ namespace kaguya
 	class TableKeyReference :public LuaRef
 	{
 	public:
-		friend LuaRef;
-		friend State;
+		friend class LuaRef;
+		friend class State;
 
 		//! this is not copy.same assign from LuaRef.
 		TableKeyReference& operator=(const TableKeyReference& src)
@@ -157,6 +157,9 @@ namespace kaguya
 		{
 			parent_.setField(key_, FunctorType(f));
 		}
+
+		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
+
 	private:
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
@@ -171,7 +174,6 @@ namespace kaguya
 
 		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
 
-		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
 
 		void swap(TableKeyReference& other)throw()
 		{
