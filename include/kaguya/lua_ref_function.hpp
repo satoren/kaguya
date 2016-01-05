@@ -42,15 +42,15 @@ namespace kaguya
 		using LuaRef::operator->*;
 		using LuaRef::costatus;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction)
-			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction)
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction);
 
-			/**
-			* @name operator()
-			* @brief call lua function.
-			* @param arg... function args
-			*/
-			using LuaRef::operator();
+		/**
+		* @name operator()
+		* @brief call lua function.
+		* @param arg... function args
+		*/
+		using LuaRef::operator();
 		using LuaRef::setFunctionEnv;
 		using LuaRef::getFunctionEnv;
 
@@ -83,15 +83,15 @@ namespace kaguya
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread)
-			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread)
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread);
 
 
-			/**
-			* create new thread.
-			* @param state lua_State pointer
-			*/
-			LuaThread(lua_State* state) :LuaRef(state, NewThread())
+		/**
+		* create new thread.
+		* @param state lua_State pointer
+		*/
+		LuaThread(lua_State* state) :LuaRef(state, NewThread())
 		{
 		}
 
