@@ -31,8 +31,8 @@ namespace kaguya
 		using LuaRef::isThreadDead;
 		using LuaRef::costatus;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData)
-			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData)
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData);
 
 			using LuaRef::getField;
 		using LuaRef::keys;
@@ -87,10 +87,10 @@ namespace kaguya
 		using LuaRef::isThreadDead;
 		using LuaRef::costatus;
 	public:
-		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable)
-			KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable)
+		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable);
+		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable);
 
-			LuaTable(lua_State* state) :LuaRef(state, NewTable())
+		LuaTable(lua_State* state) :LuaRef(state, NewTable())
 		{
 		}
 		LuaTable(lua_State* state, const NewTable& newtable) :LuaRef(state, newtable)
@@ -159,6 +159,31 @@ namespace kaguya
 		}
 
 		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
+
+		bool operator==(const TableKeyReference& other)const
+		{
+			return static_cast<const LuaRef&>(*this) == static_cast<const LuaRef&>(other);
+		}
+		bool operator<(const TableKeyReference& other)const
+		{
+			return static_cast<const LuaRef&>(*this) < static_cast<const LuaRef&>(other);
+		}
+		bool operator<=(const TableKeyReference& other)const
+		{
+			return static_cast<const LuaRef&>(*this) <= static_cast<const LuaRef&>(other);
+		}
+		bool operator>=(const TableKeyReference& other)const
+		{
+			return other <= *this;
+		}
+		bool operator>(const TableKeyReference& other)const
+		{
+			return other < *this;
+		}
+		bool operator!=(const TableKeyReference& other)const
+		{
+			return !(other == *this);
+		}
 
 	private:
 		template<typename T, typename P>
