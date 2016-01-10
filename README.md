@@ -8,14 +8,13 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
 ## Requirements
 - Lua 5.1 to 5.3 (recommended: 5.3)
-- C++03 compiler with boost library or C++11 compiler(gcc 4.8+,clang 3.4+,MSVC2015). see kaguya/config.hpp
+- C++03 compiler with boost library or C++11 compiler(gcc 4.8+,clang 3.4+,MSVC2015) without boost.
 
 
 ## Introduction
 Kaguya is Lua binding library for C++
 - header-file only
 - seamless access to lua elements
-- can use for lua module system
 
 
 ## run test
@@ -42,10 +41,9 @@ int main()
 ```c++
 extern "C" int luaopen_modulename(lua_State *L)
 {
-  using namespace kaguya;
-   State state(l);
-   LuaRef module = state.newLib();
-   module["function"] = function(somefunction);
+   kaguya::State state(l);
+   kaguya::LuaRef module = state.newLib();
+   module["function"] = kaguya::funtion(somefunction);
    return 1;//number of return lib
 }
 ```
