@@ -37,7 +37,7 @@ int main()
 }
 ```
 
-### Or free standing lua state
+### Or using exist lua state
 ```c++
 extern "C" int luaopen_modulename(lua_State *L)
 {
