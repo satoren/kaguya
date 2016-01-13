@@ -127,8 +127,10 @@ namespace t_02_classreg
 
 		ABC copy()const { return *this; }
 		const ABC& references()const { return *this; }
+		const ABC& const_references()const { return *this; }
 		ABC& references() { return *this; }
 		ABC* pointer() { return this; }
+		const ABC* const_pointer()const { return this; }
 		kaguya::standard::shared_ptr<ABC> shared_copy() { return kaguya::standard::shared_ptr<ABC>(new ABC(*this)); }
 	};
 
@@ -200,6 +202,8 @@ namespace t_02_classreg
 			.addMember("getInt", &ABC::getInt)
 			.addMember("references", static_cast<ABC& (ABC::*)()>(&ABC::references))
 			.addMember("references", static_cast<const ABC& (ABC::*)()const>(&ABC::references))
+			.addMember("const_pointer", &ABC::const_pointer)
+			
 			.addMember("pointer", &ABC::pointer)
 			.addMember("copy", &ABC::copy)
 			.addMember("shared_copy", &ABC::shared_copy)
@@ -211,6 +215,10 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(value2:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value2:getInt() == 64)"));
 		TEST_CHECK(state("value3 = assert(value:references())"));
+		TEST_CHECK(state("cvalue = assert(value:const_pointer())"));
+		TEST_CHECK(state("assert(cvalue:getString() == 'string_value3')"));
+		TEST_CHECK(state("assert(cvalue:getInt() == 64)"));
+
 		TEST_CHECK(state("assert(value3:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value3:getInt() == 64)"));
 		TEST_CHECK(state("value4 = assert(value:pointer())"));

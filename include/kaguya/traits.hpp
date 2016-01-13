@@ -29,6 +29,10 @@ namespace kaguya
 		};
 		
 
+		template<class T> struct is_const : integral_constant<bool, false> {};
+		template<class T> struct is_const<const T> : integral_constant<bool, true> {};
+
+
 		template< typename T >
 		struct remove_const_reference {
 			typedef typename remove_const<typename remove_reference<T>::type>::type type;

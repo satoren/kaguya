@@ -22,39 +22,6 @@ namespace kaguya
 	
 	namespace types
 	{
-
-		/*
-		template<class T>
-		T* get_pointer(lua_State* l, int index, typetag<T> tag)
-		{
-			int type = lua_type(l, index);
-
-			if (type == LUA_TLIGHTUSERDATA)
-			{
-				return (T*)lua_topointer(l, index);
-			}
-			else if (type != LUA_TUSERDATA)
-			{
-				return 0;
-			}
-			else
-			{
-				T* ptr = class_userdata::test_userdata<T>(l, index);
-				if (!ptr)
-				{
-					MetaPointerWrapper<T>* ptr_wrapper = class_userdata::test_userdata<MetaPointerWrapper<T> >(l, index);
-					if (ptr_wrapper) { ptr = ptr_wrapper->ptr; }
-				}
-				if (!ptr)
-				{
-					standard::shared_ptr<T>* shared_ptr = class_userdata::test_userdata<standard::shared_ptr<T> >(l, index);
-					if (shared_ptr) { ptr = shared_ptr->get(); }
-				}
-
-				return ptr;
-			}
-			return 0;
-		}*/
 		namespace detail
 		{
 			template<typename T>
@@ -197,6 +164,22 @@ namespace kaguya
 				return get_pointer(l, index, typetag<T>());
 			}
 
+			template<typename T>
+			inline const T* get(lua_State* l, int index, typetag<const T*> tag = typetag<const T*>())
+			{
+				return get_const_pointer(l, index, typetag<T>());
+			}
+			template<typename T>
+			inline const T& get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
+			{
+				const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, typetag<typename traits::remove_reference<T>::type>());
+				if (!pointer)
+				{
+					throw LuaTypeMismatch("type mismatch!!");
+				}
+				return *pointer;
+			}
+
 			inline ObjectWrapperBase* get(lua_State* l, int index, typetag<ObjectWrapperBase*> tag = typetag<ObjectWrapperBase*>())
 			{
 				return object_wrapper(l, index);
@@ -311,27 +294,7 @@ namespace kaguya
 				}
 				else if (!available_metatable<T>(l))
 				{
-					lua_pushlightuserdata(l, v);
-				}
-				else
-				{
-					typedef ObjectPointerWrapper<T> wrapper_type;
-					void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-					new(storage) wrapper_type(v);
-					class_userdata::setmetatable<T>(l);
-				}
-				return 1;
-			}
-			template<typename T>
-			inline int push(lua_State* l, const T* v)
-			{
-				if (!v)
-				{
-					lua_pushnil(l);
-				}
-				else if (!available_metatable<T>(l))
-				{
-					lua_pushlightuserdata(l, const_cast<T*>(v));
+					lua_pushlightuserdata(l, const_cast<typename traits::remove_const<T>::type*>(v));
 				}
 				else
 				{

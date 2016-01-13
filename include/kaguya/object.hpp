@@ -9,30 +9,19 @@
 
 namespace kaguya
 {
-	namespace nodirectuse {
-		typedef const std::string& metatableName_t;
-		template<typename T>
-		inline metatableName_t metatableNameNonCV(types::typetag<T>)
-		{
-			static const std::string v = std::string("kaguya_object_type_") + typeid(T*).name();
-			return v;
-		}
-	}
+#define KAGUYA_METATABLE_PREFIX "kaguya_object_type_"
 	template<typename T>
-	inline nodirectuse::metatableName_t metatableName()
+	inline const std::string& metatableName()
 	{
 		typedef typename traits::remove_cv<T>::type noncv_type;
 		typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
 		typedef typename traits::remove_const_reference<noncvpointer_type>::type noncvpointerref_type;
-		return nodirectuse::metatableNameNonCV(types::typetag<noncvpointerref_type>());
+
+		static const std::string v = std::string(KAGUYA_METATABLE_PREFIX) + typeid(noncvpointerref_type*).name();
+
+		return v;
 	}
 
-	inline bool available_metatable(lua_State* l, const char* t)
-	{
-		util::ScopedSavedStack save(l);
-		luaL_getmetatable(l, t);
-		return LUA_TNIL != lua_type(l, -1);
-	}
 	namespace class_userdata
 	{
 		template<typename T>bool get_metatable(lua_State* l)
@@ -71,6 +60,12 @@ namespace kaguya
 			return static_cast<T*>(luaL_testudata(l, index, metatableName<T>().c_str()));
 		}
 	}
+	inline bool available_metatable(lua_State* l, const char* t)
+	{
+		util::ScopedSavedStack save(l);
+		luaL_getmetatable(l, t);
+		return LUA_TNIL != lua_type(l, -1);
+	}
 	template<typename T>
 	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())
 	{
@@ -80,16 +75,13 @@ namespace kaguya
 
 	struct ObjectWrapperBase
 	{
-		template<class T> bool is_metatable_object()
-		{
-			return is_metatable_object(metatableName<T>().c_str());
-		}
-		virtual bool is_metatable_object(const char* metaname) = 0;
+		template<typename T>
+		bool is_metatable_object() { return is_metatable_object(metatableName<T>()); }
+		virtual bool is_metatable_object(const std::string& metaname) = 0;
 
-		virtual const void* get_const_pointer(const char* metaname) = 0;
-		virtual void* get_pointer(const char* metaname) = 0;
+		virtual const void* get_const_pointer(const std::string& metaname) = 0;
+		virtual void* get_pointer(const std::string& metaname) = 0;
 
-		void* get_pointer(const std::string& metaname) { return get_pointer(metaname.c_str()); }
 		virtual ~ObjectWrapperBase() {}
 	};
 
@@ -101,7 +93,7 @@ namespace kaguya
 		ObjectWrapper() :object() {}
 
 		template<class Arg1>
-		ObjectWrapper(const Arg1& v1) :object(v1) {}
+		ObjectWrapper(const Arg1& v1) : object(v1) {}
 		template<class Arg1, class Arg2>
 		ObjectWrapper(const Arg1& v1, const Arg2& v2) : object(v1, v2) {}
 		template<class Arg1, class Arg2, class Arg3>
@@ -110,16 +102,24 @@ namespace kaguya
 		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4) : object(v1, v2, v3, v4) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
 		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5) : object(v1, v2, v3, v4, v5) {}
+		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6) : object(v1, v2, v3, v4, v5, v6) {}
+		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7>
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7) : object(v1, v2, v3, v4, v5, v6, v7) {}
+		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8>
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8) : object(v1, v2, v3, v4, v5, v6, v7, v8) {}
+		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9>
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8, const Arg9& v9) : object(v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<class... Args>
 		ObjectWrapper(Args&&... args) : object(standard::forward<Args>(args)...) {}
 #endif
 
-		bool is_metatable_object(const char* metaname)
+		bool is_metatable_object(const std::string& metaname)
 		{
 			return metatableName<T>() == metaname;
 		}
-		virtual void* get_pointer(const char* metaname)
+		virtual void* get_pointer(const std::string& metaname)
 		{
 			if (metatableName<T>() == metaname)
 			{
@@ -127,7 +127,7 @@ namespace kaguya
 			}
 			return 0;
 		}
-		virtual const void* get_const_pointer(const char* metaname)
+		virtual const void* get_const_pointer(const std::string& metaname)
 		{
 			if (metatableName<T>() == metaname)
 			{
@@ -143,16 +143,12 @@ namespace kaguya
 		standard::shared_ptr<T> object;
 
 		ObjectWrapper(const standard::shared_ptr<T>& v1) :object(v1) {}
-#if KAGUYA_USE_RVALUE_REFERENCE
-		template<class... Args>
-		ObjectWrapper(Args&&... args) : object(standard::forward<Args>(args)...) {}
-#endif
 
-		bool is_metatable_object(const char* metaname)
+		bool is_metatable_object(const std::string& metaname)
 		{
 			return metatableName<T>() == metaname;
 		}
-		virtual void* get_pointer(const char* metaname)
+		virtual void* get_pointer(const std::string& metaname)
 		{
 			if (metatableName<T>() == metaname)
 			{
@@ -160,7 +156,7 @@ namespace kaguya
 			}
 			return 0;
 		}
-		virtual const void* get_const_pointer(const char* metaname)
+		virtual const void* get_const_pointer(const std::string& metaname)
 		{
 			if (metatableName<T>() == metaname)
 			{
@@ -177,19 +173,23 @@ namespace kaguya
 
 		ObjectPointerWrapper(T* ptr) :object(ptr) {}
 
-		bool is_metatable_object(const char* metaname)
+		bool is_metatable_object(const std::string& metaname)
 		{
 			return metatableName<T>() == metaname;
 		}
-		virtual void* get_pointer(const char* metaname)
+		virtual void* get_pointer(const std::string& metaname)
 		{
+			if (traits::is_const<T>::value)
+			{
+				return 0;
+			}
 			if (metatableName<T>() == metaname)
 			{
-				return object;
+				return const_cast<void*>(static_cast<const void*>(object));
 			}
 			return 0;
 		}
-		virtual const void* get_const_pointer(const char* metaname)
+		virtual const void* get_const_pointer(const std::string& metaname)
 		{
 			if (metatableName<T>() == metaname)
 			{
@@ -201,22 +201,17 @@ namespace kaguya
 
 	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index)
 	{
-		index = lua_absindex(l, index);
-		int type = lua_type(l, index);
-		if (type == LUA_TUSERDATA)
+		void* ptr = lua_touserdata(l, index);
+		if (ptr && lua_type(l, index) == LUA_TUSERDATA)
 		{
 			if (lua_getmetatable(l, index))
 			{
-				void* ptr = 0;
 				lua_getfield(l, -1, "__name");
 
 				const char* metatable = lua_tostring(l, -1);
-				if (metatable)
+				if (!metatable || strncmp(metatable, KAGUYA_METATABLE_PREFIX, strlen(KAGUYA_METATABLE_PREFIX)) != 0)
 				{
-					if (memcmp(metatable, "kaguya_object_type", strlen("kaguya_object_type")) == 0)
-					{
-						ptr = lua_touserdata(l, index);
-					}
+					ptr = 0;
 				}
 				lua_pop(l, 2);
 				return static_cast<ObjectWrapperBase*>(ptr);

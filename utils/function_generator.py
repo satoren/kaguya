@@ -220,7 +220,7 @@ def tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 
 	invoke_code = get_call_str(arg_num+1,1)
 
-	invoke_code +='  T1* ptr = types::get(state, 1, types::typetag<T1*>());\n'
+	invoke_code +='  '+funattr+' T1* ptr = types::get(state, 1, types::typetag<'+ funattr +' T1*>());\n'
 	invoke_code +='  if(!ptr){return 0;}\n'
 	invoke_code +='    Ret r = (ptr->*func_)('
 	if with_state:
@@ -229,7 +229,7 @@ def tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	invoke_code +=');\n'
 	invoke_code +='    return types::push(state,standard::forward<Ret>(r));\n'
 
-	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}\n')
+	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<'+ funattr +' T1*>()) == 0){return false;}\n')
 
 	generate(out,classname,basename,template_str(arg_num+ 1),function_type,checktype_fun,invoke_code,arg_typenames(arg_num))
 
@@ -248,7 +248,7 @@ def void_tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 
 	invoke_code = get_call_str(arg_num+1,1)
 
-	invoke_code +='  T1* ptr = types::get(state, 1, types::typetag<T1*>());\n'
+	invoke_code +='  '+funattr+' T1* ptr = types::get(state, 1, types::typetag<' + funattr + ' T1*>());\n'
 
 	invoke_code +='  if(!ptr){return 0;}\n'
 	invoke_code +='    (ptr->*func_)('
@@ -258,7 +258,7 @@ def void_tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	invoke_code +=');\n'
 	invoke_code +='    return 0;\n'
 
-	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<T1*>()) == 0){return false;}\n')
+	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<'+ funattr +' T1*>()) == 0){return false;}\n')
 
 	generate(out,classname,basename,void_template_str(arg_num+ 1),function_type,checktype_fun,invoke_code,arg_typenames(arg_num))
 
