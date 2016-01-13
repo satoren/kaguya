@@ -134,4 +134,9 @@ namespace kaguya
 		};
 	}
 
+	namespace types
+	{
+		template<typename T>
+		struct typetag {};
+	}
 };

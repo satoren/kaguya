@@ -143,12 +143,6 @@ namespace kaguya
 		{
 			set_class(reg);
 			static_cast<LuaRef&>(*this) = parent_.getField(key_);
-
-			(*this)["ptr_wrapper"].set_class(ClassMetatable<MetaPointerWrapper<T>, T>());
-			if (auto_reg_shared_ptr)
-			{
-				(*this)["shared_ptr"].set_class(ClassMetatable<standard::shared_ptr<T>, T >());
-			}
 		}
 
 		//! set function 

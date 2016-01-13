@@ -20,18 +20,18 @@ namespace t_01_primitive
 	};
 	void string_get(kaguya::State& state)
 	{
-		state("value = \"test\"");
+		state("value = 'test'");
 		TEST_CHECK(state["value"] == "test" &&  state["value"] == std::string("test"));
 	};
 	void table_get1(kaguya::State& state)
 	{
-		state("value = {1,32,\"teststr\"}");
+		state("value = {1,32,'teststr'}");
 		TEST_CHECK(state["value"][1] == 1 && state["value"][2] == 32 && state["value"][3] == "teststr");
 	};
 	void table_get2(kaguya::State& state)
 	{
-		state("value={out=32,str=\"gjgj\"}");
-		state("value[\"in\"] = \"test\"");
+		state("value={out=32,str='gjgj'}");
+		state("value['in'] = 'test'");
 		kaguya::LuaRef value = state["value"];
 		TEST_CHECK(value["str"] == "gjgj" && value["in"] == "test" &&  value["out"] == 32);
 	};
@@ -50,7 +50,7 @@ namespace t_01_primitive
 	void string_set(kaguya::State& state)
 	{
 		state["value"] = "test";
-		TEST_CHECK(state("assert(value == \"test\")"));
+		TEST_CHECK(state("assert(value == 'test')"));
 	};
 	void table_set(kaguya::State& state)
 	{
@@ -58,7 +58,7 @@ namespace t_01_primitive
 		state["value"]["abc"] = kaguya::NewTable();
 		state["value"]["abc"]["def"] = 7;
 		state["value"]["abc"]["bbb"] = "test";
-		TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")"));
+		TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test')"));
 	};
 
 	enum testenum
@@ -157,8 +157,8 @@ namespace t_02_classreg
 			.addMember("getString", &ABC::getString)
 			);
 
-		TEST_CHECK(state("value = assert(ABC.new(\"string_value\"))"));
-		TEST_CHECK(state("assert(value:getString() == \"string_value\")"));
+		TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
+		TEST_CHECK(state("assert(value:getString() == 'string_value')"));
 	};
 	void overloaded_constructor(kaguya::State& state)
 	{
@@ -175,13 +175,13 @@ namespace t_02_classreg
 
 		TEST_CHECK(state("value = assert(ABC.new(32))"));
 		TEST_CHECK(state("assert(value:getInt() == 32)"));
-		TEST_CHECK(state("value = assert(ABC.new(\"string_value\"))"));
-		TEST_CHECK(state("assert(value:getString() == \"string_value\")"));
-		TEST_CHECK(state("value = assert(ABC.new(\"string_value2\",54))"));
-		TEST_CHECK(state("assert(value:getString() == \"string_value2\")"));
+		TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
+		TEST_CHECK(state("assert(value:getString() == 'string_value')"));
+		TEST_CHECK(state("value = assert(ABC.new('string_value2',54))"));
+		TEST_CHECK(state("assert(value:getString() == 'string_value2')"));
 		TEST_CHECK(state("assert(value:getInt() == 54)"));
-		TEST_CHECK(state("value = assert(ABC.new(64,\"string_value3\"))"));
-		TEST_CHECK(state("assert(value:getString() == \"string_value3\")"));
+		TEST_CHECK(state("value = assert(ABC.new(64,'string_value3'))"));
+		TEST_CHECK(state("assert(value:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value:getInt() == 64)"));
 
 		TEST_CHECK(state("value:setInt(33)"));
@@ -206,21 +206,21 @@ namespace t_02_classreg
 			);
 
 
-		TEST_CHECK(state("value = assert(ABC.new(64,\"string_value3\"))"));
+		TEST_CHECK(state("value = assert(ABC.new(64,'string_value3'))"));
 		TEST_CHECK(state("value2 = assert(value:copy())"));
-		TEST_CHECK(state("assert(value2:getString() == \"string_value3\")"));
+		TEST_CHECK(state("assert(value2:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value2:getInt() == 64)"));
 		TEST_CHECK(state("value3 = assert(value:references())"));
-		TEST_CHECK(state("assert(value3:getString() == \"string_value3\")"));
+		TEST_CHECK(state("assert(value3:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value3:getInt() == 64)"));
 		TEST_CHECK(state("value4 = assert(value:pointer())"));
-		TEST_CHECK(state("assert(value4:getString() == \"string_value3\")"));
+		TEST_CHECK(state("assert(value4:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value4:getInt() == 64)"));
 
 		TEST_CHECK(state("value5 = assert(value:shared_copy())"));
 		TEST_CHECK(state("value =1"));
 		state.garbageCollect();//warning!! value3 and value4 to dangling pointer
-		TEST_CHECK(state("assert(value5:getString() == \"string_value3\")"));
+		TEST_CHECK(state("assert(value5:getString() == 'string_value3')"));
 		TEST_CHECK(state("assert(value5:getInt() == 64)"));
 
 
@@ -251,8 +251,8 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(value:intmember() == 4)"));
 
 
-		TEST_CHECK(state("value:stringmember(\"test\")"));
-		TEST_CHECK(state("assert(value:stringmember() == \"test\")"));
+		TEST_CHECK(state("value:stringmember('test')"));
+		TEST_CHECK(state("assert(value:stringmember() == 'test')"));
 	}
 
 	void operator_bind(kaguya::State& state)
@@ -285,7 +285,7 @@ namespace t_02_classreg
 			);
 
 		TEST_CHECK(state("assert(ABC.TEST == 1)"));
-		TEST_CHECK(state("assert(ABC.TEST2 == \"343\")"));
+		TEST_CHECK(state("assert(ABC.TEST2 == '343')"));
 		TEST_CHECK(state("assert(ABC.TEST3 == 133.23)"));
 	}
 
@@ -412,7 +412,7 @@ namespace t_03_function
 
 		state["foo"] = &foo;
 
-		state("foo:setBar(\"test\")");
+		state("foo:setBar('test')");
 		TEST_CHECK(foo.bar == "test");
 
 		TEST_CHECK(state("assert(foo.luafunc(3,4) == 12)"));
@@ -422,10 +422,10 @@ namespace t_03_function
 		TEST_CHECK(foo.bar == "test2");
 #if __cplusplus >= 201103L || defined(__cpp_lambdas)
 		lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
-		TEST_CHECK(state("Foo.bar(\"test\")"));
+		TEST_CHECK(state("Foo.bar('test')"));
 		TEST_CHECK(foo.bar == "test");
 		lfoo["bar"] = kaguya::function([&foo](std::string str) { foo.bar = str; });
-		TEST_CHECK(state("Foo.bar(\"test\")"));
+		TEST_CHECK(state("Foo.bar('test')"));
 		TEST_CHECK(foo.bar == "test");
 #else
 #endif
@@ -454,13 +454,13 @@ namespace t_03_function
 			.addMember("variadicfun", &VariFoo::variadic_arg_func)
 			);
 		state("var = Vari.new()");
-		state("var:variadicfun(\"hanaregumi\",\"hana-uta\",5)");;
+		state("var:variadicfun('hanaregumi','hana-uta',5)");;
 		VariFoo* ptr = state["var"];
 		bool res1 = ptr && ptr->args[0].get<std::string>() == "hanaregumi"
 			&&  ptr->args[1].get<std::string>() == "hana-uta"
 			&&  ptr->args[2].get<int>() == 5;
 
-		state("var = Vari.new(\"abc\")");
+		state("var = Vari.new('abc')");
 		ptr = state["var"];
 		bool res2 = ptr && ptr->args[0].get<std::string>() == "abc";
 		TEST_CHECK(res1 && res2);
@@ -484,7 +484,7 @@ namespace t_03_function
 		state["multresfun"] = kaguya::function(tuplefun);
 
 		state("a,b = multresfun()");
-		TEST_CHECK(state("assert(a == 12  and b == \"23\")"));
+		TEST_CHECK(state("assert(a == 12  and b == '23')"));
 	}
 
 	void vector_and_map_from_table_mapping(kaguya::State& state)
@@ -647,7 +647,7 @@ namespace t_04_lua_ref
 		kaguya::LuaRef ref(state.state(), "abc");
 		TEST_CHECK(ref.get<std::string>() == "abc");
 
-		state("abc={d =1,e=3,f=64,g=\"sss\"}");
+		state("abc={d =1,e=3,f=64,g='sss'}");
 		kaguya::LuaRef abctable = state["abc"];
 
 		TEST_CHECK(abctable["d"] == 1);
@@ -840,7 +840,7 @@ namespace t_04_lua_ref
 		state["value"]["abc"] = kaguya::NewTable();
 		state["value"]["abc"]["def"] = 7;
 		state["value"]["abc"]["bbb"] = "test";
-		TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == \"test\")"));
+		TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test')"));
 	}
 
 	void lua_table_reference(kaguya::State& state)
@@ -1167,13 +1167,9 @@ int main()
 		ADD_TEST(t_01_primitive::int_set);
 		ADD_TEST(t_01_primitive::string_set);
 		ADD_TEST(t_01_primitive::table_set);
-
-
 		ADD_TEST(t_01_primitive::enum_set);
 		ADD_TEST(t_01_primitive::enum_get);
-
-
-
+		
 		ADD_TEST(t_02_classreg::default_constructor);
 		ADD_TEST(t_02_classreg::int_constructor);
 		ADD_TEST(t_02_classreg::string_constructor);
@@ -1185,8 +1181,6 @@ int main()
 		ADD_TEST(t_02_classreg::copyable_class_test);
 		ADD_TEST(t_02_classreg::noncopyable_class_test);
 		ADD_TEST(t_02_classreg::registering_object_instance);
-
-
 
 
 		ADD_TEST(t_03_function::free_standing_function_test);

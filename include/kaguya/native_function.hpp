@@ -384,9 +384,10 @@ namespace kaguya
 					{
 						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 					}
-					void *storage = lua_newuserdata(state, sizeof(CLASS));
-					new(storage) CLASS(args);
-					types::class_userdata::setmetatable<CLASS>(state);
+					typedef ObjectWrapper<CLASS> wrapper_type;
+					void *storage = lua_newuserdata(state, sizeof(wrapper_type));
+					new(storage) wrapper_type(args);
+					class_userdata::setmetatable<CLASS>(state);
 					return 1;
 				}
 				virtual std::string argumentTypeNames() {
@@ -468,7 +469,7 @@ namespace kaguya
 
 		inline int functor_destructor(lua_State *state)
 		{
-			FunctorType* f = types::class_userdata::test_userdata<FunctorType>(state, 1);
+			FunctorType* f = class_userdata::test_userdata<FunctorType>(state, 1);
 			if (f)
 			{
 				f->~FunctorType();
@@ -477,7 +478,7 @@ namespace kaguya
 		}
 		inline void reg_functor_destructor(lua_State* state)
 		{
-			if (types::class_userdata::newmetatable<FunctorType>(state))
+			if (class_userdata::newmetatable<FunctorType>(state))
 			{
 				lua_pushcclosure(state, &functor_destructor, 0);
 				lua_setfield(state, -2, "__gc");
@@ -506,7 +507,7 @@ namespace kaguya
 				lua_pushnumber(l, 1);//no overload
 				void *storage = lua_newuserdata(l, sizeof(FunctorType));
 				new(storage) FunctorType(f);
-				types::class_userdata::setmetatable<FunctorType>(l);
+				class_userdata::setmetatable<FunctorType>(l);
 				lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 				return 1;
 			}
@@ -516,7 +517,7 @@ namespace kaguya
 				lua_pushnumber(l, 1);//no overload
 				void *storage = lua_newuserdata(l, sizeof(FunctorType));
 				new(storage) FunctorType(standard::forward<FunctorType>(f));
-				types::class_userdata::setmetatable<FunctorType>(l);
+				class_userdata::setmetatable<FunctorType>(l);
 				lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 				return 1;
 			}
@@ -525,7 +526,7 @@ namespace kaguya
 		template<>
 		inline FunctorType get(lua_State* l, int index, typetag<FunctorType> tag)
 		{
-			FunctorType* ptr = types::class_userdata::test_userdata<FunctorType>(l, index);
+			FunctorType* ptr = class_userdata::test_userdata<FunctorType>(l, index);
 			if (ptr)
 			{
 				return *ptr;

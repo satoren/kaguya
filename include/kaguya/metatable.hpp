@@ -39,13 +39,13 @@ namespace kaguya
 
 		ClassMetatable()
 		{
-			FunctorType dtor(&types::destructor<class_type>);
+			FunctorType dtor(&types::destructor<ObjectWrapperBase>);
 			function_map_["__gc"].push_back(dtor);
 		}
 
 		void registerClass(lua_State* state)const
 		{
-			if (types::class_userdata::newmetatable<class_type>(state))
+			if (class_userdata::newmetatable<class_type>(state))
 			{
 				registerMember(state);
 				lua_pushvalue(state, -1);
@@ -53,7 +53,7 @@ namespace kaguya
 
 				if ( !traits::is_void<parent_type>::value)
 				{
-					types::class_userdata::setmetatable<parent_type>(state);
+					class_userdata::setmetatable<parent_type>(state);
 				}
 			}
 			else
@@ -153,7 +153,7 @@ namespace kaguya
 			{
 				void *storage = lua_newuserdata(state, sizeof(FunctorType));
 				new(storage) FunctorType(*f);
-				types::class_userdata::setmetatable<FunctorType>(state);
+				class_userdata::setmetatable<FunctorType>(state);
 			}
 			lua_pushcclosure(state, &nativefunction::functor_dispatcher, funcnum + 1);
 			lua_setfield(state, -2, name);
