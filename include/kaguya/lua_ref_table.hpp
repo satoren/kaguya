@@ -34,7 +34,7 @@ namespace kaguya
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData);
 		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData);
 
-			using LuaRef::getField;
+		using LuaRef::getField;
 		using LuaRef::keys;
 		using LuaRef::values;
 		using LuaRef::map;
@@ -141,8 +141,7 @@ namespace kaguya
 		template<typename T, typename P>
 		void setClass(const ClassMetatable<T, P>& reg, bool auto_reg_shared_ptr = true)
 		{
-			set_class(reg);
-			static_cast<LuaRef&>(*this) = parent_.getField(key_);
+			static_cast<LuaRef&>(*this) = set_class(reg);
 		}
 
 		//! set function 
@@ -181,14 +180,16 @@ namespace kaguya
 
 	private:
 		template<typename T, typename P>
-		void set_class(const ClassMetatable<T, P>& reg)
+		LuaRef set_class(const ClassMetatable<T, P>& reg)
 		{
 			util::ScopedSavedStack save(state_);
 			parent_.push(state_);
 			key_.push(state_);
+			lua_createtable(state_,0,0);
 			reg.registerClass(state_);
-
+			lua_setmetatable(state_ ,-2);
 			lua_settable(state_, -3);
+			return LuaRef(state_, StackTop());
 		}
 
 		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
@@ -231,7 +232,7 @@ namespace kaguya
 	inline bool LuaRef::setFunctionEnv(NewTable env)
 	{
 		return setFunctionEnv(LuaTable(state_));
-}
+	}
 
 	inline LuaTable LuaRef::getFunctionEnv()
 	{

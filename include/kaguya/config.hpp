@@ -65,6 +65,7 @@ namespace kaguya
 		using boost::function;
 		using boost::tuple;
 		using boost::shared_ptr;
+		using boost::make_shared;
 		using boost::get;
 		using boost::is_enum;
 		using boost::is_arithmetic;
@@ -94,6 +95,7 @@ namespace kaguya
 		using std::function;
 		using std::tuple;
 		using std::shared_ptr;
+		using std::make_shared;
 		using std::to_string;
 		using std::get;
 		using std::is_enum;

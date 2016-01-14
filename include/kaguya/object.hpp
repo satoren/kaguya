@@ -79,8 +79,8 @@ namespace kaguya
 		bool is_metatable_object() { return is_metatable_object(metatableName<T>()); }
 		virtual bool is_metatable_object(const std::string& metaname) = 0;
 
-		virtual const void* get_const_pointer(const std::string& metaname) = 0;
-		virtual void* get_pointer(const std::string& metaname) = 0;
+		virtual const void* cget() = 0;
+		virtual void* get() = 0;
 
 		virtual ~ObjectWrapperBase() {}
 	};
@@ -119,21 +119,13 @@ namespace kaguya
 		{
 			return metatableName<T>() == metaname;
 		}
-		virtual void* get_pointer(const std::string& metaname)
+		virtual void* get()
 		{
-			if (metatableName<T>() == metaname)
-			{
-				return &object;
-			}
-			return 0;
+			return &object;
 		}
-		virtual const void* get_const_pointer(const std::string& metaname)
+		virtual const void* cget()
 		{
-			if (metatableName<T>() == metaname)
-			{
-				return &object;
-			}
-			return 0;
+			return &object;
 		}
 	};
 
@@ -148,21 +140,13 @@ namespace kaguya
 		{
 			return metatableName<T>() == metaname;
 		}
-		virtual void* get_pointer(const std::string& metaname)
+		virtual void* get()
 		{
-			if (metatableName<T>() == metaname)
-			{
-				return object.get();
-			}
-			return 0;
+			return object.get();
 		}
-		virtual const void* get_const_pointer(const std::string& metaname)
+		virtual const void* cget()
 		{
-			if (metatableName<T>() == metaname)
-			{
-				return object.get();
-			}
-			return 0;
+			return object.get();
 		}
 	};
 
@@ -177,43 +161,46 @@ namespace kaguya
 		{
 			return metatableName<T>() == metaname;
 		}
-		virtual void* get_pointer(const std::string& metaname)
+		virtual void* get()
 		{
 			if (traits::is_const<T>::value)
 			{
 				return 0;
 			}
-			if (metatableName<T>() == metaname)
-			{
-				return const_cast<void*>(static_cast<const void*>(object));
-			}
-			return 0;
+			return const_cast<void*>(static_cast<const void*>(object));
 		}
-		virtual const void* get_const_pointer(const std::string& metaname)
+		virtual const void* cget()
 		{
-			if (metatableName<T>() == metaname)
-			{
-				return object;
-			}
-			return 0;
+			return object;
 		}
 	};
 
-	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index)
+	inline bool recursive_base_type_check(lua_State* l, int index, const std::string& require_type)
 	{
+		if (lua_getmetatable(l, index))
+		{
+			lua_getfield(l, -1, "__name");
+			const char* metatable_name = lua_tostring(l, -1);
+			if (metatable_name)
+			{
+				if (require_type == metatable_name)
+				{
+					return true;
+				}
+				return recursive_base_type_check(l,-2, require_type);
+			}
+		}
+		return false;	
+	}
+
+	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index,const std::string& require_type= std::string())
+	{
+		util::ScopedSavedStack save(l);
 		void* ptr = lua_touserdata(l, index);
 		if (ptr && lua_type(l, index) == LUA_TUSERDATA)
 		{
-			if (lua_getmetatable(l, index))
+			if (require_type.empty() || recursive_base_type_check(l,index, require_type))
 			{
-				lua_getfield(l, -1, "__name");
-
-				const char* metatable = lua_tostring(l, -1);
-				if (!metatable || strncmp(metatable, KAGUYA_METATABLE_PREFIX, strlen(KAGUYA_METATABLE_PREFIX)) != 0)
-				{
-					ptr = 0;
-				}
-				lua_pop(l, 2);
 				return static_cast<ObjectWrapperBase*>(ptr);
 			}
 		}
@@ -234,10 +221,10 @@ namespace kaguya
 		}
 		else
 		{
-			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
+			ObjectWrapperBase* objwrapper = object_wrapper(l, index,metatableName<T>());
 			if (objwrapper)
 			{
-				return static_cast<T*>(objwrapper->get_pointer(metatableName<T>()));
+				return static_cast<T*>(objwrapper->get());
 			}
 		}
 		return 0;
@@ -257,10 +244,10 @@ namespace kaguya
 		}
 		else
 		{
-			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
+			ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
 			if (objwrapper)
 			{
-				return static_cast<const T*>(objwrapper->get_const_pointer(metatableName<T>()));
+				return static_cast<const T*>(objwrapper->cget());
 			}
 		}
 		return 0;

@@ -12,7 +12,7 @@
 namespace kaguya
 {
 
-	template<typename class_type,typename parent_type = void>
+	template<typename class_type,typename base_class_type = void>
 	struct ClassMetatable
 	{
 		struct ValueType
@@ -47,13 +47,24 @@ namespace kaguya
 		{
 			if (class_userdata::newmetatable<class_type>(state))
 			{
+				lua_createtable(state, 0, 0);//__index table
 				registerMember(state);
-				lua_pushvalue(state, -1);
-				lua_setfield(state, -1, "__index");
 
-				if ( !traits::is_void<parent_type>::value)
+				if (!traits::is_void<base_class_type>::value)
 				{
-					class_userdata::setmetatable<parent_type>(state);
+					class_userdata::setmetatable<base_class_type>(state);
+
+					//type check
+					class_type* check = 0;
+					base_class_type* ptr = check;
+				}
+
+				lua_setfield(state, -2, "__index");
+				registerMetamethods(state);
+
+				if (!traits::is_void<base_class_type>::value)
+				{
+					class_userdata::setmetatable<base_class_type>(state);
 				}
 			}
 			else
@@ -191,15 +202,52 @@ namespace kaguya
 		{
 			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
 			{
-				registerFunction(state, it->first.c_str(), it->second);
+				if (!is_metafield(it->first))
+				{
+					registerFunction(state, it->first.c_str(), it->second);
+				}
 			}
 			for (typename ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
 			{
-				registerField(state, it->first.c_str(), it->second);
+				if (!is_metafield(it->first))
+				{
+					registerField(state, it->first.c_str(), it->second);
+				}
 			}
 			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
 			{
-				registerCodeChunk(state, it->first.c_str(), it->second);
+				if (!is_metafield(it->first))
+				{
+					registerCodeChunk(state, it->first.c_str(), it->second);
+				}
+			}
+		}
+		static bool is_metafield(const std::string& name)
+		{
+			return name.compare(0, 2, "__") == 0;
+		}
+		void registerMetamethods(lua_State* state)const
+		{
+			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
+			{
+				if (is_metafield(it->first))
+				{
+					registerFunction(state, it->first.c_str(), it->second);
+				}
+			}
+			for (typename ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
+			{
+				if (is_metafield(it->first))
+				{
+					registerField(state, it->first.c_str(), it->second);
+				}
+			}
+			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
+			{
+				if (is_metafield(it->first))
+				{
+					registerCodeChunk(state, it->first.c_str(), it->second);
+				}
 			}
 		}
 		ClassMetatable& addField(const char* name, const std::string& str)

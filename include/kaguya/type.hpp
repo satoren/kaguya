@@ -27,8 +27,8 @@ namespace kaguya
 			template<typename T>
 			inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
 			{
-				ObjectWrapperBase* objwrapper = object_wrapper(l,index);
-				return objwrapper&& objwrapper->is_metatable_object<T>();
+				ObjectWrapperBase* objwrapper = object_wrapper(l,index, metatableName<T>());
+				return objwrapper != 0;
 			}
 
 #if LUA_VERSION_NUM >= 503
@@ -76,7 +76,7 @@ namespace kaguya
 			inline bool checkType(lua_State* l, int index, typetag<T> tag)
 			{
 				ObjectWrapperBase* objwrapper = object_wrapper(l, index);
-				return objwrapper && objwrapper->is_metatable_object<T>();
+				return objwrapper != 0;
 			}
 
 			template<typename T>
@@ -88,12 +88,7 @@ namespace kaguya
 				{
 					return true;
 				}
-				ObjectWrapperBase* wrapper = object_wrapper(l,index);
-				if (wrapper)
-				{
-					return wrapper->is_metatable_object<T>();
-				}
-				return false;
+				return object_wrapper(l,index,metatableName<T>()) != 0;
 			}
 
 			template<>

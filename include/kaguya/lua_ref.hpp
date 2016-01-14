@@ -231,7 +231,7 @@ namespace kaguya
 		//push to Lua stack
 		void push()const
 		{
-			lua_rawgeti(state_, LUA_REGISTRYINDEX, ref_);
+			push(state_);
 		}
 		void push(lua_State* state)const
 		{

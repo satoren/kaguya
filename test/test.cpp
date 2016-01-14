@@ -377,6 +377,47 @@ namespace t_02_classreg
 		state("assert(43 == shared_abc:get_value())");
 	}
 
+	struct Base
+	{
+		int a;
+	};
+	struct Derived:Base
+	{
+		int b;
+	};
+
+	int base_function(Base* b) {
+		b->a = 1;
+		return b->a;
+	}
+	int derived_function(Derived* d) {
+		d->b = 2;
+		return d->b;
+	}
+	void registering_derived_class(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addMember("a", &Base::a)
+			);
+
+		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
+			.addMember("b", &Derived::b)
+			);
+
+		Derived derived;
+		Base base;
+		state["base"] = &base;
+		state["derived"] = &derived;
+		state["base_function"] = &base_function;
+		state["derived_function"] = &derived_function;
+		state("assert(1 == base_function(base))");
+		state("assert(1 == base_function(derived))");
+		state("assert(2 == derived_function(derived))");
+		state("assert(1 == base:a())");
+		state("assert(1 == derived:a())");
+		state("assert(2 == derived:b())");
+	}
+	
 
 }
 
@@ -1189,6 +1230,7 @@ int main()
 		ADD_TEST(t_02_classreg::copyable_class_test);
 		ADD_TEST(t_02_classreg::noncopyable_class_test);
 		ADD_TEST(t_02_classreg::registering_object_instance);
+		ADD_TEST(t_02_classreg::registering_derived_class);
 
 
 		ADD_TEST(t_03_function::free_standing_function_test);

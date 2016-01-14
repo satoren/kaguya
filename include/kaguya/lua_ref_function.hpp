@@ -184,7 +184,7 @@ namespace kaguya
 	class FunEvaluator
 	{
 	public:
-		FunEvaluator(lua_State* state, LuaRef fun, std::vector<LuaRef> args) :state_(state), eval_info_(new eval())
+		FunEvaluator(lua_State* state, LuaRef fun, std::vector<LuaRef> args) :state_(state), eval_info_(standard::make_shared<eval>())
 		{
 			eval_info_->owner = this;
 			std::swap(eval_info_->fun, fun);

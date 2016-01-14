@@ -35,7 +35,11 @@ namespace kaguya
 
 		template< typename T >
 		struct remove_const_reference {
-			typedef typename remove_const<typename remove_reference<T>::type>::type type;
+			typedef T type;
+		};
+		template< typename T >
+		struct remove_const_reference<const T&> {
+			typedef T type;
 		};
 
 
