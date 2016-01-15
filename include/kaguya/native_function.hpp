@@ -136,7 +136,7 @@ namespace kaguya
 			base_ptr_ create(Ret(*fun)(VariadicArgType))
 			{
 				typedef VariadicArgInvoker<Ret> caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 			struct VariadicArgVoidInvoker :BaseInvoker {
@@ -275,7 +275,7 @@ namespace kaguya
 			base_ptr_ create(Ret(T::*fun)(VariadicArgType)const)
 			{
 				typedef VariadicArgConstMemFunInvoker<Ret, T> caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 			template <typename T>
@@ -310,7 +310,7 @@ namespace kaguya
 			base_ptr_ create(void (T::*fun)(VariadicArgType)const)
 			{
 				typedef VariadicArgConstMemVoidFunInvoker<T> caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 
@@ -340,7 +340,7 @@ namespace kaguya
 			base_ptr_ create(standard::function<Ret(VariadicArgType)> fun)
 			{
 				typedef VariadicArgFunInvoker<Ret> caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 			struct VariadicArgVoidFunInvoker :BaseInvoker {
