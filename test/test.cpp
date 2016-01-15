@@ -910,6 +910,17 @@ namespace t_04_lua_ref
 		TEST_CHECK(state["value"]["abc"]["ccc"] != "tes");
 	}
 
+	void metatable(kaguya::State& state)
+	{
+		kaguya::LuaTable table = state.newTable();
+		kaguya::LuaTable metatable = state.newTable();
+		kaguya::LuaTable metatable_index = state.newTable();
+		metatable_index["hana"] = "uta";
+		metatable["__index"] = metatable_index;
+		table.setMetatable(metatable);
+		TEST_CHECK(table["hana"] == "uta");
+		TEST_CHECK(table.getMetatable() == metatable);
+	}
 }
 
 namespace t_05_error_handler
@@ -1257,6 +1268,9 @@ int main()
 		ADD_TEST(t_04_lua_ref::lua_table_get);
 		ADD_TEST(t_04_lua_ref::lua_table_set);
 		ADD_TEST(t_04_lua_ref::lua_table_reference);
+
+
+		ADD_TEST(t_04_lua_ref::metatable);
 
 		ADD_TEST(t_05_error_handler::set_error_function);
 		ADD_TEST(t_05_error_handler::function_call_error);

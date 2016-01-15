@@ -85,7 +85,7 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state_);
 			push(state_);//push table to stack
-			int t = (value_type)lua_type(state_, -1);
+			int t = lua_type(state_, -1);
 			if (t != LUA_TTABLE)
 			{
 				except::typeMismatchError(state_, typeName() + "is not table");
@@ -420,6 +420,10 @@ namespace kaguya
 		*/
 		//@{
 
+		bool setMetatable(const LuaTable& table);
+
+		LuaTable getMetatable()const;
+
 		/**
 		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
 		* @param function_name function_name in table
@@ -503,7 +507,7 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state_);
 			push(state_);
-			int t = (value_type)lua_type(state_, -1);
+			int t = lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
 				except::typeMismatchError(state_, typeName() + "is not table");
@@ -527,7 +531,7 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state_);
 			push(state_);
-			int t = (value_type)lua_type(state_, -1);
+			int t = lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
 				except::typeMismatchError(state_, typeName() + "is not table");
@@ -560,7 +564,7 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state_);
 			push();
-			int t = (value_type)lua_type(state_, -1);
+			int t = lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
 				except::typeMismatchError(state_, typeName() + "is not table");
@@ -616,7 +620,7 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state_);
 			push(state_);
-			int t = (value_type)lua_type(state_, -1);
+			int t = lua_type(state_, -1);
 			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 			{
 				return;

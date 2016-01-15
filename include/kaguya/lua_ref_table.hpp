@@ -65,6 +65,8 @@ namespace kaguya
 
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
+		using LuaRef::getMetatable;
+		using LuaRef::setMetatable;
 	};
 
 	//! Reference to Lua table
@@ -105,6 +107,8 @@ namespace kaguya
 		using LuaRef::operator[];
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
+		using LuaRef::getMetatable;
+		using LuaRef::setMetatable;
 	};
 	class TableKeyReference :public LuaRef
 	{
@@ -185,9 +189,9 @@ namespace kaguya
 			util::ScopedSavedStack save(state_);
 			parent_.push(state_);
 			key_.push(state_);
-			lua_createtable(state_,0,0);
+			lua_createtable(state_, 0, 0);
 			reg.registerClass(state_);
-			lua_setmetatable(state_ ,-2);
+			lua_setmetatable(state_, -2);
 			lua_settable(state_, -3);
 			return LuaRef(state_, StackTop());
 		}
@@ -264,6 +268,43 @@ namespace kaguya
 		return TableKeyReference(*this, LuaRef(state_, index));
 	}
 
+	inline bool LuaRef::setMetatable(const LuaTable& table)
+	{
+		if (ref_ == LUA_REFNIL)
+		{
+			except::typeMismatchError(state_, "is nil");
+			return false;
+		}
+		util::ScopedSavedStack save(state_);
+		push();
+		int t = lua_type(state_, -1);
+		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+		{
+			except::typeMismatchError(state_, typeName() + "is not table");
+			return false;
+		}
+		table.push();
+		return lua_setmetatable(state_, -2) != 0;
+	}
+
+	inline LuaTable LuaRef::getMetatable()const
+	{
+		if (ref_ == LUA_REFNIL)
+		{
+			except::typeMismatchError(state_, "is nil");
+			return LuaRef(state_);
+		}
+		util::ScopedSavedStack save(state_);
+		push();
+		int t = lua_type(state_, -1);
+		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+		{
+			except::typeMismatchError(state_, typeName() + "is not table");
+			return LuaRef(state_);
+		}
+		lua_getmetatable(state_, -1);
+		return LuaRef(state_, StackTop(), NoMainCheck());
+	}
 
 
 

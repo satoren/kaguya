@@ -51,10 +51,6 @@ namespace kaguya
 			return luaL_setmetatable(l, metatableName<T>().c_str());
 		}
 
-		template<typename T>bool is_userdata(lua_State* l, int index)
-		{
-			return luaL_testudata(l, index, metatableName<T>().c_str()) != 0;
-		}
 		template<typename T>T* test_userdata(lua_State* l, int index)
 		{
 			return static_cast<T*>(luaL_testudata(l, index, metatableName<T>().c_str()));

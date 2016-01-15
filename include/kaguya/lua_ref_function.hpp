@@ -41,6 +41,8 @@ namespace kaguya
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
 		using LuaRef::costatus;
+		using LuaRef::getMetatable;
+		using LuaRef::setMetatable;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction);
 		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction);
@@ -82,6 +84,8 @@ namespace kaguya
 		using LuaRef::operator[];
 		using LuaRef::foreach_table;
 		using LuaRef::operator->*;
+		using LuaRef::getMetatable;
+		using LuaRef::setMetatable;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaThread);
 		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaThread);
