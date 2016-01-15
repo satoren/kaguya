@@ -164,7 +164,7 @@ namespace kaguya
 			inline base_ptr_ create(void(*fun)(VariadicArgType))
 			{
 				typedef VariadicArgVoidInvoker caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 			template <typename Ret, typename T>
@@ -202,7 +202,7 @@ namespace kaguya
 			base_ptr_ create(Ret(T::*fun)(VariadicArgType))
 			{
 				typedef VariadicArgMemFunInvoker<Ret, T> caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 			template <typename T>
@@ -238,7 +238,7 @@ namespace kaguya
 			base_ptr_ create(void (T::*fun)(VariadicArgType))
 			{
 				typedef VariadicArgMemVoidFunInvoker<T> caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 
@@ -367,7 +367,7 @@ namespace kaguya
 			inline base_ptr_ create(standard::function<void(VariadicArgType)> fun)
 			{
 				typedef VariadicArgVoidFunInvoker caller_type;
-				return base_ptr_(standard::make_shared<caller_type>(fun));
+				return base_ptr_(new caller_type(fun));
 			}
 
 			template<typename CLASS>
@@ -533,10 +533,11 @@ namespace kaguya
 			}
 			return FunctorType();
 		}
+		/*
 		template<>
 		inline int push(lua_State* l, const FunctorType& f)
 		{
 			return detail::push(l,f);
-		}
+		}*/
 	}
 };
