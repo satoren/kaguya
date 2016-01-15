@@ -56,7 +56,7 @@ namespace kaguya
 
 					//type check
 					class_type* check = 0;
-					base_class_type* ptr = check;
+					base_class_type* ptr = check;(void)(ptr);//unused
 				}
 
 				lua_setfield(state, -2, "__index");
