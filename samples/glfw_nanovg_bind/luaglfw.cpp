@@ -863,7 +863,7 @@ int luaopen_luaglfw(lua_State *L)
 	GLFW_LUA_REGDEF(GLFW_DISCONNECTED);
 	GLFW_LUA_REGDEF(GLFW_DONT_CARE);
 
-	luaglfw["window"].setClass(ClassMetatable<MetaPointerWrapper<GLFWwindow> >()
+	luaglfw["window"].setClass(ClassMetatable<GLFWwindow >()
 		.addStaticMember("new", [](int w, int h, const char* title) {return CreateWindow(w, h, title, 0, 0); })
 		.addStaticMember("new", &CreateWindow)
 		.addStaticMember("__gc", &DestroyWindow)
@@ -914,7 +914,7 @@ int luaopen_luaglfw(lua_State *L)
 		
 
 
-	luaglfw["cursor"].setClass(ClassMetatable<MetaPointerWrapper<GLFWcursor> >()
+	luaglfw["cursor"].setClass(ClassMetatable<GLFWcursor >()
 		.addStaticMember("new", &glfwCreateCursor)
 		.addStaticMember("new", &glfwCreateStandardCursor)
 		.addStaticMember("__gc", &glfwDestroyCursor)
