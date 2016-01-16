@@ -145,7 +145,7 @@ namespace kaguya
 		template<typename T, typename P>
 		void setClass(const ClassMetatable<T, P>& reg, bool auto_reg_shared_ptr = true)
 		{
-			static_cast<LuaRef&>(*this) = set_class(reg);
+			set_class(reg);
 		}
 
 		//! set function 
@@ -184,16 +184,11 @@ namespace kaguya
 
 	private:
 		template<typename T, typename P>
-		LuaRef set_class(const ClassMetatable<T, P>& reg)
+		void set_class(const ClassMetatable<T, P>& reg)
 		{
-			util::ScopedSavedStack save(state_);
-			parent_.push(state_);
-			key_.push(state_);
-			lua_createtable(state_, 0, 0);
-			reg.registerClass(state_);
-			lua_setmetatable(state_, -2);
-			lua_settable(state_, -3);
-			return LuaRef(state_, StackTop());
+			LuaRef table(state_, NewTable());
+			table.setMetatable(reg.registerClass(state_));
+			*this = table;
 		}
 
 		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}

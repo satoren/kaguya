@@ -34,6 +34,22 @@ namespace kaguya
 
 
 		template< typename T >
+		struct remove_const_and_reference {
+			typedef T type;
+		};
+		template< typename T >
+		struct remove_const_and_reference<T&> {
+			typedef T type;
+		};
+		template< typename T >
+		struct remove_const_and_reference<const T> {
+			typedef T type;
+		};
+		template< typename T >
+		struct remove_const_and_reference<const T&> {
+			typedef T type;
+		};
+		template< typename T >
 		struct remove_const_reference {
 			typedef T type;
 		};
@@ -51,14 +67,14 @@ namespace kaguya
 
 		template< class T >
 		struct is_convertible_lua_string :integral_constant<bool,
-			is_same<typename remove_const_reference<T>::type, std::string>::value ||
+			is_same<typename remove_const_and_reference<T>::type, std::string>::value ||
 			is_same<T, const char*>::value> {};
 
 		template< class T >
 		struct is_convertible_lua_number :integral_constant<bool,
-			is_floating_point<typename remove_const_reference<T>::type>::value ||
-			is_integral<typename remove_const_reference<T>::type>::value ||
-			is_enum<typename remove_const_reference<T>::type>::value> {};
+			is_floating_point<typename remove_const_and_reference<T>::type>::value ||
+			is_integral<typename remove_const_and_reference<T>::type>::value ||
+			is_enum<typename remove_const_and_reference<T>::type>::value> {};
 
 
 
@@ -78,7 +94,7 @@ namespace kaguya
 
 		template< class T >
 		struct is_convertible_duk_string :integral_constant<bool,
-			is_same<typename remove_const_reference<T>::type, std::string>::value ||
+			is_same<typename remove_const_and_reference<T>::type, std::string>::value ||
 			is_same<T, const char*>::value> {};
 
 		template< class T >
@@ -86,7 +102,7 @@ namespace kaguya
 		{
 			typedef typename conditional<
 				is_function<typename remove_pointer<T>::type>::value, nativefunction::FunctorType, typename conditional<is_convertible_lua_number<typename remove_reference<T>::type >::value
-				, typename lua_number_type<typename remove_const_reference<T>::type >::type
+				, typename lua_number_type<typename remove_const_and_reference<T>::type >::type
 				, T>::type>::type type;
 		};
 		template< >
@@ -109,8 +125,8 @@ namespace kaguya
 
 		template< typename T >
 		struct arg_get_type {
-			typedef typename conditional<is_convertible_lua_number<typename remove_const_reference<T>::type >::value
-				, typename remove_const_reference<T>::type
+			typedef typename conditional<is_convertible_lua_number<typename remove_const_and_reference<T>::type >::value
+				, typename remove_const_and_reference<T>::type
 				, T>::type type;
 		};
 		template< >
@@ -128,15 +144,15 @@ namespace kaguya
 
 		template< typename T >
 		struct enum_dispatch_type {
-			typedef typename remove_const_reference<T>::type type;
+			typedef typename remove_const_and_reference<T>::type type;
 		};
 
 		template< typename T >
 		struct arg_get_type_dispatch {
-			typedef typename conditional<is_enum<typename remove_const_reference<T>::type >::value
+			typedef typename conditional<is_enum<typename remove_const_and_reference<T>::type >::value
 				, enum_dispatch_type<T>
-				, typename conditional<is_convertible_lua_number<typename remove_const_reference<T>::type >::value
-				, typename lua_number_type<typename remove_const_reference<T>::type >::type
+				, typename conditional<is_convertible_lua_number<typename remove_const_and_reference<T>::type >::value
+				, typename lua_number_type<typename remove_const_and_reference<T>::type >::type
 				, typename arg_get_type<T>::type>::type
 			>::type type;
 		};

@@ -43,6 +43,9 @@ namespace kaguya
 		using LuaRef::costatus;
 		using LuaRef::getMetatable;
 		using LuaRef::setMetatable;
+
+
+
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaFunction);
 		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaFunction);
@@ -55,7 +58,61 @@ namespace kaguya
 		using LuaRef::operator();
 		using LuaRef::setFunctionEnv;
 		using LuaRef::getFunctionEnv;
+		
+		/**
+		* @name loadstring
+		* @brief load lua code .
+		* @param state pointer to lua_State
+		* @param luacode string 
+		*/
+		static LuaFunction loadstring(lua_State* state, const std::string& luacode)
+		{
+			return loadstring(state,luacode.c_str());
+		}
+		/**
+		* @name loadstring
+		* @brief load lua code .
+		* @param state pointer to lua_State
+		* @param luacode string
+		*/
+		static LuaFunction loadstring(lua_State* state, const char* luacode)
+		{
+			util::ScopedSavedStack save(state);
+			int status = luaL_loadstring(state, luacode);
 
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state);
+				return LuaRef(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
+
+
+		/**
+		* @name loadfile
+		* @brief If there are no errors,compiled file as a Lua function and return.
+		*  Otherwise send error message to error handler and return nil reference
+		* @param file  file path of lua script
+		* @return reference of lua function
+		*/
+		static LuaFunction loadfile(lua_State* state, const std::string& file)
+		{
+			return loadfile(state,file.c_str());
+		}
+		static LuaFunction loadfile(lua_State* state, const char* file)
+		{
+			util::ScopedSavedStack save(state);
+
+			int status = luaL_loadfile(state, file);
+
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state);
+				return LuaRef(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
 	};
 
 

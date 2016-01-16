@@ -218,22 +218,6 @@ namespace kaguya
 			}
 
 
-			template<typename T>
-			inline int push(lua_State* l, T& v)
-			{
-				if (!available_metatable<T>(l))
-				{
-					lua_pushlightuserdata(l, &v);
-				}
-				else
-				{
-					typedef ObjectPointerWrapper<T> wrapper_type;
-					void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-					new(storage) wrapper_type(&v);
-					class_userdata::setmetatable<T>(l);
-				}
-				return 1;
-			}
 			inline int push(lua_State* l, bool v)
 			{
 				lua_pushboolean(l, v);
@@ -299,6 +283,11 @@ namespace kaguya
 					class_userdata::setmetatable<T>(l);
 				}
 				return 1;
+			}
+			template<typename T>
+			inline int push(lua_State* l, T& v)
+			{
+				return push(l, &v);
 			}
 
 			inline int push(lua_State* l, const FunctorType& f);

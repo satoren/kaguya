@@ -202,8 +202,7 @@ namespace t_02_classreg
 			.addMember("getInt", &ABC::getInt)
 			.addMember("references", static_cast<ABC& (ABC::*)()>(&ABC::references))
 			.addMember("references", static_cast<const ABC& (ABC::*)()const>(&ABC::references))
-			.addMember("const_pointer", &ABC::const_pointer)
-			
+			.addMember("const_pointer", &ABC::const_pointer)			
 			.addMember("pointer", &ABC::pointer)
 			.addMember("copy", &ABC::copy)
 			.addMember("shared_copy", &ABC::shared_copy)
@@ -404,18 +403,21 @@ namespace t_02_classreg
 			.addMember("b", &Derived::b)
 			);
 
-		Derived derived;
-		Base base;
+		Derived derived = {};
+		Base base = {};
 		state["base"] = &base;
 		state["derived"] = &derived;
 		state["base_function"] = &base_function;
 		state["derived_function"] = &derived_function;
-		state("assert(1 == base_function(base))");
-		state("assert(1 == base_function(derived))");
-		state("assert(2 == derived_function(derived))");
-		state("assert(1 == base:a())");
-		state("assert(1 == derived:a())");
-		state("assert(2 == derived:b())");
+		TEST_CHECK(state("assert(1 == base_function(base))"));
+		TEST_CHECK(state("assert(1 == base_function(derived))"));
+		TEST_CHECK(state("assert(2 == derived_function(derived))"));
+		TEST_CHECK(state("assert(1 == base:a())"));
+		TEST_CHECK(state("assert(1 == derived:a())"));
+		state("print(derived:a())");
+		state("print(derived:b())");
+		TEST_CHECK(state("assert(2 == derived:b())"));
+		TEST_CHECK(derived.b == 2);
 	}
 	
 

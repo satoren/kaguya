@@ -105,20 +105,11 @@ namespace kaguya
 		//@{
 		LuaFunction loadfile(const std::string& file)
 		{
-			return loadfile(file.c_str());
+			return LuaFunction::loadfile(state_,file);
 		}
 		LuaFunction loadfile(const char* file)
 		{
-			util::ScopedSavedStack save(state_);
-
-			int status = luaL_loadfile(state_, file);
-
-			if (status)
-			{
-				ErrorHandler::instance().handle(status, state_);
-				return LuaRef(state_);
-			}
-			return LuaFunction(state_, StackTop());
+			return LuaFunction::loadfile(state_, file);
 		}
 		//@}
 
@@ -133,20 +124,11 @@ namespace kaguya
 		//@{
 		LuaFunction loadstring(const std::string& str)
 		{
-			return loadstring(str.c_str());
+			return LuaFunction::loadstring(state_, str);
 		}
 		LuaFunction loadstring(const char* str)
 		{
-			util::ScopedSavedStack save(state_);
-
-			int status = luaL_loadstring(state_, str);
-
-			if (status)
-			{
-				ErrorHandler::instance().handle(status, state_);
-				return LuaRef(state_);
-			}
-			return LuaFunction(state_, StackTop());
+			return LuaFunction::loadstring(state_,str);
 		}
 		//@}
 
@@ -175,7 +157,7 @@ namespace kaguya
 			}
 
 			if (!env.isNilref())
-			{
+			{//register _ENV
 				env.push();
 #if LUA_VERSION_NUM >= 502
 				lua_setupvalue(state_, -2, 1);
@@ -212,7 +194,7 @@ namespace kaguya
 				return false;
 			}
 			if (!env.isNilref())
-			{
+			{//register _ENV
 				env.push();
 #if LUA_VERSION_NUM >= 502
 				lua_setupvalue(state_, -2, 1);

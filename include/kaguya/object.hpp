@@ -15,7 +15,7 @@ namespace kaguya
 	{
 		typedef typename traits::remove_cv<T>::type noncv_type;
 		typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-		typedef typename traits::remove_const_reference<noncvpointer_type>::type noncvpointerref_type;
+		typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
 
 		static const std::string v = std::string(KAGUYA_METATABLE_PREFIX) + typeid(noncvpointerref_type*).name();
 

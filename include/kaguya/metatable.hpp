@@ -41,36 +41,33 @@ namespace kaguya
 		{
 			FunctorType dtor(&types::destructor<ObjectWrapperBase>);
 			function_map_["__gc"].push_back(dtor);
+
+			//type check
+			class_type* check = 0;
+			base_class_type* ptr = check; (void)(ptr);//unused
 		}
 
-		void registerClass(lua_State* state)const
+		LuaRef registerClass(lua_State* state)const
 		{
+			util::ScopedSavedStack save(state);
 			if (class_userdata::newmetatable<class_type>(state))
 			{
-				lua_createtable(state, 0, 0);//__index table
-				registerMember(state);
-
-				if (!traits::is_void<base_class_type>::value)
-				{
-					class_userdata::setmetatable<base_class_type>(state);
-
-					//type check
-					class_type* check = 0;
-					base_class_type* ptr = check;(void)(ptr);//unused
-				}
-
-				lua_setfield(state, -2, "__index");
+				LuaRef metatable(state, StackTop());
+				metatable.push();
 				registerMetamethods(state);
 
 				if (!traits::is_void<base_class_type>::value)
 				{
 					class_userdata::setmetatable<base_class_type>(state);
 				}
+				metatable["__index"] = createIndexTable(state);
+				return metatable;
 			}
 			else
 			{
 				except::OtherError(state,typeid(class_type).name() +  std::string("is already registered"));
 			}
+			return LuaRef(state);
 		}
 
 #include "gen/add_constructor.inl"
@@ -198,6 +195,21 @@ namespace kaguya
 			if (!except::checkErrorAndThrow(status, state)) { return; }
 			lua_setfield(state, -2, name);
 		}
+		LuaRef createIndexTable(lua_State* state)const
+		{
+			util::ScopedSavedStack save(state);
+			LuaRef indexTable(state, NewTable());
+			indexTable.push();
+			registerMember(state);
+
+			if (!traits::is_void<base_class_type>::value)
+			{
+				class_userdata::setmetatable<base_class_type>(state);
+			}
+
+			return indexTable;
+		}
+
 		void registerMember(lua_State* state)const
 		{
 			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)

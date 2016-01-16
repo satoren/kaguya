@@ -51,7 +51,7 @@ extern "C" int luaopen_modulename(lua_State *L)
 ### Runnig Lua code
 ```c++
   kaguya::State state;
-  state("a = \"test\"");//from string
+  state("a = 'test'");//from string
   state.loadFile("path/to/luascript.lua");//from file
 ```
 
@@ -98,6 +98,34 @@ assert(42 == abc:get_value())
 abc:set_value(30)
 assert(30 == abc:get_value())
 ```
+#### Registering inheritance
+```c++
+struct Base
+{
+	int a;
+};
+struct Derived:Base
+{
+	int b;
+};
+int base_function(Base* b) {
+	b->a = 1;
+	return b->a;
+}
+//
+kaguya::State state;
+state["Base"].setClass(kaguya::ClassMetatable<Base>()
+  .addMember("a", &Base::a)
+  );
+state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
+  .addMember("b", &Derived::b)
+  );
+
+state["base_function"] = &base_function;
+Derived derived;
+state["base_function"](&derived);//Base arguments function
+state("assert(1 == derived:a())");//accessing Base member
+```
 
 #### Registering object instance
 ```c++
@@ -118,8 +146,20 @@ state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 	state["shared_abc"] = kaguya::standard::shared_ptr<ABC>(new ABC(43));//kaguya::standard::shared_ptr is std::shared_ptr or boost::shared_ptr.
 	state("assert(43 == shared_abc:get_value())");
 ```
+#### Object lifetime
+```c++
+state["Base"].setClass(kaguya::ClassMetatable<Base>());
+Base base;
 
-#### Registering function
+//registering pointer. lifetime is same base
+state["b"] = &base;
+
+//registering copy instance. copied instance lifetime is handling in lua vm(garbage collection).
+state["b"] = base;
+state["b"] = static_cast<Base const&>(base);
+
+```
+### Registering function
 ```c++
 void c_free_standing_function(int v){std::cout <<"c_free_standing_function called:" << v << std::endl}
 state["fun"] = &c_free_standing_function;
