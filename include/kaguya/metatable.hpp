@@ -60,7 +60,9 @@ namespace kaguya
 				{
 					class_userdata::setmetatable<base_class_type>(state);
 				}
-				metatable["__index"] = createIndexTable(state);
+				LuaRef indexTable = createIndexTable(state);
+				indexTable.push();
+				lua_setfield(state,-2,"__index");
 				return metatable;
 			}
 			else
