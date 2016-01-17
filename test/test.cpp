@@ -378,10 +378,12 @@ namespace t_02_classreg
 
 	struct Base
 	{
+		Base() :a(0) {};
 		int a;
 	};
 	struct Derived:Base
 	{
+		Derived():b(0) {};
 		int b;
 	};
 
@@ -403,7 +405,7 @@ namespace t_02_classreg
 			.addMember("b", &Derived::b)
 			);
 
-		Derived derived = {};
+		Derived derived;
 		Base base = {};
 		state["base"] = &base;
 		state["derived"] = &derived;
