@@ -130,7 +130,7 @@ def standard_function(out,arg_num,with_state = False):
 		invoke_code += 'state'+ (',' if arg_num>0 else '')
 	invoke_code += args_str(arg_num,'t')
 	invoke_code += ');\n'
-	invoke_code += '    return types::push(state,standard::forward<Ret>(r));\n'
+	invoke_code += '    return types::push_dispatch(state,standard::forward<Ret>(r));\n'
 
 	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
@@ -177,7 +177,7 @@ def tepmlate_function(out,arg_num,with_state=False):
 		invoke_code += 'state'+ (',' if arg_num>0 else '')
 	invoke_code += args_str(arg_num,'t')
 	invoke_code += ');\n'
-	invoke_code += '    return types::push(state,standard::forward<Ret>(r));\n'
+	invoke_code += '    return types::push_dispatch(state,standard::forward<Ret>(r));\n'
 
 	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
@@ -227,7 +227,7 @@ def tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 		invoke_code += 'state'+ (',' if arg_num>0 else '')
 	invoke_code +=args_str(arg_num+1,'t',1)
 	invoke_code +=');\n'
-	invoke_code +='    return types::push(state,standard::forward<Ret>(r));\n'
+	invoke_code +='    return types::push_dispatch(state,standard::forward<Ret>(r));\n'
 
 	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<'+ funattr +' T1*>()) == 0){return false;}\n')
 

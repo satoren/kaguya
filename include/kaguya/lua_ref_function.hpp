@@ -186,11 +186,14 @@ namespace kaguya
 		struct arg_get_type<const LuaFunction& > {
 			typedef LuaFunction type;
 		};
+		template< >	struct is_push_specialized<LuaFunction> : integral_constant<bool, true> {};
 
 		template<>
 		struct arg_get_type<const LuaThread& > {
 			typedef LuaThread type;
 		};
+
+		template< >	struct is_push_specialized<LuaThread> : integral_constant<bool, true> {};
 	}
 
 	namespace types

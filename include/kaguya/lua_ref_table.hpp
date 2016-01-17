@@ -309,12 +309,15 @@ namespace kaguya
 		struct arg_get_type<const LuaUserData& > {
 			typedef LuaUserData type;
 		};
+		template< >	struct is_push_specialized<LuaUserData> : integral_constant<bool, true> {};
 
 		template<>
 		struct arg_get_type<const LuaTable& > {
 			typedef LuaTable type;
 		};
 
+		template< >	struct is_push_specialized<LuaTable> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<TableKeyReference> : integral_constant<bool, true> {};
 	}
 	namespace types
 	{

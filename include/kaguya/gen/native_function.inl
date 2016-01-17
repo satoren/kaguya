@@ -12,7 +12,7 @@ struct StdFunInvoker0:BaseInvoker{
   virtual int invoke(lua_State *state)
   {
     Ret r = func_();
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -48,7 +48,7 @@ struct StdFunInvoker1:BaseInvoker{
   {
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     Ret r = func_(t1);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -86,7 +86,7 @@ struct StdFunInvoker2:BaseInvoker{
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     Ret r = func_(t1,t2);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -126,7 +126,7 @@ struct StdFunInvoker3:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     Ret r = func_(t1,t2,t3);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -168,7 +168,7 @@ struct StdFunInvoker4:BaseInvoker{
     typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     Ret r = func_(t1,t2,t3,t4);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -212,7 +212,7 @@ struct StdFunInvoker5:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     Ret r = func_(t1,t2,t3,t4,t5);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -258,7 +258,7 @@ struct StdFunInvoker6:BaseInvoker{
     typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -306,7 +306,7 @@ struct StdFunInvoker7:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -356,7 +356,7 @@ struct StdFunInvoker8:BaseInvoker{
     typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -408,7 +408,7 @@ struct StdFunInvoker9:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -850,7 +850,7 @@ struct FunInvoker0:BaseInvoker{
   virtual int invoke(lua_State *state)
   {
     Ret r = func_();
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -886,7 +886,7 @@ struct FunInvoker1:BaseInvoker{
   {
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     Ret r = func_(t1);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -924,7 +924,7 @@ struct FunInvoker2:BaseInvoker{
     typename traits::arg_get_type<T1>::type t1 = types::get(state,1,types::typetag<typename traits::arg_get_type<T1>::type>());
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     Ret r = func_(t1,t2);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -964,7 +964,7 @@ struct FunInvoker3:BaseInvoker{
     typename traits::arg_get_type<T2>::type t2 = types::get(state,2,types::typetag<typename traits::arg_get_type<T2>::type>());
     typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     Ret r = func_(t1,t2,t3);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1006,7 +1006,7 @@ struct FunInvoker4:BaseInvoker{
     typename traits::arg_get_type<T3>::type t3 = types::get(state,3,types::typetag<typename traits::arg_get_type<T3>::type>());
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     Ret r = func_(t1,t2,t3,t4);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1050,7 +1050,7 @@ struct FunInvoker5:BaseInvoker{
     typename traits::arg_get_type<T4>::type t4 = types::get(state,4,types::typetag<typename traits::arg_get_type<T4>::type>());
     typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     Ret r = func_(t1,t2,t3,t4,t5);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1096,7 +1096,7 @@ struct FunInvoker6:BaseInvoker{
     typename traits::arg_get_type<T5>::type t5 = types::get(state,5,types::typetag<typename traits::arg_get_type<T5>::type>());
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1144,7 +1144,7 @@ struct FunInvoker7:BaseInvoker{
     typename traits::arg_get_type<T6>::type t6 = types::get(state,6,types::typetag<typename traits::arg_get_type<T6>::type>());
     typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1194,7 +1194,7 @@ struct FunInvoker8:BaseInvoker{
     typename traits::arg_get_type<T7>::type t7 = types::get(state,7,types::typetag<typename traits::arg_get_type<T7>::type>());
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1246,7 +1246,7 @@ struct FunInvoker9:BaseInvoker{
     typename traits::arg_get_type<T8>::type t8 = types::get(state,8,types::typetag<typename traits::arg_get_type<T8>::type>());
     typename traits::arg_get_type<T9>::type t9 = types::get(state,9,types::typetag<typename traits::arg_get_type<T9>::type>());
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1691,7 +1691,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)();
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1724,7 +1724,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)();
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1763,7 +1763,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1803,7 +1803,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1844,7 +1844,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1886,7 +1886,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1929,7 +1929,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -1973,7 +1973,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2018,7 +2018,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2064,7 +2064,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2111,7 +2111,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2159,7 +2159,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2208,7 +2208,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2258,7 +2258,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2309,7 +2309,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2361,7 +2361,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2414,7 +2414,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2468,7 +2468,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2523,7 +2523,7 @@ if(types::get(state, 1, types::typetag< T1*>()) == 0){return false;}
    T1* ptr = types::get(state, 1, types::typetag< T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;
@@ -2579,7 +2579,7 @@ if(types::get(state, 1, types::typetag<const T1*>()) == 0){return false;}
   const T1* ptr = types::get(state, 1, types::typetag<const T1*>());
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
-    return types::push(state,standard::forward<Ret>(r));
+    return types::push_dispatch(state,standard::forward<Ret>(r));
   }
   virtual std::string argumentTypeNames(){
     std::string result;

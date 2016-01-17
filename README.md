@@ -153,6 +153,7 @@ Base base;
 
 //registering pointer. lifetime is same base
 state["b"] = &base;
+state["b"] = std::ref(base);
 
 //registering copy instance. copied instance lifetime is handling in lua vm(garbage collection).
 state["b"] = base;

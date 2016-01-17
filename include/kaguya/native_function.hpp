@@ -62,7 +62,7 @@ namespace kaguya
 					}
 					else
 					{
-						return types::push(state, standard::forward<MemType>(ptr->*data_));
+						return types::push_dispatch(state, ptr->*data_);
 					}
 				}
 
@@ -114,7 +114,7 @@ namespace kaguya
 						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 					}
 					Ret r = func_(args);
-					return types::push(state, standard::forward<Ret>(r));
+					return types::push_dispatch(state, standard::forward<Ret>(r));
 				}
 				virtual std::string argumentTypeNames() {
 					return "VariadicArg";
@@ -175,7 +175,7 @@ namespace kaguya
 					}
 
 					Ret r = (t->*func_)(args);
-					return types::push(state, standard::forward<Ret>(r));
+					return types::push_dispatch(state, standard::forward<Ret>(r));
 				}
 
 
@@ -250,7 +250,7 @@ namespace kaguya
 					}
 
 					Ret r = (t->*func_)(args);
-					return types::push(state, standard::forward <Ret>(r));
+					return types::push_dispatch(state, standard::forward <Ret>(r));
 				}
 				virtual std::string argumentTypeNames() {
 					std::string result;
@@ -318,7 +318,7 @@ namespace kaguya
 						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
 					}
 					Ret r = func_(args);
-					return types::push(state, standard::forward<Ret>(r));
+					return types::push_dispatch(state, standard::forward<Ret>(r));
 				}
 				virtual std::string argumentTypeNames() {
 					return "VariadicArg";

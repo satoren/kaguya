@@ -39,7 +39,7 @@ namespace kaguya
 
 		ClassMetatable()
 		{
-			FunctorType dtor(&types::destructor<ObjectWrapperBase>);
+			FunctorType dtor(&class_userdata::destructor<ObjectWrapperBase>);
 			function_map_["__gc"].push_back(dtor);
 
 			//type check
@@ -158,7 +158,7 @@ namespace kaguya
 		{
 			int funcnum = int(func_array.size());
 			if (funcnum == 0) { return; }
-			types::push(state, funcnum);
+			types::push_dispatch(state, funcnum);
 			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
 			{
 				void *storage = lua_newuserdata(state, sizeof(FunctorType));
@@ -172,15 +172,15 @@ namespace kaguya
 		{
 			if (value.type == ValueType::str_value)
 			{
-				types::push(state, value.strvalue);
+				types::push_dispatch(state, value.strvalue);
 			}
 			else if (value.type == ValueType::int_value)
 			{
-				types::push(state, value.ivalue);
+				types::push_dispatch(state, value.ivalue);
 			}
 			else if (value.type == ValueType::double_value)
 			{
-				types::push(state, value.dvalue);
+				types::push_dispatch(state, value.dvalue);
 			}
 			else
 			{

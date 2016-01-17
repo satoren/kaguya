@@ -19,7 +19,19 @@ namespace kaguya
 	struct NewThread {};
 	struct GlobalTable {};
 	struct NilValue {};
-	
+
+	namespace traits
+	{
+		template< >	struct is_push_specialized<NewTable> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<NewThread> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<GlobalTable> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<NilValue> : integral_constant<bool, true> {};
+
+		template<class V> struct is_push_specialized<std::vector<V> > : integral_constant<bool, true> {};
+		template<class K, class V> struct is_push_specialized<std::map<K, V> > : integral_constant<bool, true> {};
+
+	}
+
 	namespace types
 	{
 		namespace detail
@@ -27,7 +39,7 @@ namespace kaguya
 			template<typename T>
 			inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
 			{
-				ObjectWrapperBase* objwrapper = object_wrapper(l,index, metatableName<T>());
+				ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
 				return objwrapper != 0;
 			}
 
@@ -88,7 +100,7 @@ namespace kaguya
 				{
 					return true;
 				}
-				return object_wrapper(l,index,metatableName<T>()) != 0;
+				return object_wrapper(l, index, metatableName<T>()) != 0;
 			}
 
 			template<>
@@ -179,7 +191,7 @@ namespace kaguya
 			{
 				return object_wrapper(l, index);
 			}
-			
+
 
 			template<>
 			inline lua_State* get(lua_State* l, int index, typetag<lua_State*> tag)
@@ -254,8 +266,9 @@ namespace kaguya
 				class_userdata::setmetatable<T>(l);
 				return 1;
 			}
+
 			template<typename T>
-			inline int push(lua_State* l, const T& v)
+			inline int push(lua_State* l, T v)
 			{
 				typedef ObjectWrapper<T> wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
@@ -289,6 +302,11 @@ namespace kaguya
 			{
 				return push(l, &v);
 			}
+			template<typename T>
+			inline int push(lua_State* l, const standard::reference_wrapper<T>& v)
+			{
+				return push(l, &v.get());
+			}
 
 			inline int push(lua_State* l, const FunctorType& f);
 #if KAGUYA_USE_RVALUE_REFERENCE
@@ -315,9 +333,19 @@ namespace kaguya
 		template<typename T>
 		inline int push(lua_State* l, const T& v)
 		{
-			detail::push(l, static_cast<typename traits::lua_push_type<T>::type>(v));
-			return 1;
+			return detail::push(l, static_cast<typename traits::lua_push_type<T>::type>(v));
 		}
+		template<typename T>
+		inline int push_pointer(lua_State* l, T* v)
+		{
+			return detail::push(l, v);
+		}
+		template<typename T>
+		inline int push_ref(lua_State* l, T& v)
+		{
+			return detail::push(l, standard::ref(v));
+		}
+
 
 		template<>
 		inline int push(lua_State* l, const NewTable& table)
@@ -341,7 +369,7 @@ namespace kaguya
 		}
 
 		template<>
-		inline int push(lua_State* l, const  GlobalTable&)
+		inline int push(lua_State* l, const GlobalTable&)
 		{
 #if LUA_VERSION_NUM >= 502
 			lua_pushglobaltable(l);
@@ -370,15 +398,30 @@ namespace kaguya
 		inline std::map<K, V> get(lua_State* l, int index, typetag<std::map<K, V> > tag);
 		template<typename K, typename V>
 		inline int push(lua_State* l, const std::map<K, V>& ref);
-#include "kaguya/gen/push_tuple.inl"
 
-		template<typename T>inline void destructor(T* pointer)
-		{
-			if (pointer)
-			{
-				pointer->~T();
-			}
-		}
 	}
 
+#include "kaguya/gen/push_tuple.inl"
+
+	//need define after overloaded push
+	namespace types
+	{
+		template<typename T>
+		inline int push_dispatch(lua_State* l, T& v)
+		{
+			if (!traits::is_push_specialized<typename traits::remove_const<T>::type >::value)
+			{
+				return push_ref(l, v);
+			}
+			else
+			{
+				return push(l, v);
+			}
+		}
+		template<typename T>
+		inline int push_dispatch(lua_State* l, const T& v)
+		{
+			return push(l, v);
+		}
+	}
 };

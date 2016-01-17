@@ -18,6 +18,7 @@ def generate_fun_args(out,arg_num):
 		out.write("T" + str(i+1)+"* t" + str(i+1) + "= 0")
 
 def generate_push_tuple(out,arg_num):
+	out.write("namespace types{\n")
 	generate_template(out,arg_num)
 	out.write("inline int push(lua_State* l,const standard::tuple<")
 	generate_args(out,arg_num,"T")
@@ -29,7 +30,14 @@ def generate_push_tuple(out,arg_num):
 	out.write("  return count;\n")
 	out.write("}\n")
 
+	out.write("}\n")
 
+	out.write("namespace traits{\n")
+	generate_template(out,arg_num)
+	out.write("struct is_push_specialized<standard::tuple<")
+	generate_args(out,arg_num,"T")
+	out.write("> > : integral_constant<bool, true> {};")
+	out.write("}\n")
 
 if __name__ == "__main__":
 	import sys

@@ -91,8 +91,8 @@ namespace kaguya
 				except::typeMismatchError(state_, typeName() + "is not table");
 				return;
 			}
-			int kc = types::push(state_, key);//push table key
-			int vc = types::push(state_, standard::forward<V>(value));//push value
+			int kc = types::push_dispatch(state_, standard::forward<K>(key));//push table key
+			int vc = types::push_dispatch(state_, standard::forward<V>(value));//push value
 
 			if (!pushCountCheck<K>(kc) || !pushCountCheck<V>(vc)) { return; }
 			lua_settable(state_, -3);//thistable[key] = value 
@@ -210,7 +210,7 @@ namespace kaguya
 		LuaRef(lua_State* state, T v, NoMainCheck) : state_(state)
 		{
 			util::ScopedSavedStack save(state_);
-			int vc = types::push(state_, v);
+			int vc = types::push_dispatch(state_, standard::forward<T>(v));
 			if (!pushCountCheck<T>(vc)) { return; }
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 		}
@@ -218,7 +218,7 @@ namespace kaguya
 		LuaRef(lua_State* state, T v) : state_(state)
 		{
 			util::ScopedSavedStack save(state_);
-			int vc = types::push(state_, v);
+			int vc = types::push_dispatch(state_, standard::forward<T>(v) );
 			if (!pushCountCheck<T>(vc)) { return; }
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			state_ = toMainThread(state_);
@@ -537,7 +537,7 @@ namespace kaguya
 				except::typeMismatchError(state_, typeName() + "is not table");
 				return LuaRef(state_);
 			}
-			types::push(state_, str);
+			types::push_dispatch(state_, str);
 			lua_gettable(state_, -2);
 			return LuaRef(state_, StackTop());
 		}
@@ -570,7 +570,7 @@ namespace kaguya
 				except::typeMismatchError(state_, typeName() + "is not table");
 				return LuaRef(state_);
 			}
-			types::push(state_, index);
+			types::push_dispatch(state_, index);
 			lua_gettable(state_, -2);
 			return LuaRef(state_, StackTop(), NoMainCheck());
 		}
@@ -826,6 +826,7 @@ namespace kaguya
 		struct arg_get_type<const LuaRef& > {
 			typedef LuaRef type;
 		};
+		template< >	struct is_push_specialized<LuaRef> : integral_constant<bool, true> {};
 
 	}
 }

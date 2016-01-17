@@ -408,7 +408,7 @@ namespace t_02_classreg
 		Derived derived;
 		Base base;
 		state["base"] = &base;
-		state["derived"] = &derived;
+		state["derived"] = kaguya::standard::ref(derived);
 		state["base_function"] = &base_function;
 		state["derived_function"] = &derived_function;
 		TEST_CHECK(state("assert(1 == base_function(base))"));
@@ -416,8 +416,6 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(2 == derived_function(derived))"));
 		TEST_CHECK(state("assert(1 == base:a())"));
 		TEST_CHECK(state("assert(1 == derived:a())"));
-		state("print(derived:a())");
-		state("print(derived:b())");
 		TEST_CHECK(state("assert(2 == derived:b())"));
 		TEST_CHECK(derived.b == 2);
 	}
@@ -1284,9 +1282,7 @@ int main()
 		ADD_TEST(t_06_state::load_with_other_env);
 		ADD_TEST(t_06_state::no_standard_lib);
 		ADD_TEST(t_06_state::load_lib_constructor);
-
-
-
+		
 		ADD_TEST(t_07_any_type_test::any_type_test);
 
 		test_result = execute_test(testmap);

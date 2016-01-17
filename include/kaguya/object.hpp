@@ -55,6 +55,14 @@ namespace kaguya
 		{
 			return static_cast<T*>(luaL_testudata(l, index, metatableName<T>().c_str()));
 		}
+
+		template<typename T>inline void destructor(T* pointer)
+		{
+			if (pointer)
+			{
+				pointer->~T();
+			}
+		}
 	}
 	inline bool available_metatable(lua_State* l, const char* t)
 	{

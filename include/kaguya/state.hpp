@@ -270,7 +270,11 @@ namespace kaguya
 		template<typename T>
 		void pushToStack(T value)
 		{
-			types::push(state_, value);
+			types::push_dispatch(state_, value);
+		}
+		LuaRef popFromStack()
+		{
+			return LuaRef(state_, StackTop());
 		}
 
 		//! Garbage Collection of Lua 

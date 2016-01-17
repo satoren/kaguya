@@ -122,6 +122,16 @@ namespace kaguya
 			typedef const char* type;
 		};
 
+		template<class T> struct is_push_specialized : integral_constant<bool, 
+		!standard::is_same<T, typename lua_push_type<T>::type>::value ||
+		is_convertible_lua_number<typename remove_const_and_reference<T>::type>::value
+		> {};
+
+		template< >	struct is_push_specialized<std::string> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<const std::string> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<const char*> : integral_constant<bool, true> {};
+		template< >	struct is_push_specialized<FunctorType> : integral_constant<bool, true> {};
+
 
 		template< typename T >
 		struct arg_get_type {

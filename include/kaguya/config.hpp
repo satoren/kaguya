@@ -62,25 +62,8 @@ namespace kaguya
 	namespace standard
 	{
 #if KAGUYA_USE_BOOST
-		using boost::function;
-		using boost::tuple;
-		using boost::shared_ptr;
-		using boost::get;
-		using boost::is_enum;
-		using boost::is_arithmetic;
-		using boost::is_integral;
-		using boost::is_floating_point;
-		using boost::integral_constant;
-		using boost::remove_reference;
-		using boost::remove_pointer;
-		using boost::remove_cv;
-		using boost::remove_const;
-		using boost::conditional;
-		using boost::is_same;
-		using boost::is_function;
-#if BOOST_VERSION >= 104800
-		using boost::forward;
-#else
+		using namespace boost;
+#if BOOST_VERSION < 104800
 		template<typename T>T forward(T v) { return v; }
 #endif
 
@@ -91,24 +74,7 @@ namespace kaguya
 			return buffer;
 		}
 #else
-		using std::function;
-		using std::tuple;
-		using std::shared_ptr;
-		using std::to_string;
-		using std::get;
-		using std::is_enum;
-		using std::is_arithmetic;
-		using std::is_integral;
-		using std::is_floating_point;
-		using std::integral_constant;
-		using std::remove_reference;
-		using std::remove_pointer;
-		using std::remove_cv;
-		using std::remove_const;
-		using std::conditional;
-		using std::is_same;
-		using std::is_function;
-		using std::forward;
+		using namespace std;
 #endif
 	}
 
