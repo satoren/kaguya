@@ -419,7 +419,38 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(2 == derived:b())"));
 		TEST_CHECK(derived.b == 2);
 	}
-	
+
+	int receive_shared_ptr_function(kaguya::standard::shared_ptr<Derived> d) {
+		d->b = 5;
+		return d->b;
+	}
+	void registering_shared_ptr(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addMember("a", &Base::a)
+			);
+
+		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
+			.addMember("b", &Derived::b)
+			);
+
+		kaguya::standard::shared_ptr<Derived> derived(new Derived());
+		kaguya::standard::shared_ptr<Base> base(new Base());
+		state["base"] = base;
+		state["derived"] = derived;
+		state["base_function"] = &base_function;
+		state["derived_function"] = &derived_function;
+		state["receive_shared_ptr_function"] = &receive_shared_ptr_function;
+		TEST_CHECK(state("assert(1 == base_function(base))"));
+		TEST_CHECK(state("assert(1 == base_function(derived))"));
+		TEST_CHECK(state("assert(2 == derived_function(derived))"));
+		TEST_CHECK(state("assert(1 == base:a())"));
+		TEST_CHECK(state("assert(1 == derived:a())"));
+		TEST_CHECK(state("assert(2 == derived:b())"));
+		TEST_CHECK(derived->b == 2);
+		TEST_CHECK(state("assert(5 == receive_shared_ptr_function(derived))"));
+		TEST_CHECK(derived->b == 5);
+	}
 
 }
 
@@ -1244,7 +1275,8 @@ int main()
 		ADD_TEST(t_02_classreg::noncopyable_class_test);
 		ADD_TEST(t_02_classreg::registering_object_instance);
 		ADD_TEST(t_02_classreg::registering_derived_class);
-
+		ADD_TEST(t_02_classreg::registering_shared_ptr);
+		
 
 		ADD_TEST(t_03_function::free_standing_function_test);
 		ADD_TEST(t_03_function::member_function_test);

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstring>
+#include <typeinfo>
 
 #include "kaguya/config.hpp"
 #include "kaguya/traits.hpp"
@@ -20,6 +21,14 @@ namespace kaguya
 		static const std::string v = std::string(KAGUYA_METATABLE_PREFIX) + typeid(noncvpointerref_type*).name();
 
 		return v;
+	}
+	template<typename T>
+	const std::type_info* metatableType()
+	{
+		typedef typename traits::remove_cv<T>::type noncv_type;
+		typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
+		typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
+		return &typeid(noncvpointerref_type*);
 	}
 
 	namespace class_userdata
@@ -79,10 +88,10 @@ namespace kaguya
 
 	struct ObjectWrapperBase
 	{
-		template<typename T>
-		bool is_metatable_object() { return is_metatable_object(metatableName<T>()); }
-		virtual bool is_metatable_object(const std::string& metaname) = 0;
+		virtual bool is_native_type(const std::string& type) = 0;
 
+		virtual const void* native_cget() = 0;
+		virtual void* native_get() = 0;
 		virtual const void* cget() = 0;
 		virtual void* get() = 0;
 
@@ -119,10 +128,11 @@ namespace kaguya
 		ObjectWrapper(Args&&... args) : object(standard::forward<Args>(args)...) {}
 #endif
 
-		bool is_metatable_object(const std::string& metaname)
+		virtual bool is_native_type(const std::string& type)
 		{
-			return metatableName<T>() == metaname;
+			return metatableName<T>() == type;
 		}
+
 		virtual void* get()
 		{
 			return &object;
@@ -131,18 +141,20 @@ namespace kaguya
 		{
 			return &object;
 		}
+		virtual const void* native_cget() {return cget();};
+		virtual void* native_get() { return get(); };
 	};
 
 	template<class T>
-	struct ObjectWrapper<standard::shared_ptr<T> > : ObjectWrapperBase
+	struct ObjectSmartPointerWrapper : ObjectWrapperBase
 	{
-		standard::shared_ptr<T> object;
+		T object;
 
-		ObjectWrapper(const standard::shared_ptr<T>& v1) :object(v1) {}
+		ObjectSmartPointerWrapper(const T& sptr) :object(sptr) {}
 
-		bool is_metatable_object(const std::string& metaname)
+		virtual bool is_native_type(const std::string& type)
 		{
-			return metatableName<T>() == metaname;
+			return metatableName<T >() == type;
 		}
 		virtual void* get()
 		{
@@ -152,6 +164,8 @@ namespace kaguya
 		{
 			return object.get();
 		}
+		virtual const void* native_cget() { return &object; };
+		virtual void* native_get() { return &object; };
 	};
 
 	template<class T>
@@ -161,9 +175,9 @@ namespace kaguya
 
 		ObjectPointerWrapper(T* ptr) :object(ptr) {}
 
-		bool is_metatable_object(const std::string& metaname)
+		virtual bool is_native_type(const std::string& type)
 		{
-			return metatableName<T>() == metaname;
+			return metatableName<T>() == type;
 		}
 		virtual void* get()
 		{
@@ -177,6 +191,8 @@ namespace kaguya
 		{
 			return object;
 		}
+		virtual const void* native_cget() { return cget(); };
+		virtual void* native_get() { return get(); };
 	};
 
 	inline bool recursive_base_type_check(lua_State* l, int index, const std::string& require_type)
@@ -203,7 +219,11 @@ namespace kaguya
 		void* ptr = lua_touserdata(l, index);
 		if (ptr && lua_type(l, index) == LUA_TUSERDATA)
 		{
-			if (require_type.empty() || recursive_base_type_check(l,index, require_type))
+			if (static_cast<ObjectWrapperBase*>(ptr)->is_native_type(require_type))
+			{
+				return static_cast<ObjectWrapperBase*>(ptr);
+			}
+			else if (require_type.empty() || recursive_base_type_check(l,index, require_type))
 			{
 				return static_cast<ObjectWrapperBase*>(ptr);
 			}
@@ -228,7 +248,14 @@ namespace kaguya
 			ObjectWrapperBase* objwrapper = object_wrapper(l, index,metatableName<T>());
 			if (objwrapper)
 			{
-				return static_cast<T*>(objwrapper->get());
+				if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableName<T>()))
+				{
+					return static_cast<T*>(objwrapper->native_get());
+				}
+				else
+				{
+					return static_cast<T*>(objwrapper->get());
+				}
 			}
 		}
 		return 0;
@@ -251,7 +278,14 @@ namespace kaguya
 			ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
 			if (objwrapper)
 			{
-				return static_cast<const T*>(objwrapper->cget());
+				if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableName<T>()))
+				{
+					return static_cast<const T*>(objwrapper->native_cget());
+				}
+				else
+				{
+					return static_cast<const T*>(objwrapper->cget());
+				}
 			}
 		}
 		return 0;

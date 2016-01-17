@@ -260,7 +260,7 @@ namespace kaguya
 			template<typename T>
 			inline int push(lua_State* l, const standard::shared_ptr<T>& v)
 			{
-				typedef ObjectWrapper<standard::shared_ptr<T> > wrapper_type;
+				typedef ObjectSmartPointerWrapper<standard::shared_ptr<T> > wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(v);
 				class_userdata::setmetatable<T>(l);

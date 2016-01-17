@@ -419,7 +419,7 @@ namespace kaguya
 		}
 		inline std::string build_arg_error_message(lua_State *l)
 		{
-			std::string message = "argument not matching" + util::argmentTypes(l) + "\t candidated\n";
+			std::string message = "argument not matching:" + util::argmentTypes(l) + "\t candidated\n";
 
 			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 			for (int i = 0; i < overloadnum; ++i)
