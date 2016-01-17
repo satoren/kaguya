@@ -406,7 +406,7 @@ namespace t_02_classreg
 			);
 
 		Derived derived;
-		Base base = {};
+		Base base;
 		state["base"] = &base;
 		state["derived"] = &derived;
 		state["base_function"] = &base_function;
