@@ -10,8 +10,6 @@
 #include "kaguya/type.hpp"
 #include "kaguya/utility.hpp"
 
-
-#include "kaguya/lua_ref_table.hpp"
 namespace kaguya
 {
 

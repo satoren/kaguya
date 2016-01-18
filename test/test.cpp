@@ -452,6 +452,30 @@ namespace t_02_classreg
 		TEST_CHECK(derived->b == 5);
 	}
 
+
+	void add_property(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addProperty("a", &Base::a)
+			);
+
+		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
+			.addProperty("b", &Derived::b)
+			);
+
+		Derived derived;
+		Base base;
+		state["base"] = &base;
+		state["derived"] = kaguya::standard::ref(derived);
+		TEST_CHECK(state("base.a=1"));
+		TEST_CHECK(state("derived.a = 2"));
+		TEST_CHECK(state("derived.b=3"));
+		TEST_CHECK(state("assert(1 == base.a)"));
+		TEST_CHECK(state("assert(2 == derived.a)"));
+		TEST_CHECK(state("assert(3 == derived.b)"));
+		TEST_CHECK(derived.b == 3);
+	}
+	
 }
 
 namespace t_03_function
@@ -504,11 +528,11 @@ namespace t_03_function
 		TEST_CHECK(foo.bar == "test2");
 #if __cplusplus >= 201103L || defined(__cpp_lambdas)
 		lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
-		TEST_CHECK(state("Foo.bar('test')"));
-		TEST_CHECK(foo.bar == "test");
+		TEST_CHECK(state("Foo.bar('test3')"));
+		TEST_CHECK(foo.bar == "test3");
 		lfoo["bar"] = kaguya::function([&foo](std::string str) { foo.bar = str; });
-		TEST_CHECK(state("Foo.bar('test')"));
-		TEST_CHECK(foo.bar == "test");
+		TEST_CHECK(state("Foo.bar('test4')"));
+		TEST_CHECK(foo.bar == "test4");
 #else
 #endif
 	}
@@ -954,6 +978,24 @@ namespace t_04_lua_ref
 		TEST_CHECK(table["hana"] == "uta");
 		TEST_CHECK(table.getMetatable() == metatable);
 	}
+
+
+	void luafun_dostring(kaguya::State& state)
+	{
+		kaguya::LuaRef f = kaguya::LuaFunction::loadstring(state.state(), "return function(table, key) return table['other_'..key] end")();
+
+		kaguya::LuaTable table = state.newTable();
+		table["x"] = 5;
+		table["other_x"] = 55;
+		int v = f(table, "x");
+
+
+
+
+		TEST_CHECK(v == 55);
+	}
+
+
 }
 
 namespace t_05_error_handler
@@ -1276,6 +1318,7 @@ int main()
 		ADD_TEST(t_02_classreg::registering_object_instance);
 		ADD_TEST(t_02_classreg::registering_derived_class);
 		ADD_TEST(t_02_classreg::registering_shared_ptr);
+		ADD_TEST(t_02_classreg::add_property);
 		
 
 		ADD_TEST(t_03_function::free_standing_function_test);
@@ -1303,6 +1346,7 @@ int main()
 		ADD_TEST(t_04_lua_ref::lua_table_set);
 		ADD_TEST(t_04_lua_ref::lua_table_reference);
 
+		ADD_TEST(t_04_lua_ref::luafun_dostring);
 
 		ADD_TEST(t_04_lua_ref::metatable);
 

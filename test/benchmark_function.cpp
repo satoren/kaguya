@@ -78,3 +78,29 @@
 			if (v != i) { throw std::logic_error(""); }
 		}
 	}
+
+	struct Prop
+	{	
+		Prop():d(0){}
+
+		double d;
+	};
+	void property_access(kaguya::State& state)
+	{
+		state["Prop"].setClass(kaguya::ClassMetatable<Prop>()
+			.addConstructor()
+			.addProperty("d", &Prop::d)
+			);
+
+		state(
+			"local getset = Prop.new()\n"
+			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
+			"local times = 1000000\n"
+			"for i=1,times do\n"
+			"getset.d =i\n"
+			"if(getset.d ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}

@@ -9,6 +9,9 @@
 #include "kaguya/config.hpp"
 #include "kaguya/native_function.hpp"
 
+
+#include "kaguya/lua_ref_function.hpp"
+
 namespace kaguya
 {
 
@@ -37,7 +40,7 @@ namespace kaguya
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
 
-		ClassMetatable()
+		ClassMetatable():has_property_(false)
 		{
 			FunctorType dtor(&class_userdata::destructor<ObjectWrapperBase>);
 			function_map_["__gc"].push_back(dtor);
@@ -53,14 +56,41 @@ namespace kaguya
 			if (class_userdata::newmetatable<class_type>(state))
 			{
 				LuaRef metatable(state, StackTop());
+
+
+				if (has_property_)
+				{
+					LuaRef newindexfn = LuaFunction::loadstring(state, "return function(table, index, value) "
+						"if type(table) == 'table' then rawset(table,index,value)"
+						" else "
+						" table['_prop_'..index](table,value);"
+						" end"
+						" end")();
+					metatable.setField("__newindex", newindexfn);
+
+					LuaRef indextable = createIndexTable(state);
+
+					LuaRef indexfun = kaguya::LuaFunction::loadstring(state, "local arg = {...};local indextable = arg[1];"
+						"return function(table, index)"
+						" local propfun = indextable['_prop_'..index];"
+						" if propfun then return propfun(table) end "
+						" return indextable[index]"
+						" end")(indextable);
+
+					metatable.setField("__index", indexfun);
+				}
+				else
+				{
+					metatable.setField("__index", createIndexTable(state));
+				}
+
 				metatable.push();
 				registerMetamethods(state);
-
 				if (!traits::is_void<base_class_type>::value)
 				{
 					class_userdata::setmetatable<base_class_type>(state);
 				}
-				metatable.setField("__index",createIndexTable(state));
+
 				return metatable;
 			}
 			else
@@ -105,6 +135,12 @@ namespace kaguya
 			return *this;
 		}
 #endif
+		template<typename Ret>
+		ClassMetatable& addProperty(const char* name, Ret class_type::* mem)
+		{
+			has_property_ = true;
+			return addFunction((std::string("_prop_") + name).c_str(), mem);
+		}
 
 		template<typename Fun>
 		ClassMetatable& addStaticMember(const char* name, Fun f)
@@ -296,5 +332,6 @@ namespace kaguya
 		FuncMapType function_map_;
 		ValueMapType value_map_;
 		CodeChunkMapType code_chunk_map_;
+		bool has_property_;
 	};
 };
