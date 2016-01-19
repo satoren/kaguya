@@ -100,7 +100,16 @@ namespace kaguya
 			return LuaRef(state);
 		}
 
+#if KAGUYA_USE_CPP11
+		template<typename... Args>
+		ClassMetatable& addConstructor()
+		{
+			function_map_["new"].push_back(FunctorType::ConstructorInvoker<class_type, Args...>());
+			return *this;
+		}
+#else
 #include "gen/add_constructor.inl"
+#endif
 		//variadic arguments constructor(receive const std::vector<LuaRef>&)
 //		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
 		ClassMetatable& addConstructorVariadicArg()

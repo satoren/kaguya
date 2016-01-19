@@ -980,19 +980,34 @@ namespace t_04_lua_ref
 	}
 
 
-	void luafun_dostring(kaguya::State& state)
+	void luafun_loadstring(kaguya::State& state)
 	{
-		kaguya::LuaRef f = kaguya::LuaFunction::loadstring(state.state(), "return function(table, key) return table['other_'..key] end")();
+		{
+			kaguya::LuaRef f = kaguya::LuaFunction::loadstring(state.state(), "return function(table, key) return table['other_'..key] end")();
+			kaguya::LuaTable table = state.newTable();
+			table["x"] = 5;
+			table["other_x"] = 55;
+			int v = f(table, "x");
+			TEST_CHECK(v == 55);
+		}
 
-		kaguya::LuaTable table = state.newTable();
-		table["x"] = 5;
-		table["other_x"] = 55;
-		int v = f(table, "x");
+		{
+			kaguya::LuaFunction f = kaguya::LuaFunction::loadstring(state.state()
+				, "return function(a) return 22,66 end")();
+
+			kaguya::LuaFunction forward = kaguya::LuaFunction::loadstring(state.state()
+				, "return function(...) return ... end")();
+			int a = 0;int b = 0;
+			kaguya::tie(a, b) = f();
+			TEST_CHECK(a == 22);
+			TEST_CHECK(b == 66);
+			a = 0;b = 0;
+			kaguya::tie(a,b) = forward(f());
+			TEST_CHECK(a == 22);
+			TEST_CHECK(b == 66);
+		}
 
 
-
-
-		TEST_CHECK(v == 55);
 	}
 
 
@@ -1346,7 +1361,7 @@ int main()
 		ADD_TEST(t_04_lua_ref::lua_table_set);
 		ADD_TEST(t_04_lua_ref::lua_table_reference);
 
-		ADD_TEST(t_04_lua_ref::luafun_dostring);
+		ADD_TEST(t_04_lua_ref::luafun_loadstring);
 
 		ADD_TEST(t_04_lua_ref::metatable);
 

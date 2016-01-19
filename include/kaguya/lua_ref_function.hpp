@@ -178,70 +178,7 @@ namespace kaguya
 		*/
 		using LuaRef::costatus;
 	};
-	namespace traits
-	{
-		template<>
-		struct arg_get_type<const LuaFunction& > {
-			typedef LuaFunction type;
-		};
-		template< >	struct is_push_specialized<LuaFunction> : integral_constant<bool, true> {};
 
-		template<>
-		struct arg_get_type<const LuaThread& > {
-			typedef LuaThread type;
-		};
-
-		template< >	struct is_push_specialized<LuaThread> : integral_constant<bool, true> {};
-	}
-
-	namespace types
-	{
-		template<>
-		inline bool strictCheckType(lua_State* l, int index, typetag<LuaThread>)
-		{
-			return lua_isthread(l, index);
-		}
-		template<>
-		inline bool checkType(lua_State* l, int index, typetag<LuaThread>)
-		{
-			return lua_isthread(l, index) || lua_isnil(l, index);
-		}
-		template<>
-		inline LuaThread get(lua_State* l, int index, typetag<LuaThread> tag)
-		{
-			lua_pushvalue(l, index);
-			return LuaThread(l, StackTop());
-		}
-		template<>
-		inline int push(lua_State* l, const LuaThread& ref)
-		{
-			ref.push(l);
-			return 1;
-		}
-
-		template<>
-		inline bool strictCheckType(lua_State* l, int index, typetag<LuaFunction>)
-		{
-			return lua_isfunction(l, index);
-		}
-		template<>
-		inline bool checkType(lua_State* l, int index, typetag<LuaFunction>)
-		{
-			return lua_isfunction(l, index) || lua_isnil(l, index);
-		}
-		template<>
-		inline LuaFunction get(lua_State* l, int index, typetag<LuaFunction> tag)
-		{
-			lua_pushvalue(l, index);
-			return LuaFunction(LuaRef(l, StackTop()));
-		}
-		template<>
-		inline int push(lua_State* l, const LuaFunction& ref)
-		{
-			ref.push(l);
-			return 1;
-		}
-	}
 	//! execute Lua function (or resume coroutine) and get result
 	class FunEvaluator
 	{
@@ -307,17 +244,23 @@ namespace kaguya
 			evaluate(result_count);
 			return eval_info_->results;
 		}
+
+#if KAGUYA_USE_CPP11
+//		template<typename... Args>
+//		FunEvaluator operator()(Args... args)
+//		{
+//			return get<LuaRef>()(args...);
+//		}
+#endif
+
 	private:
 
 		void evaluate(int resultnum)const
 		{
-
 			if (eval_info_&& eval_info_->owner == this && !eval_info_->invoked)
 			{
 				util::ScopedSavedStack save(state_, 0);
 				eval_info_->invoked = true;
-
-				eval_info_->results.reserve(resultnum);
 				const std::vector<LuaRef>& args = eval_info_->args;
 				if (eval_info_->coroutine)
 				{
@@ -332,7 +275,12 @@ namespace kaguya
 					int result = lua_resume(state_, argnum > 0 ? argnum - 1 : 0);
 #endif
 					except::checkErrorAndThrow(result, state_);
-					for (int i = 0; i < resultnum; ++i)
+					int retnum = lua_gettop(state_);
+					if (0 < retnum)
+					{
+						eval_info_->results.reserve(retnum);
+					}
+					for (int i = 0; i < retnum; ++i)
 					{
 						eval_info_->results.push_back(LuaRef(state_, StackTop()));
 					}
@@ -349,7 +297,12 @@ namespace kaguya
 					int result = lua_pcall(state_, int(args.size()), resultnum, 0);
 
 					except::checkErrorAndThrow(result, state_);
-					for (int i = 0; i < resultnum; ++i)
+					int retnum = lua_gettop(state_);
+					if (0 < retnum)
+					{
+						eval_info_->results.reserve(retnum);
+					}
+					for (int i = 0; i < retnum; ++i)
 					{
 						eval_info_->results.push_back(LuaRef(state_, StackTop()));
 					}
@@ -375,6 +328,84 @@ namespace kaguya
 		standard::shared_ptr<eval> eval_info_;
 	};
 
+	namespace traits
+	{
+		template<>
+		struct arg_get_type<const LuaFunction& > {
+			typedef LuaFunction type;
+		};
+		template< >	struct is_push_specialized<LuaFunction> : integral_constant<bool, true> {};
+
+		template<>
+		struct arg_get_type<const LuaThread& > {
+			typedef LuaThread type;
+		};
+		template< >	struct is_push_specialized<LuaThread> : integral_constant<bool, true> {};
+
+		template< >	struct is_push_specialized<FunEvaluator> : integral_constant<bool, true> {};
+	}
+
+	namespace types
+	{
+		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaThread>)
+		{
+			return lua_isthread(l, index);
+		}
+		template<>
+		inline bool checkType(lua_State* l, int index, typetag<LuaThread>)
+		{
+			return lua_isthread(l, index) || lua_isnil(l, index);
+		}
+		template<>
+		inline LuaThread get(lua_State* l, int index, typetag<LuaThread> tag)
+		{
+			lua_pushvalue(l, index);
+			return LuaThread(l, StackTop());
+		}
+		template<>
+		inline int push(lua_State* l, const LuaThread& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+
+		template<>
+		inline bool strictCheckType(lua_State* l, int index, typetag<LuaFunction>)
+		{
+			return lua_isfunction(l, index);
+		}
+		template<>
+		inline bool checkType(lua_State* l, int index, typetag<LuaFunction>)
+		{
+			return lua_isfunction(l, index) || lua_isnil(l, index);
+		}
+		template<>
+		inline LuaFunction get(lua_State* l, int index, typetag<LuaFunction> tag)
+		{
+			lua_pushvalue(l, index);
+			return LuaFunction(LuaRef(l, StackTop()));
+		}
+		template<>
+		inline int push(lua_State* l, const LuaFunction& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+
+		template<>
+		inline int push(lua_State* l, const FunEvaluator& ref)
+		{
+			const std::vector<LuaRef>& v = ref.get_result(LUA_MULTRET);
+			for (std::vector<LuaRef>::const_iterator it = v.begin(); it != v.end(); ++it)
+			{
+				it->push();
+			}
+			return static_cast<int>(v.size());
+		}
+		
+	}
+
 	/**
 	* @brief table and function binder.
 	* state["table"]->*"fun"() is table:fun() in Lua
@@ -387,6 +418,19 @@ namespace kaguya
 		mem_fun_binder(LuaRef self, T key) :self_(self), fun_(self_.getField(key))
 		{
 		}
+
+#if KAGUYA_USE_CPP11
+		/**
+		* @name operator()
+		* @brief call function with self.
+		* @param arg... function args
+		*/
+		template<typename... Args>
+		FunEvaluator operator()(Args... args)
+		{
+			return fun_(self_, args...);
+		}
+#else
 		/**
 		* @name operator()
 		* @brief call function with self.
@@ -395,6 +439,8 @@ namespace kaguya
 		//@{
 #include "kaguya/gen/luaref_mem_fun_def.inl"
 		//@}
+
+#endif
 	private:
 		LuaRef self_;//Table or Userdata
 		LuaFunction fun_;
@@ -405,7 +451,6 @@ namespace kaguya
 		return mem_fun_binder(*this, key);
 	}
 }
-//#include "kaguya/metatable.hpp"
 
 namespace kaguya
 {
