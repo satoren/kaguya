@@ -100,7 +100,7 @@ namespace kaguya
 			return LuaRef(state);
 		}
 
-#if KAGUYA_USE_CPP11 && defined(_MSC_VER) && _MSC_VER > 1800
+#if KAGUYA_USE_CPP11
 		template<typename... Args>
 		ClassMetatable& addConstructor()
 		{

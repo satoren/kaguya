@@ -992,10 +992,10 @@ namespace t_04_lua_ref
 		}
 
 		{
-			kaguya::LuaFunction f = kaguya::LuaFunction::loadstring(state.state()
+			kaguya::LuaRef f = kaguya::LuaFunction::loadstring(state.state()
 				, "return function(a) return 22,66 end")();
 
-			kaguya::LuaFunction forward = kaguya::LuaFunction::loadstring(state.state()
+			kaguya::LuaRef forward = kaguya::LuaFunction::loadstring(state.state()
 				, "return function(...) return ... end")();
 			int a = 0;int b = 0;
 			kaguya::tie(a, b) = f();
