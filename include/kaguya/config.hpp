@@ -56,6 +56,13 @@ extern "C" {
 #endif
 #endif
 
+#ifndef KAGUYA_USE_VARIADIC_TEMPLATE
+#if KAGUYA_USE_CPP11 && (!defined(_MSC_VER) || _MSC_VER >= 1700)
+#define KAGUYA_USE_VARIADIC_TEMPLATE 1
+#else
+#define KAGUYA_USE_VARIADIC_TEMPLATE 0
+#endif
+#endif
 
 
 namespace kaguya

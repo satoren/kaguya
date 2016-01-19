@@ -123,16 +123,11 @@ namespace kaguya
 		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8) : object(v1, v2, v3, v4, v5, v6, v7, v8) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9>
 		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8, const Arg9& v9) : object(v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
-#if KAGUYA_USE_RVALUE_REFERENCE
-#if defined(_MSC_VER) && _MSC_VER <= 1700
-		//warning for MSVC++ 2013
-		template<class Arg1, class... Args>
-		ObjectWrapper(Arg1&& arg1, Args&&... args) : object(standard::forward<Arg1>(arg1), standard::forward<Args>(args)...) {}
-#else
+#if KAGUYA_USE_VARIADIC_TEMPLATE
 		template<class... Args>
-		ObjectWrapper(Args&&... args) : object(standard::forward<Arg1>(arg1),standard::forward<Args>(args)...) {}
+		ObjectWrapper(Args&&... args) : object(standard::forward<Args>(args)...) {}
 #endif
-#endif
+
 		virtual bool is_native_type(const std::string& type)
 		{
 			return metatableName<T>() == type;
