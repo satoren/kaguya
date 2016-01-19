@@ -714,7 +714,7 @@ namespace t_03_function
 
 	}
 
-#if KAGUYA_USE_DECLTYPE
+#if KAGUYA_USE_CPP11
 	void lambdafun(kaguya::State& state)
 	{
 		state["ABC"] = kaguya::function([](int a) {return a * 2; });
@@ -1329,7 +1329,7 @@ int main()
 		ADD_TEST(t_03_function::vector_and_map_to_table_mapping);
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
-#if KAGUYA_USE_DECLTYPE
+#if KAGUYA_USE_CPP11
 		ADD_TEST(t_03_function::lambdafun);
 #endif
 

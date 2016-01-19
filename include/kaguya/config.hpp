@@ -7,9 +7,18 @@ extern "C" {
 #include <lualib.h>
 }
 
+
+#ifndef KAGUYA_USE_CPP11
+#if defined(__cpp_decltype) || __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)
+#define KAGUYA_USE_CPP11 1
+#else
+#define KAGUYA_USE_CPP11 0
+#endif
+#endif
+
+
 #ifndef KAGUYA_USE_BOOST
-//not tested on older then MSVC++2013
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER>=1700)
+#if KAGUYA_USE_CPP11
 #define KAGUYA_USE_BOOST 0
 #else
 #define KAGUYA_USE_BOOST 1
@@ -40,18 +49,10 @@ extern "C" {
 #endif
 
 #ifndef KAGUYA_USE_RVALUE_REFERENCE
-#if defined(__cpp_rvalue_references ) || defined(_HAS_RVALUE_REFERENCES)
+#if KAGUYA_USE_CPP11
 #define KAGUYA_USE_RVALUE_REFERENCE 1
 #else
 #define KAGUYA_USE_RVALUE_REFERENCE 0
-#endif
-#endif
-
-#ifndef KAGUYA_USE_DECLTYPE
-#if defined(__cpp_decltype) || __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600)
-#define KAGUYA_USE_DECLTYPE 1
-#else
-#define KAGUYA_USE_DECLTYPE 0
 #endif
 #endif
 

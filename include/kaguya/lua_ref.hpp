@@ -789,9 +789,6 @@ namespace kaguya
 	inline bool operator == (const char* lhs, const LuaRef& rhs) { return lhs == rhs.get<std::string>(); }
 
 
-
-	typedef LuaRef Selector;
-
 	namespace types
 	{
 		template<>
@@ -906,4 +903,15 @@ return *this; \
 }
 #else
 #define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME) 
+#endif
+
+#if KAGUYA_USE_CPP11
+#else
+namespace std
+{
+	template <> inline void swap(kaguya::LuaRef& a, kaguya::LuaRef& b)
+	{
+		a.swap(b);
+	}
+}
 #endif

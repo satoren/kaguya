@@ -80,7 +80,7 @@ namespace kaguya
 				return standard::shared_ptr<BaseInvoker>(new invoker_type(data));
 			}
 
-#if KAGUYA_USE_DECLTYPE
+#if KAGUYA_USE_CPP11
 			template <typename T>
 			struct lambda_fun : public lambda_fun<decltype(&T::operator())> {};
 
