@@ -95,7 +95,7 @@ namespace kaguya
 			}
 			else
 			{
-				except::OtherError(state,typeid(class_type).name() +  std::string("is already registered"));
+				except::OtherError(state,typeid(class_type*).name() +  std::string("is already registered"));
 			}
 			return LuaRef(state);
 		}

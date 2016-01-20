@@ -28,3 +28,5 @@ include_directories("../../include")#include kaguya dir
 add_library(samplesdlbind SHARED sdlbind.cpp)
 target_link_libraries(samplesdlbind ${LUA_LIBRARIES})
 target_link_libraries(samplesdlbind ${SDL_LIBRARIES})
+SET_TARGET_PROPERTIES(samplesdlbind PROPERTIES OUTPUT_NAME samplesdlbind)
+SET_TARGET_PROPERTIES(samplesdlbind PROPERTIES PREFIX "")

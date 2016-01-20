@@ -12,7 +12,7 @@ namespace
 	void SetupVideoGl(LuaRef& sdl)
 	{
 		sdl["GL"] = NewTable();
-		Selector gl = sdl["GL"];
+		LuaRef gl = sdl["GL"];
 
 
 #define REG_SDL_GL_ENUM(V) gl[#V + 7] = V
