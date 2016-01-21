@@ -155,7 +155,6 @@ namespace kaguya
 			parent_.setField(key_, FunctorType(f));
 		}
 
-		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
 
 		bool operator==(const TableKeyReference& other)const
 		{
@@ -191,8 +190,19 @@ namespace kaguya
 			*this = table;
 		}
 
+
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(LuaTable parent, LuaRef key) :LuaRef(parent.getField(key)), parent_(parent), key_(key) {}
 
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
+		TableKeyReference(const TableKeyReference& src) :LuaRef(src), parent_(src.parent_), key_(src.key_) {}
+
+#if KAGUYA_USE_RVALUE_REFERENCE
+		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
+		{
+			swap(src);
+		}
+#endif
 
 		void swap(TableKeyReference& other)throw()
 		{
@@ -200,12 +210,6 @@ namespace kaguya
 			std::swap(parent_, other.parent_);
 			std::swap(key_, other.key_);
 		}
-#if KAGUYA_USE_RVALUE_REFERENCE
-		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
-		{
-			swap(src);
-		}
-#endif
 
 		LuaTable parent_;
 		LuaRef key_;

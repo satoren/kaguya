@@ -955,9 +955,12 @@ namespace t_04_lua_ref
 		state["value"] = kaguya::NewTable();
 		state["value"]["abc"] = kaguya::NewTable();
 		state["value"]["abc"]["def"] = 7;
+		TEST_CHECK(state("assert(value.abc.def == 7)"));
 		state["value"]["abc"]["bbb"] = "test";
-		state["value"]["abc"]["ccc"] = state["value"]["abc"]["bbb"];
-		TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test' and value.abc.ccc == 'test')"));
+		TEST_CHECK(state("assert(value.abc.bbb == 'test')"));
+		state["value"]["abc"]["ddd"] = state["value"]["abc"]["ccc"] = state["value"]["abc"]["bbb"];
+		TEST_CHECK(state("assert(value.abc.ccc == 'test')"));
+		TEST_CHECK(state("assert(value.abc.ddd == 'test')"));
 
 		TEST_CHECK(state["value"]["abc"]["ccc"] == state["value"]["abc"]["bbb"]);
 		TEST_CHECK(state["value"]["abc"]["ccc"] == "test");
