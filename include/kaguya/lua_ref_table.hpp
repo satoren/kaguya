@@ -116,6 +116,19 @@ namespace kaguya
 		friend class LuaRef;
 		friend class State;
 
+#if KAGUYA_USE_RVALUE_REFERENCE
+		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
+		{
+			swap(src);
+		}
+
+		TableKeyReference& operator=(TableKeyReference&& src)
+		{
+			swap(src);
+			return *this;
+		}
+#endif
+
 		//! this is not copy.same assign from LuaRef.
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
@@ -200,12 +213,6 @@ namespace kaguya
 			std::swap(parent_, other.parent_);
 			std::swap(key_, other.key_);
 		}
-#if KAGUYA_USE_RVALUE_REFERENCE
-		TableKeyReference(TableKeyReference&& src)throw() :LuaRef(), parent_(), key_()
-		{
-			swap(src);
-		}
-#endif
 
 		LuaTable parent_;
 		LuaRef key_;
