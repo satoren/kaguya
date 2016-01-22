@@ -202,6 +202,18 @@ namespace kaguya
 		operator LuaRef() const {
 			return getValue();
 		}
+		operator LuaTable() const {
+			return getValue();
+		}
+		operator LuaUserData() const {
+			return getValue();
+		}
+		operator LuaFunction() const {
+			return getValue();
+		}
+		operator LuaThread() const {
+			return getValue();
+		}
 
 		/**
 		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
