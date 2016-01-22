@@ -69,6 +69,20 @@ extern "C" int luaopen_modulename(lua_State *L)
 
 ```
 
+### Holding Lua value
+LuaRef type is like a Variant type.
+You can use for holding a Lua-value in native code.
+```c++
+  kaguya::State state;
+  state["a"] = "test";
+  LuaRef a = state["a"];
+  assert(a == "test");
+
+  state["tbl"] = kaguya::NewTable();//tbl ={};
+  LuaTable tbl = state["tbl"];//holding Lua Table
+  tbl["value"] = 1;//tbl.value = 1 in lua
+  state("assert(tbl.value == 1)");
+```
 
 ### Registering Classes
 ```c++
@@ -153,7 +167,7 @@ Base base;
 
 //registering pointer. lifetime is same base
 state["b"] = &base;
-state["b"] = std::ref(base);
+state["b"] = kaguya::standard::ref(base);
 
 //registering copy instance. copied instance lifetime is handling in lua vm(garbage collection).
 state["b"] = base;
