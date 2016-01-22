@@ -202,21 +202,6 @@ namespace kaguya
 		operator LuaRef() const {
 			return getValue();
 		}
-#if defined(_MSC_VER) && _MSC_VER <= 1800
-		/// cannot convert from 'kaguya::TableKeyReference' to 'kaguya::LuaFunction'
-		operator LuaUserData() const {
-			return getValue();
-		}
-		operator LuaTable() const {
-			return getValue();
-		}
-		operator LuaFunction() const {
-			return getValue();
-		}
-		operator LuaThread() const {
-			return getValue();
-		}
-#endif
 
 		/**
 		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
@@ -270,6 +255,19 @@ namespace kaguya
 		LuaTable parent_;
 		LuaRef key_;
 	};
+
+	LuaRef toLuaRef(const LuaUserData& ref)
+	{
+		return static_cast<const LuaRef&>(ref);
+	}
+	LuaRef toLuaRef(const LuaTable& ref)
+	{
+		return static_cast<const LuaRef&>(ref);
+	}
+	LuaRef toLuaRef(const TableKeyReference& ref)
+	{
+		return ref.getValue();
+	}
 
 	inline bool LuaRef::setFunctionEnv(const LuaTable& env)
 	{

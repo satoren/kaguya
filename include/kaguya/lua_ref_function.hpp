@@ -113,7 +113,6 @@ namespace kaguya
 		}
 	};
 
-
 	/**
 	* Reference of Lua thread(==coroutine).
 	*/
@@ -403,6 +402,25 @@ namespace kaguya
 			return static_cast<int>(v.size());
 		}
 		
+	}
+
+
+	LuaRef toLuaRef(const LuaFunction& ref)
+	{
+		return static_cast<const LuaRef&>(ref);
+	}
+	LuaRef toLuaRef(const LuaThread& ref)
+	{
+		return static_cast<const LuaRef&>(ref);
+	}
+	LuaRef toLuaRef(const FunEvaluator& ref)
+	{
+		std::vector<LuaRef> res = ref.get_result(1);
+		if (!res.empty())
+		{
+			return res.front();
+		}
+		return LuaRef();
 	}
 
 	/**

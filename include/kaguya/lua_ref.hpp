@@ -836,6 +836,10 @@ CLASSNAME() :LuaRef()\
 CLASSNAME(const CLASSNAME& ref) :LuaRef(ref)\
 {\
 }\
+template<typename T>\
+CLASSNAME(const T& ref) :LuaRef(toLuaRef(ref))\
+{\
+}\
 CLASSNAME(const LuaRef& ref) :LuaRef(ref)\
 {\
 	typecheck();\
