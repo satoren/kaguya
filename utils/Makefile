@@ -19,6 +19,7 @@ gen_luaref_fun: luaref_function_call_generator.py
 	python luaref_function_call_generator.py > ../include/kaguya/gen/luaref_fun.inl
 	python luaref_function_call_def_generator.py > ../include/kaguya/gen/luaref_fun_def.inl
 	python luaref_mem_function_call_generator.py > ../include/kaguya/gen/luaref_mem_fun_def.inl
+	python delegate_to_luaref_generator.py > ../include/kaguya/gen/delegate_to_luaref.inl
 
 clean:
 
