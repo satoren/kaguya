@@ -215,10 +215,18 @@ namespace kaguya
 		/** call lua function
 		* template<class... Args>FunEvaluator operator()(Args... args);
 		*/
+
+#if KAGUYA_USE_CPP11
+	template<class... Args>
+	FunEvaluator operator()(Args&&... args)
+	{
+		return getValue()(standard::forward<Args>(args)...);
+	}
+#else
 #define KAGUYA_DELEGATE_LUAREF getValue()
 #include "kaguya/gen/delegate_to_luaref.inl"
 #undef KAGUYA_DELEGATE_LUAREF
-
+#endif
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const TableKeyReference& src) : parent_(src.parent_), key_(src.key_) {}
