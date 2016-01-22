@@ -245,13 +245,12 @@ namespace kaguya
 			return eval_info_->results;
 		}
 
-#if KAGUYA_USE_CPP11
-//		template<typename... Args>
-//		FunEvaluator operator()(Args... args)
-//		{
-//			return get<LuaRef>()(args...);
-//		}
-#endif
+		/** call lua-function from lua-function result
+		* template<class... Args>FunEvaluator operator()(Args... args);
+		*/
+#define KAGUYA_DELEGATE_LUAREF get<LuaRef>()
+#include "kaguya/gen/delegate_to_luaref.inl"
+#undef KAGUYA_DELEGATE_LUAREF
 
 	private:
 

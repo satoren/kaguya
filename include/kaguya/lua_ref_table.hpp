@@ -193,36 +193,6 @@ namespace kaguya
 		{
 			return !(other == *this);
 		}
-		template<typename T>
-		bool operator==(const T& other)const
-		{
-			return getValue() == other;
-		}
-		template<typename T>
-		bool operator<(const T& other)const
-		{
-			return getValue() < other;
-		}
-		template<typename T>
-		bool operator<=(const T& other)const
-		{
-			return getValue() <= other;
-		}
-		template<typename T>
-		bool operator>=(const T& other)const
-		{
-			return other <= *this;
-		}
-		template<typename T>
-		bool operator>(const T& other)const
-		{
-			return other < *this;
-		}
-		template<typename T>
-		bool operator!=(const T& other)const
-		{
-			return !(other == *this);
-		}
 
 		LuaRef getValue()const
 		{
@@ -243,10 +213,23 @@ namespace kaguya
 			return getValue()->*(function_name);
 		}
 
+		/** call lua function
+		* template<class... Args>FunEvaluator operator()(Args... args);
+		*/
 #define KAGUYA_DELEGATE_LUAREF getValue()
 #include "kaguya/gen/delegate_to_luaref.inl"
 #undef KAGUYA_DELEGATE_LUAREF
 
+
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
+		TableKeyReference(const TableKeyReference& src) : parent_(src.parent_), key_(src.key_) {}
+#if KAGUYA_USE_RVALUE_REFERENCE
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
+		TableKeyReference(TableKeyReference&& src)throw() : parent_(), key_()
+		{
+			swap(src);
+		}
+#endif
 	private:
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
@@ -256,21 +239,12 @@ namespace kaguya
 			*this = table;
 		}
 
-
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const LuaTable& parent, const LuaRef& key) : parent_(parent), key_(key) {}
 
-		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(const TableKeyReference& src) : parent_(src.parent_), key_(src.key_) {}
 
 #if KAGUYA_USE_RVALUE_REFERENCE
-
 		TableKeyReference(LuaTable&& parent, LuaRef&& key) : parent_(standard::forward<LuaTable>(parent)), key_(standard::forward<LuaRef>(key)) {}
-
-		TableKeyReference(TableKeyReference&& src)throw() : parent_(), key_()
-		{
-			swap(src);
-		}
 #endif
 
 		void swap(TableKeyReference& other)throw()
@@ -371,6 +345,68 @@ namespace kaguya
 		}
 		lua_getmetatable(state_, -1);
 		return LuaRef(state_, StackTop(), NoMainCheck());
+	}
+
+
+	template<typename T>
+	bool operator==(const TableKeyReference& lhs, const T& rhs)
+	{
+		return lhs.getValue() == rhs;
+	}
+	template<typename T>
+	bool operator<(const TableKeyReference& lhs, const T& rhs)
+	{
+		return lhs.getValue() < rhs;
+	}
+	template<typename T>
+	bool operator<=(const TableKeyReference& lhs, const T& rhs)
+	{
+		return lhs.getValue() <= rhs;
+	}
+	template<typename T>
+	bool operator>=(const TableKeyReference& lhs, const T& rhs)
+	{
+		return rhs <= lhs;
+	}
+	template<typename T>
+	bool operator>(const TableKeyReference& lhs, const T& rhs)
+	{
+		return rhs < lhs;
+	}
+	template<typename T>
+	bool operator!=(const TableKeyReference& lhs,const T& rhs)
+	{
+		return !(rhs == lhs);
+	}
+	template<typename T>
+	bool operator==(const T& lhs, const TableKeyReference& rhs)
+	{
+		return lhs == rhs.getValue();
+	}
+	template<typename T>
+	bool operator<(const T& lhs, const TableKeyReference& rhs)
+	{
+		return lhs < rhs.getValue();
+	}
+	template<typename T>
+	bool operator<=(const T& lhs, const TableKeyReference& rhs)
+	{
+		return lhs <= rhs.getValue();
+	}
+	template<typename T>
+	bool operator>=(const T& lhs, const TableKeyReference& rhs)
+	{
+		return rhs <= lhs;
+	}
+	template<typename T>
+	bool operator>(const T& lhs, const TableKeyReference& rhs)
+	{
+		return rhs < lhs;
+	}
+	template<typename T>
+	bool operator!=(const T& lhs, const TableKeyReference& rhs)
+	{
+		return !(rhs == lhs);
 	}
 
 
