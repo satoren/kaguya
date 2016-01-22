@@ -256,15 +256,15 @@ namespace kaguya
 		LuaRef key_;
 	};
 
-	LuaRef toLuaRef(const LuaUserData& ref)
+	inline LuaRef toLuaRef(const LuaUserData& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
 	}
-	LuaRef toLuaRef(const LuaTable& ref)
+	inline LuaRef toLuaRef(const LuaTable& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
 	}
-	LuaRef toLuaRef(const TableKeyReference& ref)
+	inline LuaRef toLuaRef(const TableKeyReference& ref)
 	{
 		return ref.getValue();
 	}

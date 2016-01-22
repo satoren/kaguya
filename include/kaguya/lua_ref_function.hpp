@@ -405,15 +405,15 @@ namespace kaguya
 	}
 
 
-	LuaRef toLuaRef(const LuaFunction& ref)
+	inline LuaRef toLuaRef(const LuaFunction& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
 	}
-	LuaRef toLuaRef(const LuaThread& ref)
+	inline LuaRef toLuaRef(const LuaThread& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
 	}
-	LuaRef toLuaRef(const FunEvaluator& ref)
+	inline LuaRef toLuaRef(const FunEvaluator& ref)
 	{
 		std::vector<LuaRef> res = ref.get_result(1);
 		if (!res.empty())
