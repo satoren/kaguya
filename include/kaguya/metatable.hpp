@@ -49,9 +49,20 @@ namespace kaguya
 			class_type* check = 0;
 			base_class_type* ptr = check; (void)(ptr);//unused
 
+
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+			KAGUYA_STATIC_ASSERT(!traits::is_std_vector<class_type>::value, "std::vector is binding to lua-table by default.If you wants register for std::vector yourself,"
+				"please define KAGUYA_NO_STD_VECTOR_TO_TABLE");
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
+			KAGUYA_STATIC_ASSERT(!traits::is_std_map<class_type>::value, "std::map is binding to lua-table by default.If you wants register for std::map yourself,"
+				"please define KAGUYA_NO_STD_MAP_TO_TABLE");
+#endif
+
+
 			//can not register push specialized class
 			KAGUYA_STATIC_ASSERT(!traits::is_push_specialized<class_type>::value,
-				"Can not register push-specialized class. e.g. std::tuple,std::vector,std::map");
+				"Can not register push-specialized class. e.g. std::tuple");
 		}
 
 		LuaRef registerClass(lua_State* state)const
@@ -347,28 +358,4 @@ namespace kaguya
 		CodeChunkMapType code_chunk_map_;
 		bool has_property_;
 	};
-
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-
-	template<typename T>
-	struct ClassMetatable<std::vector<T> >
-	{
-		ClassMetatable()
-		{
-			KAGUYA_STATIC_ASSERT(false, "std::vector is binding to table by default.If you wants register for std::vector yourself,"
-				"please define KAGUYA_NO_STD_VECTOR_TO_TABLE");
-		}
-	};
-#endif
-#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-	template<typename K,typename V>
-	struct ClassMetatable<std::map<K,V> >
-	{
-		ClassMetatable()
-		{
-			KAGUYA_STATIC_ASSERT(false, "std::map is binding to table by default.If you wants register for std::map yourself,"
-				"please define KAGUYA_NO_STD_MAP_TO_TABLE");
-		}
-	};
-#endif
 };

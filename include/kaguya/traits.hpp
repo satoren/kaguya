@@ -132,6 +132,10 @@ namespace kaguya
 		template< >	struct is_push_specialized<const char*> : integral_constant<bool, true> {};
 		template< >	struct is_push_specialized<FunctorType> : integral_constant<bool, true> {};
 
+		template<class T>	struct is_std_vector : integral_constant<bool, false> {};
+		template<class T>	struct is_std_vector<std::vector<T> > : integral_constant<bool, true> {};
+		template<class T>	struct is_std_map : integral_constant<bool, false> {};
+		template<class K, class V>	struct is_std_map<std::map<K,V> > : integral_constant<bool, true> {};
 
 		template< typename T >
 		struct arg_get_type {
