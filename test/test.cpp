@@ -595,27 +595,33 @@ namespace t_03_function
 
 	void vector_and_map_from_table_mapping(kaguya::State& state)
 	{
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		state("arraytablefn =function() return {32,1,2,4,8,16} end");
 		std::vector<int> b = state["arraytablefn"]();
 
 		TEST_CHECK((b.size() == 6 && b[0] == 32 && b[1] == 1 && b[2] == 2 && b[3] == 4 && b[4] == 8 && b[5] == 16));
 
-
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		state("tablefn =function() return {a=32,b=1,c=2} end");
 		std::map<std::string, int> m = state["tablefn"]();
 		TEST_CHECK((m["a"] == 32 && m["b"] == 1 && m["c"] == 2));
+#endif
 	}
 
 	void vector_and_map_to_table_mapping(kaguya::State& state)
 	{
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		std::vector<double> v; v.push_back(3); v.push_back(13); v.push_back(2); v.push_back(99);
 		state["v"] = v;
 		TEST_CHECK(state("assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)"));
 
-
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		std::map<std::string, double> m; m["a"] = 4; m["b"] = 32; m["c"] = 24;
 		state["m"] = m;
 		TEST_CHECK(state("assert(m['a'] == 4 and m['b'] == 32 and m['c'] == 24)"));
+#endif
 	}
 
 
@@ -1343,10 +1349,8 @@ int main()
 		ADD_TEST(t_03_function::member_function_test);
 		ADD_TEST(t_03_function::variadic_function_test);
 		ADD_TEST(t_03_function::multi_return_function_test);
-#if !KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
 		ADD_TEST(t_03_function::vector_and_map_from_table_mapping);
 		ADD_TEST(t_03_function::vector_and_map_to_table_mapping);
-#endif
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
 #if KAGUYA_USE_CPP11

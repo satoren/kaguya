@@ -27,8 +27,10 @@ namespace kaguya
 		template< >	struct is_push_specialized<GlobalTable> : integral_constant<bool, true> {};
 		template< >	struct is_push_specialized<NilValue> : integral_constant<bool, true> {};
 
-#if !KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		template<class V> struct is_push_specialized<std::vector<V> > : integral_constant<bool, true> {};
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		template<class K, class V> struct is_push_specialized<std::map<K, V> > : integral_constant<bool, true> {};
 #endif
 	}
@@ -380,7 +382,7 @@ namespace kaguya
 			return 1;
 		}
 
-#if !KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		//vector
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >);
@@ -390,6 +392,8 @@ namespace kaguya
 		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag);
 		template<typename T>
 		inline int push(lua_State* l, const std::vector<T>& ref);
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		//std::map
 		template<typename K, typename V>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >);

@@ -514,10 +514,10 @@ namespace kaguya
 
 	}
 
-#if !KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
 	namespace types
 	{
 		//vector and map to Lua table
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >)
 		{
@@ -574,7 +574,9 @@ namespace kaguya
 			table.push(l);
 			return 1;
 		}
+#endif
 
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		//std::map
 		template<typename K, typename V>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >)
@@ -629,17 +631,21 @@ namespace kaguya
 			table.push(l);
 			return 1;
 		}
+#endif
 	}
 	namespace traits
 	{
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		template<class V >
 		struct arg_get_type<const std::vector<V>& > {
 			typedef std::vector<V> type;
 		};
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		template<class K, class V >
 		struct arg_get_type<const std::map<K, V>& > {
 			typedef std::map<K, V> type;
 		};
-	}
 #endif
+	}
 }
