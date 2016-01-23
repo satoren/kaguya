@@ -48,6 +48,13 @@ namespace kaguya
 			//type check
 			class_type* check = 0;
 			base_class_type* ptr = check; (void)(ptr);//unused
+
+#if KAGUYA_USE_CPP11
+			//can not register push specialized class
+			//std::vector,std::map,std::tuple,
+			KAGUYA_STATIC_ASSERT(!traits::is_push_specialized<class_type>::value,
+				"Can not register push-specialized class. e.g. std::vector,std::map,std::tuple,std::");
+#endif
 		}
 
 		LuaRef registerClass(lua_State* state)const

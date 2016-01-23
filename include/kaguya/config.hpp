@@ -32,6 +32,7 @@ extern "C" {
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits.hpp>
+#include <boost/static_assert.hpp>
 #if BOOST_VERSION >= 104800
 #include <boost/move/move.hpp>
 #endif
@@ -81,8 +82,11 @@ namespace kaguya
 			snprintf(buffer, sizeof(buffer), "%d", v);
 			return buffer;
 		}
+
+#define KAGUYA_STATIC_ASSERT BOOST_STATIC_ASSERT_MSG
 #else
 		using namespace std;
+#define KAGUYA_STATIC_ASSERT static_assert
 #endif
 	}
 
