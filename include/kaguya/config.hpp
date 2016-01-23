@@ -65,6 +65,10 @@ extern "C" {
 #endif
 #endif
 
+#ifndef KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
+#define KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE 0
+#endif
+
 
 namespace kaguya
 {

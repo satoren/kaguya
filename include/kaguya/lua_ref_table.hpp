@@ -512,7 +512,11 @@ namespace kaguya
 			return 1;
 		}
 
+	}
 
+#if !KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
+	namespace types
+	{
 		//vector and map to Lua table
 		template<typename T>
 		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >)
@@ -637,4 +641,5 @@ namespace kaguya
 			typedef std::map<K, V> type;
 		};
 	}
+#endif
 }

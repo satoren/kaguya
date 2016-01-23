@@ -908,10 +908,10 @@ namespace t_04_lua_ref
 			);
 
 		(state["callback"]->*"callCallback")(454);
-		std::vector<int> callback_data = state["receive_data"];
+		kaguya::LuaTable callback_data = state["receive_data"];
 
-		TEST_CHECK((callback_data.size() == 3 && callback_data[0] == 54
-			&& callback_data[1] == 24 && callback_data[2] == 454))
+		TEST_CHECK(callback_data[1] == 54
+			&& callback_data[2] == 24 && callback_data[3] == 454)
 
 	}
 
@@ -1343,8 +1343,10 @@ int main()
 		ADD_TEST(t_03_function::member_function_test);
 		ADD_TEST(t_03_function::variadic_function_test);
 		ADD_TEST(t_03_function::multi_return_function_test);
+#if !KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
 		ADD_TEST(t_03_function::vector_and_map_from_table_mapping);
 		ADD_TEST(t_03_function::vector_and_map_to_table_mapping);
+#endif
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
 #if KAGUYA_USE_CPP11
