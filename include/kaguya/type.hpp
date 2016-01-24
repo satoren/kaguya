@@ -10,6 +10,357 @@
 
 namespace kaguya
 {
+	//default implements
+	template<typename T, typename Enable>
+	bool lua_type_traits<T, Enable>::checkType(lua_State* l, int index)
+	{
+		return object_wrapper(l, index, metatableName<T>()) != 0;
+	}
+	template<typename T, typename Enable>
+	bool lua_type_traits<T, Enable>::strictCheckType(lua_State* l, int index)
+	{
+		return object_wrapper(l, index, metatableName<T>()) != 0;
+	}
+	template<typename T, typename Enable>
+	typename lua_type_traits<T, Enable>::get_type lua_type_traits<T, Enable>::get(lua_State* l, int index)
+	{
+		const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
+		if (!pointer)
+		{
+			throw LuaTypeMismatch("type mismatch!!");
+		}
+		return *pointer;
+	}
+	template<typename T, typename Enable>
+	int lua_type_traits<T, Enable>::push(lua_State* l, push_type v)
+	{
+		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
+		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+		new(storage) wrapper_type(v);
+		class_userdata::setmetatable<T>(l);
+		return 1;
+	}
+	template<typename T, typename Enable>
+	int lua_type_traits<T, Enable>::push(lua_State* l, NCRT& v)
+	{
+		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
+		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+		new(storage) wrapper_type(v);
+		class_userdata::setmetatable<T>(l);
+		return 1;
+	}
+
+	template<typename T> struct lua_type_traits<T
+		, typename traits::enable_if<traits::is_const_reference<T>::value>::type> :lua_type_traits<typename traits::remove_const_reference<T>::type > {};
+
+	template<typename PTR> struct lua_type_traits < PTR
+		, typename traits::enable_if<traits::is_pointer<typename traits::remove_const_reference<PTR>::type>::value && !traits::is_function<typename traits::remove_pointer<PTR>::type>::value>::type >
+	{
+		typedef void Registerable;
+
+		typedef PTR get_type;
+		typedef PTR push_type;
+		typedef typename traits::remove_pointer<PTR>::type T;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<T>()) != 0;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			int type = lua_type(l, index);
+			if (type == LUA_TLIGHTUSERDATA
+				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
+			{
+				return true;
+			}
+			return object_wrapper(l, index, metatableName<T>()) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (traits::is_const<T>::value)
+			{
+				return const_cast<get_type>(get_const_pointer(l, index, types::typetag<T>()));
+			}
+			else
+			{
+				return get_pointer(l, index, types::typetag<T>());
+			}
+		}
+		static int push(lua_State* l, push_type v)
+		{
+			if (!v)
+			{
+				lua_pushnil(l);
+			}
+			else if (!available_metatable<T>(l))
+			{
+				lua_pushlightuserdata(l, const_cast<typename traits::remove_const<T>::type*>(v));
+			}
+			else
+			{
+				typedef ObjectPointerWrapper<T> wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(v);
+				class_userdata::setmetatable<T>(l);
+			}
+			return 1;
+		}
+	};
+
+	///! traits for bool
+	template<>	struct lua_type_traits<bool> {
+		typedef bool get_type;
+		typedef bool push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TBOOLEAN;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static bool get(lua_State* l, int index)
+		{
+			return lua_toboolean(l, index) != 0;
+		}
+		static int push(lua_State* l, bool s)
+		{
+			lua_pushboolean(l, s);
+			return 1;
+		}
+	};
+
+	///! traits for reference_wrapper
+	template<typename T> struct lua_type_traits<standard::reference_wrapper<T> > {
+		typedef const standard::reference_wrapper<T>& push_type;
+
+		static int push(lua_State* l, push_type v)
+		{
+			return lua_type_traits<T*>::push(l, &v.get());
+		}
+	};
+
+	///! traits for shared_ptr
+	template<typename T> struct lua_type_traits<standard::shared_ptr<T> > {
+		typedef const standard::shared_ptr<T>& push_type;
+		typedef standard::shared_ptr<T> get_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<get_type>()) != 0;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<get_type>()) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
+			if (!pointer)
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return *pointer;
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			typedef ObjectSmartPointerWrapper<standard::shared_ptr<T> > wrapper_type;
+			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+			new(storage) wrapper_type(v);
+			class_userdata::setmetatable<T>(l);
+			return 1;
+		}
+	};
+
+	///! traits for 
+	template<>	struct lua_type_traits<ObjectWrapperBase*> {
+		typedef ObjectWrapperBase* get_type;
+		typedef ObjectWrapperBase* push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index) != 0;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			return object_wrapper(l, index);
+		}
+	};
+
+	///! traits for native type of Luathread
+	template<>	struct lua_type_traits<lua_State*> {
+		typedef lua_State* get_type;
+		typedef lua_State* push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_isthread(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isthread(l, index);
+		}
+		static lua_State* get(lua_State* l, int index)
+		{
+			return lua_tothread(l, index);
+		}
+	};
+
+	template<typename T> struct lua_type_traits < T
+		, typename traits::enable_if<traits::is_floating_point<T>::value>::type >
+	{
+		typedef typename traits::remove_const_reference<T>::type get_type;
+		typedef lua_Number push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TNUMBER;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isnumber(l, index) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			return static_cast<T>(lua_tonumber(l, index));
+		}
+		static int push(lua_State* l, lua_Number s)
+		{
+			lua_pushnumber(l, s);
+			return 1;
+		}
+	};
+
+	template<typename T> struct lua_type_traits<T
+		, typename traits::enable_if<traits::is_integral<T>::value>::type>
+	{
+#if LUA_VERSION_NUM >= 503
+		typedef typename traits::remove_const_reference<T>::type get_type;
+		typedef lua_Integer push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_isinteger(l, index) != 0;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isnumber(l, index) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			return static_cast<T>(lua_tointeger(l, index));
+		}
+		static int push(lua_State* l, lua_Integer s)
+		{
+			lua_pushinteger(l, s);
+			return 1;
+		}
+#else
+		typedef typename lua_type_traits<lua_Number>::get_type get_type;
+		typedef typename lua_type_traits<lua_Number>::push_type push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type_traits<lua_Number>::strictCheckType(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_type_traits<lua_Number>::checkType(l, index);
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			return static_cast<T>(lua_type_traits<lua_Number>::get(l, index));
+		}
+		static int push(lua_State* l, T s)
+		{
+			return lua_type_traits<lua_Number>::push(l, s);
+		}
+#endif
+	};
+
+	template<typename T> struct lua_type_traits<T
+		, typename traits::enable_if<traits::is_enum<T>::value>::type>
+	{
+		typedef typename traits::remove_const_reference<T>::type get_type;
+		typedef typename traits::remove_const_reference<T>::type push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type_traits<int>::strictCheckType(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_type_traits<int>::checkType(l, index);
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			return static_cast<get_type>(lua_type_traits<int>::get(l, index));
+		}
+		static int push(lua_State* l, push_type s)
+		{
+			return lua_type_traits<int>::push(l, s);
+		}
+	};
+
+
+	template<>	struct lua_type_traits<const char*> {
+		typedef const char* get_type;
+		typedef const char* push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TSTRING;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isstring(l, index) != 0;
+		}
+		static const char* get(lua_State* l, int index)
+		{
+			return lua_tostring(l, index);
+		}
+		static int push(lua_State* l, const char* s)
+		{
+			lua_pushstring(l, s);
+			return 1;
+		}
+	};
+	template<int N>	struct lua_type_traits<const char[N]> :lua_type_traits<const char*> {};
+
+	template<>	struct lua_type_traits<std::string> {
+		typedef std::string get_type;
+		typedef const std::string& push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TSTRING;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isstring(l, index) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			size_t size = 0;
+			const char* buffer = lua_tolstring(l, index, &size);
+			return std::string(buffer, size);
+		}
+		static int push(lua_State* l, const std::string& s)
+		{
+			lua_pushlstring(l, s.c_str(), s.size());
+			return 1;
+		}
+	};
+
+#include "kaguya/gen/push_tuple.inl"
+
 	struct NewTable {
 		NewTable() :reserve_array_(0), reserve_record_(0) {}
 		NewTable(int reserve_array, int reserve_record_) :reserve_array_(reserve_array), reserve_record_(reserve_record_) {}
@@ -20,359 +371,30 @@ namespace kaguya
 	struct GlobalTable {};
 	struct NilValue {};
 
-	namespace traits
-	{
-		template< >	struct is_push_specialized<NewTable> : integral_constant<bool, true> {};
-		template< >	struct is_push_specialized<NewThread> : integral_constant<bool, true> {};
-		template< >	struct is_push_specialized<GlobalTable> : integral_constant<bool, true> {};
-		template< >	struct is_push_specialized<NilValue> : integral_constant<bool, true> {};
 
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-		template<class V> struct is_push_specialized<std::vector<V> > : integral_constant<bool, true> {};
-#endif
-#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-		template<class K, class V> struct is_push_specialized<std::map<K, V> > : integral_constant<bool, true> {};
-#endif
-	}
-
-	namespace types
-	{
-		namespace detail
-		{
-			template<typename T>
-			inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
-			{
-				ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
-				return objwrapper != 0;
-			}
-
-#if LUA_VERSION_NUM >= 503
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<lua_Integer> tag)
-			{
-				return lua_isinteger(l, index) != 0;
-			}
-#endif
-
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<lua_Number> tag)
-			{
-				return lua_type(l, index) == LUA_TNUMBER;
-			}
-
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<bool> tag)
-			{
-				return lua_type(l, index) == LUA_TBOOLEAN;
-			}
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<std::string> tag)
-			{
-				return lua_type(l, index) == LUA_TSTRING;
-			}
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<const char*> tag)
-			{
-				return lua_type(l, index) == LUA_TSTRING;
-			}
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<lua_State*> tag)
-			{
-				return lua_isthread(l, index);
-			}
-			template<>
-			inline bool strictCheckType(lua_State* l, int index, typetag<ObjectWrapperBase*> tag)
-			{
-				return object_wrapper(l, index) != 0;
-			}
-
-
-			template<typename T>
-			inline bool checkType(lua_State* l, int index, typetag<T> tag)
-			{
-				ObjectWrapperBase* objwrapper = object_wrapper(l, index);
-				return objwrapper != 0;
-			}
-
-			template<typename T>
-			inline bool checkType(lua_State* l, int index, typetag<T*> tag)
-			{
-				int type = lua_type(l, index);
-				if (type == LUA_TLIGHTUSERDATA
-					|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
-				{
-					return true;
-				}
-				return object_wrapper(l, index, metatableName<T>()) != 0;
-			}
-
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<bool> tag)
-			{
-				return true;
-			}
-#if LUA_VERSION_NUM >= 503
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<lua_Integer> tag)
-			{
-				return lua_isnumber(l, index) != 0;
-			}
-#endif
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<lua_Number> tag)
-			{
-				return lua_isnumber(l, index) != 0;
-			}
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<std::string> tag)
-			{
-				return lua_isstring(l, index) != 0;
-			}
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<const char*> tag)
-			{
-				return lua_isstring(l, index) != 0;
-			}
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<lua_State*> tag)
-			{
-				return lua_isthread(l, index);
-			}
-			template<>
-			inline bool checkType(lua_State* l, int index, typetag<ObjectWrapperBase*> tag)
-			{
-				return object_wrapper(l, index) != 0;
-			}
-
-
-			template<typename T>
-			inline T get(lua_State* l, int index, typetag<T> tag = typetag<T>())
-			{
-				typename traits::remove_reference<T>::type* pointer = get_pointer(l, index, typetag<typename traits::remove_reference<T>::type>());
-				if (!pointer)
-				{
-					throw LuaTypeMismatch("type mismatch!!");
-				}
-				return *pointer;
-			}
-#if LUA_VERSION_NUM >= 503
-			template<typename T>
-			inline T get(lua_State* l, int index, typetag<typename traits::enum_dispatch_type<T> > tag)
-			{
-				return T(lua_tointeger(l, index));
-			}
-#else
-			template<typename T>
-			inline T get(lua_State* l, int index, typetag<typename traits::enum_dispatch_type<T> > tag)
-			{
-				return T(int64_t(lua_tonumber(l, index)));
-			}
-#endif
-			template<typename T>
-			inline T* get(lua_State* l, int index, typetag<T*> tag = typetag<T*>())
-			{
-				return get_pointer(l, index, typetag<T>());
-			}
-
-			template<typename T>
-			inline const T* get(lua_State* l, int index, typetag<const T*> tag = typetag<const T*>())
-			{
-				return get_const_pointer(l, index, typetag<T>());
-			}
-			template<typename T>
-			inline const T& get(lua_State* l, int index, typetag<const T&> tag = typetag<const T&>())
-			{
-				const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, typetag<typename traits::remove_reference<T>::type>());
-				if (!pointer)
-				{
-					throw LuaTypeMismatch("type mismatch!!");
-				}
-				return *pointer;
-			}
-
-			inline ObjectWrapperBase* get(lua_State* l, int index, typetag<ObjectWrapperBase*> tag = typetag<ObjectWrapperBase*>())
-			{
-				return object_wrapper(l, index);
-			}
-
-
-			template<>
-			inline lua_State* get(lua_State* l, int index, typetag<lua_State*> tag)
-			{
-				return lua_tothread(l, index);
-			}
-			template<>
-			inline bool get(lua_State* l, int index, typetag<bool> tag)
-			{
-				return lua_toboolean(l, index) != 0;
-			}
-			template<>
-			inline lua_Number get(lua_State* l, int index, typetag<lua_Number> tag)
-			{
-				return lua_tonumber(l, index);
-			}
-#if LUA_VERSION_NUM >= 503
-			template<>
-			inline lua_Integer get(lua_State* l, int index, typetag<lua_Integer> tag)
-			{
-				return lua_tointeger(l, index);
-			}
-#endif
-
-			template<>
-			inline std::string get(lua_State* l, int index, typetag<std::string> tag)
-			{
-				size_t size = 0;
-				const char* buffer = lua_tolstring(l, index, &size);
-				return std::string(buffer, size);
-			}
-			template<>
-			inline const char* get(lua_State* l, int index, typetag<const char*> tag)
-			{
-				return lua_tostring(l, index);
-			}
-
-
-			inline int push(lua_State* l, bool v)
-			{
-				lua_pushboolean(l, v);
-				return 1;
-			}
-			inline int push(lua_State* l, lua_Number v)
-			{
-				lua_pushnumber(l, v);
-				return 1;
-			}
-#if LUA_VERSION_NUM >= 503
-			inline int push(lua_State* l, lua_Integer v)
-			{
-				lua_pushinteger(l, v);
-				return 1;
-			}
-#endif
-			inline int push(lua_State* l, const std::string& s)
-			{
-				lua_pushlstring(l, s.c_str(), s.size());
-				return 1;
-			}
-			inline int push(lua_State* l, const char* s)
-			{
-				lua_pushstring(l, s);
-				return 1;
-			}
-			template<typename T>
-			inline int push(lua_State* l, const standard::shared_ptr<T>& v)
-			{
-				typedef ObjectSmartPointerWrapper<standard::shared_ptr<T> > wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(v);
-				class_userdata::setmetatable<T>(l);
-				return 1;
-			}
-
-			template<typename T>
-			inline int push(lua_State* l, T v)
-			{
-				typedef ObjectWrapper<T> wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(v);
-				class_userdata::setmetatable<T>(l);
-				return 1;
-			}
-
-			template<typename T>
-			inline int push(lua_State* l, T* v)
-			{
-				if (!v)
-				{
-					lua_pushnil(l);
-				}
-				else if (!available_metatable<T>(l))
-				{
-					lua_pushlightuserdata(l, const_cast<typename traits::remove_const<T>::type*>(v));
-				}
-				else
-				{
-					typedef ObjectPointerWrapper<T> wrapper_type;
-					void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-					new(storage) wrapper_type(v);
-					class_userdata::setmetatable<T>(l);
-				}
-				return 1;
-			}
-			template<typename T>
-			inline int push(lua_State* l, T& v)
-			{
-				return push(l, &v);
-			}
-			template<typename T>
-			inline int push(lua_State* l, const standard::reference_wrapper<T>& v)
-			{
-				return push(l, &v.get());
-			}
-
-			inline int push(lua_State* l, const FunctorType& f);
-#if KAGUYA_USE_RVALUE_REFERENCE
-			inline int push(lua_State* l, FunctorType&& f);
-#endif
-		}
-		template<typename T>
-		inline bool strictCheckType(lua_State* l, int index, typetag<T> tag)
-		{
-			return detail::strictCheckType(l, index, typetag<typename traits::lua_push_type<T>::type>());
-		}
-		template<typename T>
-		inline bool checkType(lua_State* l, int index, typetag<T> tag)
-		{
-			return detail::checkType(l, index, typetag<typename traits::lua_push_type<T>::type>());
-		}
-
-		template<typename T>
-		inline typename traits::arg_get_type<T>::type get(lua_State* l, int index, typetag<T> tag)
-		{
-			return static_cast<typename traits::arg_get_type<T>::type>(detail::get(l, index, typetag<typename traits::arg_get_type_dispatch<T>::type>()));
-		}
-
-		template<typename T>
-		inline int push(lua_State* l, const T& v)
-		{
-			return detail::push(l, static_cast<typename traits::lua_push_type<T>::type>(v));
-		}
-		template<typename T>
-		inline int push_pointer(lua_State* l, T* v)
-		{
-			return detail::push(l, v);
-		}
-		template<typename T>
-		inline int push_ref(lua_State* l, T& v)
-		{
-			return detail::push(l, standard::ref(v));
-		}
-
-
-		template<>
-		inline int push(lua_State* l, const NewTable& table)
+	template<>	struct lua_type_traits<NewTable> {
+		static int push(lua_State* l, const NewTable& table)
 		{
 			lua_createtable(l, table.reserve_array_, table.reserve_record_);
 			return 1;
 		}
-
-		template<>
-		inline int push(lua_State* l, const NewThread&)
+	};
+	template<>	struct lua_type_traits<NewThread> {
+		static int push(lua_State* l, const NewThread&)
 		{
 			lua_newthread(l);
 			return 1;
 		}
-
-		template<>
-		inline int push(lua_State* l, const NilValue&)
+	};
+	template<>	struct lua_type_traits<NilValue> {
+		static int push(lua_State* l, const NilValue&)
 		{
 			lua_pushnil(l);
 			return 1;
 		}
-
-		template<>
-		inline int push(lua_State* l, const GlobalTable&)
+	};
+	template<>	struct lua_type_traits<GlobalTable> {
+		static int push(lua_State* l, const GlobalTable&)
 		{
 #if LUA_VERSION_NUM >= 502
 			lua_pushglobaltable(l);
@@ -381,52 +403,5 @@ namespace kaguya
 #endif
 			return 1;
 		}
-
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-		//vector
-		template<typename T>
-		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >);
-		template<typename T>
-		inline bool checkType(lua_State* l, int index, typetag<std::vector<T> >);
-		template<typename T>
-		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag);
-		template<typename T>
-		inline int push(lua_State* l, const std::vector<T>& ref);
-#endif
-#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-		//std::map
-		template<typename K, typename V>
-		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >);
-		template<typename K, typename V>
-		inline bool checkType(lua_State* l, int index, typetag<std::map<K, V> >);
-		template<typename K, typename V>
-		inline std::map<K, V> get(lua_State* l, int index, typetag<std::map<K, V> > tag);
-		template<typename K, typename V>
-		inline int push(lua_State* l, const std::map<K, V>& ref);
-#endif
-	}
-
-#include "kaguya/gen/push_tuple.inl"
-
-	//need define after overloaded push
-	namespace types
-	{
-		template<typename T>
-		inline int push_dispatch(lua_State* l, T& v)
-		{
-			if (!traits::is_push_specialized<typename traits::remove_const<T>::type >::value)
-			{
-				return push_ref(l, v);
-			}
-			else
-			{
-				return push(l, v);
-			}
-		}
-		template<typename T>
-		inline int push_dispatch(lua_State* l, const T& v)
-		{
-			return push(l, v);
-		}
-	}
+	};
 };

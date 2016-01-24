@@ -9,7 +9,7 @@ def args(out,arg_num,name,argoffset=0):
 
 def get_call(out,arg_num,offset=0):
 	for i in range (offset + 1,arg_num + 1):
-		out.write('    typename traits::arg_get_type<T'+str(i) +'>::type t' +str(i) +' = types::get(state,' + str(i) + ',types::typetag<typename traits::arg_get_type<T'+ str(i) + '>::type>());\n')
+		out.write('    typename traits::arg_get_type<T'+str(i) +'>::type t' +str(i) +' = lua_type_traits<T'+ str(i) + '>::get(state,' + str(i) + ');\n')
 
 def strictCheckType(out,arg_num,offset=0,customcheck=""):
 	out.write('  virtual bool checktype(lua_State *state,bool strictcheck){\n')
@@ -22,14 +22,14 @@ def strictCheckType(out,arg_num,offset=0,customcheck=""):
 		for i in range (offset+1,arg_num+1):
 			if i>offset+1:
 				out.write('||')
-			out.write('!types::strictCheckType(state,' + str(i) + ',types::typetag<typename traits::arg_get_type<T'+ str(i) + '>::type>())')
+			out.write('!lua_type_traits<T'+ str(i) + '>::strictCheckType(state,' + str(i) + ')')
 		out.write('){return false;}\n')
 		out.write('  }else{\n')
 		out.write('      if(')
 		for i in range (offset+1,arg_num+1):
 			if i>offset+1:
 				out.write('||')
-			out.write('!types::checkType(state,' + str(i) + ',types::typetag<typename traits::arg_get_type<T'+ str(i) + '>::type>())')
+			out.write('!lua_type_traits<T'+ str(i) + '>::checkType(state,' + str(i) + ')')
 		out.write('){return false;}\n')
 		out.write('  }\n')
 	out.write('    return true;\n')
@@ -130,7 +130,7 @@ def standard_function(out,arg_num,with_state = False):
 		invoke_code += 'state'+ (',' if arg_num>0 else '')
 	invoke_code += args_str(arg_num,'t')
 	invoke_code += ');\n'
-	invoke_code += '    return types::push_dispatch(state,standard::forward<Ret>(r));\n'
+	invoke_code += '    return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));\n'
 
 	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
@@ -177,7 +177,7 @@ def tepmlate_function(out,arg_num,with_state=False):
 		invoke_code += 'state'+ (',' if arg_num>0 else '')
 	invoke_code += args_str(arg_num,'t')
 	invoke_code += ');\n'
-	invoke_code += '    return types::push_dispatch(state,standard::forward<Ret>(r));\n'
+	invoke_code += '    return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));\n'
 
 	generate(out,classname,basename,template_str(arg_num),function_type,checkType_str(arg_num),invoke_code,arg_typenames(arg_num))
 
@@ -220,16 +220,16 @@ def tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 
 	invoke_code = get_call_str(arg_num+1,1)
 
-	invoke_code +='  '+funattr+' T1* ptr = types::get(state, 1, types::typetag<'+ funattr +' T1*>());\n'
+	invoke_code +='  '+funattr+' T1* ptr = lua_type_traits<'+ funattr +' T1*>::get(state, 1);\n'
 	invoke_code +='  if(!ptr){return 0;}\n'
 	invoke_code +='    Ret r = (ptr->*func_)('
 	if with_state:
 		invoke_code += 'state'+ (',' if arg_num>0 else '')
 	invoke_code +=args_str(arg_num+1,'t',1)
 	invoke_code +=');\n'
-	invoke_code +='    return types::push_dispatch(state,standard::forward<Ret>(r));\n'
+	invoke_code +='    return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));\n'
 
-	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<'+ funattr +' T1*>()) == 0){return false;}\n')
+	checktype_fun = checkType_str(arg_num+1,1,'if(lua_type_traits<'+ funattr +' T1*>::get(state, 1) == 0){return false;}\n')
 
 	generate(out,classname,basename,template_str(arg_num+ 1),function_type,checktype_fun,invoke_code,arg_typenames(arg_num))
 
@@ -248,7 +248,7 @@ def void_tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 
 	invoke_code = get_call_str(arg_num+1,1)
 
-	invoke_code +='  '+funattr+' T1* ptr = types::get(state, 1, types::typetag<' + funattr + ' T1*>());\n'
+	invoke_code +='  '+funattr+' T1* ptr = lua_type_traits<' + funattr + ' T1*>::get(state, 1);\n'
 
 	invoke_code +='  if(!ptr){return 0;}\n'
 	invoke_code +='    (ptr->*func_)('
@@ -258,7 +258,7 @@ def void_tepmlate_mem_function(out,arg_num,funattr,with_state=False):
 	invoke_code +=');\n'
 	invoke_code +='    return 0;\n'
 
-	checktype_fun = checkType_str(arg_num+1,1,'if(types::get(state, 1, types::typetag<'+ funattr +' T1*>()) == 0){return false;}\n')
+	checktype_fun = checkType_str(arg_num+1,1,'if(lua_type_traits<'+ funattr +' T1*>::get(state, 1) == 0){return false;}\n')
 
 	generate(out,classname,basename,void_template_str(arg_num+ 1),function_type,checktype_fun,invoke_code,arg_typenames(arg_num))
 

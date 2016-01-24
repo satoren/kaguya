@@ -22,7 +22,7 @@ namespace kaguya
 			virtual std::string argumentTypeNames() = 0;
 			virtual ~BaseInvoker() {}
 		};
-		
+
 		struct FunctorType :standard::shared_ptr<BaseInvoker>
 		{
 			typedef standard::shared_ptr<BaseInvoker> base_ptr_;
@@ -49,20 +49,20 @@ namespace kaguya
 				MemDataInvoker(data_type data) :data_(data) {}
 				virtual bool checktype(lua_State *state, bool strictcheck) {
 					if (lua_gettop(state) != 1 && lua_gettop(state) != 2) { return false; }
-					if (types::checkType(state, 1, types::typetag< ClassType*>()) == 0) { return false; }
+					if (lua_type_traits<ClassType*>::checkType(state, 1) == 0) { return false; }
 					return true;
 				}
 				virtual int invoke(lua_State *state)
 				{
-					ClassType* ptr = types::get(state, 1, types::typetag< ClassType*>());
+					ClassType* ptr = lua_type_traits<ClassType*>::get(state, 1);
 					if (lua_gettop(state) == 2)
 					{
-						ptr->*data_ = types::get(state, 2, types::typetag<MemType>());
+						ptr->*data_ = lua_type_traits<MemType>::get(state, 2);
 						return 0;
 					}
 					else
 					{
-						return types::push_dispatch(state, ptr->*data_);
+						return lua_type_traits<MemType>::push(state, ptr->*data_);
 					}
 				}
 
@@ -111,10 +111,10 @@ namespace kaguya
 					args.reserve(top + 1);
 					for (int i = 1; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 					Ret r = func_(args);
-					return types::push_dispatch(state, standard::forward<Ret>(r));
+					return lua_type_traits<Ret>::push(state, standard::forward<Ret>(r));
 				}
 				virtual std::string argumentTypeNames() {
 					return "VariadicArg";
@@ -139,7 +139,7 @@ namespace kaguya
 					args.reserve(top + 1);
 					for (int i = 1; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 					func_(args);
 					return 0;
@@ -163,7 +163,7 @@ namespace kaguya
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
-					T* t = types::get(state, 1, types::typetag<T*>());
+					T* t = lua_type_traits<T*>::get(state, 1);
 					if (!t) { return 0; }
 
 					std::vector<LuaRef> args;
@@ -171,11 +171,11 @@ namespace kaguya
 					args.reserve(top);
 					for (int i = 2; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 
 					Ret r = (t->*func_)(args);
-					return types::push_dispatch(state, standard::forward<Ret>(r));
+					return lua_type_traits<Ret>::push(state, standard::forward<Ret>(r));
 				}
 
 
@@ -201,7 +201,7 @@ namespace kaguya
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
-					T* t = types::get(state, 1, types::typetag<T*>());
+					T* t = lua_type_traits<T*>::get(state, 1);
 					if (!t) { return 0; }
 
 					std::vector<LuaRef> args;
@@ -209,7 +209,7 @@ namespace kaguya
 					args.reserve(top);
 					for (int i = 2; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 
 					(t->*func_)(args);
@@ -238,7 +238,7 @@ namespace kaguya
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
-					T* t = types::get(state, 1, types::typetag<T*>());
+					T* t = lua_type_traits<T*>::get(state, 1);
 					if (!t) { return 0; }
 
 					std::vector<LuaRef> args;
@@ -246,11 +246,11 @@ namespace kaguya
 					args.reserve(top - 1);
 					for (int i = 2; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 
 					Ret r = (t->*func_)(args);
-					return types::push_dispatch(state, standard::forward <Ret>(r));
+					return lua_type_traits<Ret>::push(state, standard::forward <Ret>(r));
 				}
 				virtual std::string argumentTypeNames() {
 					std::string result;
@@ -274,14 +274,14 @@ namespace kaguya
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
-					T* t = types::get(state, 1, types::typetag<T*>());
+					T* t = lua_type_traits<T*>::get(state, 1);
 					if (!t) { return 0; }
 					std::vector<LuaRef> args;
 					int top = lua_gettop(state);
 					args.reserve(top - 1);
 					for (int i = 2; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 
 					(t->*func_)(args);
@@ -315,10 +315,10 @@ namespace kaguya
 					args.reserve(top + 1);
 					for (int i = 1; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 					Ret r = func_(args);
-					return types::push_dispatch(state, standard::forward<Ret>(r));
+					return lua_type_traits<Ret>::push(state, standard::forward<Ret>(r));
 				}
 				virtual std::string argumentTypeNames() {
 					return "VariadicArg";
@@ -343,7 +343,7 @@ namespace kaguya
 					args.reserve(top + 1);
 					for (int i = 1; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 					func_(args);
 					return 0;
@@ -370,7 +370,7 @@ namespace kaguya
 					args.reserve(top + 1);
 					for (int i = 1; i <= top; ++i)
 					{
-						args.push_back(types::get(state, i, types::typetag<LuaRef>()));
+						args.push_back(lua_type_traits<LuaRef>::get(state, i));
 					}
 					typedef ObjectWrapper<CLASS> wrapper_type;
 					void *storage = lua_newuserdata(state, sizeof(wrapper_type));
@@ -486,33 +486,21 @@ namespace kaguya
 	{
 		return FunctorType(standard::forward<T>(f));
 	}
-	namespace types
-	{
-		namespace detail {
 
-			inline int push(lua_State* l, const FunctorType& f)
-			{
-				lua_pushnumber(l, 1);//no overload
-				void *storage = lua_newuserdata(l, sizeof(FunctorType));
-				new(storage) FunctorType(f);
-				class_userdata::setmetatable<FunctorType>(l);
-				lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
-				return 1;
-			}
-#if KAGUYA_USE_RVALUE_REFERENCE
-			inline int push(lua_State* l, FunctorType&& f)
-			{
-				lua_pushnumber(l, 1);//no overload
-				void *storage = lua_newuserdata(l, sizeof(FunctorType));
-				new(storage) FunctorType(standard::forward<FunctorType>(f));
-				class_userdata::setmetatable<FunctorType>(l);
-				lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
-				return 1;
-			}
-#endif
+
+	template<>	struct lua_type_traits<FunctorType> {
+		typedef FunctorType get_type;
+		typedef FunctorType push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return 0 != class_userdata::test_userdata<FunctorType>(l, index);
 		}
-		template<>
-		inline FunctorType get(lua_State* l, int index, typetag<FunctorType> tag)
+		static bool checkType(lua_State* l, int index)
+		{
+			return 0 != class_userdata::test_userdata<FunctorType>(l, index);
+		}
+		static FunctorType get(lua_State* l, int index)
 		{
 			FunctorType* ptr = class_userdata::test_userdata<FunctorType>(l, index);
 			if (ptr)
@@ -521,11 +509,32 @@ namespace kaguya
 			}
 			return FunctorType();
 		}
-		/*
-		template<>
-		inline int push(lua_State* l, const FunctorType& f)
+		static int push(lua_State* l, const FunctorType& f)
 		{
-			return detail::push(l,f);
-		}*/
-	}
+			lua_pushnumber(l, 1);//no overload
+			void *storage = lua_newuserdata(l, sizeof(FunctorType));
+			new(storage) FunctorType(f);
+			class_userdata::setmetatable<FunctorType>(l);
+			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
+			return 1;
+		}
+#if KAGUYA_USE_RVALUE_REFERENCE
+		static int push(lua_State* l, FunctorType&& f)
+		{
+			lua_pushnumber(l, 1);//no overload
+			void *storage = lua_newuserdata(l, sizeof(FunctorType));
+			new(storage) FunctorType(standard::forward<FunctorType>(f));
+			class_userdata::setmetatable<FunctorType>(l);
+			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
+			return 1;
+		}
+#endif
+	};
+
+	template<>	struct lua_type_traits<const FunctorType&> :lua_type_traits<FunctorType> {};
+
+
+	template<typename T> struct lua_type_traits < T
+		, typename traits::enable_if<traits::is_function<typename traits::remove_pointer<T>::type>::value>::type > :lua_type_traits<FunctorType>{};
+	
 };

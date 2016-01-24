@@ -27,7 +27,7 @@ def generate(out,arg_num):
 	out.write('  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}\n')
 	out.write('  int argstart = lua_gettop(state_);\n')
 	for i in range (1,arg_num+1):
-		out.write('  types::push_dispatch(state_,standard::forward<T' +  str(i) + '>(t' + str(i) + '));\n')
+		out.write('  lua_type_traits<T' +  str(i) + '>::push(state_,standard::forward<T' +  str(i) + '>(t' + str(i) + '));\n')
 	out.write('  int argnum = lua_gettop(state_) - argstart;\n')
 	out.write('  std::vector<LuaRef> args;\n')
 	out.write('  args.reserve(argnum);\n')

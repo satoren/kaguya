@@ -1158,9 +1158,7 @@ namespace t_07_any_type_test
 	template<class T, class T2>
 	bool test(kaguya::State& state, T value1, T2 value2)
 	{
-		TEST_CHECK(setget_eq(state, value1, value2));
-		TEST_CHECK(function_call(state, value1, value2));
-		return true;
+		return setget_eq(state, value1, value2) && function_call(state, value1, value2);
 	}
 	void any_type_test(kaguya::State& state)
 	{

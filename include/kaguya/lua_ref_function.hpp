@@ -211,12 +211,12 @@ namespace kaguya
 		}
 
 		template<typename T>
-		typename traits::arg_get_type<T>::type get()const
+		typename lua_type_traits<T>::get_type get()const
 		{
 			evaluate(1);
 			if (eval_info_ && !eval_info_->results.empty())
 			{
-				return eval_info_->results.back().get<typename traits::arg_get_type<T>::type>();
+				return eval_info_->results.back().get<typename lua_type_traits<T>::get_type>();
 			}
 			return LuaRef(state_);//method invoke error
 		}
@@ -333,73 +333,59 @@ namespace kaguya
 		standard::shared_ptr<eval> eval_info_;
 	};
 
-	namespace traits
-	{
-		template<>
-		struct arg_get_type<const LuaFunction& > {
-			typedef LuaFunction type;
-		};
-		template< >	struct is_push_specialized<LuaFunction> : integral_constant<bool, true> {};
+	template<>	struct lua_type_traits<LuaFunction> {
+		typedef LuaFunction get_type;
+		typedef LuaFunction push_type;
 
-		template<>
-		struct arg_get_type<const LuaThread& > {
-			typedef LuaThread type;
-		};
-		template< >	struct is_push_specialized<LuaThread> : integral_constant<bool, true> {};
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_isfunction(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isfunction(l, index) || lua_isnil(l, index);
+		}
+		static LuaFunction get(lua_State* l, int index)
+		{
+			lua_pushvalue(l, index);
+			return LuaFunction(l, StackTop());
+		}
+		static int push(lua_State* l, const LuaFunction& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+	};
+	template<>	struct lua_type_traits<const LuaFunction&> :lua_type_traits<LuaFunction> {};
 
-		template< >	struct is_push_specialized<FunEvaluator> : integral_constant<bool, true> {};
-	}
+	template<>	struct lua_type_traits<LuaThread>{
+		typedef LuaThread get_type;
+		typedef LuaThread push_type;
 
-	namespace types
-	{
-		template<>
-		inline bool strictCheckType(lua_State* l, int index, typetag<LuaThread>)
+		static bool strictCheckType(lua_State* l, int index)
 		{
 			return lua_isthread(l, index);
 		}
-		template<>
-		inline bool checkType(lua_State* l, int index, typetag<LuaThread>)
+		static bool checkType(lua_State* l, int index)
 		{
 			return lua_isthread(l, index) || lua_isnil(l, index);
 		}
-		template<>
-		inline LuaThread get(lua_State* l, int index, typetag<LuaThread> tag)
+		static LuaThread get(lua_State* l, int index)
 		{
 			lua_pushvalue(l, index);
 			return LuaThread(l, StackTop());
 		}
-		template<>
-		inline int push(lua_State* l, const LuaThread& ref)
+		static int push(lua_State* l, const LuaThread& ref)
 		{
 			ref.push(l);
 			return 1;
 		}
+	};
+	template<>	struct lua_type_traits<const LuaThread&> :lua_type_traits<LuaThread> {};
 
-		template<>
-		inline bool strictCheckType(lua_State* l, int index, typetag<LuaFunction>)
-		{
-			return lua_isfunction(l, index);
-		}
-		template<>
-		inline bool checkType(lua_State* l, int index, typetag<LuaFunction>)
-		{
-			return lua_isfunction(l, index) || lua_isnil(l, index);
-		}
-		template<>
-		inline LuaFunction get(lua_State* l, int index, typetag<LuaFunction> tag)
-		{
-			lua_pushvalue(l, index);
-			return LuaFunction(LuaRef(l, StackTop()));
-		}
-		template<>
-		inline int push(lua_State* l, const LuaFunction& ref)
-		{
-			ref.push(l);
-			return 1;
-		}
 
-		template<>
-		inline int push(lua_State* l, const FunEvaluator& ref)
+	template<>	struct lua_type_traits<FunEvaluator> {
+		static int push(lua_State* l, const FunEvaluator& ref)
 		{
 			const std::vector<LuaRef>& v = ref.get_result(LUA_MULTRET);
 			for (std::vector<LuaRef>::const_iterator it = v.begin(); it != v.end(); ++it)
@@ -408,8 +394,7 @@ namespace kaguya
 			}
 			return static_cast<int>(v.size());
 		}
-		
-	}
+	};
 
 
 	inline LuaRef toLuaRef(const LuaFunction& ref)

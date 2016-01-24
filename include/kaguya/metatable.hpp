@@ -61,7 +61,7 @@ namespace kaguya
 
 
 			//can not register push specialized class
-			KAGUYA_STATIC_ASSERT(!traits::is_push_specialized<class_type>::value,
+			KAGUYA_STATIC_ASSERT(RegisterableCheck<class_type>::value,
 				"Can not register push-specialized class. e.g. std::tuple");
 		}
 
@@ -216,7 +216,7 @@ namespace kaguya
 		{
 			int funcnum = int(func_array.size());
 			if (funcnum == 0) { return; }
-			types::push_dispatch(state, funcnum);
+			lua_pushnumber(state, funcnum);
 			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
 			{
 				void *storage = lua_newuserdata(state, sizeof(FunctorType));
@@ -230,15 +230,15 @@ namespace kaguya
 		{
 			if (value.type == ValueType::str_value)
 			{
-				types::push_dispatch(state, value.strvalue);
+				lua_type_traits<std::string>::push(state, value.strvalue);
 			}
 			else if (value.type == ValueType::int_value)
 			{
-				types::push_dispatch(state, value.ivalue);
+				lua_type_traits<int64_t>::push(state, value.ivalue);
 			}
 			else if (value.type == ValueType::double_value)
 			{
-				types::push_dispatch(state, value.dvalue);
+				lua_type_traits<double>::push(state, value.dvalue);
 			}
 			else
 			{

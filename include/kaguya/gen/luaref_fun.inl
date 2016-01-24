@@ -18,7 +18,7 @@ inline FunEvaluator LuaRef::operator()(T1 t1)
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -33,8 +33,8 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -49,9 +49,9 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -66,10 +66,10 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
-  types::push_dispatch(state_,standard::forward<T4>(t4));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
+  lua_type_traits<T4>::push(state_,standard::forward<T4>(t4));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -84,11 +84,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
-  types::push_dispatch(state_,standard::forward<T4>(t4));
-  types::push_dispatch(state_,standard::forward<T5>(t5));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
+  lua_type_traits<T4>::push(state_,standard::forward<T4>(t4));
+  lua_type_traits<T5>::push(state_,standard::forward<T5>(t5));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -103,12 +103,12 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
-  types::push_dispatch(state_,standard::forward<T4>(t4));
-  types::push_dispatch(state_,standard::forward<T5>(t5));
-  types::push_dispatch(state_,standard::forward<T6>(t6));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
+  lua_type_traits<T4>::push(state_,standard::forward<T4>(t4));
+  lua_type_traits<T5>::push(state_,standard::forward<T5>(t5));
+  lua_type_traits<T6>::push(state_,standard::forward<T6>(t6));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -123,13 +123,13 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
-  types::push_dispatch(state_,standard::forward<T4>(t4));
-  types::push_dispatch(state_,standard::forward<T5>(t5));
-  types::push_dispatch(state_,standard::forward<T6>(t6));
-  types::push_dispatch(state_,standard::forward<T7>(t7));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
+  lua_type_traits<T4>::push(state_,standard::forward<T4>(t4));
+  lua_type_traits<T5>::push(state_,standard::forward<T5>(t5));
+  lua_type_traits<T6>::push(state_,standard::forward<T6>(t6));
+  lua_type_traits<T7>::push(state_,standard::forward<T7>(t7));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -144,14 +144,14 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
-  types::push_dispatch(state_,standard::forward<T4>(t4));
-  types::push_dispatch(state_,standard::forward<T5>(t5));
-  types::push_dispatch(state_,standard::forward<T6>(t6));
-  types::push_dispatch(state_,standard::forward<T7>(t7));
-  types::push_dispatch(state_,standard::forward<T8>(t8));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
+  lua_type_traits<T4>::push(state_,standard::forward<T4>(t4));
+  lua_type_traits<T5>::push(state_,standard::forward<T5>(t5));
+  lua_type_traits<T6>::push(state_,standard::forward<T6>(t6));
+  lua_type_traits<T7>::push(state_,standard::forward<T7>(t7));
+  lua_type_traits<T8>::push(state_,standard::forward<T8>(t8));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);
@@ -166,15 +166,15 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7
   value_type typ = type();
   if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}
   int argstart = lua_gettop(state_);
-  types::push_dispatch(state_,standard::forward<T1>(t1));
-  types::push_dispatch(state_,standard::forward<T2>(t2));
-  types::push_dispatch(state_,standard::forward<T3>(t3));
-  types::push_dispatch(state_,standard::forward<T4>(t4));
-  types::push_dispatch(state_,standard::forward<T5>(t5));
-  types::push_dispatch(state_,standard::forward<T6>(t6));
-  types::push_dispatch(state_,standard::forward<T7>(t7));
-  types::push_dispatch(state_,standard::forward<T8>(t8));
-  types::push_dispatch(state_,standard::forward<T9>(t9));
+  lua_type_traits<T1>::push(state_,standard::forward<T1>(t1));
+  lua_type_traits<T2>::push(state_,standard::forward<T2>(t2));
+  lua_type_traits<T3>::push(state_,standard::forward<T3>(t3));
+  lua_type_traits<T4>::push(state_,standard::forward<T4>(t4));
+  lua_type_traits<T5>::push(state_,standard::forward<T5>(t5));
+  lua_type_traits<T6>::push(state_,standard::forward<T6>(t6));
+  lua_type_traits<T7>::push(state_,standard::forward<T7>(t7));
+  lua_type_traits<T8>::push(state_,standard::forward<T8>(t8));
+  lua_type_traits<T9>::push(state_,standard::forward<T9>(t9));
   int argnum = lua_gettop(state_) - argstart;
   std::vector<LuaRef> args;
   args.reserve(argnum);

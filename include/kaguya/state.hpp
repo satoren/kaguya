@@ -270,7 +270,7 @@ namespace kaguya
 		template<typename T>
 		void pushToStack(T value)
 		{
-			types::push_dispatch(state_, value);
+			lua_type_traits<T>::push(state_, value);
 		}
 		LuaRef popFromStack()
 		{

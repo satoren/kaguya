@@ -217,3 +217,68 @@ while(!cor2.isThreadDead())
     std::cout << int(cor2(corfun, 3)) << ",";
 }
 ```
+
+
+### type conversion
+std::map and std::vector will be convert to a lua-table by default
+```c++
+kaguya::State s;
+std::vector<int> vect = { 2,4,6,1 };
+s["vect"] = vect;
+s("print(type(vect))");// table
+s("for i,v in ipairs(vect) do print(v) end");
+```
+output:
+```
+table
+1 2
+2 4
+3 6
+4 1
+```
+```c++
+kaguya::State s;
+std::map<std::string, int> map = { { "apple",3 },{ "dog",5 },{"cat",124},{ "catfood",644 } };
+s["map"] = map;
+s("print(type(map))");// table
+s("for i,v in pairs(map) do print(i,v) end");
+```
+output:
+```
+table
+catfood 644
+dog     5
+cat     124
+apple   3
+```
+
+#### type conversion customize
+  If you want to customize the conversion to type of lua yourself ,implement specialize of kaguya::lua_type_traits
+
+  example: this code is default implements for std::string
+  ```c++
+  template<>	struct lua_type_traits<std::string> {
+  typedef std::string get_type;
+  typedef const std::string& push_type;
+
+  static bool strictCheckType(lua_State* l, int index)
+  {
+    return lua_type(l, index) == LUA_TSTRING;
+  }
+  static bool checkType(lua_State* l, int index)
+  {
+    return lua_isstring(l, index) != 0;
+  }
+  static get_type get(lua_State* l, int index)
+  {
+    size_t size = 0;
+    const char* buffer = lua_tolstring(l, index, &size);
+    return std::string(buffer, size);
+  }
+  static int push(lua_State* l, push_type s)
+  {
+    lua_pushlstring(l, s.c_str(), s.size());
+    return 1;
+  }
+};
+  ```

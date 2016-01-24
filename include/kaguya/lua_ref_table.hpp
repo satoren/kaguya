@@ -229,11 +229,11 @@ namespace kaguya
 		*/
 
 #if KAGUYA_USE_CPP11
-	template<class... Args>
-	FunEvaluator operator()(Args&&... args)
-	{
-		return getValue()(standard::forward<Args>(args)...);
-	}
+		template<class... Args>
+		FunEvaluator operator()(Args&&... args)
+		{
+			return getValue()(standard::forward<Args>(args)...);
+		}
 #else
 #define KAGUYA_DELEGATE_LUAREF getValue()
 #include "kaguya/gen/delegate_to_luaref.inl"
@@ -406,7 +406,7 @@ namespace kaguya
 		return rhs < lhs;
 	}
 	template<typename T>
-	bool operator!=(const TableKeyReference& lhs,const T& rhs)
+	bool operator!=(const TableKeyReference& lhs, const T& rhs)
 	{
 		return !(rhs == lhs);
 	}
@@ -440,103 +440,77 @@ namespace kaguya
 	{
 		return !(rhs == lhs);
 	}
+	
+	template<>	struct lua_type_traits<LuaUserData> {
+		typedef LuaUserData get_type;
+		typedef LuaUserData push_type;
 
-
-
-	namespace traits
-	{
-		template<>
-		struct arg_get_type<const LuaUserData& > {
-			typedef LuaUserData type;
-		};
-		template< >	struct is_push_specialized<LuaUserData> : integral_constant<bool, true> {};
-
-		template<>
-		struct arg_get_type<const LuaTable& > {
-			typedef LuaTable type;
-		};
-
-		template< >	struct is_push_specialized<LuaTable> : integral_constant<bool, true> {};
-		template< >	struct is_push_specialized<TableKeyReference> : integral_constant<bool, true> {};
-	}
-	namespace types
-	{
-		template<>
-		inline bool strictCheckType(lua_State* l, int index, typetag<LuaUserData>)
+		static bool strictCheckType(lua_State* l, int index)
 		{
 			return lua_type(l, index) == LUA_TUSERDATA;
 		}
-		template<>
-		inline bool checkType(lua_State* l, int index, typetag<LuaUserData>)
+		static bool checkType(lua_State* l, int index)
 		{
 			return lua_type(l, index) == LUA_TUSERDATA || lua_isnil(l, index);
 		}
-		template<>
-		inline LuaUserData get(lua_State* l, int index, typetag<LuaUserData> tag)
+		static LuaUserData get(lua_State* l, int index)
 		{
 			lua_pushvalue(l, index);
 			return LuaUserData(l, StackTop());
 		}
-		template<>
-		inline int push(lua_State* l, const LuaUserData& ref)
+		static int push(lua_State* l, const LuaUserData& ref)
 		{
 			ref.push(l);
 			return 1;
 		}
-		template<>
-		inline bool strictCheckType(lua_State* l, int index, typetag<LuaTable>)
+	};
+	template<>	struct lua_type_traits<const LuaUserData&> :lua_type_traits<LuaUserData> {};
+
+
+	template<>	struct lua_type_traits<LuaTable> {
+		typedef LuaTable get_type;
+		typedef LuaTable push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
 		{
 			return lua_istable(l, index);
 		}
-		template<>
-		inline bool checkType(lua_State* l, int index, typetag<LuaTable>)
+		static bool checkType(lua_State* l, int index)
 		{
 			return lua_istable(l, index) || lua_isnil(l, index);
 		}
-		template<>
-		inline LuaTable get(lua_State* l, int index, typetag<LuaTable> tag)
+		static LuaTable get(lua_State* l, int index)
 		{
 			lua_pushvalue(l, index);
 			return LuaTable(l, StackTop());
 		}
-		template<>
-		inline int push(lua_State* l, const LuaTable& ref)
+		static int push(lua_State* l, const LuaTable& ref)
 		{
 			ref.push(l);
 			return 1;
 		}
-		template<>
-		inline int push(lua_State* l, const TableKeyReference& ref)
+	};
+	template<>	struct lua_type_traits<const LuaTable&> :lua_type_traits<LuaTable> {};
+
+
+	template<>	struct lua_type_traits<TableKeyReference> {
+		static int push(lua_State* l, const TableKeyReference& ref)
 		{
 			ref.getValue().push(l);
 			return 1;
 		}
+	};
 
-	}
-
-	namespace types
-	{
-		//vector and map to Lua table
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-		template<typename T>
-		inline bool strictCheckType(lua_State* l, int index, typetag<std::vector<T> >)
+	template<typename T, typename A>
+	struct lua_type_traits<std::vector<T, A> >
+	{
+		typedef std::vector<T, A> get_type;
+		typedef const std::vector<T, A>& push_type;
+
+		static bool checkType(lua_State* l, int index)
 		{
-			LuaRef table = get(l, index, typetag<LuaRef>());
-			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				if (!it->first.typeTest<size_t>() || !it->second.typeTest<T>())
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		template<typename T>
-		inline bool checkType(lua_State* l, int index, typetag<std::vector<T> >)
-		{
-			LuaRef table = get(l, index, typetag<LuaRef>());
+			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 			std::map<LuaRef, LuaRef> values = table.map();
 			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
@@ -548,11 +522,25 @@ namespace kaguya
 			}
 			return true;
 		}
-		template<typename T>
-		inline std::vector<T> get(lua_State* l, int index, typetag<std::vector<T> > tag)
+		static bool strictCheckType(lua_State* l, int index)
 		{
-			std::vector<T> result;
-			LuaRef table = get(l, index, typetag<LuaRef>());
+			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
+			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				if (!it->first.typeTest<size_t>() || !it->second.typeTest<T>())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		static get_type get(lua_State* l, int index)
+		{
+			get_type result;
+			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			std::vector<LuaRef> values = table.values();
 			result.reserve(values.size());
 			for (std::vector<LuaRef>::iterator it = values.begin(); it != values.end(); ++it)
@@ -561,42 +549,31 @@ namespace kaguya
 			}
 			return result;
 		}
-		template<typename T>
-		inline int push(lua_State* l, const std::vector<T>& ref)
+		static int push(lua_State* l, push_type v)
 		{
-			LuaRef table(l, NewTable(int(ref.size()), 0));
+			LuaRef table(l, NewTable(int(v.size()), 0));
 
 			int count = 1;//array is 1 origin in Lua
-			for (typename std::vector<T>::const_iterator it = ref.begin(); it != ref.end(); ++it)
+			for (typename std::vector<T>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
 				table[count++] = *it;
 			}
 			table.push(l);
 			return 1;
 		}
+	};
 #endif
 
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-		//std::map
-		template<typename K, typename V>
-		inline bool strictCheckType(lua_State* l, int index, typetag<std::map<K, V> >)
+	template<typename K, typename V, typename C, typename A>
+	struct lua_type_traits<std::map<K, V, C, A> >
+	{
+		typedef std::map<K, V, C, A> get_type;
+		typedef const std::map<K, V, C, A>& push_type;
+
+		static bool checkType(lua_State* l, int index)
 		{
-			LuaRef table = get(l, index, typetag<LuaRef>());
-			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				if (!it->first.typeTest<K>() || !it->second.typeTest<V>())
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		template<typename K, typename V>
-		inline bool checkType(lua_State* l, int index, typetag<std::map<K, V> >)
-		{
-			LuaRef table = get(l, index, typetag<LuaRef>());
+			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 			std::map<LuaRef, LuaRef> values = table.map();
 			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
@@ -608,11 +585,25 @@ namespace kaguya
 			}
 			return true;
 		}
-		template<typename K, typename V>
-		inline std::map<K, V> get(lua_State* l, int index, typetag<std::map<K, V> > tag)
+		static bool strictCheckType(lua_State* l, int index)
 		{
-			std::map<K, V> result;
-			LuaRef table = get(l, index, typetag<LuaRef>());
+			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
+			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
+			std::map<LuaRef, LuaRef> values = table.map();
+			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
+			{
+				if (!it->first.typeTest<K>() || !it->second.typeTest<V>())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		static get_type get(lua_State* l, int index)
+		{
+			get_type result;
+			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			std::map<LuaRef, LuaRef> values = table.map();
 			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
 			{
@@ -620,32 +611,16 @@ namespace kaguya
 			}
 			return result;
 		}
-		template<typename K, typename V>
-		inline int push(lua_State* l, const std::map<K, V>& ref)
+		static int push(lua_State* l, push_type v)
 		{
-			LuaRef table(l, NewTable(0, int(ref.size())));
-			for (typename std::map<K, V>::const_iterator it = ref.begin(); it != ref.end(); ++it)
+			LuaRef table(l, NewTable(0, int(v.size())));
+			for (typename std::map<K, V>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
 				table[it->first] = it->second;
 			}
 			table.push(l);
 			return 1;
 		}
+	};
 #endif
-	}
-	namespace traits
-	{
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-		template<class V >
-		struct arg_get_type<const std::vector<V>& > {
-			typedef std::vector<V> type;
-		};
-#endif
-#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-		template<class K, class V >
-		struct arg_get_type<const std::map<K, V>& > {
-			typedef std::map<K, V> type;
-		};
-#endif
-	}
 }
