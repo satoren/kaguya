@@ -15,7 +15,7 @@
 namespace kaguya
 {
 
-	template<typename class_type,typename base_class_type = void>
+	template<typename class_type, typename base_class_type = void>
 	struct ClassMetatable
 	{
 		struct ValueType
@@ -40,7 +40,7 @@ namespace kaguya
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
 
-		ClassMetatable():has_property_(false)
+		ClassMetatable() :has_property_(false)
 		{
 			FunctorType dtor(&class_userdata::destructor<ObjectWrapperBase>);
 			function_map_["__gc"].push_back(dtor);
@@ -50,19 +50,15 @@ namespace kaguya
 			base_class_type* ptr = check; (void)(ptr);//unused
 
 
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-			KAGUYA_STATIC_ASSERT(!traits::is_std_vector<class_type>::value, "std::vector is binding to lua-table by default.If you wants register for std::vector yourself,"
+			KAGUYA_STATIC_ASSERT(is_registerable<class_type>::value || !traits::is_std_vector<class_type>::value, "std::vector is binding to lua-table by default.If you wants register for std::vector yourself,"
 				"please define KAGUYA_NO_STD_VECTOR_TO_TABLE");
-#endif
-#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-			KAGUYA_STATIC_ASSERT(!traits::is_std_map<class_type>::value, "std::map is binding to lua-table by default.If you wants register for std::map yourself,"
-				"please define KAGUYA_NO_STD_MAP_TO_TABLE");
-#endif
 
+			KAGUYA_STATIC_ASSERT(is_registerable<class_type>::value || !traits::is_std_map<class_type>::value, "std::map is binding to lua-table by default.If you wants register for std::map yourself,"
+				"please define KAGUYA_NO_STD_MAP_TO_TABLE");
 
 			//can not register push specialized class
-			KAGUYA_STATIC_ASSERT(RegisterableCheck<class_type>::value,
-				"Can not register push-specialized class. e.g. std::tuple");
+			KAGUYA_STATIC_ASSERT(is_registerable<class_type>::value,
+				"Can not register specialized of type conversion class. e.g. std::tuple");
 		}
 
 		LuaRef registerClass(lua_State* state)const
@@ -110,7 +106,7 @@ namespace kaguya
 			}
 			else
 			{
-				except::OtherError(state,typeid(class_type*).name() +  std::string("is already registered"));
+				except::OtherError(state, typeid(class_type*).name() + std::string(" is already registered"));
 			}
 			return LuaRef(state);
 		}

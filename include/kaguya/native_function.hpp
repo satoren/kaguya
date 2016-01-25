@@ -475,6 +475,9 @@ namespace kaguya
 		}
 	}
 
+	typedef nativefunction::FunctorType FunctorType;
+	
+
 	template<typename T>
 	inline FunctorType lua_function(T f)
 	{
