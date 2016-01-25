@@ -741,6 +741,24 @@ namespace t_03_function
 
 	}
 
+	void reffun(Foo& ref)
+	{
+		ref.setBar("BarBar");
+	}
+	void arg_class_ref(kaguya::State& state)
+	{
+		state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
+			.addMember("setBar", &Foo::setBar)
+			);
+
+		Foo foo;
+		state["reffun"] = kaguya::function(reffun);
+
+		state["reffun"](kaguya::standard::ref(foo));
+		TEST_CHECK(foo.bar == "BarBar");
+	}
+	
+
 #if KAGUYA_USE_CPP11
 	void lambdafun(kaguya::State& state)
 	{
@@ -1379,6 +1397,7 @@ int main()
 		ADD_TEST(t_03_function::vector_and_map_to_table_mapping);
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
+		ADD_TEST(t_03_function::arg_class_ref);
 #if KAGUYA_USE_CPP11
 		ADD_TEST(t_03_function::lambdafun);
 #endif

@@ -53,6 +53,51 @@ namespace kaguya
 	template<typename T> struct lua_type_traits<T
 		, typename traits::enable_if<traits::is_const_reference<T>::value>::type> :lua_type_traits<typename traits::remove_const_reference<T>::type > {};
 
+
+
+	template<typename REF> struct lua_type_traits < REF
+		, typename traits::enable_if<traits::is_lvalue_reference<REF>::value && !traits::is_const<typename traits::remove_reference<REF>::type>::value>::type >
+	{
+		typedef void Registerable;
+
+		typedef REF get_type;
+		typedef REF push_type;
+		typedef typename traits::remove_reference<REF>::type T;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<T>()) != 0;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<T>()) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			T* pointer =  get_pointer(l, index, types::typetag<T>());
+			if (!pointer)
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return *pointer;
+		}
+		static int push(lua_State* l, push_type v)
+		{
+			if (!available_metatable<T>(l))
+			{
+				lua_pushlightuserdata(l, const_cast<typename traits::remove_const<T>::type*>(&v));
+			}
+			else
+			{
+				typedef ObjectPointerWrapper<T> wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(&v);
+				class_userdata::setmetatable<T>(l);
+			}
+			return 1;
+		}
+	};
+
 	template<typename PTR> struct lua_type_traits < PTR
 		, typename traits::enable_if<traits::is_pointer<typename traits::remove_const_reference<PTR>::type>::value && !traits::is_function<typename traits::remove_pointer<PTR>::type>::value>::type >
 	{
