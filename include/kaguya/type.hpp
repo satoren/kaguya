@@ -70,6 +70,10 @@ namespace kaguya
 		}
 		static bool checkType(lua_State* l, int index)
 		{
+			if (lua_type(l, index) == LUA_TLIGHTUSERDATA)
+			{
+				return true;
+			}
 			return object_wrapper(l, index, metatableName<T>()) != 0;
 		}
 		static get_type get(lua_State* l, int index)
