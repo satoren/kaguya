@@ -77,6 +77,27 @@ namespace t_01_primitive
 		state("value = 1");
 		TEST_CHECK(state["value"] == Bar);
 	};
+
+#if KAGUYA_USE_CPP11
+
+	enum class testenumclass
+	{
+		Foo = 0,
+		Bar = 1,
+	};
+
+
+	void enum_class_set(kaguya::State& state)
+	{
+		state["value"] = testenumclass::Foo;
+		TEST_CHECK(state("assert(value == 0)"));
+	};
+	void enum_class_get(kaguya::State& state)
+	{
+		state("value = 1");
+		TEST_CHECK(state["value"] == testenumclass::Bar);
+	};
+#endif
 }
 
 namespace t_02_classreg
@@ -1326,6 +1347,13 @@ int main()
 		ADD_TEST(t_01_primitive::table_set);
 		ADD_TEST(t_01_primitive::enum_set);
 		ADD_TEST(t_01_primitive::enum_get);
+
+
+#if KAGUYA_USE_CPP11
+		ADD_TEST(t_01_primitive::enum_class_set);
+		ADD_TEST(t_01_primitive::enum_class_get);
+#endif
+
 		
 		ADD_TEST(t_02_classreg::default_constructor);
 		ADD_TEST(t_02_classreg::int_constructor);
