@@ -286,8 +286,8 @@ namespace kaguya
 	template<typename T> struct lua_type_traits<T
 		, typename traits::enable_if<traits::is_integral<T>::value>::type>
 	{
-#if LUA_VERSION_NUM >= 503
 		typedef typename traits::remove_const_reference<T>::type get_type;
+#if LUA_VERSION_NUM >= 503
 		typedef lua_Integer push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -308,7 +308,6 @@ namespace kaguya
 			return 1;
 		}
 #else
-		typedef typename lua_type_traits<lua_Number>::get_type get_type;
 		typedef typename lua_type_traits<lua_Number>::push_type push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -321,9 +320,9 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			return static_cast<T>(lua_type_traits<lua_Number>::get(l, index));
+			return static_cast<get_type>(lua_type_traits<lua_Number>::get(l, index));
 		}
-		static int push(lua_State* l, T s)
+		static int push(lua_State* l, push_type s)
 		{
 			return lua_type_traits<lua_Number>::push(l, s);
 		}
@@ -346,11 +345,11 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			return static_cast<get_type>(static_cast<int64_t>(lua_type_traits<int64_t>::get(l, index)));
+			return static_cast<get_type>(lua_type_traits<int64_t>::get(l, index));
 		}
 		static int push(lua_State* l, push_type s)
 		{
-			return lua_type_traits<int64_t>::push(l, static_cast<int64_t>(s));
+			return lua_type_traits<int64_t>::push(l, static_cast<typename lua_type_traits<int64_t>::push_type>(s));
 		}
 	};
 
