@@ -46,7 +46,7 @@ struct StdFunInvoker1:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
     Ret r = func_(t1);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -83,8 +83,8 @@ struct StdFunInvoker2:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
     Ret r = func_(t1,t2);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -122,9 +122,9 @@ struct StdFunInvoker3:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
     Ret r = func_(t1,t2,t3);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -163,10 +163,10 @@ struct StdFunInvoker4:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
     Ret r = func_(t1,t2,t3,t4);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -206,11 +206,11 @@ struct StdFunInvoker5:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
     Ret r = func_(t1,t2,t3,t4,t5);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -251,12 +251,12 @@ struct StdFunInvoker6:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
     Ret r = func_(t1,t2,t3,t4,t5,t6);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -298,13 +298,13 @@ struct StdFunInvoker7:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -347,14 +347,14 @@ struct StdFunInvoker8:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -398,15 +398,15 @@ struct StdFunInvoker9:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -475,7 +475,7 @@ struct VoidStdFunInvoker1:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
     func_(t1);
     return 0;
   }
@@ -509,8 +509,8 @@ struct VoidStdFunInvoker2:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
     func_(t1,t2);
     return 0;
   }
@@ -545,9 +545,9 @@ struct VoidStdFunInvoker3:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
     func_(t1,t2,t3);
     return 0;
   }
@@ -583,10 +583,10 @@ struct VoidStdFunInvoker4:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
     func_(t1,t2,t3,t4);
     return 0;
   }
@@ -623,11 +623,11 @@ struct VoidStdFunInvoker5:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
     func_(t1,t2,t3,t4,t5);
     return 0;
   }
@@ -665,12 +665,12 @@ struct VoidStdFunInvoker6:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
     func_(t1,t2,t3,t4,t5,t6);
     return 0;
   }
@@ -709,13 +709,13 @@ struct VoidStdFunInvoker7:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
     func_(t1,t2,t3,t4,t5,t6,t7);
     return 0;
   }
@@ -755,14 +755,14 @@ struct VoidStdFunInvoker8:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
     func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
@@ -803,15 +803,15 @@ struct VoidStdFunInvoker9:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
     func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
@@ -884,7 +884,7 @@ struct FunInvoker1:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
     Ret r = func_(t1);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -921,8 +921,8 @@ struct FunInvoker2:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
     Ret r = func_(t1,t2);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -960,9 +960,9 @@ struct FunInvoker3:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
     Ret r = func_(t1,t2,t3);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1001,10 +1001,10 @@ struct FunInvoker4:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
     Ret r = func_(t1,t2,t3,t4);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1044,11 +1044,11 @@ struct FunInvoker5:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
     Ret r = func_(t1,t2,t3,t4,t5);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1089,12 +1089,12 @@ struct FunInvoker6:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
     Ret r = func_(t1,t2,t3,t4,t5,t6);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1136,13 +1136,13 @@ struct FunInvoker7:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1185,14 +1185,14 @@ struct FunInvoker8:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1236,15 +1236,15 @@ struct FunInvoker9:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
     Ret r = func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return lua_type_traits<Ret>::push(state,standard::forward<Ret>(r));
   }
@@ -1313,7 +1313,7 @@ struct VoidFunInvoker1:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
     func_(t1);
     return 0;
   }
@@ -1347,8 +1347,8 @@ struct VoidFunInvoker2:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
     func_(t1,t2);
     return 0;
   }
@@ -1383,9 +1383,9 @@ struct VoidFunInvoker3:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
     func_(t1,t2,t3);
     return 0;
   }
@@ -1421,10 +1421,10 @@ struct VoidFunInvoker4:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
     func_(t1,t2,t3,t4);
     return 0;
   }
@@ -1461,11 +1461,11 @@ struct VoidFunInvoker5:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
     func_(t1,t2,t3,t4,t5);
     return 0;
   }
@@ -1503,12 +1503,12 @@ struct VoidFunInvoker6:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
     func_(t1,t2,t3,t4,t5,t6);
     return 0;
   }
@@ -1547,13 +1547,13 @@ struct VoidFunInvoker7:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
     func_(t1,t2,t3,t4,t5,t6,t7);
     return 0;
   }
@@ -1593,14 +1593,14 @@ struct VoidFunInvoker8:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
     func_(t1,t2,t3,t4,t5,t6,t7,t8);
     return 0;
   }
@@ -1641,15 +1641,15 @@ struct VoidFunInvoker9:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
     func_(t1,t2,t3,t4,t5,t6,t7,t8,t9);
     return 0;
   }
@@ -1759,7 +1759,7 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
@@ -1799,7 +1799,7 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2);
@@ -1839,8 +1839,8 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
@@ -1881,8 +1881,8 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3);
@@ -1923,9 +1923,9 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
@@ -1967,9 +1967,9 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4);
@@ -2011,10 +2011,10 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
@@ -2057,10 +2057,10 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5);
@@ -2103,11 +2103,11 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -2151,11 +2151,11 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -2199,12 +2199,12 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -2249,12 +2249,12 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -2299,13 +2299,13 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -2351,13 +2351,13 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -2403,14 +2403,14 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -2457,14 +2457,14 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -2511,15 +2511,15 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
-    typename traits::arg_get_type<T10>::type t10 = lua_type_traits<T10>::get(state,10);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T10>::get_type t10 = lua_type_traits<T10>::get(state,10);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -2567,15 +2567,15 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
-    typename traits::arg_get_type<T10>::type t10 = lua_type_traits<T10>::get(state,10);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T10>::get_type t10 = lua_type_traits<T10>::get(state,10);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     Ret r = (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -2682,7 +2682,7 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2);
@@ -2719,7 +2719,7 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2);
@@ -2756,8 +2756,8 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
@@ -2795,8 +2795,8 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3);
@@ -2834,9 +2834,9 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
@@ -2875,9 +2875,9 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4);
@@ -2916,10 +2916,10 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
@@ -2959,10 +2959,10 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5);
@@ -3002,11 +3002,11 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -3047,11 +3047,11 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6);
@@ -3092,12 +3092,12 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -3139,12 +3139,12 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7);
@@ -3186,13 +3186,13 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -3235,13 +3235,13 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8);
@@ -3284,14 +3284,14 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -3335,14 +3335,14 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9);
@@ -3386,15 +3386,15 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
-    typename traits::arg_get_type<T10>::type t10 = lua_type_traits<T10>::get(state,10);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T10>::get_type t10 = lua_type_traits<T10>::get(state,10);
    T1* ptr = lua_type_traits< T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -3439,15 +3439,15 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
-    typename traits::arg_get_type<T10>::type t10 = lua_type_traits<T10>::get(state,10);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T10>::get_type t10 = lua_type_traits<T10>::get(state,10);
   const T1* ptr = lua_type_traits<const T1*>::get(state, 1);
   if(!ptr){return 0;}
     (ptr->*func_)(t2,t3,t4,t5,t6,t7,t8,t9,t10);
@@ -3509,7 +3509,7 @@ struct ConstructorInvoker1:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1);
@@ -3536,8 +3536,8 @@ struct ConstructorInvoker2:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2);
@@ -3565,9 +3565,9 @@ struct ConstructorInvoker3:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3);
@@ -3596,10 +3596,10 @@ struct ConstructorInvoker4:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3,t4);
@@ -3629,11 +3629,11 @@ struct ConstructorInvoker5:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3,t4,t5);
@@ -3664,12 +3664,12 @@ struct ConstructorInvoker6:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3,t4,t5,t6);
@@ -3701,13 +3701,13 @@ struct ConstructorInvoker7:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3,t4,t5,t6,t7);
@@ -3740,14 +3740,14 @@ struct ConstructorInvoker8:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3,t4,t5,t6,t7,t8);
@@ -3781,15 +3781,15 @@ struct ConstructorInvoker9:BaseInvoker{
   }
   virtual int invoke(lua_State *state)
   {
-    typename traits::arg_get_type<T1>::type t1 = lua_type_traits<T1>::get(state,1);
-    typename traits::arg_get_type<T2>::type t2 = lua_type_traits<T2>::get(state,2);
-    typename traits::arg_get_type<T3>::type t3 = lua_type_traits<T3>::get(state,3);
-    typename traits::arg_get_type<T4>::type t4 = lua_type_traits<T4>::get(state,4);
-    typename traits::arg_get_type<T5>::type t5 = lua_type_traits<T5>::get(state,5);
-    typename traits::arg_get_type<T6>::type t6 = lua_type_traits<T6>::get(state,6);
-    typename traits::arg_get_type<T7>::type t7 = lua_type_traits<T7>::get(state,7);
-    typename traits::arg_get_type<T8>::type t8 = lua_type_traits<T8>::get(state,8);
-    typename traits::arg_get_type<T9>::type t9 = lua_type_traits<T9>::get(state,9);
+    typename lua_type_traits<T1>::get_type t1 = lua_type_traits<T1>::get(state,1);
+    typename lua_type_traits<T2>::get_type t2 = lua_type_traits<T2>::get(state,2);
+    typename lua_type_traits<T3>::get_type t3 = lua_type_traits<T3>::get(state,3);
+    typename lua_type_traits<T4>::get_type t4 = lua_type_traits<T4>::get(state,4);
+    typename lua_type_traits<T5>::get_type t5 = lua_type_traits<T5>::get(state,5);
+    typename lua_type_traits<T6>::get_type t6 = lua_type_traits<T6>::get(state,6);
+    typename lua_type_traits<T7>::get_type t7 = lua_type_traits<T7>::get(state,7);
+    typename lua_type_traits<T8>::get_type t8 = lua_type_traits<T8>::get(state,8);
+    typename lua_type_traits<T9>::get_type t9 = lua_type_traits<T9>::get(state,9);
   typedef ObjectWrapper<CLASS> wrapper_type;
   void *storage = lua_newuserdata(state, sizeof(wrapper_type));
     new(storage) wrapper_type(t1,t2,t3,t4,t5,t6,t7,t8,t9);

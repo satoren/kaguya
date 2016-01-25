@@ -9,7 +9,7 @@ def args(out,arg_num,name,argoffset=0):
 
 def get_call(out,arg_num,offset=0):
 	for i in range (offset + 1,arg_num + 1):
-		out.write('    typename traits::arg_get_type<T'+str(i) +'>::type t' +str(i) +' = lua_type_traits<T'+ str(i) + '>::get(state,' + str(i) + ');\n')
+		out.write('    typename lua_type_traits<T'+str(i) +'>::get_type t' +str(i) +' = lua_type_traits<T'+ str(i) + '>::get(state,' + str(i) + ');\n')
 
 def strictCheckType(out,arg_num,offset=0,customcheck=""):
 	out.write('  virtual bool checktype(lua_State *state,bool strictcheck){\n')

@@ -10,6 +10,12 @@
 
 namespace kaguya
 {
+	namespace types
+	{
+		template<typename T>
+		struct typetag {};
+	}
+
 #define KAGUYA_METATABLE_PREFIX "kaguya_object_type_"
 	template<typename T>
 	inline const std::string& metatableName()
