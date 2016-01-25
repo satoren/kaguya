@@ -246,7 +246,7 @@ namespace kaguya
 		template<typename T>
 		LuaRef newRef(T value)
 		{
-			return LuaRef(state_, value);
+			return LuaRef(state_, standard::forward<T>(value));
 		}
 
 		//! return new Lua table

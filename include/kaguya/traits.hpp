@@ -75,6 +75,9 @@ namespace kaguya
 		static get_type get(lua_State* l, int index);
 		static int push(lua_State* l, push_type v);
 		static int push(lua_State* l, NCRT& v);
+#if KAGUYA_USE_RVALUE_REFERENCE
+		static int push(lua_State* l, NCRT&& v);
+#endif
 	};
 
 	template< typename T, typename Enable = void>

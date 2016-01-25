@@ -150,7 +150,7 @@ namespace kaguya
 		template<typename T>
 		TableKeyReference& operator=(T src)
 		{
-			parent_.setField(key_, src);
+			parent_.setField(key_, standard::forward<T>(src));
 			return *this;
 		}
 

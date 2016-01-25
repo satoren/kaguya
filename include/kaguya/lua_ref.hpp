@@ -580,7 +580,7 @@ namespace kaguya
 		template<typename T>
 		void setField(int key, T value)
 		{
-			setFieldImpl<int, T>(key, value);
+			setFieldImpl<int, T>(key, standard::forward<T>(value));
 		}
 
 		/**
@@ -589,7 +589,7 @@ namespace kaguya
 		template<typename T>
 		void setField(const char* key, T value)
 		{
-			setFieldImpl<const char*, T>(key, value);
+			setFieldImpl<const char*, T>(key, standard::forward<T>(value));
 		}
 		/**
 		* @brief table[key] = value;
@@ -597,7 +597,7 @@ namespace kaguya
 		template<typename T>
 		void setField(const std::string& key, T value)
 		{
-			setField(key.c_str(), value);
+			setField(key.c_str(), standard::forward<T>(value));
 		}
 
 		/**
@@ -606,7 +606,7 @@ namespace kaguya
 		template<typename T>
 		void setField(const LuaRef& key, T value)
 		{
-			setFieldImpl<LuaRef, T>(key, value);
+			setFieldImpl<LuaRef, T>(key, standard::forward<T>(value));
 		}
 
 		/**

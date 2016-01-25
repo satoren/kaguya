@@ -378,6 +378,40 @@ namespace t_02_classreg
 		TEST_CHECK(noncpyref == &noncopy);
 	}
 
+#if KAGUYA_USE_CPP11
+
+	struct MoveOnlyClass
+	{
+		MoveOnlyClass(int i) :member(i) {}
+		int member;
+
+		MoveOnlyClass(MoveOnlyClass&& src) :member(src.member) {}
+	private:
+		MoveOnlyClass();
+		MoveOnlyClass(const MoveOnlyClass&);
+		MoveOnlyClass& operator=(const MoveOnlyClass&);
+	};
+	void movable_class_test(kaguya::State& state)
+	{
+		state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
+			.addConstructor<int>()
+			.addProperty("member",&MoveOnlyClass::member)
+			);
+
+		state["moveonly"] = MoveOnlyClass(2);
+
+		const MoveOnlyClass* ref = state["moveonly"];
+		TEST_CHECK(ref->member == 2);
+
+		state("func =function(arg) return assert(arg.member == 5) end");
+		state["func"](MoveOnlyClass(5));
+
+		state.newRef(MoveOnlyClass(5));
+	}
+
+#endif
+
+
 	void registering_object_instance(kaguya::State& state)
 	{
 		state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -1389,14 +1423,6 @@ int main()
 		ADD_TEST(t_01_primitive::table_set);
 		ADD_TEST(t_01_primitive::enum_set);
 		ADD_TEST(t_01_primitive::enum_get);
-
-
-#if KAGUYA_USE_CPP11
-		ADD_TEST(t_01_primitive::enum_class_set);
-		ADD_TEST(t_01_primitive::enum_class_get);
-#endif
-
-		
 		ADD_TEST(t_02_classreg::default_constructor);
 		ADD_TEST(t_02_classreg::int_constructor);
 		ADD_TEST(t_02_classreg::string_constructor);
@@ -1412,9 +1438,6 @@ int main()
 		ADD_TEST(t_02_classreg::registering_shared_ptr);
 		ADD_TEST(t_02_classreg::add_property);
 		ADD_TEST(t_02_classreg::add_property_ref_check);
-		
-		
-
 		ADD_TEST(t_03_function::free_standing_function_test);
 		ADD_TEST(t_03_function::member_function_test);
 		ADD_TEST(t_03_function::variadic_function_test);
@@ -1424,10 +1447,6 @@ int main()
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
 		ADD_TEST(t_03_function::arg_class_ref);
-#if KAGUYA_USE_CPP11
-		ADD_TEST(t_03_function::lambdafun);
-#endif
-
 		ADD_TEST(t_04_lua_ref::access);
 		ADD_TEST(t_04_lua_ref::newtable);
 		ADD_TEST(t_04_lua_ref::callfunction);
@@ -1440,14 +1459,10 @@ int main()
 		ADD_TEST(t_04_lua_ref::lua_table_get);
 		ADD_TEST(t_04_lua_ref::lua_table_set);
 		ADD_TEST(t_04_lua_ref::lua_table_reference);
-
 		ADD_TEST(t_04_lua_ref::luafun_loadstring);
-
 		ADD_TEST(t_04_lua_ref::metatable);
-
 		ADD_TEST(t_05_error_handler::set_error_function);
 		ADD_TEST(t_05_error_handler::function_call_error);
-
 		ADD_TEST(t_06_state::other_state);
 		ADD_TEST(t_06_state::load_string);
 		ADD_TEST(t_06_state::load_with_other_env);
@@ -1455,6 +1470,15 @@ int main()
 		ADD_TEST(t_06_state::load_lib_constructor);
 		
 		ADD_TEST(t_07_any_type_test::any_type_test);
+
+
+
+#if KAGUYA_USE_CPP11
+		ADD_TEST(t_01_primitive::enum_class_set);
+		ADD_TEST(t_01_primitive::enum_class_get);
+		ADD_TEST(t_02_classreg::movable_class_test);
+		ADD_TEST(t_03_function::lambdafun);
+#endif
 
 		test_result = execute_test(testmap);
 	}
