@@ -496,7 +496,31 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(3 == derived.b)"));
 		TEST_CHECK(derived.b == 3);
 	}
-	
+
+	struct Prop
+	{
+		Prop() :a(0){}
+		int a;
+	};
+	struct PropHolder
+	{
+		Prop mem;
+	};
+	void add_property_ref_check(kaguya::State& state)
+	{
+		state["Prop"].setClass(kaguya::ClassMetatable<Prop>()
+			.addProperty("a", &Prop::a)
+			);
+
+		state["PropHolder"].setClass(kaguya::ClassMetatable<PropHolder>()
+			.addProperty("mem", &PropHolder::mem)
+			);
+
+		PropHolder prop;
+		state["prop"] = &prop;
+		TEST_CHECK(state("prop.mem.a=455"));
+		TEST_CHECK(prop.mem.a == 455);
+	}
 }
 
 namespace t_03_function
@@ -1387,6 +1411,8 @@ int main()
 		ADD_TEST(t_02_classreg::registering_derived_class);
 		ADD_TEST(t_02_classreg::registering_shared_ptr);
 		ADD_TEST(t_02_classreg::add_property);
+		ADD_TEST(t_02_classreg::add_property_ref_check);
+		
 		
 
 		ADD_TEST(t_03_function::free_standing_function_test);
