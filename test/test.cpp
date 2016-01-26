@@ -453,10 +453,21 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(5 == receive_shared_ptr_function(derived))"));
 		TEST_CHECK(derived->b == 5);
 	}
+
+	struct shared_ptr_fun
+	{
+		kaguya::standard::shared_ptr<int>& ptr;
+		shared_ptr_fun(kaguya::standard::shared_ptr<int>& r):ptr(r){}
+		void operator()(kaguya::standard::shared_ptr<int> p)
+		{
+			ptr = p;
+		}
+	};
+
 	void shared_ptr_null(kaguya::State& state)
 	{
 		kaguya::standard::shared_ptr<int> ptr(new int(5));
-		state["foo"] = kaguya::function([&](kaguya::standard::shared_ptr<int> p) { ptr = p; });
+		state["foo"] = kaguya::function(kaguya::standard::function<void(kaguya::standard::shared_ptr<int>)>(shared_ptr_fun(ptr)));
 		state("foo(nil)");
 		TEST_CHECK(ptr == 0);
 	}
