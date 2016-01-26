@@ -455,10 +455,10 @@ namespace t_02_classreg
 	}
 	void shared_ptr_null(kaguya::State& state)
 	{
-		kaguya::standard::shared_ptr<int> ptr;
+		kaguya::standard::shared_ptr<int> ptr(new int(5));
 		state["foo"] = kaguya::function([&](kaguya::standard::shared_ptr<int> p) { ptr = p; });
 		state("foo(nil)");
-		TEST_CHECK(ptr == nullptr);
+		TEST_CHECK(ptr == 0);
 	}
 	
 

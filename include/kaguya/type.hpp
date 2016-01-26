@@ -223,7 +223,7 @@ namespace kaguya
 		static get_type get(lua_State* l, int index)
 		{
 			if (lua_type(l, index) == LUA_TNIL) {
-				return 0;
+				return get_type();
 			}
 			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
 			if (!pointer)
