@@ -77,27 +77,6 @@ namespace t_01_primitive
 		state("value = 1");
 		TEST_CHECK(state["value"] == Bar);
 	};
-
-#if KAGUYA_USE_CPP11
-
-	enum class testenumclass
-	{
-		Foo = 0,
-		Bar = 1,
-	};
-
-
-	void enum_class_set(kaguya::State& state)
-	{
-		state["value"] = testenumclass::Foo;
-		TEST_CHECK(state("assert(value == 0)"));
-	};
-	void enum_class_get(kaguya::State& state)
-	{
-		state("value = 1");
-		TEST_CHECK(state["value"] == testenumclass::Bar);
-	};
-#endif
 }
 
 namespace t_02_classreg
@@ -378,38 +357,6 @@ namespace t_02_classreg
 		TEST_CHECK(noncpyref == &noncopy);
 	}
 
-#if KAGUYA_USE_CPP11
-
-	struct MoveOnlyClass
-	{
-		MoveOnlyClass(int i) :member(i) {}
-		int member;
-
-		MoveOnlyClass(MoveOnlyClass&& src) :member(src.member) {}
-	private:
-		MoveOnlyClass();
-		MoveOnlyClass(const MoveOnlyClass&);
-		MoveOnlyClass& operator=(const MoveOnlyClass&);
-	};
-	void movable_class_test(kaguya::State& state)
-	{
-		state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
-			.addConstructor<int>()
-			.addProperty("member",&MoveOnlyClass::member)
-			);
-
-		state["moveonly"] = MoveOnlyClass(2);
-
-		const MoveOnlyClass* ref = state["moveonly"];
-		TEST_CHECK(ref->member == 2);
-
-		state("func =function(arg) return assert(arg.member == 5) end");
-		state["func"](MoveOnlyClass(5));
-
-		state.newRef(MoveOnlyClass(5));
-	}
-
-#endif
 
 
 	void registering_object_instance(kaguya::State& state)
@@ -506,6 +453,14 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(5 == receive_shared_ptr_function(derived))"));
 		TEST_CHECK(derived->b == 5);
 	}
+	void shared_ptr_null(kaguya::State& state)
+	{
+		kaguya::standard::shared_ptr<int> ptr;
+		state["foo"] = kaguya::function([&](kaguya::standard::shared_ptr<int> p) { ptr = p; });
+		state("foo(nil)");
+		TEST_CHECK(ptr == nullptr);
+	}
+	
 
 
 	void add_property(kaguya::State& state)
@@ -779,7 +734,7 @@ namespace t_03_function
 	{
 		TEST_CHECK(pointer == 0);
 	}
-	void const_pointerfun(VariFoo* pointer)
+	void const_pointerfun(const VariFoo* pointer)
 	{
 		TEST_CHECK(pointer == 0);
 	}
@@ -790,8 +745,10 @@ namespace t_03_function
 	{
 		state["pointerfun"] = kaguya::function(pointerfun);
 		TEST_CHECK(state("pointerfun(0)"));
+		TEST_CHECK(state("pointerfun(nil)"));
 		state["const_pointerfun"] = kaguya::function(const_pointerfun);
 		TEST_CHECK(state("const_pointerfun(0)"));
+		TEST_CHECK(state("const_pointerfun(nil)"));
 
 		state.setErrorHandler(ignore_error_fun);
 		TEST_CHECK(!state("pointerfun(32)"));// is error
@@ -816,18 +773,6 @@ namespace t_03_function
 		TEST_CHECK(foo.bar == "BarBar");
 	}
 	
-
-#if KAGUYA_USE_CPP11
-	void lambdafun(kaguya::State& state)
-	{
-		state["ABC"] = kaguya::function([](int a) {return a * 2; });
-		int a = state["ABC"](54);
-		TEST_CHECK(a == 108);
-
-		state["free2"] = kaguya::function([]() {return 12; });
-		TEST_CHECK(state["free2"]() == 12.0);
-	}
-#endif
 
 	enum TestEnum
 	{
@@ -1321,6 +1266,95 @@ namespace t_07_any_type_test
 		}
 	}
 }
+
+#if KAGUYA_USE_CPP11
+
+namespace t_08_cxx11_feature
+{
+
+	enum class testenumclass
+	{
+		Foo = 0,
+		Bar = 1,
+	};
+
+
+	void enum_class_set(kaguya::State& state)
+	{
+		state["value"] = testenumclass::Foo;
+		TEST_CHECK(state("assert(value == 0)"));
+	};
+	void enum_class_get(kaguya::State& state)
+	{
+		state("value = 1");
+		TEST_CHECK(state["value"] == testenumclass::Bar);
+	};
+
+
+
+	struct MoveOnlyClass
+	{
+		MoveOnlyClass(int i) :member(i) {}
+		int member;
+
+		MoveOnlyClass(MoveOnlyClass&& src) :member(src.member) {}
+	private:
+		MoveOnlyClass();
+		MoveOnlyClass(const MoveOnlyClass&);
+		MoveOnlyClass& operator=(const MoveOnlyClass&);
+	};
+	void movable_class_test(kaguya::State& state)
+	{
+		state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
+			.addConstructor<int>()
+			.addProperty("member", &MoveOnlyClass::member)
+			);
+
+		state["moveonly"] = MoveOnlyClass(2);
+
+		const MoveOnlyClass* ref = state["moveonly"];
+		TEST_CHECK(ref->member == 2);
+
+		state("func =function(arg) return assert(arg.member == 5) end");
+		state["func"](MoveOnlyClass(5));
+
+		state.newRef(MoveOnlyClass(5));
+	}
+
+	void lambdafun(kaguya::State& state)
+	{
+		state["ABC"] = kaguya::function([](int a) {return a * 2; });
+		int a = state["ABC"](54);
+		TEST_CHECK(a == 108);
+
+		state["free2"] = kaguya::function([]() {return 12; });
+		TEST_CHECK(state["free2"]() == 12.0);
+	}
+
+	void put_unique_ptr(kaguya::State& state)
+	{
+		state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
+			.addConstructor<int>()
+			.addProperty("member", &MoveOnlyClass::member)
+			);
+
+		state["uniqueptr"] = std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(2));
+
+		const MoveOnlyClass* ref = state["uniqueptr"];
+		TEST_CHECK(ref->member == 2);
+
+		state("func =function(arg) return assert(arg.member == 5) end");
+		TEST_CHECK(state["func"](std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(5))) == true);
+
+	}
+	void compare_null_ptr(kaguya::State& state)
+	{
+		kaguya::LuaRef nullref = state.newRef(nullptr);
+		TEST_CHECK(nullref == nullptr);
+	}
+}
+#endif
+
 void test_error_handler(int status, const char* message)
 {
 	throw std::runtime_error(std::string(message));
@@ -1436,6 +1470,7 @@ int main()
 		ADD_TEST(t_02_classreg::registering_object_instance);
 		ADD_TEST(t_02_classreg::registering_derived_class);
 		ADD_TEST(t_02_classreg::registering_shared_ptr);
+		ADD_TEST(t_02_classreg::shared_ptr_null);
 		ADD_TEST(t_02_classreg::add_property);
 		ADD_TEST(t_02_classreg::add_property_ref_check);
 		ADD_TEST(t_03_function::free_standing_function_test);
@@ -1474,10 +1509,16 @@ int main()
 
 
 #if KAGUYA_USE_CPP11
-		ADD_TEST(t_01_primitive::enum_class_set);
-		ADD_TEST(t_01_primitive::enum_class_get);
-		ADD_TEST(t_02_classreg::movable_class_test);
-		ADD_TEST(t_03_function::lambdafun);
+		ADD_TEST(t_08_cxx11_feature::enum_class_set);
+		ADD_TEST(t_08_cxx11_feature::enum_class_get);
+		ADD_TEST(t_08_cxx11_feature::movable_class_test);
+		ADD_TEST(t_08_cxx11_feature::lambdafun);
+
+		ADD_TEST(t_08_cxx11_feature::put_unique_ptr);
+		
+		ADD_TEST(t_08_cxx11_feature::compare_null_ptr);
+
+		
 #endif
 
 		test_result = execute_test(testmap);

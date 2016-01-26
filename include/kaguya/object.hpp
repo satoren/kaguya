@@ -157,6 +157,10 @@ namespace kaguya
 		T object;
 
 		ObjectSmartPointerWrapper(const T& sptr) :object(sptr) {}
+#if KAGUYA_USE_RVALUE_REFERENCE
+		ObjectSmartPointerWrapper(T&& sptr) : object(std::move(sptr)) {}
+#endif
+
 
 		virtual bool is_native_type(const std::string& type)
 		{

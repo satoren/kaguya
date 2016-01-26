@@ -132,6 +132,7 @@ namespace kaguya
 		{
 			int type = lua_type(l, index);
 			if (type == LUA_TLIGHTUSERDATA
+				|| type == LUA_TNIL
 				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
 			{
 				return true;
@@ -211,7 +212,8 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>()) != 0;
+			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
+				lua_type(l, index) == LUA_TNIL;
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
@@ -219,6 +221,9 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
+			if (lua_type(l, index) == LUA_TNIL) {
+				return 0;
+			}
 			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
 			if (!pointer)
 			{
@@ -236,6 +241,72 @@ namespace kaguya
 			return 1;
 		}
 	};
+
+#if KAGUYA_USE_CPP11
+	///! traits for unique_ptr
+	template<typename T,typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
+		typedef std::unique_ptr<T, Deleter>&& push_type;
+		typedef std::unique_ptr<T, Deleter> get_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
+				lua_type(l, index) == LUA_TNIL;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<get_type>()) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (lua_type(l, index) == LUA_TNIL) {
+				return 0;
+			}
+			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
+			if (!pointer)
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return *pointer;
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			typedef ObjectSmartPointerWrapper<std::unique_ptr<T,Deleter> > wrapper_type;
+			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+			new(storage) wrapper_type(standard::forward<push_type>(v));
+			class_userdata::setmetatable<T>(l);
+			return 1;
+		}
+	};
+	///! traits for nullptr
+	template<>	struct lua_type_traits<std::nullptr_t> {
+		typedef void* push_type;
+		typedef std::nullptr_t get_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TNIL;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TNIL;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (lua_type(l, index) != LUA_TNIL) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return nullptr;
+		}
+
+		static int push(lua_State* l, push_type&& v)
+		{
+			lua_pushnil(l);
+			return 1;
+		}
+	};
+#endif
 
 	///! traits for 
 	template<>	struct lua_type_traits<ObjectWrapperBase*> {
