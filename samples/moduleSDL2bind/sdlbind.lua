@@ -16,7 +16,7 @@ while not quit do
 	end
   end
   SDL.RenderClear(renderer);
-  SDL.RenderCopy(renderer, bitmapTex, 0, 0);
+  SDL.RenderCopy(renderer, bitmapTex, nil, nil);
   SDL.RenderPresent(renderer);
 end
 

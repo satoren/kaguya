@@ -61,7 +61,7 @@ end
 	}
 
     -- Create a windowed mode window and its OpenGL context
-    window = glfw.window.new(640, 480, "Hello World", 0, 0);
+    window = glfw.window.new(640, 480, "Hello World", nil, nil);
     if (window == nil) then
         glfw.Terminate();
         return -1;

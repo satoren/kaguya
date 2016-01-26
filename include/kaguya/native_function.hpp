@@ -15,8 +15,10 @@ namespace kaguya
 
 	namespace nativefunction
 	{
+		enum { MULTI_ARG = -1 };
 		struct BaseInvoker
 		{
+			virtual int argsCount()const = 0;
 			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
 			virtual std::string argumentTypeNames() = 0;
@@ -47,6 +49,7 @@ namespace kaguya
 				typedef MemType ClassType::*data_type;
 				data_type data_;
 				MemDataInvoker(data_type data) :data_(data) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strictcheck) {
 					if (lua_gettop(state) != 1 && lua_gettop(state) != 2) { return false; }
 					if (lua_type_traits<ClassType*>::checkType(state, 1) == 0) { return false; }
@@ -103,6 +106,7 @@ namespace kaguya
 				typedef Ret(*func_type)(VariadicArgType);
 				func_type func_;
 				VariadicArgInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -131,6 +135,7 @@ namespace kaguya
 				typedef void(*func_type)(VariadicArgType);
 				func_type func_;
 				VariadicArgVoidInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -160,6 +165,7 @@ namespace kaguya
 				typedef Ret(T::*func_type)(VariadicArgType);
 				func_type func_;
 				VariadicArgMemFunInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -198,6 +204,7 @@ namespace kaguya
 				typedef void (T::*func_type)(VariadicArgType);
 				func_type func_;
 				VariadicArgMemVoidFunInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -235,6 +242,7 @@ namespace kaguya
 				typedef Ret(T::*func_type)(VariadicArgType)const;
 				func_type func_;
 				VariadicArgConstMemFunInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -271,6 +279,7 @@ namespace kaguya
 				typedef void (T::*func_type)(VariadicArgType)const;
 				func_type func_;
 				VariadicArgConstMemVoidFunInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -307,6 +316,7 @@ namespace kaguya
 				typedef standard::function<Ret(VariadicArgType)> func_type;
 				func_type func_;
 				VariadicArgFunInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -335,6 +345,7 @@ namespace kaguya
 				typedef standard::function<void(VariadicArgType)> func_type;
 				func_type func_;
 				VariadicArgVoidFunInvoker(func_type fun) :func_(fun) {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 				virtual int invoke(lua_State *state)
 				{
@@ -361,6 +372,7 @@ namespace kaguya
 			template<typename CLASS>
 			struct VariadicArgConstructorInvoker :BaseInvoker {
 				VariadicArgConstructorInvoker() {}
+				virtual int argsCount()const { return MULTI_ARG; }
 				virtual bool checktype(lua_State *state, bool strict_check) { return !strict_check; }
 
 				virtual int invoke(lua_State *state)
@@ -386,6 +398,7 @@ namespace kaguya
 
 		inline FunctorType* pick_match_function(lua_State *l)
 		{
+			int argcount = lua_gettop(l);
 			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 
 			if (overloadnum == 1)
@@ -399,6 +412,7 @@ namespace kaguya
 				return fun;
 			}
 			FunctorType* weak_match = 0;
+			FunctorType* argcount_unmatch = 0;
 			for (int i = 0; i < overloadnum; ++i)
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
@@ -406,16 +420,25 @@ namespace kaguya
 				{
 					continue;
 				}
-				if ((*fun)->checktype(l, true))
+				int fnarg = (*fun)->argsCount();
+				bool match_argcount = fnarg == argcount || fnarg == MULTI_ARG;
+				if (match_argcount && (*fun)->checktype(l, true))
 				{
 					return fun;
 				}
 				else if (weak_match == 0 && (*fun)->checktype(l, false))
 				{
-					weak_match = fun;
+					if (match_argcount)
+					{
+						weak_match = fun;
+					}
+					else
+					{
+						argcount_unmatch = fun;
+					}
 				}
 			}
-			return weak_match;
+			return weak_match?weak_match: argcount_unmatch;
 		}
 		inline std::string build_arg_error_message(lua_State *l)
 		{

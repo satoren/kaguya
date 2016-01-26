@@ -133,6 +133,7 @@ namespace kaguya
 			int type = lua_type(l, index);
 			if (type == LUA_TLIGHTUSERDATA
 				|| type == LUA_TNIL
+				|| type == LUA_TNONE
 				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
 			{
 				return true;
@@ -286,7 +287,8 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
-			return lua_type(l, index) == LUA_TNIL;
+			int type = lua_type(l, index);
+			return type == LUA_TNIL || type == LUA_TNONE;
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
@@ -294,7 +296,8 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (lua_type(l, index) != LUA_TNIL) {
+			int type = lua_type(l, index);
+			if (type != LUA_TNIL && type != LUA_TNONE) {
 				throw LuaTypeMismatch("type mismatch!!");
 			}
 			return nullptr;

@@ -1,12 +1,11 @@
 //generated header by function_generator.py
 template<typename Ret>
-
 struct StdFunInvoker0:BaseInvoker{
   typedef standard::function<Ret()> func_type;
   func_type func_;
   StdFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 0;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 0){return false;}
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -20,23 +19,20 @@ struct StdFunInvoker0:BaseInvoker{
   }
 };
 template<typename Ret>
-
 inline base_ptr_ create(standard::function<Ret()> fun)
 {
-  typedef StdFunInvoker0<Ret>
- InvokerType;
+  typedef StdFunInvoker0<Ret> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1>
-
 struct StdFunInvoker1:BaseInvoker{
   typedef standard::function<Ret(T1)> func_type;
   func_type func_;
   StdFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)){return false;}
   }else{
@@ -57,23 +53,20 @@ struct StdFunInvoker1:BaseInvoker{
   }
 };
 template<typename Ret,typename T1>
-
 inline base_ptr_ create(standard::function<Ret(T1)> fun)
 {
-  typedef StdFunInvoker1<Ret,T1>
- InvokerType;
+  typedef StdFunInvoker1<Ret,T1> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2>
-
 struct StdFunInvoker2:BaseInvoker{
   typedef standard::function<Ret(T1,T2)> func_type;
   func_type func_;
   StdFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
   }else{
@@ -96,23 +89,20 @@ struct StdFunInvoker2:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2)> fun)
 {
-  typedef StdFunInvoker2<Ret,T1,T2>
- InvokerType;
+  typedef StdFunInvoker2<Ret,T1,T2> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3>
-
 struct StdFunInvoker3:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3)> func_type;
   func_type func_;
   StdFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
   }else{
@@ -137,23 +127,20 @@ struct StdFunInvoker3:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3)> fun)
 {
-  typedef StdFunInvoker3<Ret,T1,T2,T3>
- InvokerType;
+  typedef StdFunInvoker3<Ret,T1,T2,T3> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 struct StdFunInvoker4:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4)> func_type;
   func_type func_;
   StdFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
   }else{
@@ -180,23 +167,20 @@ struct StdFunInvoker4:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3,T4)> fun)
 {
-  typedef StdFunInvoker4<Ret,T1,T2,T3,T4>
- InvokerType;
+  typedef StdFunInvoker4<Ret,T1,T2,T3,T4> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 struct StdFunInvoker5:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5)> func_type;
   func_type func_;
   StdFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
   }else{
@@ -225,23 +209,20 @@ struct StdFunInvoker5:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3,T4,T5)> fun)
 {
-  typedef StdFunInvoker5<Ret,T1,T2,T3,T4,T5>
- InvokerType;
+  typedef StdFunInvoker5<Ret,T1,T2,T3,T4,T5> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 struct StdFunInvoker6:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6)> func_type;
   func_type func_;
   StdFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
   }else{
@@ -272,23 +253,20 @@ struct StdFunInvoker6:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3,T4,T5,T6)> fun)
 {
-  typedef StdFunInvoker6<Ret,T1,T2,T3,T4,T5,T6>
- InvokerType;
+  typedef StdFunInvoker6<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 struct StdFunInvoker7:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6,T7)> func_type;
   func_type func_;
   StdFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
   }else{
@@ -321,23 +299,20 @@ struct StdFunInvoker7:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7)> fun)
 {
-  typedef StdFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7>
- InvokerType;
+  typedef StdFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 struct StdFunInvoker8:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8)> func_type;
   func_type func_;
   StdFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
   }else{
@@ -372,23 +347,20 @@ struct StdFunInvoker8:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8)> fun)
 {
-  typedef StdFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
- InvokerType;
+  typedef StdFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 struct StdFunInvoker9:BaseInvoker{
   typedef standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8,T9)> func_type;
   func_type func_;
   StdFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
   }else{
@@ -425,11 +397,9 @@ struct StdFunInvoker9:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 inline base_ptr_ create(standard::function<Ret(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun)
 {
-  typedef StdFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
- InvokerType;
+  typedef StdFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
@@ -438,8 +408,8 @@ struct VoidStdFunInvoker0:BaseInvoker{
   typedef standard::function<void()> func_type;
   func_type func_;
   VoidStdFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 0;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 0){return false;}
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -464,8 +434,8 @@ struct VoidStdFunInvoker1:BaseInvoker{
   typedef standard::function<void(T1)> func_type;
   func_type func_;
   VoidStdFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)){return false;}
   }else{
@@ -498,8 +468,8 @@ struct VoidStdFunInvoker2:BaseInvoker{
   typedef standard::function<void(T1,T2)> func_type;
   func_type func_;
   VoidStdFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
   }else{
@@ -534,8 +504,8 @@ struct VoidStdFunInvoker3:BaseInvoker{
   typedef standard::function<void(T1,T2,T3)> func_type;
   func_type func_;
   VoidStdFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
   }else{
@@ -572,8 +542,8 @@ struct VoidStdFunInvoker4:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4)> func_type;
   func_type func_;
   VoidStdFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
   }else{
@@ -612,8 +582,8 @@ struct VoidStdFunInvoker5:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5)> func_type;
   func_type func_;
   VoidStdFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
   }else{
@@ -654,8 +624,8 @@ struct VoidStdFunInvoker6:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6)> func_type;
   func_type func_;
   VoidStdFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
   }else{
@@ -698,8 +668,8 @@ struct VoidStdFunInvoker7:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6,T7)> func_type;
   func_type func_;
   VoidStdFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
   }else{
@@ -744,8 +714,8 @@ struct VoidStdFunInvoker8:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8)> func_type;
   func_type func_;
   VoidStdFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
   }else{
@@ -792,8 +762,8 @@ struct VoidStdFunInvoker9:BaseInvoker{
   typedef standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> func_type;
   func_type func_;
   VoidStdFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
   }else{
@@ -838,13 +808,12 @@ inline base_ptr_ create(standard::function<void(T1,T2,T3,T4,T5,T6,T7,T8,T9)> fun
 
 
 template<typename Ret>
-
 struct FunInvoker0:BaseInvoker{
   typedef Ret (*func_type)();
   func_type func_;
   FunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 0;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 0){return false;}
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -858,23 +827,20 @@ struct FunInvoker0:BaseInvoker{
   }
 };
 template<typename Ret>
-
 inline base_ptr_ create(Ret (*fun)())
 {
-  typedef FunInvoker0<Ret>
- InvokerType;
+  typedef FunInvoker0<Ret> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1>
-
 struct FunInvoker1:BaseInvoker{
   typedef Ret (*func_type)(T1);
   func_type func_;
   FunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)){return false;}
   }else{
@@ -895,23 +861,20 @@ struct FunInvoker1:BaseInvoker{
   }
 };
 template<typename Ret,typename T1>
-
 inline base_ptr_ create(Ret (*fun)(T1))
 {
-  typedef FunInvoker1<Ret,T1>
- InvokerType;
+  typedef FunInvoker1<Ret,T1> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2>
-
 struct FunInvoker2:BaseInvoker{
   typedef Ret (*func_type)(T1,T2);
   func_type func_;
   FunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
   }else{
@@ -934,23 +897,20 @@ struct FunInvoker2:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2))
 {
-  typedef FunInvoker2<Ret,T1,T2>
- InvokerType;
+  typedef FunInvoker2<Ret,T1,T2> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3>
-
 struct FunInvoker3:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3);
   func_type func_;
   FunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
   }else{
@@ -975,23 +935,20 @@ struct FunInvoker3:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3))
 {
-  typedef FunInvoker3<Ret,T1,T2,T3>
- InvokerType;
+  typedef FunInvoker3<Ret,T1,T2,T3> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 struct FunInvoker4:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3,T4);
   func_type func_;
   FunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
   }else{
@@ -1018,23 +975,20 @@ struct FunInvoker4:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3,T4))
 {
-  typedef FunInvoker4<Ret,T1,T2,T3,T4>
- InvokerType;
+  typedef FunInvoker4<Ret,T1,T2,T3,T4> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 struct FunInvoker5:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3,T4,T5);
   func_type func_;
   FunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
   }else{
@@ -1063,23 +1017,20 @@ struct FunInvoker5:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3,T4,T5))
 {
-  typedef FunInvoker5<Ret,T1,T2,T3,T4,T5>
- InvokerType;
+  typedef FunInvoker5<Ret,T1,T2,T3,T4,T5> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 struct FunInvoker6:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6);
   func_type func_;
   FunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
   }else{
@@ -1110,23 +1061,20 @@ struct FunInvoker6:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3,T4,T5,T6))
 {
-  typedef FunInvoker6<Ret,T1,T2,T3,T4,T5,T6>
- InvokerType;
+  typedef FunInvoker6<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 struct FunInvoker7:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7);
   func_type func_;
   FunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
   }else{
@@ -1159,23 +1107,20 @@ struct FunInvoker7:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7))
 {
-  typedef FunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7>
- InvokerType;
+  typedef FunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 struct FunInvoker8:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8);
   func_type func_;
   FunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
   }else{
@@ -1210,23 +1155,20 @@ struct FunInvoker8:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8))
 {
-  typedef FunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
- InvokerType;
+  typedef FunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 struct FunInvoker9:BaseInvoker{
   typedef Ret (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8,T9);
   func_type func_;
   FunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
   }else{
@@ -1263,11 +1205,9 @@ struct FunInvoker9:BaseInvoker{
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 inline base_ptr_ create(Ret (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
 {
-  typedef FunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
- InvokerType;
+  typedef FunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
@@ -1276,8 +1216,8 @@ struct VoidFunInvoker0:BaseInvoker{
   typedef void (*func_type)();
   func_type func_;
   VoidFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 0;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 0){return false;}
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -1302,8 +1242,8 @@ struct VoidFunInvoker1:BaseInvoker{
   typedef void (*func_type)(T1);
   func_type func_;
   VoidFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)){return false;}
   }else{
@@ -1336,8 +1276,8 @@ struct VoidFunInvoker2:BaseInvoker{
   typedef void (*func_type)(T1,T2);
   func_type func_;
   VoidFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
   }else{
@@ -1372,8 +1312,8 @@ struct VoidFunInvoker3:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3);
   func_type func_;
   VoidFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
   }else{
@@ -1410,8 +1350,8 @@ struct VoidFunInvoker4:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3,T4);
   func_type func_;
   VoidFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
   }else{
@@ -1450,8 +1390,8 @@ struct VoidFunInvoker5:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3,T4,T5);
   func_type func_;
   VoidFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
   }else{
@@ -1492,8 +1432,8 @@ struct VoidFunInvoker6:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3,T4,T5,T6);
   func_type func_;
   VoidFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
   }else{
@@ -1536,8 +1476,8 @@ struct VoidFunInvoker7:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7);
   func_type func_;
   VoidFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
   }else{
@@ -1582,8 +1522,8 @@ struct VoidFunInvoker8:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8);
   func_type func_;
   VoidFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
   }else{
@@ -1630,8 +1570,8 @@ struct VoidFunInvoker9:BaseInvoker{
   typedef void (*func_type)(T1,T2,T3,T4,T5,T6,T7,T8,T9);
   func_type func_;
   VoidFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
   }else{
@@ -1676,13 +1616,12 @@ inline base_ptr_ create(void (*fun)(T1,T2,T3,T4,T5,T6,T7,T8,T9))
 
 
 template<typename Ret,typename T1>
-
 struct MemFunInvoker0:BaseInvoker{
   typedef Ret (T1::*func_type)() ;
   func_type func_;
   MemFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     return true;
   }
@@ -1699,23 +1638,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1>
-
 inline base_ptr_ create(Ret (T1::*fun)() )
 {
-  typedef MemFunInvoker0<Ret,T1>
- InvokerType;
+  typedef MemFunInvoker0<Ret,T1> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1>
-
 struct constMemFunInvoker0:BaseInvoker{
   typedef Ret (T1::*func_type)() const;
   func_type func_;
   constMemFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     return true;
   }
@@ -1732,23 +1668,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1>
-
 inline base_ptr_ create(Ret (T1::*fun)() const)
 {
-  typedef constMemFunInvoker0<Ret,T1>
- InvokerType;
+  typedef constMemFunInvoker0<Ret,T1> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2>
-
 struct MemFunInvoker1:BaseInvoker{
   typedef Ret (T1::*func_type)(T2) ;
   func_type func_;
   MemFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
@@ -1772,23 +1705,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2) )
 {
-  typedef MemFunInvoker1<Ret,T1,T2>
- InvokerType;
+  typedef MemFunInvoker1<Ret,T1,T2> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2>
-
 struct constMemFunInvoker1:BaseInvoker{
   typedef Ret (T1::*func_type)(T2) const;
   func_type func_;
   constMemFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
@@ -1812,23 +1742,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2) const)
 {
-  typedef constMemFunInvoker1<Ret,T1,T2>
- InvokerType;
+  typedef constMemFunInvoker1<Ret,T1,T2> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3>
-
 struct MemFunInvoker2:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3) ;
   func_type func_;
   MemFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
@@ -1854,23 +1781,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3) )
 {
-  typedef MemFunInvoker2<Ret,T1,T2,T3>
- InvokerType;
+  typedef MemFunInvoker2<Ret,T1,T2,T3> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3>
-
 struct constMemFunInvoker2:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3) const;
   func_type func_;
   constMemFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
@@ -1896,23 +1820,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3) const)
 {
-  typedef constMemFunInvoker2<Ret,T1,T2,T3>
- InvokerType;
+  typedef constMemFunInvoker2<Ret,T1,T2,T3> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 struct MemFunInvoker3:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4) ;
   func_type func_;
   MemFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
@@ -1940,23 +1861,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4) )
 {
-  typedef MemFunInvoker3<Ret,T1,T2,T3,T4>
- InvokerType;
+  typedef MemFunInvoker3<Ret,T1,T2,T3,T4> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 struct constMemFunInvoker3:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4) const;
   func_type func_;
   constMemFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
@@ -1984,23 +1902,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4) const)
 {
-  typedef constMemFunInvoker3<Ret,T1,T2,T3,T4>
- InvokerType;
+  typedef constMemFunInvoker3<Ret,T1,T2,T3,T4> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 struct MemFunInvoker4:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5) ;
   func_type func_;
   MemFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
@@ -2030,23 +1945,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5) )
 {
-  typedef MemFunInvoker4<Ret,T1,T2,T3,T4,T5>
- InvokerType;
+  typedef MemFunInvoker4<Ret,T1,T2,T3,T4,T5> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 struct constMemFunInvoker4:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5) const;
   func_type func_;
   constMemFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
@@ -2076,23 +1988,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5) const)
 {
-  typedef constMemFunInvoker4<Ret,T1,T2,T3,T4,T5>
- InvokerType;
+  typedef constMemFunInvoker4<Ret,T1,T2,T3,T4,T5> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 struct MemFunInvoker5:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6) ;
   func_type func_;
   MemFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
@@ -2124,23 +2033,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6) )
 {
-  typedef MemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6>
- InvokerType;
+  typedef MemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 struct constMemFunInvoker5:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6) const;
   func_type func_;
   constMemFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
@@ -2172,23 +2078,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6) const)
 {
-  typedef constMemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6>
- InvokerType;
+  typedef constMemFunInvoker5<Ret,T1,T2,T3,T4,T5,T6> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 struct MemFunInvoker6:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7) ;
   func_type func_;
   MemFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
@@ -2222,23 +2125,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) )
 {
-  typedef MemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7>
- InvokerType;
+  typedef MemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 struct constMemFunInvoker6:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7) const;
   func_type func_;
   constMemFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
@@ -2272,23 +2172,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7) const)
 {
-  typedef constMemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7>
- InvokerType;
+  typedef constMemFunInvoker6<Ret,T1,T2,T3,T4,T5,T6,T7> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 struct MemFunInvoker7:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) ;
   func_type func_;
   MemFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
@@ -2324,23 +2221,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) )
 {
-  typedef MemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
- InvokerType;
+  typedef MemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 struct constMemFunInvoker7:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) const;
   func_type func_;
   constMemFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
@@ -2376,23 +2270,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8) const)
 {
-  typedef constMemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8>
- InvokerType;
+  typedef constMemFunInvoker7<Ret,T1,T2,T3,T4,T5,T6,T7,T8> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 struct MemFunInvoker8:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) ;
   func_type func_;
   MemFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
@@ -2430,23 +2321,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) )
 {
-  typedef MemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
- InvokerType;
+  typedef MemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 struct constMemFunInvoker8:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) const;
   func_type func_;
   constMemFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
@@ -2484,23 +2372,20 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9) const)
 {
-  typedef constMemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9>
- InvokerType;
+  typedef constMemFunInvoker8<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-
 struct MemFunInvoker9:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) ;
   func_type func_;
   MemFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 10;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 10){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)||!lua_type_traits<T10>::strictCheckType(state,10)){return false;}
@@ -2540,23 +2425,20 @@ if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) )
 {
-  typedef MemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
- InvokerType;
+  typedef MemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
 
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-
 struct constMemFunInvoker9:BaseInvoker{
   typedef Ret (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const;
   func_type func_;
   constMemFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 10;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 10){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)||!lua_type_traits<T10>::strictCheckType(state,10)){return false;}
@@ -2596,11 +2478,9 @@ if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
   }
 };
 template<typename Ret,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9,typename T10>
-
 inline base_ptr_ create(Ret (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
 {
-  typedef constMemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
- InvokerType;
+  typedef constMemFunInvoker9<Ret,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> InvokerType;
   return base_ptr_(new InvokerType(fun));
 }
 
@@ -2610,8 +2490,8 @@ struct VoidMemFunInvoker0:BaseInvoker{
   typedef void (T1::*func_type)() ;
   func_type func_;
   VoidMemFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     return true;
   }
@@ -2640,8 +2520,8 @@ struct constVoidMemFunInvoker0:BaseInvoker{
   typedef void (T1::*func_type)() const;
   func_type func_;
   constVoidMemFunInvoker0(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     return true;
   }
@@ -2670,8 +2550,8 @@ struct VoidMemFunInvoker1:BaseInvoker{
   typedef void (T1::*func_type)(T2) ;
   func_type func_;
   VoidMemFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
@@ -2707,8 +2587,8 @@ struct constVoidMemFunInvoker1:BaseInvoker{
   typedef void (T1::*func_type)(T2) const;
   func_type func_;
   constVoidMemFunInvoker1(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
@@ -2744,8 +2624,8 @@ struct VoidMemFunInvoker2:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3) ;
   func_type func_;
   VoidMemFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
@@ -2783,8 +2663,8 @@ struct constVoidMemFunInvoker2:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3) const;
   func_type func_;
   constVoidMemFunInvoker2(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
@@ -2822,8 +2702,8 @@ struct VoidMemFunInvoker3:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4) ;
   func_type func_;
   VoidMemFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
@@ -2863,8 +2743,8 @@ struct constVoidMemFunInvoker3:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4) const;
   func_type func_;
   constVoidMemFunInvoker3(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
@@ -2904,8 +2784,8 @@ struct VoidMemFunInvoker4:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5) ;
   func_type func_;
   VoidMemFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
@@ -2947,8 +2827,8 @@ struct constVoidMemFunInvoker4:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5) const;
   func_type func_;
   constVoidMemFunInvoker4(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
@@ -2990,8 +2870,8 @@ struct VoidMemFunInvoker5:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6) ;
   func_type func_;
   VoidMemFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
@@ -3035,8 +2915,8 @@ struct constVoidMemFunInvoker5:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6) const;
   func_type func_;
   constVoidMemFunInvoker5(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
@@ -3080,8 +2960,8 @@ struct VoidMemFunInvoker6:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7) ;
   func_type func_;
   VoidMemFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
@@ -3127,8 +3007,8 @@ struct constVoidMemFunInvoker6:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7) const;
   func_type func_;
   constVoidMemFunInvoker6(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
@@ -3174,8 +3054,8 @@ struct VoidMemFunInvoker7:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) ;
   func_type func_;
   VoidMemFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
@@ -3223,8 +3103,8 @@ struct constVoidMemFunInvoker7:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8) const;
   func_type func_;
   constVoidMemFunInvoker7(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
@@ -3272,8 +3152,8 @@ struct VoidMemFunInvoker8:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) ;
   func_type func_;
   VoidMemFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
@@ -3323,8 +3203,8 @@ struct constVoidMemFunInvoker8:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9) const;
   func_type func_;
   constVoidMemFunInvoker8(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
@@ -3374,8 +3254,8 @@ struct VoidMemFunInvoker9:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) ;
   func_type func_;
   VoidMemFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 10;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 10){return false;}
 if(lua_type_traits< T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)||!lua_type_traits<T10>::strictCheckType(state,10)){return false;}
@@ -3427,8 +3307,8 @@ struct constVoidMemFunInvoker9:BaseInvoker{
   typedef void (T1::*func_type)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const;
   func_type func_;
   constVoidMemFunInvoker9(func_type fun):func_(fun){}
+ virtual int argsCount()const{return 10;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 10){return false;}
 if(lua_type_traits<const T1*>::get(state, 1) == 0){return false;}
     if(strictcheck){
       if(!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)||!lua_type_traits<T10>::strictCheckType(state,10)){return false;}
@@ -3478,8 +3358,8 @@ inline base_ptr_ create(void (T1::*fun)(T2,T3,T4,T5,T6,T7,T8,T9,T10) const)
 template<typename CLASS>
 struct ConstructorInvoker0:BaseInvoker{
   ConstructorInvoker0(){}
+ virtual int argsCount()const{return 0;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 0){return false;}
     return true;
   }
   virtual int invoke(lua_State *state)
@@ -3498,8 +3378,8 @@ struct ConstructorInvoker0:BaseInvoker{
 template<typename CLASS,typename T1>
 struct ConstructorInvoker1:BaseInvoker{
   ConstructorInvoker1(){}
+ virtual int argsCount()const{return 1;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 1){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)){return false;}
   }else{
@@ -3525,8 +3405,8 @@ struct ConstructorInvoker1:BaseInvoker{
 template<typename CLASS,typename T1,typename T2>
 struct ConstructorInvoker2:BaseInvoker{
   ConstructorInvoker2(){}
+ virtual int argsCount()const{return 2;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 2){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)){return false;}
   }else{
@@ -3554,8 +3434,8 @@ struct ConstructorInvoker2:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3>
 struct ConstructorInvoker3:BaseInvoker{
   ConstructorInvoker3(){}
+ virtual int argsCount()const{return 3;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 3){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)){return false;}
   }else{
@@ -3585,8 +3465,8 @@ struct ConstructorInvoker3:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4>
 struct ConstructorInvoker4:BaseInvoker{
   ConstructorInvoker4(){}
+ virtual int argsCount()const{return 4;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 4){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)){return false;}
   }else{
@@ -3618,8 +3498,8 @@ struct ConstructorInvoker4:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5>
 struct ConstructorInvoker5:BaseInvoker{
   ConstructorInvoker5(){}
+ virtual int argsCount()const{return 5;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 5){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)){return false;}
   }else{
@@ -3653,8 +3533,8 @@ struct ConstructorInvoker5:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 struct ConstructorInvoker6:BaseInvoker{
   ConstructorInvoker6(){}
+ virtual int argsCount()const{return 6;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 6){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)){return false;}
   }else{
@@ -3690,8 +3570,8 @@ struct ConstructorInvoker6:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 struct ConstructorInvoker7:BaseInvoker{
   ConstructorInvoker7(){}
+ virtual int argsCount()const{return 7;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 7){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)){return false;}
   }else{
@@ -3729,8 +3609,8 @@ struct ConstructorInvoker7:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 struct ConstructorInvoker8:BaseInvoker{
   ConstructorInvoker8(){}
+ virtual int argsCount()const{return 8;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 8){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)){return false;}
   }else{
@@ -3770,8 +3650,8 @@ struct ConstructorInvoker8:BaseInvoker{
 template<typename CLASS,typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 struct ConstructorInvoker9:BaseInvoker{
   ConstructorInvoker9(){}
+ virtual int argsCount()const{return 9;}
   virtual bool checktype(lua_State *state,bool strictcheck){
-    if(lua_gettop(state) != 9){return false;}
     if(strictcheck){
       if(!lua_type_traits<T1>::strictCheckType(state,1)||!lua_type_traits<T2>::strictCheckType(state,2)||!lua_type_traits<T3>::strictCheckType(state,3)||!lua_type_traits<T4>::strictCheckType(state,4)||!lua_type_traits<T5>::strictCheckType(state,5)||!lua_type_traits<T6>::strictCheckType(state,6)||!lua_type_traits<T7>::strictCheckType(state,7)||!lua_type_traits<T8>::strictCheckType(state,8)||!lua_type_traits<T9>::strictCheckType(state,9)){return false;}
   }else{

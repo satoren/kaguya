@@ -753,7 +753,13 @@ namespace t_03_function
 		state.setErrorHandler(ignore_error_fun);
 		TEST_CHECK(!state("pointerfun(32)"));// is error
 		TEST_CHECK(!state("pointerfun('232')"));// is error
-
+	}
+	void noargs_to_nullpointer(kaguya::State& state)
+	{
+		state["pointerfun"] = kaguya::function(pointerfun);
+		TEST_CHECK(state("pointerfun()"));
+		state["const_pointerfun"] = kaguya::function(const_pointerfun);
+		TEST_CHECK(state("const_pointerfun()"));
 	}
 
 	void reffun(Foo& ref)

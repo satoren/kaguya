@@ -7,7 +7,7 @@ if glfw.Init() == false then
 end
 
     -- Create a windowed mode window and its OpenGL context
-    window = glfw.CreateWindow(640, 480, "Hello World", 0, 0);
+    window = glfw.CreateWindow(640, 480, "Hello World", nil, nil);
     if (window == nil) then
         glfw.Terminate();
         return -1;

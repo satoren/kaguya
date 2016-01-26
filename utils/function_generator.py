@@ -12,9 +12,9 @@ def get_call(out,arg_num,offset=0):
 		out.write('    typename lua_type_traits<T'+str(i) +'>::get_type t' +str(i) +' = lua_type_traits<T'+ str(i) + '>::get(state,' + str(i) + ');\n')
 
 def strictCheckType(out,arg_num,offset=0,customcheck=""):
-	out.write('  virtual bool checktype(lua_State *state,bool strictcheck){\n')
-	out.write('    if(lua_gettop(state) != ' + str(arg_num) + '){return false;}\n')
 
+	out.write(' virtual int argsCount()const{return '+ str(arg_num) + ';}\n')
+	out.write('  virtual bool checktype(lua_State *state,bool strictcheck){\n')
 	out.write(customcheck)
 	if arg_num> offset:
 		out.write('    if(strictcheck){\n')
@@ -91,7 +91,7 @@ def template_str(arg_num):
 	if arg_num > 0:
 		result+=','
 		result+=args_str(arg_num,'typename T')
-	result+='>\n'
+	result+='>'
 	return result
 
 def void_template_str(arg_num):
