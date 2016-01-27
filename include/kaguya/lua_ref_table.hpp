@@ -239,8 +239,10 @@ namespace kaguya
 #include "kaguya/gen/delegate_to_luaref.inl"
 #undef KAGUYA_DELEGATE_LUAREF
 #endif
-
-	private:
+#if KAGUYA_USE_CPP11
+	private://cant resolve compile error on travis-ci g++ with c++03
+		//msg error: no matching function for call to 'forward(const t_02_classreg::ABC&)'
+#endif
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const TableKeyReference& src) : parent_(src.parent_), key_(src.key_) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
@@ -250,6 +252,8 @@ namespace kaguya
 			swap(src);
 		}
 #endif
+	private:
+
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
 		{
