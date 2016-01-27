@@ -240,6 +240,7 @@ namespace kaguya
 #undef KAGUYA_DELEGATE_LUAREF
 #endif
 
+	private:
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const TableKeyReference& src) : parent_(src.parent_), key_(src.key_) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
@@ -249,7 +250,6 @@ namespace kaguya
 			swap(src);
 		}
 #endif
-	private:
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
 		{

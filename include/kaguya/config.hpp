@@ -16,18 +16,13 @@ extern "C" {
 #endif
 #endif
 
-
-#ifndef KAGUYA_USE_BOOST
 #if KAGUYA_USE_CPP11
-#define KAGUYA_USE_BOOST 0
+#include <functional>
+#include <tuple>
+#include <memory>
+#include <utility>
+#include <type_traits>
 #else
-#define KAGUYA_USE_BOOST 1
-#endif
-#endif
-
-
-
-#if KAGUYA_USE_BOOST
 #include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
@@ -36,12 +31,6 @@ extern "C" {
 #if BOOST_VERSION >= 104800
 #include <boost/move/move.hpp>
 #endif
-#else
-#include <functional>
-#include <tuple>
-#include <memory>
-#include <utility>
-#include <type_traits>
 #endif
 
 
@@ -75,10 +64,13 @@ namespace kaguya
 {
 	namespace standard
 	{
-#if KAGUYA_USE_BOOST
+#if KAGUYA_USE_CPP11
+		using namespace std;
+#define KAGUYA_STATIC_ASSERT static_assert
+#else
 		using namespace boost;
 #if BOOST_VERSION < 104800
-		template<typename T>T forward(T v) { return v; }
+		template<typename T>const T& forward(const T& v) { return v; }
 #endif
 
 		inline std::string to_string(int v)
@@ -89,9 +81,6 @@ namespace kaguya
 		}
 
 #define KAGUYA_STATIC_ASSERT BOOST_STATIC_ASSERT_MSG
-#else
-		using namespace std;
-#define KAGUYA_STATIC_ASSERT static_assert
 #endif
 	}
 
