@@ -828,8 +828,15 @@ namespace t_04_lua_ref
 
 		typedef std::map<kaguya::LuaRef, kaguya::LuaRef> maptype;
 		const maptype& map = abctable.map();
-
 		TEST_CHECK(map.size() == 4);
+
+		std::map<std::string,std::string> strmap = abctable.map<std::string, std::string>();
+
+		TEST_CHECK(strmap["d"] == "1");
+		TEST_CHECK(strmap["e"] == "3");
+		TEST_CHECK(strmap["f"] == "64");
+		TEST_CHECK(strmap["g"] == "sss");
+		TEST_CHECK(strmap.size() == 4);
 
 		abctable.setField("a", "test");
 		TEST_CHECK(abctable["a"] == std::string("test"));

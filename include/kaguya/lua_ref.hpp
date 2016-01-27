@@ -67,29 +67,32 @@ namespace kaguya
 			}
 		}
 
+		template<typename K>
 		struct gettablekey
 		{
-			std::vector<LuaRef>& v_;
-			gettablekey(std::vector<LuaRef>&v) :v_(v) {}
-			void operator ()(LuaRef key, const LuaRef&)
+			std::vector<K>& v_;
+			gettablekey(std::vector<K>&v) :v_(v) {}
+			void operator ()(K key, const LuaRef&)
 			{
 				v_.push_back(key);
 			}
 		};
+		template<typename V>
 		struct gettablevalue
 		{
-			std::vector<LuaRef>& v_;
-			gettablevalue(std::vector<LuaRef>&v) :v_(v) {}
-			void operator ()(const LuaRef&, LuaRef value)
+			std::vector<V>& v_;
+			gettablevalue(std::vector<V>&v) :v_(v) {}
+			void operator ()(const LuaRef&, V value)
 			{
 				v_.push_back(value);
 			}
 		};
+		template<typename K, typename V>
 		struct gettablemap
 		{
-			std::map<LuaRef, LuaRef>& m_;
-			gettablemap(std::map<LuaRef, LuaRef>& m) :m_(m) {}
-			void operator ()(LuaRef key, LuaRef value)
+			std::map<K, V>& m_;
+			gettablemap(std::map<K, V>& m) :m_(m) {}
+			void operator ()(K key, V value)
 			{
 				m_[key] = value;
 			}
@@ -637,7 +640,7 @@ namespace kaguya
 		/**
 		* @brief foreach table fields
 		*/
-		template<class Fun>void foreach_table(Fun f)const
+		template < class Fun, class K = LuaRef, class V = LuaRef > void foreach_table(Fun f)const
 		{
 			if (ref_ == LUA_REFNIL)
 			{
@@ -654,10 +657,10 @@ namespace kaguya
 			lua_pushnil(state_);
 			while (lua_next(state_, top) != 0)
 			{
-				LuaRef value(state_, StackTop(), NoMainCheck());
-				lua_pushvalue(state_, -1);//push key to stack for next
-				LuaRef key(state_, StackTop(), NoMainCheck());
+				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state_,-1);
+				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state_, -2);
 				f(key, value);
+				lua_pop(state_,1);//pop value
 			}
 		}
 
@@ -666,30 +669,33 @@ namespace kaguya
 		* @brief If type is table or userdata, return keys.
 		* @return field keys
 		*/
-		std::vector<LuaRef> keys()const
+		template<typename K = LuaRef>
+		std::vector<K> keys()const
 		{
-			std::vector<LuaRef> res;
-			foreach_table(gettablekey(res));
+			std::vector<K> res;
+			foreach_table(gettablekey<K>(res));
 			return res;
 		}
 		/**
 		* @brief If type is table or userdata, return values.
 		* @return field value
 		*/
-		std::vector<LuaRef> values()const
+		template<typename V = LuaRef>
+		std::vector<V> values()const
 		{
-			std::vector<LuaRef> res;
-			foreach_table(gettablevalue(res));
+			std::vector<V> res;
+			foreach_table(gettablevalue<V>(res));
 			return res;
 		}
 		/**
 		* @brief If type is table or userdata, return key value pair.
 		* @return key value pair
 		*/
-		std::map<LuaRef, LuaRef> map()const
+		template<typename K = LuaRef, typename V = LuaRef>
+		std::map<K, V> map()const
 		{
-			std::map<LuaRef, LuaRef> res;
-			foreach_table(gettablemap(res));
+			std::map<K, V> res;
+			foreach_table(gettablemap<K, V>(res));
 			return res;
 		}
 		//@}
