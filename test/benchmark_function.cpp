@@ -1,5 +1,7 @@
 #include "kaguya/kaguya.hpp"
 
+namespace kaguya_benchmark
+{
 	class SetGet
 	{
 	public:
@@ -70,6 +72,18 @@
 	void lua_table_access(kaguya::State& state)
 	{
 		state("lua_table={value=0}");
+		kaguya::LuaTable lua_table = state["lua_table"];
+		for (int i = 0; i < 1000000; i++)
+		{
+			lua_table.setField("value", i);
+			int v = lua_table.getField("value");
+			if (v != i) { throw std::logic_error(""); }
+		}
+	}
+
+	void lua_table_ref_access(kaguya::State& state)
+	{
+		state("lua_table={value=0}");
 		kaguya::LuaRef lua_table = state["lua_table"];
 		for (int i = 0; i < 1000000; i++)
 		{
@@ -80,8 +94,8 @@
 	}
 
 	struct Prop
-	{	
-		Prop():d(0){}
+	{
+		Prop() :d(0) {}
 
 		double d;
 	};
@@ -104,3 +118,27 @@
 			"end\n"
 			"");
 	}
+}
+
+
+namespace original_api
+{
+	void lua_table_access(kaguya::State& state)
+	{
+		lua_State* s = state.state();
+		luaL_dostring(s, "lua_table={value=0}");
+		for (int i = 0; i < 1000000; i++)
+		{
+			lua_getglobal(s, "lua_table");
+			lua_pushnumber(s,i);
+			lua_setfield(s,-2, "value");
+			lua_settop(s, 0);
+
+			lua_getglobal(s, "lua_table");
+			lua_getfield(s,-1, "value");
+			int v = lua_tonumber(s,-1);
+			if (v != i) { throw std::logic_error(""); }
+			lua_settop(s,0);
+		}
+	}
+}

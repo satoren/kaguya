@@ -41,11 +41,13 @@ int main()
 	benchmark_function_map_t functionmap;
 #define ADD_BENCHMARK(function) functionmap.push_back(std::make_pair(#function,&function));
 	ADD_BENCHMARK(empty);
-	ADD_BENCHMARK(simple_get_set);
-	ADD_BENCHMARK(property_access);
-	ADD_BENCHMARK(object_pointer_register_get_set);
-	ADD_BENCHMARK(call_lua_function);
-	ADD_BENCHMARK(lua_table_access);
+	ADD_BENCHMARK(kaguya_benchmark::simple_get_set);
+	ADD_BENCHMARK(kaguya_benchmark::property_access);
+	ADD_BENCHMARK(kaguya_benchmark::object_pointer_register_get_set);
+	ADD_BENCHMARK(kaguya_benchmark::call_lua_function);
+	ADD_BENCHMARK(kaguya_benchmark::lua_table_access);
+	ADD_BENCHMARK(original_api::lua_table_access);
+	ADD_BENCHMARK(kaguya_benchmark::lua_table_ref_access);
 	
 	
 

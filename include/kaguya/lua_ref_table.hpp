@@ -556,7 +556,7 @@ namespace kaguya
 			int count = 1;//array is 1 origin in Lua
 			for (typename std::vector<T>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
-				table[count++] = *it;
+				table.setField(count++ , *it);
 			}
 			table.push(l);
 			return 1;
@@ -616,7 +616,7 @@ namespace kaguya
 			LuaRef table(l, NewTable(0, int(v.size())));
 			for (typename std::map<K, V>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
-				table[it->first] = it->second;
+				table.setField(it->first , it->second);
 			}
 			table.push(l);
 			return 1;
