@@ -154,6 +154,10 @@ namespace kaguya
 			return *this;
 		}
 
+		bool isNilref()const {
+			return getValue().isNilref();
+		}
+
 		//! register class metatable to lua and set to table
 		template<typename T, typename P>
 		void setClass(const ClassMetatable<T, P>& reg, bool auto_reg_shared_ptr = true)
@@ -280,11 +284,11 @@ namespace kaguya
 		LuaRef key_;
 	};
 
-	inline LuaRef toLuaRef(const LuaUserData& ref)
+	inline const LuaRef& toLuaRef(const LuaUserData& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
 	}
-	inline LuaRef toLuaRef(const LuaTable& ref)
+	inline const LuaRef& toLuaRef(const LuaTable& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
 	}

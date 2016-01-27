@@ -76,12 +76,12 @@ namespace kaguya_benchmark
 		for (int i = 0; i < 1000000; i++)
 		{
 			lua_table.setField("value", i);
-			int v = lua_table.getField("value");
+			int v = lua_table.getField<int>("value");
 			if (v != i) { throw std::logic_error(""); }
 		}
 	}
 
-	void lua_table_ref_access(kaguya::State& state)
+	void lua_table_bracket_operator_access(kaguya::State& state)
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaRef lua_table = state["lua_table"];

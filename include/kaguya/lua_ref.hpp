@@ -21,6 +21,27 @@ namespace kaguya
 	class FunEvaluator;
 	class mem_fun_binder;
 
+	class LuaRef;
+
+	template<>
+	struct lua_type_traits<LuaRef>
+	{
+		typedef LuaRef get_type;
+		typedef const LuaRef& push_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return false;
+		}
+
+		static get_type get(lua_State* l, int index);
+		static int push(lua_State* l, push_type v);
+	};
+	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
 
 	/**
 	* Reference of Lua any type value.
@@ -498,7 +519,8 @@ namespace kaguya
 		* @param key key of table
 		* @return reference of field value
 		*/
-		LuaRef getField(const LuaRef& key)const
+		template<typename T = LuaRef>
+		typename lua_type_traits<T>::get_type getField(const LuaRef& key)const
 		{
 			if (ref_ == LUA_REFNIL)
 			{
@@ -515,14 +537,15 @@ namespace kaguya
 			}
 			key.push(state_);
 			lua_gettable(state_, -2);
-			return LuaRef(state_, StackTop(), NoMainCheck());
+			return lua_type_traits<T>::get(state_, -1);
 		}
 		/**
 		* @brief value = table[key];
 		* @param key key of table
 		* @return reference of field value
 		*/
-		LuaRef getField(const char* str)const
+		template<typename T = LuaRef>
+		typename lua_type_traits<T>::get_type getField(const char* str)const
 		{
 			if (ref_ == LUA_REFNIL)
 			{
@@ -539,14 +562,15 @@ namespace kaguya
 			}
 			lua_pushstring(state_, str);
 			lua_gettable(state_, -2);
-			return LuaRef(state_, StackTop());
+			return lua_type_traits<T>::get(state_, -1);
 		}
 		/**
 		* @brief value = table[key];
 		* @param key key of table
 		* @return reference of field value
 		*/
-		LuaRef getField(const std::string& str)const
+		template<typename T = LuaRef>
+		typename lua_type_traits<T>::get_type getField(const std::string& str)const
 		{
 			return getField(str.c_str());
 		}
@@ -555,7 +579,8 @@ namespace kaguya
 		* @param key key of table
 		* @return reference of field value
 		*/
-		LuaRef getField(int index)const
+		template<typename T = LuaRef>
+		typename lua_type_traits<T>::get_type getField(int index)const
 		{
 			if (ref_ == LUA_REFNIL)
 			{
@@ -572,7 +597,7 @@ namespace kaguya
 			}
 			lua_type_traits<int>::push(state_, index);
 			lua_gettable(state_, -2);
-			return LuaRef(state_, StackTop(), NoMainCheck());
+			return lua_type_traits<T>::get(state_,-1);
 		}
 		/**
 		* @brief table[key] = value;
@@ -789,33 +814,17 @@ namespace kaguya
 	inline bool operator == (const char* lhs, const LuaRef& rhs) { return lhs == rhs.get<std::string>(); }
 
 
-	template<>
-	struct lua_type_traits<LuaRef>
+	inline lua_type_traits<LuaRef>::get_type lua_type_traits<LuaRef>::get(lua_State* l, int index)
 	{
-		typedef LuaRef get_type;
-		typedef LuaRef push_type;
+		lua_pushvalue(l, index);
+		return LuaRef(l, StackTop());
+	}
+	inline int lua_type_traits<LuaRef>::push(lua_State* l, lua_type_traits<LuaRef>:: push_type v)
+	{
+		v.push(l);
+		return 1;
+	}
 
-		static bool checkType(lua_State* l, int index)
-		{
-			return true;
-		}
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return false;
-		}
-
-		static get_type get(lua_State* l, int index)
-		{
-			lua_pushvalue(l, index);
-			return LuaRef(l, StackTop());
-		}
-		static int push(lua_State* l, const LuaRef& v)
-		{
-			v.push(l);
-			return 1;
-		}
-	};
-	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
 }
 
 
