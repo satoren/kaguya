@@ -522,7 +522,7 @@ namespace kaguya
 		* @param key key of table
 		* @return reference of field value
 		*/
-		template<typename T = LuaRef>
+		template<typename T>
 		typename lua_type_traits<T>::get_type getField(const LuaRef& key)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -542,12 +542,15 @@ namespace kaguya
 			lua_gettable(state_, -2);
 			return lua_type_traits<T>::get(state_, -1);
 		}
+		LuaRef getField(const LuaRef& key)const {
+			return getField<LuaRef>(key);
+		}
 		/**
 		* @brief value = table[key];
 		* @param key key of table
 		* @return reference of field value
 		*/
-		template<typename T = LuaRef>
+		template<typename T>
 		typename lua_type_traits<T>::get_type getField(const char* str)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -567,22 +570,31 @@ namespace kaguya
 			lua_gettable(state_, -2);
 			return lua_type_traits<T>::get(state_, -1);
 		}
+		LuaRef getField(const char* str)const
+		{
+			return getField<LuaRef>(str);
+		}
+
 		/**
 		* @brief value = table[key];
 		* @param key key of table
 		* @return reference of field value
 		*/
-		template<typename T = LuaRef>
+		template<typename T>
 		typename lua_type_traits<T>::get_type getField(const std::string& str)const
 		{
 			return getField(str.c_str());
+		}
+		LuaRef getField(const std::string& str)const
+		{
+			return getField<LuaRef>(str);
 		}
 		/**
 		* @brief value = table[key];
 		* @param key key of table
 		* @return reference of field value
 		*/
-		template<typename T = LuaRef>
+		template<typename T>
 		typename lua_type_traits<T>::get_type getField(int index)const
 		{
 			if (ref_ == LUA_REFNIL)
@@ -601,6 +613,10 @@ namespace kaguya
 			lua_type_traits<int>::push(state_, index);
 			lua_gettable(state_, -2);
 			return lua_type_traits<T>::get(state_,-1);
+		}
+		LuaRef getField(int index)const
+		{
+			return getField<LuaRef>(index);
 		}
 		/**
 		* @brief table[key] = value;
@@ -676,28 +692,32 @@ namespace kaguya
 			foreach_table(gettablekey<K>(res));
 			return res;
 		}
+		std::vector<LuaRef> keys()const { return keys<LuaRef>(); }
 		/**
 		* @brief If type is table or userdata, return values.
 		* @return field value
 		*/
-		template<typename V = LuaRef>
+		template<typename V>
 		std::vector<V> values()const
 		{
 			std::vector<V> res;
 			foreach_table(gettablevalue<V>(res));
 			return res;
 		}
+		std::vector<LuaRef> values()const { return values<LuaRef>(); }
 		/**
 		* @brief If type is table or userdata, return key value pair.
 		* @return key value pair
 		*/
-		template<typename K = LuaRef, typename V = LuaRef>
+		template<typename K, typename V>
 		std::map<K, V> map()const
 		{
 			std::map<K, V> res;
 			foreach_table(gettablemap<K, V>(res));
 			return res;
 		}
+		template<typename K, typename V>
+		std::map<LuaRef, LuaRef> map()const { return map<LuaRef, LuaRef>(); }
 		//@}
 
 		enum value_type type() const
