@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <map>
-#include <algorithm>
 #include <cassert>
 #include "kaguya/config.hpp"
 #include "kaguya/lua_ref.hpp"

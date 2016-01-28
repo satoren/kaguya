@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <algorithm>
 #include "kaguya/config.hpp"
 #include "kaguya/error_handler.hpp"
 #include "kaguya/type.hpp"
