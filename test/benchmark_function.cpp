@@ -1,6 +1,6 @@
 #include "kaguya/kaguya.hpp"
 
-namespace kaguya_benchmark
+namespace kaguya_api_benchmark______
 {
 	class SetGet
 	{
@@ -121,8 +121,22 @@ namespace kaguya_benchmark
 }
 
 
-namespace original_api
+namespace original_api_no_type_check
 {
+	void call_lua_function(kaguya::State& state)
+	{
+		lua_State* s = state.state();
+		luaL_dostring(s,"lua_function=function(i)return i;end");
+		for (int i = 0; i < 1000000; i++)
+		{
+			lua_getglobal(s, "lua_function");
+			lua_pushnumber(s, i);
+			lua_pcall(s, 1, 1, 0);
+			int r = static_cast<int>(lua_tonumber(s, -1));
+			if (r != i) { throw std::logic_error(""); }
+			lua_settop(s, 0);
+		}
+	}
 	void lua_table_access(kaguya::State& state)
 	{
 		lua_State* s = state.state();

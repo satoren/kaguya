@@ -1,5 +1,5 @@
 #pragma once
-namespace kaguya_benchmark
+namespace kaguya_api_benchmark______
 {
 
 	void simple_get_set(kaguya::State& state);
@@ -13,7 +13,8 @@ namespace kaguya_benchmark
 	void property_access(kaguya::State& state);
 }
 
-namespace original_api
+namespace original_api_no_type_check
 {
+	void call_lua_function(kaguya::State& state);
 	void lua_table_access(kaguya::State& state);
 }
