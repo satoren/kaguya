@@ -10,7 +10,11 @@ inline FunEvaluator LuaRef::operator()()
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1>
 inline FunEvaluator LuaRef::operator()(T1 t1)
@@ -25,7 +29,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1)
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
@@ -41,7 +49,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2)
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
@@ -58,7 +70,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3)
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3,typename T4>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
@@ -76,7 +92,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4)
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
@@ -95,7 +115,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5)
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
@@ -115,7 +139,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6)
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7)
@@ -136,7 +164,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8)
@@ -158,7 +190,11 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }
 template<typename T1,typename T2,typename T3,typename T4,typename T5,typename T6,typename T7,typename T8,typename T9>
 inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7,T8 t8,T9 t9)
@@ -181,5 +217,9 @@ inline FunEvaluator LuaRef::operator()(T1 t1,T2 t2,T3 t3,T4 t4,T5 t5,T6 t6,T7 t7
   for (int i = 0; i < argnum; ++i)
     args.push_back(LuaRef(state_, StackTop()));
   std::reverse(args.begin(), args.end());
+#if KAGUYA_USE_RVALUE_REFERENCE
+  return FunEvaluator(state_,*this,std::move(args));
+#else
   return FunEvaluator(state_,*this,args);
+#endif
 }

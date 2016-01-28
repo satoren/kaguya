@@ -36,7 +36,11 @@ def generate(out,arg_num):
 	out.write('    args.push_back(LuaRef(state_, StackTop()));\n')
 	out.write('  std::reverse(args.begin(), args.end());\n')
 
+	out.write('#if KAGUYA_USE_RVALUE_REFERENCE\n')
+	out.write('  return FunEvaluator(state_,*this,std::move(args));\n')
+	out.write('#else\n')
 	out.write('  return FunEvaluator(state_,*this,args);\n')
+	out.write('#endif\n')
 	out.write('}\n')
 
 if __name__ == "__main__":
