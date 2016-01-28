@@ -70,9 +70,11 @@ namespace kaguya
 		template<typename K>
 		struct gettablekey
 		{
+			typedef K key_type;
+			typedef void value_type;
 			std::vector<K>& v_;
 			gettablekey(std::vector<K>&v) :v_(v) {}
-			void operator ()(K key, const LuaRef&)
+			void operator ()(K key, const void*)
 			{
 				v_.push_back(key);
 			}
@@ -80,9 +82,11 @@ namespace kaguya
 		template<typename V>
 		struct gettablevalue
 		{
+			typedef void key_type;
+			typedef V value_type;
 			std::vector<V>& v_;
 			gettablevalue(std::vector<V>&v) :v_(v) {}
-			void operator ()(const LuaRef&, V value)
+			void operator ()(const void*, V value)
 			{
 				v_.push_back(value);
 			}
@@ -90,6 +94,8 @@ namespace kaguya
 		template<typename K, typename V>
 		struct gettablemap
 		{
+			typedef K key_type;
+			typedef V value_type;
 			std::map<K, V>& m_;
 			gettablemap(std::map<K, V>& m) :m_(m) {}
 			void operator ()(K key, V value)
@@ -656,7 +662,7 @@ namespace kaguya
 		/**
 		* @brief foreach table fields
 		*/
-		template < class Fun, class K = LuaRef, class V = LuaRef > void foreach_table(Fun f)const
+		template < class K, class V, class Fun> void foreach_table(Fun f)const
 		{
 			if (ref_ == LUA_REFNIL)
 			{
@@ -685,11 +691,11 @@ namespace kaguya
 		* @brief If type is table or userdata, return keys.
 		* @return field keys
 		*/
-		template<typename K = LuaRef>
+		template<typename K>
 		std::vector<K> keys()const
 		{
 			std::vector<K> res;
-			foreach_table(gettablekey<K>(res));
+			foreach_table<K,void>(gettablekey<K>(res));
 			return res;
 		}
 		std::vector<LuaRef> keys()const { return keys<LuaRef>(); }
@@ -701,7 +707,7 @@ namespace kaguya
 		std::vector<V> values()const
 		{
 			std::vector<V> res;
-			foreach_table(gettablevalue<V>(res));
+			foreach_table<void,V>(gettablevalue<V>(res));
 			return res;
 		}
 		std::vector<LuaRef> values()const { return values<LuaRef>(); }
@@ -713,7 +719,7 @@ namespace kaguya
 		std::map<K, V> map()const
 		{
 			std::map<K, V> res;
-			foreach_table(gettablemap<K, V>(res));
+			foreach_table<K, V>(gettablemap<K, V>(res));
 			return res;
 		}
 		template<typename K, typename V>

@@ -196,6 +196,29 @@ namespace kaguya
 		}
 	};
 
+	template<>	struct lua_type_traits<void> {
+		typedef void* get_type;
+		typedef void* push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			return 0;
+		}
+		static int push(lua_State* l, push_type s)
+		{
+			return 0;
+		}
+	};
+
+
 	///! traits for reference_wrapper
 	template<typename T> struct lua_type_traits<standard::reference_wrapper<T> > {
 		typedef const standard::reference_wrapper<T>& push_type;
