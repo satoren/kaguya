@@ -722,7 +722,6 @@ namespace kaguya
 			foreach_table<K, V>(gettablemap<K, V>(res));
 			return res;
 		}
-		template<typename K, typename V>
 		std::map<LuaRef, LuaRef> map()const { return map<LuaRef, LuaRef>(); }
 		//@}
 
