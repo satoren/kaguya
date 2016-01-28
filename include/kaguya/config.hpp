@@ -67,7 +67,11 @@ namespace kaguya
 #if KAGUYA_USE_CPP11
 		using namespace std;
 #define KAGUYA_STATIC_ASSERT static_assert
+#if (!defined(_MSC_VER) || _MSC_VER >= 1900)
 #define KAGUYA_DEPRECATED [[deprecated]]
+#else
+#define KAGUYA_DEPRECATED
+#endif
 #else
 		using namespace boost;
 #if BOOST_VERSION < 104800
