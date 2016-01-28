@@ -178,49 +178,30 @@ namespace kaguya
 		using LuaRef::costatus;
 	};
 
-	//! execute Lua function (or resume coroutine) and get result
-	class FunEvaluator
-	{
-	public:
-		FunEvaluator(lua_State* state, LuaRef fun, std::vector<LuaRef> args) :state_(state), eval_info_(new eval())
-		{
-			eval_info_->owner = this;
-			std::swap(eval_info_->fun, fun);
-			std::swap(eval_info_->args, args);
 
-			if (eval_info_->fun.type() == LuaRef::TYPE_THREAD)
+	class FunctionResults
+	{
+		std::vector<LuaRef> results_;
+	public:
+		FunctionResults()
+		{
+			results_.resize(1);//for empty value
+		}
+		FunctionResults(std::vector<LuaRef> results)
+		{
+			std::swap(results_, results);
+			if (results_.empty())
 			{
-				state_ = eval_info_->fun.get<lua_State*>();//get coroutine thread
-				eval_info_->coroutine = true;
+				results_.resize(1);//for empty value
 			}
 		}
 
-		FunEvaluator(lua_State* state) :state_(state), eval_info_()
-		{
-			//error!
-		}
-
-		FunEvaluator(const FunEvaluator&other) :state_(other.state_), eval_info_(other.eval_info_)
-		{
-			eval_info_->owner = this;
-		}
-
-		~FunEvaluator()
-		{
-			evaluate(0);
-		}
 
 		template<typename T>
 		typename lua_type_traits<T>::get_type get()const
 		{
-			evaluate(1);
-			if (eval_info_ && !eval_info_->results.empty())
-			{
-				return eval_info_->results.back().get<typename lua_type_traits<T>::get_type>();
-			}
-			return LuaRef(state_);//method invoke error
+			return results_.front().get<typename lua_type_traits<T>::get_type>();
 		}
-
 		template<typename T>
 		operator T()const {
 			return get<T>();
@@ -238,101 +219,38 @@ namespace kaguya
 		}
 		bool operator == (const char* v)const { return get<std::string>() == v; }
 
-		const std::vector<LuaRef>& get_result(int result_count)const
+		const std::vector<LuaRef>& get_result(int unused=0)const
 		{
-			evaluate(result_count);
-			return eval_info_->results;
+			return results_;
 		}
-
 #if KAGUYA_USE_CPP11
 		template<class... Args>
-		FunEvaluator operator()(Args&&... args)
+		FunctionResults operator()(Args&&... args)
 		{
-			return get<LuaRef>()(standard::forward<Args>(args)...);
+			return results_.front()(standard::forward<Args>(args)...);
 		}
 #else
 		/** call lua-function from lua-function result
-		* template<class... Args>FunEvaluator operator()(Args... args);
+		* template<class... Args>FunctionResults operator()(Args... args);
 		*/
-#define KAGUYA_DELEGATE_LUAREF get<LuaRef>()
+#define KAGUYA_DELEGATE_LUAREF results_.front()
 #include "kaguya/gen/delegate_to_luaref.inl"
 #undef KAGUYA_DELEGATE_LUAREF
 #endif
-	private:
-
-		void evaluate(int resultnum)const
-		{
-			if (eval_info_&& eval_info_->owner == this && !eval_info_->invoked)
-			{
-				util::ScopedSavedStack save(state_, 0);
-				eval_info_->invoked = true;
-				const std::vector<LuaRef>& args = eval_info_->args;
-				if (eval_info_->coroutine)
-				{
-					for (size_t i = 0; i < args.size(); ++i)
-					{
-						args[i].push(state_);
-					}
-					int argnum = lua_gettop(state_);
-#if LUA_VERSION_NUM >= 502
-					int result = lua_resume(state_, 0, argnum > 0 ? argnum - 1 : 0);
-#else
-					int result = lua_resume(state_, argnum > 0 ? argnum - 1 : 0);
-#endif
-					except::checkErrorAndThrow(result, state_);
-					int retnum = lua_gettop(state_);
-					if (0 < retnum)
-					{
-						eval_info_->results.reserve(retnum);
-					}
-					for (int i = 0; i < retnum; ++i)
-					{
-						eval_info_->results.push_back(LuaRef(state_, StackTop()));
-					}
-					std::reverse(eval_info_->results.begin(), eval_info_->results.end());
-				}
-				else
-				{
-					eval_info_->fun.push(state_);
-
-					for (size_t i = 0; i < args.size(); ++i)
-					{
-						args[i].push(state_);
-					}
-					int result = lua_pcall(state_, int(args.size()), resultnum, 0);
-
-					except::checkErrorAndThrow(result, state_);
-					int retnum = lua_gettop(state_);
-					if (0 < retnum)
-					{
-						eval_info_->results.reserve(retnum);
-					}
-					for (int i = 0; i < retnum; ++i)
-					{
-						eval_info_->results.push_back(LuaRef(state_, StackTop()));
-					}
-					std::reverse(eval_info_->results.begin(), eval_info_->results.end());
-				}
-			}
-		}
-
-		struct eval
-		{
-			eval() :invoked(false), coroutine(false), owner(0) {}
-			LuaRef fun;
-			std::vector<LuaRef> args;
-			std::vector<LuaRef> results;
-			bool invoked;
-			bool coroutine;
-			FunEvaluator* owner;
-		};
-
-		FunEvaluator& operator=(const FunEvaluator& src);
-
-		lua_State* state_;
-		standard::shared_ptr<eval> eval_info_;
 	};
 
+	template<>	struct lua_type_traits<FunctionResults> {
+		static int push(lua_State* l, const FunctionResults& ref)
+		{
+			const std::vector<LuaRef>& v = ref.get_result();
+			for (std::vector<LuaRef>::const_iterator it = v.begin(); it != v.end(); ++it)
+			{
+				it->push();
+			}
+			return static_cast<int>(v.size());
+		}
+	};
+	
 	template<>	struct lua_type_traits<LuaFunction> {
 		typedef LuaFunction get_type;
 		typedef LuaFunction push_type;
@@ -382,20 +300,7 @@ namespace kaguya
 		}
 	};
 	template<>	struct lua_type_traits<const LuaThread&> :lua_type_traits<LuaThread> {};
-
-
-	template<>	struct lua_type_traits<FunEvaluator> {
-		static int push(lua_State* l, const FunEvaluator& ref)
-		{
-			const std::vector<LuaRef>& v = ref.get_result(LUA_MULTRET);
-			for (std::vector<LuaRef>::const_iterator it = v.begin(); it != v.end(); ++it)
-			{
-				it->push();
-			}
-			return static_cast<int>(v.size());
-		}
-	};
-
+	
 
 	inline LuaRef toLuaRef(const LuaFunction& ref)
 	{
@@ -405,15 +310,13 @@ namespace kaguya
 	{
 		return static_cast<const LuaRef&>(ref);
 	}
-	inline LuaRef toLuaRef(const FunEvaluator& ref)
+	inline LuaRef toLuaRef(const FunctionResults& ref)
 	{
-		std::vector<LuaRef> res = ref.get_result(1);
-		if (!res.empty())
-		{
-			return res.front();
-		}
-		return LuaRef();
+		return ref.get<LuaRef>();
 	}
+
+	//!FunEvaluator is deleted. typedef for compatibility
+	KAGUYA_DEPRECATED typedef	FunctionResults FunEvaluator;
 
 	/**
 	* @brief table and function binder.
@@ -435,7 +338,7 @@ namespace kaguya
 		* @param arg... function args
 		*/
 		template<typename... Args>
-		FunEvaluator operator()(Args... args)
+		FunctionResults operator()(Args... args)
 		{
 			return fun_(self_, args...);
 		}

@@ -136,7 +136,7 @@ namespace original_api
 
 			lua_getglobal(s, "lua_table");
 			lua_getfield(s,-1, "value");
-			int v = lua_tonumber(s,-1);
+			int v = static_cast<int>(lua_tonumber(s,-1));
 			if (v != i) { throw std::logic_error(""); }
 			lua_settop(s,0);
 		}

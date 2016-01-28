@@ -229,12 +229,12 @@ namespace kaguya
 		}
 
 		/** call lua function
-		* template<class... Args>FunEvaluator operator()(Args... args);
+		* template<class... Args>FunctionResults operator()(Args... args);
 		*/
 
 #if KAGUYA_USE_CPP11
 		template<class... Args>
-		FunEvaluator operator()(Args&&... args)
+		FunctionResults operator()(Args&&... args)
 		{
 			return getValue()(standard::forward<Args>(args)...);
 		}

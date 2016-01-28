@@ -18,7 +18,7 @@ namespace kaguya
 	class LuaFunction;
 	class LuaThread;
 	class TableKeyReference;
-	class FunEvaluator;
+	class FunctionResults;
 	class mem_fun_binder;
 
 	class LuaRef;
@@ -42,6 +42,7 @@ namespace kaguya
 		static int push(lua_State* l, push_type v);
 	};
 	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
+
 
 	/**
 	* Reference of Lua any type value.
@@ -157,6 +158,50 @@ namespace kaguya
 			return true;
 		}
 
+		std::vector<LuaRef> funInvoke(lua_State* state,int argnum)
+		{
+			util::ScopedSavedStack save(state, 0);
+
+			std::vector<LuaRef> results;
+			if (type() == TYPE_THREAD)
+			{
+				//stack first is function.other arguments.
+				int argnum = lua_gettop(state) - 1;
+#if LUA_VERSION_NUM >= 502
+				int result = lua_resume(state, 0, argnum);
+#else
+				int result = lua_resume(state, argnum);
+#endif
+				except::checkErrorAndThrow(result, state);
+				int retnum = lua_gettop(state);
+				if (0 < retnum)
+				{
+					results.reserve(retnum);
+				}
+				for (int i = 0; i < retnum; ++i)
+				{
+					results.push_back(LuaRef(state, StackTop()));
+				}
+				std::reverse(results.begin(), results.end());
+			}
+			else
+			{
+				int result = lua_pcall(state, argnum, LUA_MULTRET, 0);
+
+				except::checkErrorAndThrow(result, state);
+				int retnum = lua_gettop(state);
+				if (0 < retnum)
+				{
+					results.reserve(retnum);
+				}
+				for (int i = 0; i < retnum; ++i)
+				{
+					results.push_back(LuaRef(state, StackTop()));
+				}
+				std::reverse(results.begin(), results.end());
+			}
+			return results;
+		}
 	public:
 
 		struct NoMainCheck {};
@@ -298,6 +343,10 @@ namespace kaguya
 		typename lua_type_traits<T>::get_type get()const
 		{
 			typedef typename lua_type_traits<T>::get_type get_type;
+			if (!state_)
+			{
+				throw LuaTypeMismatch(std::string("no reference "));
+			}
 			util::ScopedSavedStack save(state_);
 			push(state_);
 			if (!lua_type_traits<get_type>::checkType(state_, -1))

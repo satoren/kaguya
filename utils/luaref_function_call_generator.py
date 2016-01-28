@@ -19,28 +19,22 @@ def generate_fun_args(out,arg_num):
 
 def generate(out,arg_num):
 	generate_template(out,arg_num)
-	out.write('inline FunEvaluator LuaRef::operator()(')
+	out.write('inline FunctionResults LuaRef::operator()(')
 	generate_fun_args(out,arg_num)
 	out.write(')\n')
 	out.write('{\n')
-	out.write('  value_type typ = type();\n')
-	out.write('  if(typ != TYPE_FUNCTION && typ != TYPE_THREAD){except::typeMismatchError(state_, "is not function");return FunEvaluator(state_);}\n')
-	out.write('  int argstart = lua_gettop(state_);\n')
+	out.write('  util::ScopedSavedStack save(state_);\n')
+	out.write('  push(state_);\n')
+	out.write('  int typ = lua_type(state_, -1);\n')
+	out.write('  lua_State* exec_state = state_;\n')
+	out.write('  if(typ == TYPE_FUNCTION){}\n')
+	out.write('  else if(typ == TYPE_THREAD){exec_state = get<lua_State*>();}\n')
+	out.write('  else{except::typeMismatchError(exec_state, " is not function or thread");return FunctionResults();}\n')
+	out.write('  int argstart = lua_gettop(exec_state);\n')
 	for i in range (1,arg_num+1):
-		out.write('  lua_type_traits<T' +  str(i) + '>::push(state_,standard::forward<T' +  str(i) + '>(t' + str(i) + '));\n')
-	out.write('  int argnum = lua_gettop(state_) - argstart;\n')
-	out.write('  std::vector<LuaRef> args;\n')
-	out.write('  args.reserve(argnum);\n')
-
-	out.write('  for (int i = 0; i < argnum; ++i)\n')
-	out.write('    args.push_back(LuaRef(state_, StackTop()));\n')
-	out.write('  std::reverse(args.begin(), args.end());\n')
-
-	out.write('#if KAGUYA_USE_RVALUE_REFERENCE\n')
-	out.write('  return FunEvaluator(state_,*this,std::move(args));\n')
-	out.write('#else\n')
-	out.write('  return FunEvaluator(state_,*this,args);\n')
-	out.write('#endif\n')
+		out.write('  lua_type_traits<T' +  str(i) + '>::push(exec_state,standard::forward<T' +  str(i) + '>(t' + str(i) + '));\n')
+	out.write('  int argnum = lua_gettop(exec_state) - argstart;\n')
+	out.write('  return FunctionResults(funInvoke(exec_state,argnum));\n')
 	out.write('}\n')
 
 if __name__ == "__main__":
