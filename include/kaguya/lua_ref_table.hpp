@@ -30,6 +30,8 @@ namespace kaguya
 		using LuaRef::threadStatus;
 		using LuaRef::isThreadDead;
 		using LuaRef::costatus;
+		using LuaRef::resume;
+		using LuaRef::call;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaUserData);
 		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaUserData);
@@ -88,6 +90,8 @@ namespace kaguya
 		using LuaRef::threadStatus;
 		using LuaRef::isThreadDead;
 		using LuaRef::costatus;
+		using LuaRef::resume;
+		using LuaRef::call;
 	public:
 		KAGUYA_LUA_REF_EXTENDS_DEFAULT_DEFINE(LuaTable);
 		KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(LuaTable);
@@ -232,17 +236,11 @@ namespace kaguya
 		* template<class... Args>FunctionResults operator()(Args... args);
 		*/
 
-#if KAGUYA_USE_CPP11
-		template<class... Args>
-		FunctionResults operator()(Args&&... args)
-		{
-			return getValue()(standard::forward<Args>(args)...);
-		}
-#else
 #define KAGUYA_DELEGATE_LUAREF getValue()
-#include "kaguya/gen/delegate_to_luaref.inl"
+#include "kaguya/delegate_to_luaref.inl"
 #undef KAGUYA_DELEGATE_LUAREF
-#endif
+
+
 #if KAGUYA_USE_CPP11
 	private://cant resolve compile error on travis-ci g++ with c++03
 		//msg error: no matching function for call to 'forward(const t_02_classreg::ABC&)'
@@ -448,7 +446,7 @@ namespace kaguya
 	{
 		return !(rhs == lhs);
 	}
-	
+
 	template<>	struct lua_type_traits<LuaUserData> {
 		typedef LuaUserData get_type;
 		typedef LuaUserData push_type;
@@ -564,7 +562,7 @@ namespace kaguya
 			int count = 1;//array is 1 origin in Lua
 			for (typename std::vector<T>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
-				table.setField(count++ , *it);
+				table.setField(count++, *it);
 			}
 			table.push(l);
 			return 1;
@@ -624,7 +622,7 @@ namespace kaguya
 			LuaRef table(l, NewTable(0, int(v.size())));
 			for (typename std::map<K, V>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
-				table.setField(it->first , it->second);
+				table.setField(it->first, it->second);
 			}
 			table.push(l);
 			return 1;

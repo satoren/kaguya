@@ -6,6 +6,7 @@
 
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #B );
+#define TEST_EQUAL(A,B)  if(!(A == B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #A"==" #B +"\nleft:" + kaguya::standard::to_string(A)+"\nright:" + kaguya::standard::to_string(B));
 namespace t_01_primitive
 {
 	void bool_get(kaguya::State& state)
@@ -630,7 +631,20 @@ namespace t_03_function
 		int a, b, c, d, e;
 		a = b = c = d = e = 0;
 		kaguya::tie(a, b, c, d, e) = state["multresfun"]();
-		TEST_CHECK((a == 1 && b == 2 && c == 4 && d == 8 && e == 16));
+		TEST_EQUAL(a, 1);
+		TEST_EQUAL(b, 2);
+		TEST_EQUAL(c, 4);
+		TEST_EQUAL(d, 8);
+		TEST_EQUAL(e, 16);
+
+
+		a = b = c = d = e = 0;
+		kaguya::tie(a, b, c, d, e) = state["multresfun"].call<kaguya::standard::tuple<int,int,int,int,int> >();
+		TEST_EQUAL(a, 1);
+		TEST_EQUAL(b, 2);
+		TEST_EQUAL(c, 4);
+		TEST_EQUAL(d, 8);
+		TEST_EQUAL(e, 16);
 
 		state["multresfun"] = kaguya::function(tuplefun);
 
@@ -712,9 +726,9 @@ namespace t_03_function
 
 			kaguya::LuaFunction corfun = state["corfun"];
 			int r1 = cor2(corfun, 3);
-			int r2 = cor2();
-			int r3 = cor2();
-			int r4 = cor2();
+			int r2 = cor2.resume<int>();
+			int r3 = cor2.resume<int>();
+			int r4 = cor2.resume<int>();
 
 			TEST_CHECK((r1 == 3 && r2 == 6 && r3 == 9 && r4 == 12));
 		}
@@ -888,6 +902,25 @@ namespace t_04_lua_ref
 		globalTable["free2"] = kaguya::function(&free_standing_function);
 
 		TEST_CHECK(state("assert(free2()==12)"));
+
+
+		state("tbl.sum=function(...) local args = {...};"
+			"local total=0;"
+			"for i = 1, #args do "
+			"  total = total + args[i];"
+			" end "
+			"return total;"
+			"end");
+		TEST_CHECK(tbl["sum"](1, 2, 3, 4, 5, 6, 7, 8) == 36)
+		TEST_CHECK(tbl["sum"].call<int>(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+
+		state("tbl.retfun=function(tbl) return tbl.sum end");
+		TEST_CHECK((tbl->*"retfun")()(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+	
+		//callable check
+		TEST_CHECK((tbl->*"retfun").call<kaguya::LuaFunction>()(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+		TEST_CHECK((tbl->*"retfun")().call<int>(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+
 	}
 
 	struct ob

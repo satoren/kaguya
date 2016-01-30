@@ -562,4 +562,7 @@ namespace kaguya
 			return 1;
 		}
 	};
+
+
+
 };

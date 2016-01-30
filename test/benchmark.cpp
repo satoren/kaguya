@@ -31,7 +31,7 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 			total_time += end - start;
 		}
 
-		std::cout << test_name << " avegrage time:" << total_time/N << std::endl;
+		std::cout << test_name << " average time:" << total_time/N << std::endl;
 	}
 }
 
@@ -46,6 +46,7 @@ int main()
 	ADD_BENCHMARK(kaguya_api_benchmark______::object_pointer_register_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::call_lua_function);
 	ADD_BENCHMARK(original_api_no_type_check::call_lua_function);
+	ADD_BENCHMARK(kaguya_api_benchmark______::call_lua_function_operator_functional);
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_access);
 	ADD_BENCHMARK(original_api_no_type_check::lua_table_access);
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_access);

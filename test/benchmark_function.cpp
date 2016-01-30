@@ -65,10 +65,22 @@ namespace kaguya_api_benchmark______
 		kaguya::LuaRef lua_function = state["lua_function"];
 		for (int i = 0; i < 1000000; i++)
 		{
+			int r = lua_function.call<int>(i);
+			if (r != i) { throw std::logic_error(""); }
+		}
+	}
+	void call_lua_function_operator_functional(kaguya::State& state)
+	{
+		state("lua_function=function(i)return i;end");
+
+		kaguya::LuaRef lua_function = state["lua_function"];
+		for (int i = 0; i < 1000000; i++)
+		{
 			int r = lua_function(i);
 			if (r != i) { throw std::logic_error(""); }
 		}
 	}
+	
 	void lua_table_access(kaguya::State& state)
 	{
 		state("lua_table={value=0}");

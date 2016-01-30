@@ -2,7 +2,7 @@
 def gen_args(write,arg_num,format,separator=","):
 	for i in range (arg_num):
 		if i > 0:
-			write(separator)			
+			write(separator)
 		write(format.replace('#N#',str(i)))
 
 def gen_template(write,arg_num):
@@ -19,17 +19,16 @@ def gen_ref_tuple(write,arg_num):
 	write("):")
 	gen_args(write,arg_num,"v#N#(va#N#)")
 	write("{}\n")
-	
+
 	gen_args(write,arg_num,"  T#N#& v#N#;","")
-	
+
 	write("\n  static const int size="+str(arg_num)+";\n")
-	
+
 	write("  template<class T>\n")
-	write("  void operator=(const T& eval)\n  {\n")
-	write("    const std::vector<LuaRef>& res = eval.get_result(size);\n")
-	
-	gen_args(write,arg_num,"    if(#N# < res.size())v#N# = res[#N#].get<T#N#>();","\n")
-	
+	write("  void operator=(const T& fres)\n  {\n")
+	write("    using standard::get;\n")
+	gen_args(write,arg_num,"    v#N# =get<#N#>(fres);","\n")
+
 	write("\n")
 	write("  }\n")
 	write("};\n\n")

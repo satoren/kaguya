@@ -44,7 +44,11 @@ namespace kaguya
 	};
 	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
 
-
+	namespace util
+	{
+		template<class Result>
+		inline Result get_result(lua_State* l);
+	}
 	/**
 	* Reference of Lua any type value.
 	*/
@@ -58,6 +62,9 @@ namespace kaguya
 	private:
 		lua_State *state_;
 		int ref_;
+
+		typedef void (LuaRef::*bool_type)() const;
+		void this_type_does_not_support_comparisons() const {}
 
 		void unref()
 		{
@@ -127,7 +134,7 @@ namespace kaguya
 			int vc = lua_type_traits<V>::push(state_, standard::forward<V>(value));//push value
 
 			if (!pushCountCheck<K>(kc) || !pushCountCheck<V>(vc)) { return; }
-			lua_settable(state_, -3);//thistable[key] = value 
+			lua_settable(state_, -3);//thistable[key] = value
 		}
 
 		static lua_State* toMainThread(lua_State* state)
@@ -158,51 +165,15 @@ namespace kaguya
 			}
 			return true;
 		}
-
-		std::vector<LuaRef> funInvoke(lua_State* state,int argnum)
+		int lua_resume_compat(lua_State *L, int nargs)
 		{
-			util::ScopedSavedStack save(state, 0);
-
-			std::vector<LuaRef> results;
-			if (type() == TYPE_THREAD)
-			{
-				//stack first is function.other arguments.
-				int argnum = lua_gettop(state) - 1;
 #if LUA_VERSION_NUM >= 502
-				int result = lua_resume(state, 0, argnum);
+			return lua_resume(L, 0, nargs);
 #else
-				int result = lua_resume(state, argnum);
+			return lua_resume(L, nargs);
 #endif
-				except::checkErrorAndThrow(result, state);
-				int retnum = lua_gettop(state);
-				if (0 < retnum)
-				{
-					results.reserve(retnum);
-				}
-				for (int i = 0; i < retnum; ++i)
-				{
-					results.push_back(LuaRef(state, StackTop()));
-				}
-				std::reverse(results.begin(), results.end());
-			}
-			else
-			{
-				int result = lua_pcall(state, argnum, LUA_MULTRET, 0);
-
-				except::checkErrorAndThrow(result, state);
-				int retnum = lua_gettop(state);
-				if (0 < retnum)
-				{
-					results.reserve(retnum);
-				}
-				for (int i = 0; i < retnum; ++i)
-				{
-					results.push_back(LuaRef(state, StackTop()));
-				}
-				std::reverse(results.begin(), results.end());
-			}
-			return results;
 		}
+
 	public:
 
 		struct NoMainCheck {};
@@ -362,8 +333,11 @@ namespace kaguya
 			return get<T>();
 		}
 
-		operator bool()const {
-			return !isNilref() && get<bool>() == true;
+
+
+		operator bool_type() const
+		{
+			return (!isNilref() && get<bool>() == true)? &LuaRef::this_type_does_not_support_comparisons : 0;
 		}
 
 		/**
@@ -386,17 +360,103 @@ namespace kaguya
 
 		//@}
 
+
+#if KAGUYA_USE_CPP11
+		template<class Result, class...Args> Result call(Args... args)
+		{
+			util::ScopedSavedStack save(state_, 0);
+			push(state_);
+			int argstart = lua_gettop(state_);
+
+			util::push_args(state_, standard::forward<Args>(args)...);
+
+			int argnum = lua_gettop(state_) - argstart;
+			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);
+			except::checkErrorAndThrow(result, state_);
+			return util::get_result<Result>(state_);
+		}
+		template<class Result, class...Args> Result resume(Args... args)
+		{
+			lua_State* cor = get<lua_State*>();
+			util::ScopedSavedStack save(cor, 0);
+
+			util::push_args(cor, standard::forward<Args>(args)...);
+
+			//stack first is function.other arguments.
+			int argnum = lua_gettop(cor) - 1;
+			int result = lua_resume_compat(cor, argnum);
+			except::checkErrorAndThrow(result, cor);
+
+			return util::get_result<Result>(cor);
+		}
+
+		template<class...Args> FunctionResults operator()(Args... args);
+#else
+
+#define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)
+#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
+#define KAGUYA_PUSH_ARG_DEF(N) ,standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N))
+#define KAGUYA_CALL_DEF(N) \
+		template<class Result KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
+		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+		{\
+			util::ScopedSavedStack save(state_, 0);\
+			push(state_);\
+			int argstart = lua_gettop(state_);\
+			util::push_args(state_ KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_ARG_DEF));\
+			int argnum = lua_gettop(state_) - argstart;\
+			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);\
+			except::checkErrorAndThrow(result, state_);\
+			return util::get_result<Result>(state_);\
+		}
+
+
+		KAGUYA_CALL_DEF(0)
+			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
+
+#define KAGUYA_RESUME_DEF(N) \
+		template<class Result  KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
+		Result resume(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+		{\
+			lua_State* cor = get<lua_State*>();\
+			util::ScopedSavedStack save(cor, 0);\
+			util::push_args(cor KAGUYA_PP_REPEAT(N, KAGUYA_PUSH_ARG_DEF));\
+			int argnum = lua_gettop(cor) - 1;\
+			int result = lua_resume_compat(cor, argnum);\
+			except::checkErrorAndThrow(result, cor);\
+			return util::get_result<Result>(cor);\
+		}
+
+			KAGUYA_RESUME_DEF(0)
+			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
+
+#undef KAGUYA_PUSH_DEF
+#undef KAGUYA_PUSH_ARG_DEF
+#undef KAGUYA_PP_TEMPLATE
+#undef KAGUYA_RESUME_DEF
+
+#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
+#define KAGUYA_OP_FN_DEF(N) \
+		template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
+		FunctionResults operator()(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG));
+
 		/**
 		* @name operator()
 		* @brief If type is function, call lua function.
-		   If type is lua thread,start or resume lua thread.
-		   Otherwise send error message to error handler
+		If type is lua thread,start or resume lua thread.
+		Otherwise send error message to error handler
 		* @param arg... function args
 		*/
 		//@{
-#include "kaguya/gen/luaref_fun_def.inl"
+		FunctionResults operator()();
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 		//@}
+#undef KAGUYA_PP_TEMPLATE
+#undef KAGUYA_PP_FARG
+#undef KAGUYA_CALL_DEF
+#undef KAGUYA_OP_FN_DEF
 
+#endif
 		/**
 		* @name coroutine type
 		*/
@@ -404,7 +464,7 @@ namespace kaguya
 		/**
 		* @return state status
 		*/
-		int threadStatus()const
+			int threadStatus()const
 		{
 			if (isNilref())
 			{
@@ -668,7 +728,7 @@ namespace kaguya
 			}
 			lua_type_traits<int>::push(state_, index);
 			lua_gettable(state_, -2);
-			return lua_type_traits<T>::get(state_,-1);
+			return lua_type_traits<T>::get(state_, -1);
 		}
 		LuaRef getField(int index)const
 		{
@@ -729,10 +789,10 @@ namespace kaguya
 			lua_pushnil(state_);
 			while (lua_next(state_, top) != 0)
 			{
-				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state_,-1);
+				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state_, -1);
 				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state_, -2);
 				f(key, value);
-				lua_pop(state_,1);//pop value
+				lua_pop(state_, 1);//pop value
 			}
 		}
 
@@ -745,7 +805,7 @@ namespace kaguya
 		std::vector<K> keys()const
 		{
 			std::vector<K> res;
-			foreach_table<K,void>(gettablekey<K>(res));
+			foreach_table<K, void>(gettablekey<K>(res));
 			return res;
 		}
 		std::vector<LuaRef> keys()const { return keys<LuaRef>(); }
@@ -757,7 +817,7 @@ namespace kaguya
 		std::vector<V> values()const
 		{
 			std::vector<V> res;
-			foreach_table<void,V>(gettablevalue<V>(res));
+			foreach_table<void, V>(gettablevalue<V>(res));
 			return res;
 		}
 		std::vector<LuaRef> values()const { return values<LuaRef>(); }
@@ -900,12 +960,81 @@ namespace kaguya
 		lua_pushvalue(l, index);
 		return LuaRef(l, StackTop());
 	}
-	inline int lua_type_traits<LuaRef>::push(lua_State* l, lua_type_traits<LuaRef>:: push_type v)
+	inline int lua_type_traits<LuaRef>::push(lua_State* l, lua_type_traits<LuaRef>::push_type v)
 	{
 		v.push(l);
 		return 1;
 	}
 
+	namespace util
+	{
+
+		template<class Result>
+		inline Result get_result_impl(lua_State* l, types::typetag<Result>)
+		{
+			return lua_type_traits<Result>::get(l, 1);
+		}
+		template<>
+		inline std::vector<LuaRef> get_result_impl<std::vector<LuaRef> >(lua_State* l, types::typetag<std::vector<LuaRef> >)
+		{
+			std::vector<LuaRef> results;
+			int num = lua_gettop(l);
+			if (0 < num)
+			{
+				results.reserve(num);
+			}
+			for (int i = 0; i < num; ++i)
+			{
+				results.push_back(LuaRef(l, StackTop()));
+			}
+			std::reverse(results.begin(), results.end());
+			return results;
+		}
+#if KAGUYA_USE_CPP11
+		inline standard::tuple<> get_result_tuple_impl(lua_State* l, int index, types::typetag<standard::tuple<> > tag)
+		{
+			return standard::tuple<>();
+		}
+		template<typename T,typename... TYPES>
+		inline standard::tuple<T,TYPES...> get_result_tuple_impl(lua_State* l,int index, types::typetag<standard::tuple<T,TYPES...> > tag)
+		{
+			return standard::tuple_cat(standard::tuple<T>(lua_type_traits<T>::get(l, index) ),
+			get_result_tuple_impl(l, index+1, types::typetag<standard::tuple<TYPES...> >()));
+		}
+		template<typename... TYPES>
+		inline standard::tuple<TYPES...> get_result_impl(lua_State* l, types::typetag<standard::tuple<TYPES...> > tag)
+		{
+			return get_result_tuple_impl<TYPES...>(l,1,tag);
+		}
+#else
+
+		inline standard::tuple<> get_result_impl(lua_State *l, types::typetag<standard::tuple<> > tag)
+		{
+			return standard::tuple<>();
+		}
+
+#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
+#define KAGUYA_PP_TARG(N) KAGUYA_PP_CAT(A,N)
+#define KAGUYA_GET_DEF(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(l, N) 
+#define KAGUYA_GET_TUPLE_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
+		inline standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> get_result_impl(lua_State *l,types::typetag<standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> >)\
+		{\
+			return standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG) >(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_GET_DEF));\
+		}
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_GET_TUPLE_DEF)
+#undef KAGUYA_PP_TEMPLATE
+#undef KAGUYA_PP_TARG
+#undef KAGUYA_GET_DEF
+#undef KAGUYA_GET_TUPLE_DEF
+#endif
+
+		template<class Result>
+		inline Result get_result(lua_State* l)
+		{
+			return get_result_impl(l,types::typetag<Result>());
+		}
+
+	}
 }
 
 
@@ -986,7 +1115,7 @@ static_cast<LuaRef&>(*this) = standard::forward<LuaRef>(src); \
 return *this; \
 }
 #else
-#define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME) 
+#define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME)
 #endif
 
 #if KAGUYA_USE_CPP11

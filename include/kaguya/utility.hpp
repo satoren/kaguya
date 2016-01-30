@@ -1,10 +1,11 @@
 #pragma once
 
 #include "kaguya/config.hpp"
+#include "kaguya/type.hpp"
+#include "kaguya/preprocess.hpp"
 
 namespace kaguya
 {
-
 	namespace util
 	{
 		class ScopedSavedStack {
@@ -98,5 +99,42 @@ namespace kaguya
 			}
 			printf("\n");  /* end the listing */
 		}
+
+#if KAGUYA_USE_CPP11
+		inline void push_args(lua_State *l)
+		{
+		}
+		template<class Arg, class...Args>
+		inline void push_args(lua_State *l, Arg&& arg, Args&&... args)
+		{
+			lua_type_traits<Arg>::push(l, standard::forward<Arg>(arg));
+			push_args(l, standard::forward<Args>(args)...);
+		}
+		template<class Arg, class...Args>
+		inline void push_args(lua_State *l, const Arg& arg,Args&&... args)
+		{
+			lua_type_traits<Arg>::push(l, arg);
+			push_args(l, standard::forward<Args>(args)...);
+		}
+#else
+		inline void push_args(lua_State *l)
+		{
+		}
+
+#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
+#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
+#define KAGUYA_PUSH_DEF(N) lua_type_traits<KAGUYA_PP_CAT(A,N) >::push(l, standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N))); 
+#define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
+		inline void push_args(lua_State *l,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+		{\
+			using standard::forward;\
+			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF)\
+		}
+		KAGUYA_PP_REPEAT_DEF(9,KAGUYA_PUSH_ARG_DEF)
+#undef KAGUYA_PP_TEMPLATE
+#undef KAGUYA_PP_FARG
+#undef KAGUYA_PUSH_DEF
+#undef KAGUYA_PUSH_ARG_DEF
+#endif
 	}
 }
