@@ -1,5 +1,14 @@
 #include "kaguya/kaguya.hpp"
 
+namespace
+{
+
+	int test_native_function(int arg)
+	{
+		return arg;
+	}
+}
+
 namespace kaguya_api_benchmark______
 {
 	class SetGet
@@ -57,7 +66,19 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			);
 	}
-
+	void call_native_function(kaguya::State& state)
+	{
+		state["nativefun"] = &test_native_function;
+		state(
+			"local times = 1000000\n"
+			"for i=1,times do\n"
+			"local r = nativefun(i)\n"
+			"if(r ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			);
+	}
 	void call_lua_function(kaguya::State& state)
 	{
 		state("lua_function=function(i)return i;end");
@@ -135,18 +156,43 @@ namespace kaguya_api_benchmark______
 
 namespace original_api_no_type_check
 {
+	int static_native_function_binding(lua_State* L)
+	{
+		int arg = lua_tonumber(L,1);
+		int result = test_native_function(arg);
+		lua_pushnumber(L,result);
+		return 1;
+	}
+	void call_native_function(kaguya::State& state)
+	{
+		lua_State* s = state.state();
+		lua_pushcclosure(s, static_native_function_binding, 0);  /* closure with those upvalues */
+		lua_setglobal(s,"nativefun");
+
+		state(
+			"local times = 1000000\n"
+			"for i=1,times do\n"
+			"local r = nativefun(i)\n"
+			"if(r ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			);
+	}
 	void call_lua_function(kaguya::State& state)
 	{
 		lua_State* s = state.state();
 		luaL_dostring(s,"lua_function=function(i)return i;end");
+		lua_getglobal(s, "lua_function");
+		int funref = luaL_ref(s, LUA_REGISTRYINDEX);
 		for (int i = 0; i < 1000000; i++)
 		{
-			lua_getglobal(s, "lua_function");
+			lua_rawgeti(s, LUA_REGISTRYINDEX, funref);
 			lua_pushnumber(s, i);
 			lua_pcall(s, 1, 1, 0);
 			int r = static_cast<int>(lua_tonumber(s, -1));
 			if (r != i) { throw std::logic_error(""); }
-			lua_settop(s, 0);
+			lua_pop(s, 1);
 		}
 	}
 	void lua_table_access(kaguya::State& state)
