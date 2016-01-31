@@ -235,7 +235,7 @@ namespace kaguya
 	};
 
 
-	std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
+	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
 		std::vector<LuaRef> results = res.get_result();
 		

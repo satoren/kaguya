@@ -1039,7 +1039,7 @@ namespace kaguya
 		v.push(l);
 		return 1;
 	}
-	std::ostream& operator<<(std::ostream& os, const LuaRef& ref)
+	inline std::ostream& operator<<(std::ostream& os, const LuaRef& ref)
 	{
 		ref.dump(os);
 		return os;

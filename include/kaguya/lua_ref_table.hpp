@@ -283,7 +283,7 @@ namespace kaguya
 	};
 
 
-	std::ostream& operator<<(std::ostream& os, const TableKeyReference& ref)
+	inline std::ostream& operator<<(std::ostream& os, const TableKeyReference& ref)
 	{
 		ref.getValue().dump(os);
 		return os;
