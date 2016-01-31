@@ -23,6 +23,7 @@ namespace kaguya_api_benchmark______
 		{
 			return _i;
 		}
+		double a;
 	private:
 		double _i;
 	};
@@ -32,6 +33,7 @@ namespace kaguya_api_benchmark______
 			.addConstructor()
 			.addMember("set", &SetGet::set)
 			.addMember("get", &SetGet::get)
+			.addProperty("a", &SetGet::a)
 			);
 
 		state(

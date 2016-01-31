@@ -234,6 +234,19 @@ namespace kaguya
 #undef KAGUYA_DELEGATE_LUAREF
 	};
 
+
+	std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
+	{
+		std::vector<LuaRef> results = res.get_result();
+		
+		for (std::vector<LuaRef>::iterator it = results.end(); it != results.end(); ++it)
+		{
+			it->dump(os); os << ",";
+		}
+		
+		return os;
+	}
+
 	template<>	struct lua_type_traits<FunctionResults> {
 		static int push(lua_State* l, const FunctionResults& ref)
 		{

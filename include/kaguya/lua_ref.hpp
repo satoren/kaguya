@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <set>
 #include <map>
 #include <cassert>
 #include <algorithm>
+#include <ostream>
 #include "kaguya/config.hpp"
 #include "kaguya/error_handler.hpp"
 #include "kaguya/type.hpp"
@@ -337,7 +339,7 @@ namespace kaguya
 
 		operator bool_type() const
 		{
-			return (!isNilref() && get<bool>() == true)? &LuaRef::this_type_does_not_support_comparisons : 0;
+			return (!isNilref() && get<bool>() == true) ? &LuaRef::this_type_does_not_support_comparisons : 0;
 		}
 
 		/**
@@ -440,17 +442,17 @@ namespace kaguya
 		template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
 		FunctionResults operator()(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG));
 
-		/**
-		* @name operator()
-		* @brief If type is function, call lua function.
-		If type is lua thread,start or resume lua thread.
-		Otherwise send error message to error handler
-		* @param arg... function args
-		*/
-		//@{
-		FunctionResults operator()();
+			/**
+			* @name operator()
+			* @brief If type is function, call lua function.
+			If type is lua thread,start or resume lua thread.
+			Otherwise send error message to error handler
+			* @param arg... function args
+			*/
+			//@{
+			FunctionResults operator()();
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
-		//@}
+			//@}
 #undef KAGUYA_PP_TEMPLATE
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF
@@ -911,7 +913,72 @@ namespace kaguya
 		{
 			return !(other == *this);
 		}
+
+		const void* native_pointer()const
+		{
+			util::ScopedSavedStack save(state_);
+			push(state_);
+			return lua_topointer(state_, -1);
+		}
 		//@}
+		static void putindent(std::ostream& os, int indent)
+		{
+			while (indent-- > 0)
+			{
+				os << "  ";
+			}
+		}
+		void dump(std::ostream& os, int nest = 0,std::set<const void*>& outtable = std::set<const void*>())const
+		{
+			static int MAX_RECURSIVE = 32;
+			switch (type())
+			{
+			case LuaRef::TYPE_NIL:
+				os << "nil";
+				break;
+			case LuaRef::TYPE_BOOL:
+				os << get<bool>();
+				break;
+			case LuaRef::TYPE_NUMBER:
+				os << get<double>();
+				break;
+			case LuaRef::TYPE_STRING:
+				os << "'" << get<std::string>() << "'";
+				break;
+			case LuaRef::TYPE_TABLE:
+			{
+				const void* ptr= native_pointer();
+				if (outtable.count(ptr))
+				{
+					os << "{" << ptr << "}" << std::endl;
+					return;
+				}
+				outtable.insert(ptr);
+				os << "{";
+				std::map<LuaRef, LuaRef> table = map();
+				bool first = true;
+				for (std::map<LuaRef, LuaRef>::iterator it = table.begin(); it != table.end(); it++)
+				{
+					if (first) { first = false; }
+					else { os << ","; }
+					it->first.dump(os, nest + 1, outtable);
+					os << " = ";
+					it->second.dump(os, nest + 1, outtable);
+				}
+				os << "}";
+			}
+			break;
+			case LuaRef::TYPE_LIGHTUSERDATA:
+			case LuaRef::TYPE_FUNCTION:
+			case LuaRef::TYPE_USERDATA:
+			case LuaRef::TYPE_THREAD:
+				os << typeName() << "(" << native_pointer() << ")";
+				break;
+			default:
+				os << "unknown type";
+				break;
+			}
+		}
 	};
 
 	template<typename T>
@@ -965,6 +1032,12 @@ namespace kaguya
 		v.push(l);
 		return 1;
 	}
+	std::ostream& operator<<(std::ostream& os, const LuaRef& ref)
+	{
+		ref.dump(os);
+		return os;
+	}
+
 
 	namespace util
 	{
@@ -995,16 +1068,16 @@ namespace kaguya
 		{
 			return standard::tuple<>();
 		}
-		template<typename T,typename... TYPES>
-		inline standard::tuple<T,TYPES...> get_result_tuple_impl(lua_State* l,int index, types::typetag<standard::tuple<T,TYPES...> > tag)
+		template<typename T, typename... TYPES>
+		inline standard::tuple<T, TYPES...> get_result_tuple_impl(lua_State* l, int index, types::typetag<standard::tuple<T, TYPES...> > tag)
 		{
-			return standard::tuple_cat(standard::tuple<T>(lua_type_traits<T>::get(l, index) ),
-			get_result_tuple_impl(l, index+1, types::typetag<standard::tuple<TYPES...> >()));
+			return standard::tuple_cat(standard::tuple<T>(lua_type_traits<T>::get(l, index)),
+				get_result_tuple_impl(l, index + 1, types::typetag<standard::tuple<TYPES...> >()));
 		}
 		template<typename... TYPES>
 		inline standard::tuple<TYPES...> get_result_impl(lua_State* l, types::typetag<standard::tuple<TYPES...> > tag)
 		{
-			return get_result_tuple_impl<TYPES...>(l,1,tag);
+			return get_result_tuple_impl<TYPES...>(l, 1, tag);
 		}
 #else
 
@@ -1028,10 +1101,10 @@ namespace kaguya
 #undef KAGUYA_GET_TUPLE_DEF
 #endif
 
-		template<class Result>
+			template<class Result>
 		inline Result get_result(lua_State* l)
 		{
-			return get_result_impl(l,types::typetag<Result>());
+			return get_result_impl(l, types::typetag<Result>());
 		}
 
 	}

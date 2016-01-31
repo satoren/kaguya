@@ -282,6 +282,13 @@ namespace kaguya
 		LuaRef key_;
 	};
 
+
+	std::ostream& operator<<(std::ostream& os, const TableKeyReference& ref)
+	{
+		ref.getValue().dump(os);
+		return os;
+	}
+
 	inline const LuaRef& toLuaRef(const LuaUserData& ref)
 	{
 		return static_cast<const LuaRef&>(ref);
