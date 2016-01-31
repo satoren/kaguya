@@ -928,7 +928,14 @@ namespace kaguya
 				os << "  ";
 			}
 		}
-		void dump(std::ostream& os, int nest = 0,std::set<const void*>& outtable = std::set<const void*>())const
+
+		void dump(std::ostream& os)const
+		{
+			std::set<const void*> table;
+			dump_impl(os,0, table);
+		}
+		private:
+		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
 		{
 			static int MAX_RECURSIVE = 32;
 			switch (type())
@@ -961,9 +968,9 @@ namespace kaguya
 				{
 					if (first) { first = false; }
 					else { os << ","; }
-					it->first.dump(os, nest + 1, outtable);
+					it->first.dump_impl(os, nest + 1, outtable);
 					os << " = ";
-					it->second.dump(os, nest + 1, outtable);
+					it->second.dump_impl(os, nest + 1, outtable);
 				}
 				os << "}";
 			}
