@@ -2,7 +2,6 @@
 
 #include "kaguya/config.hpp"
 #include "kaguya/type.hpp"
-#include "kaguya/preprocess.hpp"
 
 namespace kaguya
 {

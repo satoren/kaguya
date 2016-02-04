@@ -164,7 +164,7 @@ namespace kaguya
 
 		virtual bool is_native_type(const std::string& type)
 		{
-			return metatableName<T >() == type;
+			return metatableName<T>() == type;
 		}
 		virtual void* get()
 		{
@@ -226,9 +226,9 @@ namespace kaguya
 	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index,const std::string& require_type= std::string())
 	{
 		util::ScopedSavedStack save(l);
-		void* ptr = lua_touserdata(l, index);
-		if (ptr && lua_type(l, index) == LUA_TUSERDATA)
+		if (lua_type(l, index) == LUA_TUSERDATA)
 		{
+			void* ptr = lua_touserdata(l, index);
 			if (static_cast<ObjectWrapperBase*>(ptr)->is_native_type(require_type))
 			{
 				return static_cast<ObjectWrapperBase*>(ptr);
@@ -288,7 +288,7 @@ namespace kaguya
 			ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
 			if (objwrapper)
 			{
-				if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableName<T>()))
+				if (objwrapper->is_native_type(metatableName<T>()))
 				{
 					return static_cast<const T*>(objwrapper->native_cget());
 				}

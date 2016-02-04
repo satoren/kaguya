@@ -589,7 +589,7 @@ namespace t_03_function
 
 		(state["foo"]->*"setBar")("test2");
 		TEST_EQUAL(foo.bar , "test2");
-#if __cplusplus >= 201103L || defined(__cpp_lambdas)
+#if KAGUYA_USE_CPP11
 		lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
 		TEST_CHECK(state("Foo.bar('test3')"));
 		TEST_EQUAL(foo.bar , "test3");
@@ -839,6 +839,38 @@ namespace t_03_function
 
 		state["reffun"](kaguya::standard::ref(foo));
 		TEST_EQUAL(foo.bar, "BarBar");
+	}
+
+	void native_function_call_test(kaguya::State& state)
+	{
+		using namespace kaguya::nativefunction;
+		Foo foo;
+		state.newRef(6).push();
+		state.newRef(9).push();
+		state.newRef(2).push();
+		
+		int r = call(state.state(), &free_standing_function);
+
+		lua_settop(state.state(), 0);
+		state.newRef(&foo).push();
+		state.newRef("Bar").push();
+		call(state.state(), &Foo::setBar);
+#if KAGUYA_USE_CPP11
+		state.newRef(&foo).push();
+		state.newRef(9).push();
+		call(state.state(), [](Foo* foo, int b) {
+			foo->setBar("fromlambda");
+		});
+		TEST_EQUAL(foo.bar, "fromlambda");
+
+		std::string capture("capture");
+		call(state.state(), [=](Foo* foo, int b) {
+			foo->setBar(capture + "lambda");
+		});
+		TEST_EQUAL(foo.bar, "capturelambda");
+#endif
+		
+		lua_settop(state.state(), 0);
 	}
 	
 
@@ -1532,6 +1564,7 @@ bool execute_test(const test_function_map_t& testmap)
 	return !fail;
 }
 
+
 int main()
 {
 	bool test_result = false;
@@ -1575,6 +1608,9 @@ int main()
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
 		ADD_TEST(t_03_function::arg_class_ref);
+
+		ADD_TEST(t_03_function::native_function_call_test);
+
 		ADD_TEST(t_04_lua_ref::access);
 		ADD_TEST(t_04_lua_ref::newtable);
 		ADD_TEST(t_04_lua_ref::callfunction);

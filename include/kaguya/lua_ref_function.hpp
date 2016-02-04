@@ -326,7 +326,7 @@ namespace kaguya
 	}
 
 	//!FunEvaluator is deleted. typedef for compatibility
-	KAGUYA_DEPRECATED typedef	FunctionResults FunEvaluator;
+	typedef	FunctionResults FunEvaluator;
 
 	/**
 	* @brief table and function binder.

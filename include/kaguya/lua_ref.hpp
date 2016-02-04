@@ -937,7 +937,6 @@ namespace kaguya
 		private:
 		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
 		{
-			static int MAX_RECURSIVE = 32;
 			switch (type())
 			{
 			case LuaRef::TYPE_NIL:

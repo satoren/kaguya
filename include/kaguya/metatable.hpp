@@ -115,17 +115,33 @@ namespace kaguya
 		template<typename... Args>
 		ClassMetatable& addConstructor()
 		{
-			function_map_["new"].push_back(FunctorType::ConstructorInvoker<class_type, Args...>());
+			typedef typename nativefunction::constructor_signature_type<class_type, Args...> cons;
+			function_map_["new"].push_back(cons());
 			return *this;
 		}
 #else
-#include "gen/add_constructor.inl"
+#define KAGUYA_TEMPLATE_PARAMETER(N)
+#define KAGUYA_ADD_CON_FN_DEF(N) \
+	KAGUYA_TEMPLATE_PARAMETER(N)\
+	inline ClassMetatable& addConstructor()\
+	{\
+		typedef typename nativefunction::constructor_signature_type<class_type KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)> cons;\
+		function_map_["new"].push_back(cons());\
+		return *this;\
+	}
+	KAGUYA_ADD_CON_FN_DEF(0)
+#undef KAGUYA_TEMPLATE_PARAMETER
+#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
+	KAGUYA_PP_REPEAT_DEF(9, KAGUYA_ADD_CON_FN_DEF)
+#undef KAGUYA_TEMPLATE_PARAMETER
+#undef KAGUYA_ADD_CON_FN_DEF
 #endif
 		//variadic arguments constructor(receive const std::vector<LuaRef>&)
 //		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
 		ClassMetatable& addConstructorVariadicArg()
 		{
-			function_map_["new"].push_back(FunctorType::VariadicConstructorInvoker<class_type>());
+			typedef typename nativefunction::constructor_signature_type<class_type, VariadicArgType> cons;
+			function_map_["new"].push_back(FunctorType(cons()));
 			return *this;
 		}
 
@@ -345,7 +361,7 @@ namespace kaguya
 		template<typename Fun>
 		ClassMetatable& addFunction(const char* name, Fun f)
 		{
-			function_map_[name].push_back(f);
+			function_map_[name].push_back(FunctorType(f));
 			return *this;
 		}
 
