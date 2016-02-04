@@ -183,7 +183,27 @@ namespace kaguya
 				}
 				virtual int invoke(lua_State *state)
 				{
-					return call(state, func_);
+					int count = call(state, func_);
+					
+					// If return pointer,return value retain first argment object
+					// example: a = value.pointer_member; value = nil;
+					// a has value reference
+					// fixme not good implement this
+					int top = lua_gettop(state);
+					if (top != count)
+					{
+						for (int i = top - count + 1; i <= top; ++i)
+						{
+							ObjectWrapperBase* wrapper = object_wrapper(state, i);
+							if (wrapper)
+							{
+								wrapper->addRef(state, 1);//this_ retain
+							}
+						}
+					}
+
+					return count;
+
 				}
 				virtual std::string argumentTypeNames() {
 					return argTypesName(func_);

@@ -7,6 +7,88 @@ namespace kaguya
 {
 	namespace util
 	{
+		class Ref
+		{
+		public:
+			Ref(const Ref& src) :state_(src.state_)
+			{
+				if (src.state_ != 0)
+				{
+					src.push(state_);
+					ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				}
+				else
+				{
+					ref_ = LUA_REFNIL;
+				}
+			}
+			Ref& operator =(const Ref& src)
+			{
+				unref();
+				state_ = src.state_;
+				if (src.state_ != 0)
+				{
+					src.push(state_);
+					ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				}
+				else
+				{
+					ref_ = LUA_REFNIL;
+				}
+				return *this;
+			}
+#if KAGUYA_USE_RVALUE_REFERENCE
+			Ref(Ref&& src)throw() :state_(0), ref_(LUA_REFNIL)
+			{
+				swap(src);
+			}
+			Ref& operator =(Ref&& src)throw()
+			{
+				swap(src);
+				return *this;
+			}
+#endif
+
+			Ref() :state_(0), ref_(LUA_REFNIL) {}
+			Ref(lua_State* state) :state_(state), ref_(LUA_REFNIL) {}
+
+			Ref(lua_State* state, int index) :state_(state), ref_(LUA_REFNIL)
+			{
+				lua_pushvalue(state_,index);
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			}
+			void swap(Ref& other)throw()
+			{
+				std::swap(state_, other.state_);
+				std::swap(ref_, other.ref_);
+			}
+			~Ref()
+			{
+				unref();
+			}
+			void ref()
+			{
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			}
+			void unref()
+			{
+				luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+				state_ = 0;
+				ref_ = LUA_REFNIL;
+			}
+			void push()const
+			{
+				push(state_);
+			}
+			void push(lua_State* state)const
+			{
+				lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
+			}
+		private:
+			lua_State *state_;
+			int ref_;
+		};
+
 		class ScopedSavedStack {
 			lua_State * state_;
 			int saved_top_index_;
@@ -16,7 +98,7 @@ namespace kaguya
 				: state_(state),
 				saved_top_index_(lua_gettop(state_))
 			{}
-			explicit ScopedSavedStack(lua_State * state,int count)
+			explicit ScopedSavedStack(lua_State * state, int count)
 				: state_(state),
 				saved_top_index_(count)
 			{}
@@ -62,7 +144,7 @@ namespace kaguya
 #else
 			lua_pushstring(state, message);
 #endif
-		}
+	}
 
 		inline void stackDump(lua_State *L) {
 			int i;
@@ -110,7 +192,7 @@ namespace kaguya
 			push_args(l, standard::forward<Args>(args)...);
 		}
 		template<class Arg, class...Args>
-		inline void push_args(lua_State *l, const Arg& arg,Args&&... args)
+		inline void push_args(lua_State *l, const Arg& arg, Args&&... args)
 		{
 			lua_type_traits<Arg>::push(l, arg);
 			push_args(l, standard::forward<Args>(args)...);
@@ -129,11 +211,11 @@ namespace kaguya
 			using standard::forward;\
 			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF)\
 		}
-		KAGUYA_PP_REPEAT_DEF(9,KAGUYA_PUSH_ARG_DEF)
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_PUSH_ARG_DEF)
 #undef KAGUYA_PP_TEMPLATE
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_PUSH_DEF
 #undef KAGUYA_PUSH_ARG_DEF
 #endif
-	}
+		}
 }

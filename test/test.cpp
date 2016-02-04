@@ -522,6 +522,9 @@ namespace t_02_classreg
 	struct PropHolder
 	{
 		Prop mem;
+		~PropHolder() {
+			int A = 0;
+		}
 	};
 	void add_property_ref_check(kaguya::State& state)
 	{
@@ -537,6 +540,14 @@ namespace t_02_classreg
 		state["prop"] = &prop;
 		TEST_CHECK(state("prop.mem.a=455"));
 		TEST_EQUAL(prop.mem.a , 455);
+
+		{//member retain check
+			state["prop"] = PropHolder();
+			TEST_CHECK(state("member = prop.mem"));
+			TEST_CHECK(state("prop = nil"));
+			state.garbageCollect();
+			TEST_CHECK(state("member.a = 3232"));
+		}
 	}
 }
 

@@ -101,7 +101,15 @@ namespace kaguya
 		virtual const void* cget() = 0;
 		virtual void* get() = 0;
 
+		virtual void addRef(lua_State* state,int index) {};
+
+		ObjectWrapperBase() {}
 		virtual ~ObjectWrapperBase() {}
+	private:
+
+		//noncopyable
+		ObjectWrapperBase(const ObjectWrapperBase&);
+		ObjectWrapperBase& operator=(const ObjectWrapperBase&);
 	};
 
 	template<class T>
@@ -203,6 +211,11 @@ namespace kaguya
 		}
 		virtual const void* native_cget() { return cget(); };
 		virtual void* native_get() { return get(); };
+
+
+		virtual void addRef(lua_State* state, int index) { retain_ref_.push_back(util::Ref(state,index)); };
+	private:
+		std::vector<util::Ref> retain_ref_;
 	};
 
 	inline bool recursive_base_type_check(lua_State* l, int index, const std::string& require_type)
@@ -225,9 +238,9 @@ namespace kaguya
 
 	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index,const std::string& require_type= std::string())
 	{
-		util::ScopedSavedStack save(l);
 		if (lua_type(l, index) == LUA_TUSERDATA)
 		{
+			util::ScopedSavedStack save(l);
 			void* ptr = lua_touserdata(l, index);
 			if (static_cast<ObjectWrapperBase*>(ptr)->is_native_type(require_type))
 			{
