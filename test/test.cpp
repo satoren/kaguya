@@ -1350,12 +1350,8 @@ namespace t_07_any_type_test
 		TEST_CHECK(test(state, std::numeric_limits<double>::min(), std::numeric_limits<double>::min()));
 		TEST_CHECK(test(state, std::numeric_limits<float>::max(), std::numeric_limits<float>::max()));
 		TEST_CHECK(test(state, std::numeric_limits<double>::max(), std::numeric_limits<double>::max()));
-#if LUA_VERSION_NUM > 502
-		TEST_CHECK(test(state, std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::min()));
-		TEST_CHECK(test(state, std::numeric_limits<uint64_t>::min(), std::numeric_limits<uint64_t>::min()));
-		TEST_CHECK(test(state, std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max()));
-		TEST_CHECK(test(state, std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint64_t>::max()));
-#endif
+		TEST_CHECK(test(state, std::numeric_limits<kaguya::luaInt>::min(), std::numeric_limits<kaguya::luaInt>::min()));
+		TEST_CHECK(test(state, std::numeric_limits<kaguya::luaInt>::max(), std::numeric_limits<kaguya::luaInt>::max()));
 		TEST_CHECK(test(state, short(5), short(5)));
 		TEST_CHECK(test(state, 1, state.newRef(1)));
 		TEST_CHECK(test(state, "test", state.newRef("test")));
@@ -1454,6 +1450,29 @@ namespace t_08_cxx11_feature
 
 		state["free2"] = kaguya::function([]() {return 12; });
 		TEST_EQUAL(state["free2"]() , 12.0);
+
+
+		state["sum"] = kaguya::function([](kaguya::VariadicArgType args) {
+			int sum = 0;
+			for (int arg : args)
+			{
+				sum += arg;
+			}
+			return sum;
+		});
+		TEST_EQUAL(state["sum"](1,2,3,4,5,6,7,8,9,10), 55);
+
+
+
+		state["ssum"] = kaguya::function([](kaguya::VariadicArgType args) {
+			std::string sum;
+			for (std::string arg : args)
+			{
+				sum += arg;
+			}
+			return sum;
+		});
+		TEST_EQUAL(state["ssum"](1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "12345678910");
 	}
 
 	void put_unique_ptr(kaguya::State& state)

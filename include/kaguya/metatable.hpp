@@ -246,7 +246,7 @@ namespace kaguya
 			}
 			else if (value.type == ValueType::int_value)
 			{
-				lua_type_traits<int64_t>::push(state, value.ivalue);
+				lua_type_traits<luaInt>::push(state, value.ivalue);
 			}
 			else if (value.type == ValueType::double_value)
 			{

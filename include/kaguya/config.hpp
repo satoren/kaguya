@@ -116,4 +116,9 @@ namespace kaguya
 		}
 	}
 #endif
+#if LUA_VERSION_NUM > 502
+	typedef lua_Integer luaInt;
+#else
+	typedef int luaInt;
+#endif
 }

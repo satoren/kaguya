@@ -451,19 +451,19 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return lua_type_traits<int64_t>::strictCheckType(l, index);
+			return lua_type_traits<luaInt>::strictCheckType(l, index);
 		}
 		static bool checkType(lua_State* l, int index)
 		{
-			return lua_type_traits<int64_t>::checkType(l, index);
+			return lua_type_traits<luaInt>::checkType(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			return static_cast<get_type>(lua_type_traits<int64_t>::get(l, index));
+			return static_cast<get_type>(lua_type_traits<luaInt>::get(l, index));
 		}
 		static int push(lua_State* l, push_type s)
 		{
-			return lua_type_traits<int64_t>::push(l, static_cast<typename lua_type_traits<int64_t>::push_type>(s));
+			return lua_type_traits<luaInt>::push(l, static_cast<typename lua_type_traits<int64_t>::push_type>(s));
 		}
 	};
 

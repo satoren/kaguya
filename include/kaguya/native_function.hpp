@@ -38,6 +38,89 @@ namespace kaguya
 			}
 			return result;
 		}
+
+		struct reference
+		{
+			reference(lua_State* s, int index) :state(s), stack_index(index)
+			{
+			}
+
+			template<typename T>
+			operator T()const
+			{
+				return lua_type_traits<T>::get(state, stack_index);
+			}
+			template<typename T>T get()const
+			{
+				return lua_type_traits<T>::get(state, stack_index);
+			}
+			enum value_type type() const
+			{
+				return (value_type)lua_type(state, stack_index);
+			}
+			std::string typeName()const
+			{
+				return lua_typename(state, type());
+			}
+
+			int stack_index;
+			lua_State* state;
+		};
+		struct iterator
+		{
+			iterator(lua_State* state, int index) :state_(state), stack_index_(index)
+			{
+			}
+			reference operator*()const
+			{
+				return reference(state_,stack_index_);
+			}
+			const iterator& operator++()
+			{
+				stack_index_++;
+				return *this;
+			}
+			iterator operator++(int)
+			{
+				return iterator(state_, stack_index_++);
+			}
+
+			iterator operator+=(int n)
+			{
+				stack_index_ += n;
+				return iterator(state_, stack_index_);
+			}
+			bool operator==(const iterator& other)const
+			{
+				return state_ == other.state_ && stack_index_ == other.stack_index_;
+			}
+			bool operator!=(const iterator& other)const
+			{
+				return !(*this == other);
+			}
+		private:
+			int stack_index_;
+			lua_State* state_;
+		};
+		typedef iterator const_iterator;
+		typedef reference const_reference;
+
+		iterator begin()
+		{
+			return iterator(state_, startIndex_);
+		}
+		iterator end()
+		{
+			return iterator(state_, endIndex_);
+		}
+		const_iterator cbegin()
+		{
+			return const_iterator(state_, startIndex_);
+		}
+		const_iterator cend()
+		{
+			return const_iterator(state_, endIndex_);
+		}
 	private:
 		int startIndex_;
 		int endIndex_;
