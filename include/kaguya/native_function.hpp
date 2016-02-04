@@ -6,8 +6,6 @@
 #include "kaguya/config.hpp"
 #include "kaguya/utility.hpp"
 #include "kaguya/type.hpp"
-#include "kaguya/lua_ref.hpp"
-
 
 #if KAGUYA_USE_CPP11
 #include "native_function_cxx11.hpp"
@@ -54,17 +52,17 @@ namespace kaguya
 			{
 				return lua_type_traits<T>::get(state, stack_index);
 			}
-			enum value_type type() const
+			int type() const
 			{
-				return (value_type)lua_type(state, stack_index);
+				return lua_type(state, stack_index);
 			}
 			std::string typeName()const
 			{
 				return lua_typename(state, type());
 			}
 
-			int stack_index;
 			lua_State* state;
+			int stack_index;
 		};
 		struct iterator
 		{
