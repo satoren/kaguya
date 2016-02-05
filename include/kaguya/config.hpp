@@ -1,3 +1,7 @@
+// Copyright satoren
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
 #pragma once
 
 #include<string>
@@ -70,7 +74,7 @@ namespace kaguya
 
 		inline std::string to_string(int v)
 		{
-			char buffer[128] = { 0 };
+			char buffer[28] = { 0 };
 			snprintf(buffer, sizeof(buffer), "%d", v);
 			return buffer;
 		}

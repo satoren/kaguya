@@ -69,7 +69,7 @@ extern "C" int luaopen_modulename(lua_State *L)
 
 ```
 
-### Holding Lua value
+### Retain Lua value from C++
 LuaRef type is like a Variant type.
 You can use for holding a Lua-value in native code.
 ```c++
@@ -185,7 +185,7 @@ state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::endl;
 state("lambda()");//lambda called
 ```
 
-#### Variadic argments function
+#### Variadic arguments function
 ```c++
 state["va_fun"] = kaguya::function([](kaguya::VariadicArgType arg) {for (auto v : arg) { std::cout << v.get<std::string>() << ","; }std::cout << std::endl; });//C++11 lambda
 state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
@@ -219,7 +219,7 @@ while(!cor2.isThreadDead())
 ```
 
 
-### type conversion
+### Automatic type conversion
 std::map and std::vector will be convert to a lua-table by default
 ```c++
 kaguya::State s;
@@ -252,7 +252,7 @@ cat     124
 apple   3
 ```
 
-#### type conversion customize
+#### Type conversion customize
   If you want to customize the conversion to type of lua yourself ,implement specialize of kaguya::lua_type_traits
 
   example: this code is default implements for std::string
