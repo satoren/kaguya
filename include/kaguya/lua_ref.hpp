@@ -1112,11 +1112,16 @@ namespace kaguya
 #undef KAGUYA_GET_TUPLE_DEF
 #endif
 
-			template<class Result>
+		template<class Result>
 		inline Result get_result(lua_State* l)
 		{
 			return get_result_impl(l, types::typetag<Result>());
 		}
+		template<>
+		inline void get_result<void>(lua_State* l)
+		{
+		}
+
 
 	}
 }

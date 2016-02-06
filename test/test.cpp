@@ -779,6 +779,9 @@ namespace t_03_function
 			TEST_EQUAL(r2, 6);
 			TEST_EQUAL(r3, 9);
 			TEST_EQUAL(r4, 12);
+
+
+			cor2.resume<void>(corfun, 3);
 		}
 		{
 
@@ -991,8 +994,11 @@ namespace t_04_lua_ref
 			" end "
 			"return total;"
 			"end");
-		TEST_CHECK(tbl["sum"](1, 2, 3, 4, 5, 6, 7, 8) == 36)
-		TEST_CHECK(tbl["sum"].call<int>(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+		TEST_CHECK(tbl["sum"](1, 2, 3, 4, 5, 6, 7, 8) == 36);
+		TEST_CHECK(tbl["sum"].call<int>(1, 2, 3, 4, 5, 6, 7, 8) == 36);
+
+		//no return compile test
+		tbl["sum"].call<void>(1, 2, 3, 4, 5, 6, 7, 8);
 
 		state("tbl.retfun=function(tbl) return tbl.sum end");
 		TEST_CHECK((tbl->*"retfun")()(1, 2, 3, 4, 5, 6, 7, 8) == 36)
