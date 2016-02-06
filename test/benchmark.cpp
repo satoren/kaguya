@@ -52,8 +52,10 @@ int main()
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_access);
 	ADD_BENCHMARK(original_api_no_type_check::lua_table_access);
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_access);
+	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_assign);
+	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_get);
 	
-	
+
 
 	execute_benchmark(functionmap);
 
