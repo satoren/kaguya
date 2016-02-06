@@ -230,15 +230,15 @@ namespace kaguya
 		//@}
 
 		//! return element reference from global table
-		TableKeyReference operator[](const std::string& str)
+		TableKeyReference<std::string> operator[](const std::string& str)
 		{
-			return TableKeyReference(globalTable(), LuaRef(state_, str));
+			return TableKeyReference<std::string>(globalTable(), LuaRef(state_, str));
 		}
 
 		//! return element reference from global table
-		TableKeyReference operator[](const char* str)
+		TableKeyReference<std::string> operator[](const char* str)
 		{
-			return TableKeyReference(globalTable(), LuaRef(state_, str));
+			return TableKeyReference<std::string>(globalTable(), LuaRef(state_, str));
 		}
 
 		//! return global table

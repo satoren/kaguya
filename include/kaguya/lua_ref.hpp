@@ -25,7 +25,7 @@ namespace kaguya
 	class LuaTable;
 	class LuaFunction;
 	class LuaThread;
-	class TableKeyReference;
+	template<typename KEY>class TableKeyReference;
 	class FunctionResults;
 	class mem_fun_binder;
 
@@ -65,7 +65,6 @@ namespace kaguya
 		friend class LuaTable;
 		friend class LuaFunction;
 		friend class LuaThread;
-		friend class TableKeyReference;
 	private:
 		lua_State *state_;
 		int ref_;
@@ -182,6 +181,7 @@ namespace kaguya
 		}
 
 	public:
+		lua_State *state()const { return state_; };
 
 		struct NoMainCheck {};
 		bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
@@ -583,25 +583,25 @@ namespace kaguya
 		* @param key key of table
 		* @return reference of field value
 		*/
-		TableKeyReference operator[](const LuaRef& key);
+		TableKeyReference<LuaRef> operator[](const LuaRef& key);
 		/**
 		* @brief value = table[key];or table[key] = value;
 		* @param key key of table
 		* @return reference of field value
 		*/
-		TableKeyReference operator[](const char* key);
+		TableKeyReference<std::string> operator[](const char* key);
 		/**
 		* @brief value = table[key];or table[key] = value;
 		* @param key key of table
 		* @return reference of field value
 		*/
-		TableKeyReference operator[](const std::string& key);
+		TableKeyReference<std::string> operator[](const std::string& key);
 		/**
 		* @brief value = table[index];or table[index] = value;
 		* @param index index of table
 		* @return reference of field value
 		*/
-		TableKeyReference operator[](int index);
+		TableKeyReference<int> operator[](int index);
 
 		/**
 		* @brief value = table[key];
