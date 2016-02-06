@@ -207,14 +207,15 @@ kaguya::LuaFunction corfun = state["corfun"];//lua function get
 //exec coroutine with function and argment
 std::cout << int(cor(corfun, 3)) << std::endl;//3
 std::cout << int(cor()) << std::endl;//6
-std::cout << int(cor()) << std::endl;//9
+//resume template argument is result type
+std::cout << cor.resume<int>() << std::endl;//9
 std::cout << int(cor()) << std::endl;//12
 
 kaguya::LuaThread cor2 = state.newThread();
 //3,6,9,12,
 while(!cor2.isThreadDead())
 {
-    std::cout << int(cor2(corfun, 3)) << ",";
+    std::cout << cor2.resume<int>(corfun, 3) << ",";
 }
 ```
 
