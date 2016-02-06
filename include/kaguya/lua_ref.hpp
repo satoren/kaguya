@@ -173,6 +173,7 @@ namespace kaguya
 		}
 		int lua_resume_compat(lua_State *L, int nargs)
 		{
+			if (nargs < 0) { nargs = 0; }
 #if LUA_VERSION_NUM >= 502
 			return lua_resume(L, 0, nargs);
 #else
