@@ -242,7 +242,7 @@ namespace kaguya
 		static bool checkType(lua_State* l, int index)
 		{
 			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
-				lua_type(l, index) == LUA_TNIL;
+				lua_isnil(l, index);
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
@@ -250,7 +250,7 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (lua_type(l, index) == LUA_TNIL) {
+			if (lua_isnil(l, index)) {
 				return get_type();
 			}
 			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
@@ -280,7 +280,7 @@ namespace kaguya
 		static bool checkType(lua_State* l, int index)
 		{
 			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
-				lua_type(l, index) == LUA_TNIL;
+				lua_isnil(l, index);
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
@@ -288,7 +288,7 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (lua_type(l, index) == LUA_TNIL) {
+			if (lua_isnoneornil(l, index)) {
 				return 0;
 			}
 			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
@@ -315,17 +315,15 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
-			int type = lua_type(l, index);
-			return type == LUA_TNIL || type == LUA_TNONE;
+			return lua_isnoneornil(l, index);
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return lua_type(l, index) == LUA_TNIL;
+			return lua_isnil(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			int type = lua_type(l, index);
-			if (type != LUA_TNIL && type != LUA_TNONE) {
+			if (!lua_isnoneornil(l, index)) {
 				throw LuaTypeMismatch("type mismatch!!");
 			}
 			return nullptr;

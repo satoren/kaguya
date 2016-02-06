@@ -47,7 +47,7 @@ namespace kaguya
 		template<typename T>bool get_metatable(lua_State* l)
 		{
 			luaL_getmetatable(l, metatableName<T>().c_str());
-			return LUA_TNIL != lua_type(l, -1);
+			return !lua_isnil(l, -1);
 		}
 		template<typename T>bool available_metatable(lua_State* l)
 		{
@@ -88,7 +88,7 @@ namespace kaguya
 	{
 		util::ScopedSavedStack save(l);
 		luaL_getmetatable(l, t);
-		return LUA_TNIL != lua_type(l, -1);
+		return !lua_isnil(l, -1);
 	}
 	template<typename T>
 	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())
