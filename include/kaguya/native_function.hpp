@@ -102,8 +102,8 @@ namespace kaguya
 				return !(*this == other);
 			}
 		private:
-			int stack_index_;
 			lua_State* state_;
+			int stack_index_;
 		};
 		typedef iterator const_iterator;
 		typedef reference const_reference;
