@@ -125,9 +125,9 @@ namespace kaguya
 			return const_iterator(state_, endIndex_);
 		}
 	private:
+		lua_State* state_;
 		int startIndex_;
 		int endIndex_;
-		lua_State* state_;
 	};
 	template<> struct lua_type_traits<VariadicArgType>
 	{

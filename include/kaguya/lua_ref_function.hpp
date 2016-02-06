@@ -425,5 +425,6 @@ namespace kaguya
 
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
+#undef KAGUYA_TEMPLATE_PARAMETER
 #endif
 }

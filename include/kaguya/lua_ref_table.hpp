@@ -132,8 +132,11 @@ namespace kaguya
 		friend class State;
 		template<typename OTHERKEY>
 		friend class TableKeyReference;
-
-
+		
+		TableKeyReference<std::string> operator[](const char* key)
+		{
+			return getValue()[key];
+		}
 		TableKeyReference<std::string> operator[](const std::string& key)
 		{
 			return getValue()[key];
