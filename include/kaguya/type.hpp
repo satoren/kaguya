@@ -147,14 +147,27 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (traits::is_const<T>::value)
+			int type = lua_type(l, index);
+			if (type == LUA_TUSERDATA || type == LUA_TLIGHTUSERDATA)
 			{
-				return const_cast<get_type>(get_const_pointer(l, index, types::typetag<T>()));
+				if (traits::is_const<T>::value)
+				{
+					return const_cast<get_type>(get_const_pointer(l, index, types::typetag<T>()));
+				}
+				else
+				{
+					return get_pointer(l, index, types::typetag<T>());
+				}
 			}
-			else
+
+			if (type == LUA_TNIL
+				|| type == LUA_TNONE
+				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
 			{
-				return get_pointer(l, index, types::typetag<T>());
+				return 0;
 			}
+			throw LuaTypeMismatch("type mismatch!!");
+			return 0;
 		}
 		static int push(lua_State* l, push_type v)
 		{

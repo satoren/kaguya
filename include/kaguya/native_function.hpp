@@ -202,7 +202,15 @@ namespace kaguya
 							ObjectWrapperBase* wrapper = object_wrapper(state, i);
 							if (wrapper)
 							{
-								wrapper->addRef(state, 1);//this_ retain
+								for (int arg = 1; arg < top - count; ++arg)
+								{
+									if (lua_type(state, arg) == LUA_TUSERDATA)
+									{
+										//return value retain arguments
+										wrapper->addRef(state, arg);
+									}
+
+								}
 							}
 						}
 					}
@@ -231,10 +239,6 @@ namespace kaguya
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(2)));
 
-				if (!(*fun)->checktype(l, false))
-				{
-					return 0;
-				}
 				return fun;
 			}
 			FunctorType* weak_match = 0;
