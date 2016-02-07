@@ -286,14 +286,14 @@ namespace kaguya
 		//push to Lua stack
 		int push()const
 		{
-			push(state_);
+			return push(state_);
 		}
 		int push(lua_State* state)const
 		{
 			if (isNilref())
 			{
 				lua_pushnil(state);
-				return;
+				return 1;
 			}
 #if LUA_VERSION_NUM >= 502
 			if (state != state_)
