@@ -1511,6 +1511,15 @@ namespace t_08_cxx11_feature
 			return sum;
 		});
 		TEST_EQUAL(state["ssum"](1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "12345678910");
+
+
+		state["overload"] = kaguya::overload([](int) {return 1; },
+			[](const std::string&) {return 2; },
+			[]() {return 3; }
+		);
+		state("assert(overload() == 1)");//no argument version
+		state("assert(overload('2') == 2)");//string version
+		state("assert(overload(2) == 3)");//int version
 	}
 
 	void put_unique_ptr(kaguya::State& state)

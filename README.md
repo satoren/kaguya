@@ -183,6 +183,16 @@ state("fun(22)");//c_free_standing_function called:22
 
 state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::endl;});//C++11 lambda
 state("lambda()");//lambda called
+
+
+state["overload"] = kaguya::overload([](int) {std::cout << "int version" << std::endl; },
+	[](const std::string&) {std::cout << "string version" << std::endl; },
+	[]() {std::cout << "no arg version" << std::endl; }
+);
+state("overload()");//no args version
+state("overload(2)");//int version
+state("overload('2')");//string version
+
 ```
 
 #### Variadic arguments function
