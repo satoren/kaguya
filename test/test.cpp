@@ -484,7 +484,7 @@ namespace t_02_classreg
 	void shared_ptr_null(kaguya::State& state)
 	{
 		kaguya::standard::shared_ptr<int> ptr(new int(5));
-		state["foo"] = kaguya::function(kaguya::standard::function<void(kaguya::standard::shared_ptr<int>)>(shared_ptr_fun(ptr)));
+		state["foo"] = kaguya::function<void(kaguya::standard::shared_ptr<int>)>(shared_ptr_fun(ptr));
 		state("foo(nil)");
 		TEST_EQUAL(ptr , 0);
 	}
@@ -601,7 +601,7 @@ namespace t_03_function
 		(state["foo"]->*"setBar")("test2");
 		TEST_EQUAL(foo.bar , "test2");
 #if KAGUYA_USE_CPP11
-		lfoo["bar"] = kaguya::function(kaguya::standard::function<void(std::string)>([&foo](std::string str) { foo.bar = str; }));
+		lfoo["bar"] = kaguya::function<void(std::string)>([&foo](std::string str) { foo.bar = str; });
 		TEST_CHECK(state("Foo.bar('test3')"));
 		TEST_EQUAL(foo.bar , "test3");
 		lfoo["bar"] = kaguya::function([&foo](std::string str) { foo.bar = str; });
@@ -1333,8 +1333,7 @@ namespace t_07_any_type_test
 	template<class T, class T2> bool function_call(kaguya::State& state, T setvalue, T2 condvalue)
 	{
 		callback_function<T2> fun(condvalue);
-		kaguya::standard::function<bool(T2)>f = fun;
-		state["testfn"] = kaguya::function(f);
+		state["testfn"] = kaguya::function<bool(T2)>(fun);
 		state["value"] = setvalue;
 		return state("assert(testfn(value))");
 	}

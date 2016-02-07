@@ -330,7 +330,7 @@ namespace kaguya
 
 	typedef nativefunction::FunctorType FunctorType;
 
-
+	//deprecate
 	template<typename T>
 	inline FunctorType lua_function(T f)
 	{
@@ -341,6 +341,12 @@ namespace kaguya
 	inline FunctorType function(T f)
 	{
 		return FunctorType(standard::forward<T>(f));
+	}
+
+	template<typename FTYPE, typename T>
+	inline FunctorType function(T f)
+	{
+		return FunctorType(standard::function<FTYPE>(f));
 	}
 
 	template<>	struct lua_type_traits<FunctorType> {
