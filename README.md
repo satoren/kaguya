@@ -42,9 +42,9 @@ int main()
 extern "C" int luaopen_modulename(lua_State *L)
 {
    kaguya::State state(l);
-   kaguya::LuaRef module = state.newLib();
+   kaguya::LuaTable module = state.newTable();
    module["function"] = kaguya::funtion(somefunction);
-   return 1;//number of return lib
+   return module.push();//number of return lib
 }
 ```
 
@@ -52,7 +52,12 @@ extern "C" int luaopen_modulename(lua_State *L)
 ```c++
   kaguya::State state;
   state("a = 'test'");//from string
-  state.loadFile("path/to/luascript.lua");//from file
+  state.dofile("path/to/luascript.lua");//from file
+
+  kaguya::LuaFunction f1 = state.loadFile("path/to/luascript.lua");//load file without execute
+  f1();//execute
+  kaguya::LuaFunction f2 = state.loadFile("a = 'test'");//load string without execute
+  f2();//execute
 ```
 
 ### Accessing values
