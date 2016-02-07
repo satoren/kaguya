@@ -330,6 +330,9 @@ namespace kaguya
 
 	typedef nativefunction::FunctorType FunctorType;
 
+
+	typedef std::vector<FunctorType> FunctorOverloadType;
+
 	//deprecate
 	template<typename T>
 	inline FunctorType lua_function(T f)
@@ -348,6 +351,46 @@ namespace kaguya
 	{
 		return FunctorType(standard::function<FTYPE>(f));
 	}
+
+#if KAGUYA_USE_CPP11
+	namespace detail
+	{
+		inline void push_back_r(FunctorOverloadType& v)
+		{
+		}
+		template<typename F, typename... Functions>
+		void push_back_r(FunctorOverloadType& v, const F& f, const Functions&... fns)
+		{
+			v.reserve(sizeof...(fns));
+			v.push_back(f);
+			push_back_r(v, fns...);
+		}
+	}
+	template<typename... Functions>
+	inline FunctorOverloadType overload(const Functions&... fns)
+	{
+		FunctorOverloadType v;
+		detail::push_back_r(v, fns...);
+		return v;
+	}
+#else
+
+#define KAGUYA_DEF_TEMPLATE(N) KAGUYA_PP_CAT(typename F,N)
+#define KAGUYA_PUSH_DEF(N) v.push_back(KAGUYA_PP_CAT(f,N));
+#define KAGUYA_ARG_DEF(N) KAGUYA_PP_CAT(F,N) KAGUYA_PP_CAT(f,N)
+#define KAGUYA_FOVERLOAD_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_DEF_TEMPLATE)>\
+		FunctorOverloadType overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_ARG_DEF))\
+		{\
+			FunctorOverloadType v;\
+			v.reserve(N);\
+			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF);\
+			return v;\
+		}
+	KAGUYA_PP_REPEAT_DEF(9, KAGUYA_FOVERLOAD_DEF);
+#undef KAGUYA_DEF_TEMPLATE
+#undef KAGUYA_PUSH_DEF
+#undef KAGUYA_FOVERLOAD_DEF
+#endif
 
 	template<>	struct lua_type_traits<FunctorType> {
 		typedef FunctorType get_type;
@@ -393,9 +436,28 @@ namespace kaguya
 	};
 
 	template<>	struct lua_type_traits<const FunctorType&> :lua_type_traits<FunctorType> {};
-
-
+	
+	//specialize for c function
 	template<typename T> struct lua_type_traits < T
 		, typename traits::enable_if<traits::is_function<typename traits::remove_pointer<T>::type>::value>::type > :lua_type_traits<FunctorType> {};
+
+
+
+	template<>	struct lua_type_traits<FunctorOverloadType> {
+		typedef const FunctorOverloadType& push_type;
+
+		static int push(lua_State* l, push_type fns)
+		{
+			lua_pushnumber(l, static_cast<lua_Number>(fns.size()));
+			for (FunctorOverloadType::const_iterator f = fns.begin(); f != fns.end(); ++f)
+			{
+				void *storage = lua_newuserdata(l, sizeof(FunctorType));
+				new(storage) FunctorType(*f);
+				class_userdata::setmetatable<FunctorType>(l);
+			}
+			lua_pushcclosure(l, &nativefunction::functor_dispatcher, static_cast<int>(fns.size() + 1));
+			return 1;
+		}
+	};
 
 };

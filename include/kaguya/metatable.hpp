@@ -38,8 +38,8 @@ namespace kaguya
 			enum { str_value, int_value, double_value } type;
 		};
 
-		typedef std::vector<FunctorType> FuncArrayType;
-		typedef std::map<std::string, FuncArrayType> FuncMapType;
+		typedef std::vector<FunctorType> FunctorOverloadType;
+		typedef std::map<std::string, FunctorOverloadType> FuncMapType;
 
 		typedef std::map<std::string, ValueType> ValueMapType;
 		typedef std::map<std::string, std::string> CodeChunkMapType;
@@ -229,19 +229,12 @@ namespace kaguya
 			}
 			return false;
 		}
-		void registerFunction(lua_State* state, const char* name, const FuncArrayType& func_array)const
+		void registerFunction(lua_State* state, const char* name, const FunctorOverloadType& func_array)const
 		{
-			int funcnum = int(func_array.size());
-			if (funcnum == 0) { return; }
-			lua_pushnumber(state, funcnum);
-			for (FuncArrayType::const_iterator f = func_array.begin(); f != func_array.end(); ++f)
+			if (lua_type_traits<FunctorOverloadType>::push(state, func_array))
 			{
-				void *storage = lua_newuserdata(state, sizeof(FunctorType));
-				new(storage) FunctorType(*f);
-				class_userdata::setmetatable<FunctorType>(state);
+				lua_setfield(state, -2, name);
 			}
-			lua_pushcclosure(state, &nativefunction::functor_dispatcher, funcnum + 1);
-			lua_setfield(state, -2, name);
 		}
 		void registerField(lua_State* state, const char* name, const ValueType& value)const
 		{

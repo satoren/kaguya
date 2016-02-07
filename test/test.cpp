@@ -886,6 +886,28 @@ namespace t_03_function
 		
 		lua_settop(state.state(), 0);
 	}
+
+	int overload1()
+	{
+		return 1;
+	}
+	int overload2(const std::string&)
+	{
+		return 2;
+	}
+	int overload3(int)
+	{
+		return 3;
+	}
+
+	void overload(kaguya::State& state)
+	{
+		state["overloaded_function"] = kaguya::overload(overload1, overload2, overload3);
+		kaguya::LuaFunction f = state["overloaded_function"];
+		TEST_EQUAL(f(), 1);
+		TEST_EQUAL(f(""), 2);
+		TEST_EQUAL(f(121), 3);
+	}
 	
 
 	enum TestEnum
@@ -1645,6 +1667,7 @@ int main()
 		ADD_TEST(t_03_function::arg_class_ref);
 
 		ADD_TEST(t_03_function::native_function_call_test);
+		ADD_TEST(t_03_function::overload);
 
 		ADD_TEST(t_04_lua_ref::access);
 		ADD_TEST(t_04_lua_ref::newtable);
