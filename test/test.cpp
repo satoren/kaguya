@@ -1517,9 +1517,9 @@ namespace t_08_cxx11_feature
 			[](const std::string&) {return 2; },
 			[]() {return 3; }
 		);
-		state("assert(overload() == 1)");//no argument version
+		state("assert(overload(2) == 1)");//int version
 		state("assert(overload('2') == 2)");//string version
-		state("assert(overload(2) == 3)");//int version
+		state("assert(overload() == 3)");//no argument version
 	}
 
 	void put_unique_ptr(kaguya::State& state)
