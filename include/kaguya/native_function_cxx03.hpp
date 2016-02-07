@@ -87,8 +87,7 @@ namespace kaguya
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				Ret r = f(KAGUYA_GET_REPEAT(N));\
-				return lua_type_traits<Ret>::push(state, standard::forward<Ret>(r));\
+				return lua_type_traits<Ret>::push(state, f(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
@@ -147,8 +146,7 @@ namespace kaguya
 			inline int call(lua_State* state,KAGUYA_FUNC_DEF(N))\
 			{\
 				KAGUYA_MEM_ATTRBUTE ThisType* this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::get(state, 1); \
-				Ret r = (this_->*f)(KAGUYA_GET_REPEAT(N));\
-				return lua_type_traits<Ret>::push(state, standard::forward<Ret>(r));\
+				return lua_type_traits<Ret>::push(state, (this_->*f)(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename ThisType,typename Ret  KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
@@ -200,8 +198,7 @@ namespace kaguya
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				Ret r = f(KAGUYA_GET_REPEAT(N));\
-				return lua_type_traits<Ret>::push(state, standard::forward<Ret>(r));\
+				return lua_type_traits<Ret>::push(state,f(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\

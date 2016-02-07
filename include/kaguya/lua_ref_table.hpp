@@ -193,7 +193,7 @@ namespace kaguya
 
 		//! register class metatable to lua and set to table
 		template<typename T, typename P>
-		void setClass(const ClassMetatable<T, P>& reg, bool auto_reg_shared_ptr = true)
+		void setClass(const ClassMetatable<T, P>& reg)
 		{
 			set_class(reg);
 		}
