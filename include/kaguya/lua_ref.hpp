@@ -284,11 +284,11 @@ namespace kaguya
 		}
 
 		//push to Lua stack
-		void push()const
+		int push()const
 		{
 			push(state_);
 		}
-		void push(lua_State* state)const
+		int push(lua_State* state)const
 		{
 			if (isNilref())
 			{
@@ -302,6 +302,7 @@ namespace kaguya
 			}
 #endif
 			lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
+			return 1;
 		}
 
 		template<typename T>

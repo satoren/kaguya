@@ -235,17 +235,18 @@ namespace kaguya
 		{
 			return parent_.getField(key_);
 		}
-		void push(lua_State* state)const
+		int push(lua_State* state)const
 		{
 			parent_.push(state);
 			lua_type_traits<key_type>::push(state, key_);
 			lua_gettable(state, -2);
 			lua_remove(state,-2);//remove table
+			return 1;
 		}
 
-		void push()const
+		int push()const
 		{
-			push(parent_.state());
+			return push(parent_.state());
 		}
 
 		operator LuaRef() const {
