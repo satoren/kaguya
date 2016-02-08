@@ -908,6 +908,15 @@ namespace t_03_function
 		TEST_EQUAL(f(""), 2);
 		TEST_EQUAL(f(121), 3);
 	}
+
+
+	void result_to_table(kaguya::State& state)
+	{
+		state["result_to_table"] = kaguya::function(overload1);
+		state["result"] = state["result_to_table"]();
+		TEST_EQUAL(state["result"], 1);
+	}
+
 	
 
 	enum TestEnum
@@ -1171,6 +1180,7 @@ namespace t_04_lua_ref
 		state["value"]["abc"]["bbb"] = "test";
 		TEST_CHECK(state("assert(value.abc.bbb == 'test')"));
 		state["value"]["abc"]["ddd"] = state["value"]["abc"]["ccc"] = state["value"]["abc"]["bbb"];
+		TEST_CHECK(state("print(value.abc.ccc)"));
 		TEST_CHECK(state("assert(value.abc.ccc == 'test')"));
 		TEST_CHECK(state("assert(value.abc.ddd == 'test')"));
 
@@ -1677,6 +1687,7 @@ int main()
 
 		ADD_TEST(t_03_function::native_function_call_test);
 		ADD_TEST(t_03_function::overload);
+		ADD_TEST(t_03_function::result_to_table);
 
 		ADD_TEST(t_04_lua_ref::access);
 		ADD_TEST(t_04_lua_ref::newtable);

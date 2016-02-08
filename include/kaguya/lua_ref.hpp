@@ -25,7 +25,7 @@ namespace kaguya
 	class LuaTable;
 	class LuaFunction;
 	class LuaThread;
-	template<typename KEY>class TableKeyReference;
+	class TableKeyReference;
 	class FunctionResults;
 	class mem_fun_binder;
 
@@ -54,7 +54,7 @@ namespace kaguya
 	namespace util
 	{
 		template<class Result>
-		inline Result get_result(lua_State* l);
+		inline Result get_result(lua_State* l,int startindex);
 	}
 	/**
 	* Reference of Lua any type value.
@@ -373,30 +373,29 @@ namespace kaguya
 #if KAGUYA_USE_CPP11
 		template<class Result, class...Args> Result call(Args... args)
 		{
-			util::ScopedSavedStack save(state_, 0);
+			int argstart = lua_gettop(state_) + 1;
+			util::ScopedSavedStack save(state_, argstart - 1);
 			push(state_);
-			int argstart = lua_gettop(state_);
-
 			util::push_args(state_, standard::forward<Args>(args)...);
-
 			int argnum = lua_gettop(state_) - argstart;
 			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);
 			except::checkErrorAndThrow(result, state_);
-			return util::get_result<Result>(state_);
+			return util::get_result<Result>(state_, argstart);
 		}
 		template<class Result, class...Args> Result resume(Args... args)
 		{
 			lua_State* cor = get<lua_State*>();
-			util::ScopedSavedStack save(cor, 0);
-
+			int argstart = lua_gettop(cor) + 1;
+			if (argstart > 1 && lua_status(cor) != LUA_YIELD)
+			{
+				argstart -= 1;
+			}
+			util::ScopedSavedStack save(cor, argstart-1);
 			util::push_args(cor, standard::forward<Args>(args)...);
-
-			//stack first is function.other arguments.
-			int argnum = lua_gettop(cor) - 1;
+			int argnum = lua_gettop(cor) - argstart;
 			int result = lua_resume_compat(cor, argnum);
 			except::checkErrorAndThrow(result, cor);
-
-			return util::get_result<Result>(cor);
+			return util::get_result<Result>(cor, argstart);
 		}
 
 		template<class...Args> FunctionResults operator()(Args... args);
@@ -409,14 +408,14 @@ namespace kaguya
 		template<class Result KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
 		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
 		{\
-			util::ScopedSavedStack save(state_, 0);\
+			int argstart = lua_gettop(state_) + 1;\
+			util::ScopedSavedStack save(state_, argstart - 1);\
 			push(state_);\
-			int argstart = lua_gettop(state_);\
 			util::push_args(state_ KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_ARG_DEF));\
 			int argnum = lua_gettop(state_) - argstart;\
 			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);\
 			except::checkErrorAndThrow(result, state_);\
-			return util::get_result<Result>(state_);\
+			return util::get_result<Result>(state_, argstart);\
 		}
 
 
@@ -428,12 +427,17 @@ namespace kaguya
 		Result resume(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
 		{\
 			lua_State* cor = get<lua_State*>();\
-			util::ScopedSavedStack save(cor, 0);\
+			int argstart = lua_gettop(cor) + 1;\
+			if (argstart > 1 && lua_status(cor) != LUA_YIELD)\
+			{\
+				argstart -= 1;\
+			}\
+			util::ScopedSavedStack save(cor, argstart - 1);\
 			util::push_args(cor KAGUYA_PP_REPEAT(N, KAGUYA_PUSH_ARG_DEF));\
-			int argnum = lua_gettop(cor) - 1;\
+			int argnum = lua_gettop(cor) - argstart;\
 			int result = lua_resume_compat(cor, argnum);\
 			except::checkErrorAndThrow(result, cor);\
-			return util::get_result<Result>(cor);\
+			return util::get_result<Result>(cor, argstart);\
 		}
 
 			KAGUYA_RESUME_DEF(0)
@@ -585,25 +589,25 @@ namespace kaguya
 		* @param key key of table
 		* @return reference of field value
 		*/
-		TableKeyReference<LuaRef> operator[](const LuaRef& key);
+		TableKeyReference operator[](const LuaRef& key);
 		/**
 		* @brief value = table[key];or table[key] = value;
 		* @param key key of table
 		* @return reference of field value
 		*/
-		TableKeyReference<std::string> operator[](const char* key);
+		TableKeyReference operator[](const char* key);
 		/**
 		* @brief value = table[key];or table[key] = value;
 		* @param key key of table
 		* @return reference of field value
 		*/
-		TableKeyReference<std::string> operator[](const std::string& key);
+		TableKeyReference operator[](const std::string& key);
 		/**
 		* @brief value = table[index];or table[index] = value;
 		* @param index index of table
 		* @return reference of field value
 		*/
-		TableKeyReference<int> operator[](int index);
+		TableKeyReference operator[](int index);
 
 		/**
 		* @brief value = table[key];
@@ -1056,20 +1060,20 @@ namespace kaguya
 	{
 
 		template<class Result>
-		inline Result get_result_impl(lua_State* l, types::typetag<Result>)
+		inline Result get_result_impl(lua_State* l, int startindex, types::typetag<Result>)
 		{
-			return lua_type_traits<Result>::get(l, 1);
+			return lua_type_traits<Result>::get(l, startindex);
 		}
 		template<>
-		inline std::vector<LuaRef> get_result_impl<std::vector<LuaRef> >(lua_State* l, types::typetag<std::vector<LuaRef> >)
+		inline std::vector<LuaRef> get_result_impl<std::vector<LuaRef> >(lua_State* l, int startindex, types::typetag<std::vector<LuaRef> >)
 		{
 			std::vector<LuaRef> results;
 			int num = lua_gettop(l);
-			if (0 < num)
+			if (startindex-1 < num)
 			{
 				results.reserve(num);
 			}
-			for (int i = 0; i < num; ++i)
+			for (int i = startindex - 1; i < num; ++i)
 			{
 				results.push_back(LuaRef(l, StackTop()));
 			}
@@ -1088,22 +1092,22 @@ namespace kaguya
 				get_result_tuple_impl(l, index + 1, types::typetag<standard::tuple<TYPES...> >()));
 		}
 		template<typename... TYPES>
-		inline standard::tuple<TYPES...> get_result_impl(lua_State* l, types::typetag<standard::tuple<TYPES...> > tag)
+		inline standard::tuple<TYPES...> get_result_impl(lua_State* l, int startindex, types::typetag<standard::tuple<TYPES...> > tag)
 		{
-			return get_result_tuple_impl<TYPES...>(l, 1, tag);
+			return get_result_tuple_impl<TYPES...>(l, startindex, tag);
 		}
 #else
 
-		inline standard::tuple<> get_result_impl(lua_State *l, types::typetag<standard::tuple<> > tag)
+		inline standard::tuple<> get_result_impl(lua_State *l, int startindex, types::typetag<standard::tuple<> > tag)
 		{
 			return standard::tuple<>();
 		}
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PP_TARG(N) KAGUYA_PP_CAT(A,N)
-#define KAGUYA_GET_DEF(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(l, N) 
+#define KAGUYA_GET_DEF(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(l, N + startindex - 1) 
 #define KAGUYA_GET_TUPLE_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> get_result_impl(lua_State *l,types::typetag<standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> >)\
+		inline standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> get_result_impl(lua_State *l,int startindex,types::typetag<standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> >)\
 		{\
 			return standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG) >(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_GET_DEF));\
 		}
@@ -1115,12 +1119,12 @@ namespace kaguya
 #endif
 
 		template<class Result>
-		inline Result get_result(lua_State* l)
+		inline Result get_result(lua_State* l,int startindex)
 		{
-			return get_result_impl(l, types::typetag<Result>());
+			return get_result_impl(l, startindex, types::typetag<Result>());
 		}
 		template<>
-		inline void get_result<void>(lua_State* l)
+		inline void get_result<void>(lua_State* l, int startindex)
 		{
 		}
 
