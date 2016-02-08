@@ -232,13 +232,23 @@ namespace kaguya
 		//! return element reference from global table
 		TableKeyReference operator[](const std::string& str)
 		{
-			return TableKeyReference(globalTable(),str);
+			int stack_top = lua_gettop(state_);
+			lua_type_traits<GlobalTable>::push(state_, GlobalTable());
+			lua_type_traits<std::string>::push(state_, str);
+			int table_index = stack_top + 1;
+			int key_index = stack_top + 2;
+			return TableKeyReference(state_, table_index, key_index, stack_top);
 		}
 
 		//! return element reference from global table
 		TableKeyReference operator[](const char* str)
 		{
-			return TableKeyReference(globalTable(), str);
+			int stack_top = lua_gettop(state_);
+			lua_type_traits<GlobalTable>::push(state_, GlobalTable());
+			lua_type_traits<const char*>::push(state_, str);
+			int table_index = stack_top + 1;
+			int key_index = stack_top + 2;
+			return TableKeyReference(state_, table_index, key_index, stack_top);
 		}
 
 		//! return global table

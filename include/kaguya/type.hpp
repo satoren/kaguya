@@ -485,7 +485,7 @@ namespace kaguya
 
 
 	template<>	struct lua_type_traits<const char*> {
-		typedef const char* get_type;
+		typedef std::string get_type;
 		typedef const char* push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -503,6 +503,29 @@ namespace kaguya
 		static int push(lua_State* l, const char* s)
 		{
 			lua_pushstring(l, s);
+			return 1;
+		}
+	};
+
+	template<int N>	struct lua_type_traits<char[N]> {
+		typedef std::string get_type;
+		typedef const char* push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TSTRING;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isstring(l, index) != 0;
+		}
+		static const char* get(lua_State* l, int index)
+		{
+			return lua_tostring(l, index);
+		}
+		static int push(lua_State* l, const char s[N])
+		{
+			lua_pushlstring(l, s,N);
 			return 1;
 		}
 	};

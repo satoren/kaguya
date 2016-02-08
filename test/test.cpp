@@ -655,6 +655,15 @@ namespace t_03_function
 		return kaguya::standard::tuple<int, std::string>(12, "23");
 	}
 
+	void multireturn_pass_through_to_arg(int a, int b, int c, int d, int e)
+	{
+		TEST_EQUAL(a, 1);
+		TEST_EQUAL(b, 2);
+		TEST_EQUAL(c, 4);
+		TEST_EQUAL(d, 8);
+		TEST_EQUAL(e, 16);
+	}
+
 	void multi_return_function_test(kaguya::State& state)
 	{
 		state("multresfun =function() return 1,2,4,8,16 end");
@@ -676,10 +685,15 @@ namespace t_03_function
 		TEST_EQUAL(d, 8);
 		TEST_EQUAL(e, 16);
 
-		state["multresfun"] = kaguya::function(tuplefun);
 
-		state("a,b = multresfun()");
-		TEST_CHECK(state("assert(a == 12  and b == '23')"));
+		state["multireturn_pass_through_to_arg"] = kaguya::function(multireturn_pass_through_to_arg);
+		state["multireturn_pass_through_to_arg"](state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >());
+		state["multireturn_pass_through_to_arg"](state["multresfun"]());
+
+		state["multresfun2"] = kaguya::function(tuplefun);
+
+		state("a,b = multresfun2()");
+		TEST_CHECK(state("assert(a == 12  and b == '23')"));		
 	}
 
 	void vector_and_map_from_table_mapping(kaguya::State& state)

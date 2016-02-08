@@ -1016,7 +1016,6 @@ namespace kaguya
 	{
 		return !(lhs == rhs);
 	}
-	inline 	bool operator == (const LuaRef& lhs, const char* rhs) { return lhs.get<std::string>() == rhs; }
 
 	template<typename T>
 	bool operator == (const T& lhs, const LuaRef& rhs)
@@ -1036,7 +1035,6 @@ namespace kaguya
 	{
 		return !(lhs == rhs);
 	}
-	inline bool operator == (const char* lhs, const LuaRef& rhs) { return lhs == rhs.get<std::string>(); }
 
 
 	inline lua_type_traits<LuaRef>::get_type lua_type_traits<LuaRef>::get(lua_State* l, int index)
