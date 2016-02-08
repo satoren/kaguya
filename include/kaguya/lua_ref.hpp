@@ -54,7 +54,7 @@ namespace kaguya
 	namespace util
 	{
 		template<class Result>
-		inline Result get_result(lua_State* l,int startindex);
+		inline Result get_result(lua_State* l, int startindex);
 	}
 	/**
 	* Reference of Lua any type value.
@@ -181,6 +181,56 @@ namespace kaguya
 #endif
 		}
 
+		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
+		{
+			switch (type())
+			{
+			case LuaRef::TYPE_NIL:
+				os << "nil";
+				break;
+			case LuaRef::TYPE_BOOL:
+				os << get<bool>();
+				break;
+			case LuaRef::TYPE_NUMBER:
+				os << get<double>();
+				break;
+			case LuaRef::TYPE_STRING:
+				os << "'" << get<std::string>() << "'";
+				break;
+			case LuaRef::TYPE_TABLE:
+			{
+				const void* ptr = native_pointer();
+				if (outtable.count(ptr))
+				{
+					os << "{" << ptr << "}" << std::endl;
+					return;
+				}
+				outtable.insert(ptr);
+				os << "{";
+				std::map<LuaRef, LuaRef> table = map();
+				bool first = true;
+				for (std::map<LuaRef, LuaRef>::iterator it = table.begin(); it != table.end(); it++)
+				{
+					if (first) { first = false; }
+					else { os << ","; }
+					it->first.dump_impl(os, nest + 1, outtable);
+					os << " = ";
+					it->second.dump_impl(os, nest + 1, outtable);
+				}
+				os << "}";
+			}
+			break;
+			case LuaRef::TYPE_LIGHTUSERDATA:
+			case LuaRef::TYPE_FUNCTION:
+			case LuaRef::TYPE_USERDATA:
+			case LuaRef::TYPE_THREAD:
+				os << typeName() << "(" << native_pointer() << ")";
+				break;
+			default:
+				os << "unknown type";
+				break;
+			}
+		}
 	public:
 		lua_State *state()const { return state_; };
 
@@ -390,7 +440,7 @@ namespace kaguya
 			{
 				argstart -= 1;
 			}
-			util::ScopedSavedStack save(cor, argstart-1);
+			util::ScopedSavedStack save(cor, argstart - 1);
 			util::push_args(cor, standard::forward<Args>(args)...);
 			int argnum = lua_gettop(cor) - argstart;
 			int result = lua_resume_compat(cor, argnum);
@@ -943,58 +993,7 @@ namespace kaguya
 		void dump(std::ostream& os)const
 		{
 			std::set<const void*> table;
-			dump_impl(os,0, table);
-		}
-		private:
-		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
-		{
-			switch (type())
-			{
-			case LuaRef::TYPE_NIL:
-				os << "nil";
-				break;
-			case LuaRef::TYPE_BOOL:
-				os << get<bool>();
-				break;
-			case LuaRef::TYPE_NUMBER:
-				os << get<double>();
-				break;
-			case LuaRef::TYPE_STRING:
-				os << "'" << get<std::string>() << "'";
-				break;
-			case LuaRef::TYPE_TABLE:
-			{
-				const void* ptr= native_pointer();
-				if (outtable.count(ptr))
-				{
-					os << "{" << ptr << "}" << std::endl;
-					return;
-				}
-				outtable.insert(ptr);
-				os << "{";
-				std::map<LuaRef, LuaRef> table = map();
-				bool first = true;
-				for (std::map<LuaRef, LuaRef>::iterator it = table.begin(); it != table.end(); it++)
-				{
-					if (first) { first = false; }
-					else { os << ","; }
-					it->first.dump_impl(os, nest + 1, outtable);
-					os << " = ";
-					it->second.dump_impl(os, nest + 1, outtable);
-				}
-				os << "}";
-			}
-			break;
-			case LuaRef::TYPE_LIGHTUSERDATA:
-			case LuaRef::TYPE_FUNCTION:
-			case LuaRef::TYPE_USERDATA:
-			case LuaRef::TYPE_THREAD:
-				os << typeName() << "(" << native_pointer() << ")";
-				break;
-			default:
-				os << "unknown type";
-				break;
-			}
+			dump_impl(os, 0, table);
 		}
 	};
 
@@ -1067,7 +1066,7 @@ namespace kaguya
 		{
 			std::vector<LuaRef> results;
 			int num = lua_gettop(l);
-			if (startindex-1 < num)
+			if (startindex - 1 < num)
 			{
 				results.reserve(num);
 			}
@@ -1116,8 +1115,8 @@ namespace kaguya
 #undef KAGUYA_GET_TUPLE_DEF
 #endif
 
-		template<class Result>
-		inline Result get_result(lua_State* l,int startindex)
+			template<class Result>
+		inline Result get_result(lua_State* l, int startindex)
 		{
 			return get_result_impl(l, startindex, types::typetag<Result>());
 		}

@@ -179,7 +179,6 @@ namespace kaguya
 	public:
 		friend class LuaRef;
 		friend class State;
-		friend class TableKeyReference;
 		
 		TableKeyReference operator[](const char* key)
 		{
@@ -364,7 +363,10 @@ namespace kaguya
 
 		~TableKeyReference()
 		{
-			lua_settop(state_, stack_top_);
+			if(state_)
+			{
+				lua_settop(state_, stack_top_);
+			}
 		}
 
 #if KAGUYA_USE_CPP11
@@ -372,12 +374,9 @@ namespace kaguya
 		//msg error: no matching function for call to 'forward(const t_02_classreg::ABC&)'
 #endif
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(lua_gettop(state_))
+		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_index_(src.key_index_)
 		{
-			lua_pushvalue(state_,src.key_index_);
-			lua_pushvalue(state_,src.table_index_);
-			key_index_ = stack_top_ + 1;
-			table_index_ = stack_top_ + 2;
+			src.state_ = 0;
 		}
 
 	private:
@@ -412,7 +411,7 @@ namespace kaguya
 			}
 		}
 
-		lua_State* state_;
+		mutable lua_State* state_;//mutable for RVO unsupported compiler
 		int stack_top_;
 		int table_index_;
 		int key_index_;

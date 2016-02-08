@@ -523,7 +523,6 @@ namespace t_02_classreg
 	{
 		Prop mem;
 		~PropHolder() {
-			int A = 0;
 		}
 	};
 	void add_property_ref_check(kaguya::State& state)
@@ -877,7 +876,7 @@ namespace t_03_function
 		state.newRef(9).push();
 		state.newRef(2).push();
 		
-		int r = call(state.state(), &free_standing_function);
+		call(state.state(), &free_standing_function);
 
 		lua_settop(state.state(), 0);
 		state.newRef(&foo).push();
