@@ -216,7 +216,9 @@ namespace kaguya
 		template<typename T>
 		void setFunction(T f)
 		{
-			parent_.setField(key_, FunctorType(f));
+			lua_pushvalue(state_, key_index_);
+			lua_type_traits<FunctorType>::push(state_, FunctorType(f));
+			lua_settable(state_, table_index_);
 		}
 
 
