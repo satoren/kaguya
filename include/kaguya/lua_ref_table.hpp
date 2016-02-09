@@ -368,9 +368,15 @@ namespace kaguya
 		* template<class... Args>FunctionResults operator()(Args... args);
 		*/
 
-#define KAGUYA_DELEGATE_LUAREF getValue()
-#include "kaguya/delegate_to_luaref.inl"
-#undef KAGUYA_DELEGATE_LUAREF
+
+		int type()const
+		{
+			util::ScopedSavedStack save(state_);
+			push();
+			return lua_type(state_, -1);
+		}
+
+#include "call_resume_implements.inl"
 
 		~TableKeyReference()
 		{

@@ -292,9 +292,9 @@ namespace kaguya
 		}
 
 #define KAGUYA_DELEGATE_LUAREF fun_
-#define KAGUYA__DELEGATE_FIRST_ARG self_
+#define KAGUYA_DELEGATE_FIRST_ARG self_
 #include "kaguya/delegate_to_luaref.inl"
-#undef KAGUYA__DELEGATE_FIRST_ARG
+#undef KAGUYA_DELEGATE_FIRST_ARG
 #undef KAGUYA_DELEGATE_LUAREF
 
 	private:
@@ -306,70 +306,4 @@ namespace kaguya
 	{
 		return mem_fun_binder(*this, key);
 	}
-}
-
-
-
-namespace kaguya
-{
-#if KAGUYA_USE_CPP11
-	template<class...Args> FunctionResults LuaRef::operator()(Args&&... args)
-	{
-		int t = type();
-		if (t == TYPE_THREAD)
-		{
-			return resume<FunctionResults>(standard::forward<Args>(args)...);
-		}
-		else if (t == TYPE_FUNCTION)
-		{
-			return call<FunctionResults>(standard::forward<Args>(args)...);
-		}
-		else
-		{
-			except::typeMismatchError(state_, " is not function or thread");
-			return FunctionResults(state_);
-		}
-	}
-#else
-#define KAGUYA_TEMPLATE_PARAMETER(N)
-#define KAGUYA_FUNCTION_ARGS_DEF(N)
-#define KAGUYA_CALL_ARGS(N)
-
-#define KAGUYA_OP_FN_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults LuaRef::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-		int t = type(); \
-		if (t == TYPE_THREAD)\
-		{\
-			return FunctionResults(resume<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
-		}\
-		else if (t == TYPE_FUNCTION)\
-		{\
-			return FunctionResults(call<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
-		}\
-		else\
-		{\
-			except::typeMismatchError(state_, " is not function or thread"); \
-			return FunctionResults(); \
-		}\
-	}
-
-	KAGUYA_OP_FN_DEF(0)
-
-#undef KAGUYA_TEMPLATE_PARAMETER
-#undef KAGUYA_FUNCTION_ARGS_DEF
-#undef KAGUYA_CALL_ARGS
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
-#define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
-#define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
-
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_ARG_DEF(N) standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N)) 
-
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
-#undef KAGUYA_OP_FN_DEF
-#undef KAGUYA_TEMPLATE_PARAMETER
-#endif
 }

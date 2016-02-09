@@ -59,22 +59,6 @@ namespace kaguya
 		{
 			return lua_type_traits<Result>::get(l, startindex);
 		}
-		/*
-		template<class T>
-		inline std::vector<T> get_result_impl(lua_State* l, int startindex, types::typetag<std::vector<T> >)
-		{
-			std::vector<T> results;
-			int num = lua_gettop(l);
-			if (startindex - 1 < num)
-			{
-				results.reserve(num);
-			}
-			for (int i = startindex - 1; i < num; ++i)
-			{
-				results.push_back(lua_type_traits<T>::get(l, i));
-			}
-			return results;
-		}*/
 #if KAGUYA_USE_CPP11
 		inline standard::tuple<> get_result_tuple_impl(lua_State* l, int index, types::typetag<standard::tuple<> > tag)
 		{
@@ -147,7 +131,7 @@ namespace kaguya
 		{
 			if (state_)
 			{
-				lua_settop(state_, startIndex_-1);
+				lua_settop(state_, startIndex_ - 1);
 			}
 		}
 
@@ -244,12 +228,12 @@ namespace kaguya
 
 
 		template<class Result>
-		typename Result get()const
+		Result get()const
 		{
 			return util::get_result<Result>(state_, startIndex_);
 		}
 		template<>
-		typename FunctionResults get<FunctionResults>()const
+		FunctionResults get<FunctionResults>()const
 		{
 			return *this;
 		}
@@ -280,10 +264,18 @@ namespace kaguya
 			return !((*this) == v);
 		}
 		bool operator == (const char* v)const { return get<std::string>() == v; }
-		
-#define KAGUYA_DELEGATE_LUAREF get<LuaRef>()
-#include "kaguya/delegate_to_luaref.inl"
-#undef KAGUYA_DELEGATE_LUAREF
+
+		//push first result
+		int push(lua_State* state)const
+		{
+			lua_pushvalue(state, startIndex_);
+			return 1;
+		}
+		int type()const
+		{
+			return lua_type(state_, startIndex_);
+		}
+#include "call_resume_implements.inl"
 	private:
 		mutable lua_State* state_;
 		int startIndex_;
@@ -407,15 +399,6 @@ namespace kaguya
 			}
 			return true;
 		}
-		int lua_resume_compat(lua_State *L, int nargs)
-		{
-			if (nargs < 0) { nargs = 0; }
-#if LUA_VERSION_NUM >= 502
-			return lua_resume(L, 0, nargs);
-#else
-			return lua_resume(L, nargs);
-#endif
-		}
 
 		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
 		{
@@ -467,7 +450,7 @@ namespace kaguya
 				break;
 			}
 		}
-		public:
+	public:
 		lua_State *state()const { return state_; };
 
 		struct NoMainCheck {};
@@ -655,103 +638,8 @@ namespace kaguya
 
 		//@}
 
+#include "call_resume_implements.inl"
 
-#if KAGUYA_USE_CPP11
-		template<class Result, class...Args> Result call(Args&&... args)
-		{
-			int argstart = lua_gettop(state_) + 1;
-			push(state_);
-			util::push_args(state_, standard::forward<Args>(args)...);
-			int argnum = lua_gettop(state_) - argstart;
-			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);
-			except::checkErrorAndThrow(result, state_);
-			return FunctionResults(state_, argstart).get<Result>();
-		}
-		template<class Result, class...Args> Result resume(Args&&... args)
-		{
-			lua_State* cor = get<lua_State*>();
-			int argstart = lua_gettop(cor) + 1;
-			if (argstart > 1 && lua_status(cor) != LUA_YIELD)
-			{
-				argstart -= 1;
-			}
-			util::push_args(cor, standard::forward<Args>(args)...);
-			int argnum = lua_gettop(cor) - argstart;
-			int result = lua_resume_compat(cor, argnum);
-			except::checkErrorAndThrow(result, cor);
-			return FunctionResults(cor, argstart).get<Result>();
-		}
-
-		template<class...Args> FunctionResults operator()(Args&&... args);
-#else
-
-#define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_ARG_DEF(N) ,standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N))
-#define KAGUYA_CALL_DEF(N) \
-		template<class Result KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
-		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
-		{\
-			int argstart = lua_gettop(state_) + 1;\
-			push(state_);\
-			util::push_args(state_ KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_ARG_DEF));\
-			int argnum = lua_gettop(state_) - argstart;\
-			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);\
-			except::checkErrorAndThrow(result, state_);\
-			return FunctionResults(state_, argstart);\
-		}
-
-
-		KAGUYA_CALL_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
-
-#define KAGUYA_RESUME_DEF(N) \
-		template<class Result  KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
-		Result resume(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
-		{\
-			lua_State* cor = get<lua_State*>();\
-			int argstart = lua_gettop(cor) + 1;\
-			if (argstart > 1 && lua_status(cor) != LUA_YIELD)\
-			{\
-				argstart -= 1;\
-			}\
-			util::push_args(cor KAGUYA_PP_REPEAT(N, KAGUYA_PUSH_ARG_DEF));\
-			int argnum = lua_gettop(cor) - argstart;\
-			int result = lua_resume_compat(cor, argnum);\
-			except::checkErrorAndThrow(result, cor);\
-			return FunctionResults(cor, argstart);\
-		}
-
-			KAGUYA_RESUME_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
-
-#undef KAGUYA_PUSH_DEF
-#undef KAGUYA_PUSH_ARG_DEF
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_RESUME_DEF
-
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_OP_FN_DEF(N) \
-		template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
-		FunctionResults operator()(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG));
-
-			/**
-			* @name operator()
-			* @brief If type is function, call lua function.
-			If type is lua thread,start or resume lua thread.
-			Otherwise send error message to error handler
-			* @param arg... function args
-			*/
-			//@{
-			FunctionResults operator()();
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
-			//@}
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
-#undef KAGUYA_CALL_DEF
-#undef KAGUYA_OP_FN_DEF
-
-#endif
 		/**
 		* @name coroutine type
 		*/
@@ -1135,11 +1023,11 @@ namespace kaguya
 			if (ref_ == LUA_REFNIL)
 			{
 				return TYPE_NIL;
-		}
+			}
 			util::ScopedSavedStack save(state_);
 			push(state_);
 			return (value_type)lua_type(state_, -1);
-	}
+		}
 		std::string typeName()const
 		{
 			return lua_typename(state_, type());
@@ -1227,7 +1115,7 @@ namespace kaguya
 			std::set<const void*> table;
 			dump_impl(os, 0, table);
 		}
-		};
+	};
 
 	template<typename T>
 	bool operator == (const LuaRef& lhs, const T& rhs)
