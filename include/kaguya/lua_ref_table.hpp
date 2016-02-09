@@ -236,14 +236,25 @@ namespace kaguya
 
 		//! assign from T
 		template<typename T>
-		TableKeyReference& operator=(T src)
+		TableKeyReference& operator=(const T& src)
 		{
 			lua_pushvalue(state_, key_index_);
-			lua_type_traits<T>::push(state_,standard::forward<T>(src));
+			lua_type_traits<T>::push(state_,src);
 			lua_settable(state_, table_index_);
 
 			return *this;
 		}
+#if KAGUYA_USE_CPP11
+		template<typename T>
+		TableKeyReference& operator=(T&& src)
+		{
+			lua_pushvalue(state_, key_index_);
+			lua_type_traits<traits::remove_reference<T>::type >::push(state_, standard::forward<T>(src));
+			lua_settable(state_, table_index_);
+
+			return *this;
+		}
+#endif
 
 		bool isNilref()const {
 			if (!state_)
