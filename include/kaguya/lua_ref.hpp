@@ -421,7 +421,7 @@ namespace kaguya
 
 
 #if KAGUYA_USE_CPP11
-		template<class Result, class...Args> Result call(Args... args)
+		template<class Result, class...Args> Result call(Args&&... args)
 		{
 			int argstart = lua_gettop(state_) + 1;
 			util::ScopedSavedStack save(state_, argstart - 1);
@@ -432,7 +432,7 @@ namespace kaguya
 			except::checkErrorAndThrow(result, state_);
 			return util::get_result<Result>(state_, argstart);
 		}
-		template<class Result, class...Args> Result resume(Args... args)
+		template<class Result, class...Args> Result resume(Args&&... args)
 		{
 			lua_State* cor = get<lua_State*>();
 			int argstart = lua_gettop(cor) + 1;
@@ -448,7 +448,7 @@ namespace kaguya
 			return util::get_result<Result>(cor, argstart);
 		}
 
-		template<class...Args> FunctionResults operator()(Args... args);
+		template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 
 #define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)

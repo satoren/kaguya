@@ -552,10 +552,10 @@ namespace t_02_classreg
 
 namespace t_03_function
 {
-	int result = 0;
+	int arg = 0;
 	void free_standing_function(int r)
 	{
-		result = r;
+		arg = r;
 	}
 	int free_standing_function2()
 	{
@@ -567,7 +567,7 @@ namespace t_03_function
 		state["ABC"] = &free_standing_function;
 		state["ABC"](54);
 		state["free2"] = &free_standing_function2;
-		TEST_EQUAL(result, 54);
+		TEST_EQUAL(arg, 54);
 		TEST_CHECK(state["free2"]() == 12.0);
 	}
 

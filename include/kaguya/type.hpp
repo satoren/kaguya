@@ -525,7 +525,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, const char s[N])
 		{
-			lua_pushlstring(l, s,N);
+			lua_pushstring(l, s);
 			return 1;
 		}
 	};

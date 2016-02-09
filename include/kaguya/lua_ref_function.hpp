@@ -368,7 +368,7 @@ namespace kaguya
 namespace kaguya
 {
 #if KAGUYA_USE_CPP11
-	template<class...Args> FunctionResults LuaRef::operator()(Args... args)
+	template<class...Args> FunctionResults LuaRef::operator()(Args&&... args)
 	{
 		int t = type();
 		if (t == TYPE_THREAD)

@@ -192,7 +192,7 @@ namespace kaguya
 		template<class Arg, class...Args>
 		inline void push_args(lua_State *l, Arg&& arg, Args&&... args)
 		{
-			lua_type_traits<Arg>::push(l, standard::forward<Arg>(arg));
+			lua_type_traits<typename traits::remove_reference<Arg>::type>::push(l, standard::forward<Arg>(arg));
 			push_args(l, standard::forward<Args>(args)...);
 		}
 		template<class Arg, class...Args>
