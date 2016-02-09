@@ -117,7 +117,7 @@ KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
 		else\
 		{\
 			except::typeMismatchError(state_, " is not function or thread"); \
-			return FunctionResults(); \
+			return FunctionResults(state_); \
 		}\
 	}
 

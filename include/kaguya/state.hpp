@@ -259,10 +259,18 @@ namespace kaguya
 
 		//! return new Lua reference from argument value
 		template<typename T>
-		LuaRef newRef(T value)
+		LuaRef newRef(const T& value)
 		{
-			return LuaRef(state_, standard::forward<T>(value));
+			return LuaRef(state_, value);
 		}
+#if KAGUYA_USE_CPP11
+		//! return new Lua reference from argument value
+		template<typename T>
+		LuaRef newRef(T&& value)
+		{
+			return LuaRef(state_, std::forward<T>(value));
+		}
+#endif
 
 		//! return new Lua table
 		LuaTable newTable()

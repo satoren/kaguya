@@ -195,20 +195,21 @@ namespace kaguya
 #endif
 		}
 #if KAGUYA_USE_CPP11
-		inline void push_args(lua_State *l)
+		inline int push_args(lua_State *l)
 		{
+			return 0;
 		}
 		template<class Arg, class...Args>
-		inline void push_args(lua_State *l, Arg&& arg, Args&&... args)
+		inline int push_args(lua_State *l, Arg&& arg, Args&&... args)
 		{
-			lua_type_traits<typename traits::remove_reference<Arg>::type>::push(l, standard::forward<Arg>(arg));
-			push_args(l, standard::forward<Args>(args)...);
+			int c = lua_type_traits<typename traits::remove_reference<Arg>::type>::push(l, std::forward<Arg>(arg));
+			return c + push_args(l, std::forward<Args>(args)...);
 		}
 		template<class Arg, class...Args>
-		inline void push_args(lua_State *l, const Arg& arg, Args&&... args)
+		inline int push_args(lua_State *l, const Arg& arg, Args&&... args)
 		{
-			lua_type_traits<Arg>::push(l, arg);
-			push_args(l, standard::forward<Args>(args)...);
+			int c = lua_type_traits<Arg>::push(l, arg);
+			return c + push_args(l, std::forward<Args>(args)...);
 		}
 #else
 		inline void push_args(lua_State *l)
@@ -216,12 +217,13 @@ namespace kaguya
 		}
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_DEF(N) lua_type_traits<KAGUYA_PP_CAT(A,N) >::push(l, standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N))); 
+#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
+#define KAGUYA_PUSH_DEF(N) c+=lua_type_traits<KAGUYA_PP_CAT(A,N) >::push(l, KAGUYA_PP_CAT(a,N)); 
 #define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
 		inline void push_args(lua_State *l,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
 		{\
 			using standard::forward;\
+			int c =0;\
 			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF)\
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_PUSH_ARG_DEF)

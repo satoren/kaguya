@@ -249,7 +249,7 @@ namespace kaguya
 		TableKeyReference& operator=(T&& src)
 		{
 			lua_pushvalue(state_, key_index_);
-			lua_type_traits<typename traits::remove_reference<T>::type>::push(state_, standard::forward<T>(src));
+			lua_type_traits<typename traits::remove_reference<T>::type>::push(state_, std::forward<T>(src));
 			lua_settable(state_, table_index_);
 
 			return *this;

@@ -337,20 +337,33 @@ namespace kaguya
 	template<typename T>
 	inline FunctorType lua_function(T f)
 	{
-		return FunctorType(standard::forward<T>(f));
+		return FunctorType(f);
 	}
 
 	template<typename T>
-	inline FunctorType function(T f)
+	inline FunctorType function(const T& f)
 	{
-		return FunctorType(standard::forward<T>(f));
+		return FunctorType(f);
 	}
 
 	template<typename FTYPE, typename T>
-	inline FunctorType function(T f)
+	inline FunctorType function(const T&  f)
 	{
 		return FunctorType(standard::function<FTYPE>(f));
 	}
+#if KAGUYA_USE_CPP11
+	template<typename T>
+	inline FunctorType function(T&& f)
+	{
+		return FunctorType(std::forward<T>(f));
+	}
+
+	template<typename FTYPE, typename T>
+	inline FunctorType function(T&& f)
+	{
+		return FunctorType(standard::function<FTYPE>(std::forward<T>(f)));
+	}
+#endif
 
 #if KAGUYA_USE_CPP11
 	namespace detail
@@ -427,7 +440,7 @@ namespace kaguya
 		{
 			lua_pushnumber(l, 1);//no overload
 			void *storage = lua_newuserdata(l, sizeof(FunctorType));
-			new(storage) FunctorType(standard::forward<FunctorType>(f));
+			new(storage) FunctorType(std::forward<FunctorType>(f));
 			class_userdata::setmetatable<FunctorType>(l);
 			lua_pushcclosure(l, &nativefunction::functor_dispatcher, 2);
 			return 1;

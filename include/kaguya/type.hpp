@@ -62,7 +62,7 @@ namespace kaguya
 	{
 		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
 		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(standard::forward<NCRT>(v));
+		new(storage) wrapper_type(std::forward<NCRT>(v));
 		class_userdata::setmetatable<T>(l);
 		return 1;
 	}
@@ -316,7 +316,7 @@ namespace kaguya
 		{
 			typedef ObjectSmartPointerWrapper<std::unique_ptr<T,Deleter> > wrapper_type;
 			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-			new(storage) wrapper_type(standard::forward<push_type>(v));
+			new(storage) wrapper_type(std::forward<push_type>(v));
 			class_userdata::setmetatable<T>(l);
 			return 1;
 		}

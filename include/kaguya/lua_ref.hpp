@@ -344,7 +344,7 @@ namespace kaguya
 
 
 		template<typename K, typename V>
-		void setFieldImpl(K key, V value)
+		void setFieldImpl(const K& key,const V& value)
 		{
 			if (ref_ == LUA_REFNIL)
 			{
@@ -359,12 +359,36 @@ namespace kaguya
 				except::typeMismatchError(state_, typeName() + "is not table");
 				return;
 			}
-			int kc = lua_type_traits<K>::push(state_, standard::forward<K>(key));//push table key
-			int vc = lua_type_traits<V>::push(state_, standard::forward<V>(value));//push value
+			int kc = util::push_args(state_, key);//push table key
+			int vc = util::push_args(state_, value);//push value
 
 			if (!pushCountCheck<K>(kc) || !pushCountCheck<V>(vc)) { return; }
 			lua_settable(state_, -3);//thistable[key] = value
 		}
+#if KAGUYA_USE_CPP11
+		template<typename K, typename V>
+		void setFieldImpl(K&& key, V&& value)
+		{
+			if (ref_ == LUA_REFNIL)
+			{
+				except::typeMismatchError(state_, "is nil");
+				return;
+			}
+			util::ScopedSavedStack save(state_);
+			push(state_);//push table to stack
+			int t = lua_type(state_, -1);
+			if (t != LUA_TTABLE)
+			{
+				except::typeMismatchError(state_, typeName() + "is not table");
+				return;
+			}
+			int kc = util::push_args(state_, std::forward<K>(key));//push table key
+			int vc = util::push_args(state_, std::forward<V>(value));//push value
+
+			if (!pushCountCheck<K>(kc) || !pushCountCheck<V>(vc)) { return; }
+			lua_settable(state_, -3);//thistable[key] = value
+		}
+#endif
 
 		static lua_State* toMainThread(lua_State* state)
 		{
@@ -526,22 +550,41 @@ namespace kaguya
 		}
 
 		template<typename T>
-		LuaRef(lua_State* state, T v, NoMainCheck) : state_(state)
+		LuaRef(lua_State* state, const T& v, NoMainCheck) : state_(state)
 		{
 			util::ScopedSavedStack save(state_);
-			int vc = lua_type_traits<T>::push(state_, standard::forward<T>(v));
+			int vc = util::push_args(state_, v);
 			if (!pushCountCheck<T>(vc)) { return; }
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 		}
 		template<typename T>
-		LuaRef(lua_State* state, T v) : state_(state)
+		LuaRef(lua_State* state, const T& v) : state_(state)
 		{
 			util::ScopedSavedStack save(state_);
-			int vc = lua_type_traits<T>::push(state_, standard::forward<T>(v));
+			int vc = util::push_args(state_, v);
 			if (!pushCountCheck<T>(vc)) { return; }
 			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			state_ = toMainThread(state_);
 		}
+#if KAGUYA_USE_CPP11
+		template<typename T>
+		LuaRef(lua_State* state, T&& v, NoMainCheck) : state_(state)
+		{
+			util::ScopedSavedStack save(state_);
+			int vc = util::push_args(state_, standard::forward<T>(v));
+			if (!pushCountCheck<T>(vc)) { return; }
+			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+		}
+		template<typename T>
+		LuaRef(lua_State* state, T&& v) : state_(state)
+		{
+			util::ScopedSavedStack save(state_);
+			int vc = util::push_args(state_, standard::forward<T>(v));
+			if (!pushCountCheck<T>(vc)) { return; }
+			ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			state_ = toMainThread(state_);
+		}
+#endif
 		~LuaRef()
 		{
 			unref();
@@ -912,40 +955,25 @@ namespace kaguya
 		{
 			return getField<LuaRef>(index);
 		}
-		/**
-		* @brief table[key] = value;
-		*/
-		template<typename T>
-		void setField(int key, T value)
-		{
-			setFieldImpl<int, T>(key, standard::forward<T>(value));
-		}
 
 		/**
 		* @brief table[key] = value;
 		*/
-		template<typename T>
-		void setField(const char* key, T value)
+		template<typename K,typename V>
+		void setField(const K& key, const V& value)
 		{
-			setFieldImpl<const char*, T>(key, standard::forward<T>(value));
+			setFieldImpl<K, V>(key, value);
 		}
+#if KAGUYA_USE_CPP11
 		/**
 		* @brief table[key] = value;
 		*/
-		template<typename T>
-		void setField(const std::string& key, T value)
+		template<typename K, typename V>
+		void setField(K&& key, V&& value)
 		{
-			setField(key.c_str(), standard::forward<T>(value));
+			setFieldImpl<K, V>(std::forward<K>(key), std::forward<V>(value));
 		}
-
-		/**
-		* @brief table[key] = value;
-		*/
-		template<typename T>
-		void setField(const LuaRef& key, T value)
-		{
-			setFieldImpl<LuaRef, T>(key, standard::forward<T>(value));
-		}
+#endif
 
 		/**
 		* @brief foreach table fields
@@ -1227,22 +1255,22 @@ bool operator>(const CLASSNAME& other)const\
 #if KAGUYA_USE_RVALUE_REFERENCE
 
 #define KAGUYA_LUA_REF_EXTENDS_MOVE_DEFINE(CLASSNAME) \
-CLASSNAME(LuaRef&& src)throw() :LuaRef(standard::forward<LuaRef>(src))\
+CLASSNAME(LuaRef&& src)throw() :LuaRef(std::move(src))\
 {\
 	typecheck(); \
 }\
 CLASSNAME& operator =(LuaRef&& src)throw()\
 {\
-	static_cast<LuaRef&>(*this) = standard::forward<LuaRef>(src);\
+	static_cast<LuaRef&>(*this) = std::move(src);\
 	typecheck(); \
 	return *this;\
 }\
-CLASSNAME(CLASSNAME&& src)throw() :LuaRef(standard::forward<LuaRef>(src))\
+CLASSNAME(CLASSNAME&& src)throw() :LuaRef(std::move(src))\
 {\
 }\
 CLASSNAME& operator =(CLASSNAME&& src)throw()\
 {\
-static_cast<LuaRef&>(*this) = standard::forward<LuaRef>(src); \
+static_cast<LuaRef&>(*this) = standard::move(src); \
 return *this; \
 }
 #else
