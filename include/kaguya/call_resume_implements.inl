@@ -1,3 +1,12 @@
+template<typename RetType>
+RetType returnvalue_(lua_State* state, int retindex, types::typetag<RetType> tag)
+{
+	return FunctionResults(state, retindex);
+}
+void returnvalue_(lua_State* state, int retindex, types::typetag<void> tag)
+{
+}
+
 #if KAGUYA_USE_CPP11
 template<class Result, class...Args> Result call(Args&&... args)
 {
@@ -7,7 +16,7 @@ template<class Result, class...Args> Result call(Args&&... args)
 	int argnum = lua_gettop(state_) - argstart;
 	int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);
 	except::checkErrorAndThrow(result, state_);
-	return FunctionResults(state_, argstart);
+	return returnvalue_(state_, argstart, types::typetag<Result>());
 }
 template<class Result, class...Args> Result resume(Args&&... args)
 {
@@ -21,7 +30,7 @@ template<class Result, class...Args> Result resume(Args&&... args)
 	int argnum = lua_gettop(cor) - argstart;
 	int result = util::lua_resume_compat(cor, argnum);
 	except::checkErrorAndThrow(result, cor);
-	return FunctionResults(cor, argstart);
+	return returnvalue_(cor, argstart, types::typetag<Result>());
 }
 
 template<class...Args> FunctionResults operator()(Args&&... args)
@@ -56,7 +65,7 @@ template<class...Args> FunctionResults operator()(Args&&... args)
 			int argnum = lua_gettop(state_) - argstart;\
 			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);\
 			except::checkErrorAndThrow(result, state_);\
-			return FunctionResults(state_, argstart);\
+			return returnvalue_(state_, argstart, types::typetag<Result>());\
 		}
 
 
@@ -77,7 +86,7 @@ KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
 			int argnum = lua_gettop(cor) - argstart;\
 			int result = util::lua_resume_compat(cor, argnum);\
 			except::checkErrorAndThrow(result, cor);\
-			return FunctionResults(cor, argstart);\
+			return returnvalue_(cor, argstart, types::typetag<Result>());\
 		}
 
 KAGUYA_RESUME_DEF(0)
@@ -99,11 +108,11 @@ KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
 		int t = type(); \
 		if (t == LUA_TTHREAD)\
 		{\
-			return FunctionResults(resume<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
+			return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
 		}\
 		else if (t == LUA_TFUNCTION)\
 		{\
-			return FunctionResults(call<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
+			return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
 		}\
 		else\
 		{\
