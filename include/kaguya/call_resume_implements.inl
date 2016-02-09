@@ -1,10 +1,15 @@
 template<typename RetType>
 RetType returnvalue_(lua_State* state, int retindex, types::typetag<RetType> tag)
 {
+	return FunctionResults(state, retindex).get<RetType>();
+}
+FunctionResults returnvalue_(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
+{
 	return FunctionResults(state, retindex);
 }
 void returnvalue_(lua_State* state, int retindex, types::typetag<void> tag)
 {
+	FunctionResults(state, retindex);
 }
 
 #if KAGUYA_USE_CPP11
