@@ -185,8 +185,8 @@ namespace kaguya
 			int stack_top = lua_gettop(state_);
 			push(state_);
 			lua_type_traits<const char*>::push(state_,key);
-			int keyindex = lua_absindex(state_, -1);
-			int tableindex = lua_absindex(state_, -2);
+			int keyindex = stack_top + 2;
+			int tableindex = stack_top + 1;
 			return TableKeyReference(state_, tableindex, keyindex, stack_top);
 		}
 		TableKeyReference operator[](const std::string& key)
@@ -194,8 +194,8 @@ namespace kaguya
 			int stack_top = lua_gettop(state_);
 			push(state_);
 			lua_type_traits<std::string>::push(state_, key);
-			int keyindex = lua_absindex(state_, -1);
-			int tableindex = lua_absindex(state_, -2);
+			int keyindex = stack_top + 2;
+			int tableindex = stack_top + 1;
 			return TableKeyReference(state_, tableindex, keyindex, stack_top);
 		}
 		TableKeyReference operator[](const LuaRef& key)
@@ -203,8 +203,8 @@ namespace kaguya
 			int stack_top = lua_gettop(state_);
 			push(state_);
 			lua_type_traits<LuaRef>::push(state_, key);
-			int keyindex = lua_absindex(state_, -1);
-			int tableindex = lua_absindex(state_, -2);
+			int keyindex = stack_top + 2;
+			int tableindex = stack_top + 1;
 			return TableKeyReference(state_, tableindex, keyindex, stack_top);
 		}
 		TableKeyReference operator[](int key)
@@ -212,8 +212,8 @@ namespace kaguya
 			int stack_top = lua_gettop(state_);
 			push(state_);			
 			lua_type_traits<int>::push(state_, key);
-			int keyindex = lua_absindex(state_, -1);
-			int tableindex = lua_absindex(state_, -2);
+			int keyindex = stack_top + 2;
+			int tableindex = stack_top + 1;
 			return TableKeyReference(state_, tableindex, keyindex, stack_top);
 		}
 
