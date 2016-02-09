@@ -9,25 +9,25 @@
 		template<class... Args>
 		FunctionResults operator()(Args&&... args)
 		{
-			return KAGUYA_DELEGATE_LUAREF(KAGUYA_DELEGATE_FIRST_ARG_C standard::forward<Args>(args)...);
+			return KAGUYA_DELEGATE_LUAREF(KAGUYA_DELEGATE_FIRST_ARG_C std::forward<Args>(args)...);
 		}
 
 		template<class Result, class... Args>
 		Result call(Args&&... args)
 		{
-			return KAGUYA_DELEGATE_LUAREF.template call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C standard::forward<Args>(args)...);
+			return KAGUYA_DELEGATE_LUAREF.template call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C std::forward<Args>(args)...);
 		}
 		template<class Result, class... Args>
 		Result resume(Args&&... args)
 		{
-			return KAGUYA_DELEGATE_LUAREF.template resume<Result>(KAGUYA_DELEGATE_FIRST_ARG_C standard::forward<Args>(args)...);
+			return KAGUYA_DELEGATE_LUAREF.template resume<Result>(KAGUYA_DELEGATE_FIRST_ARG_C std::forward<Args>(args)...);
 		}
 
 #else
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_ARG_DEF(N) standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N))
+#define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N)
 #define KAGUYA_OP_FN_DEF(N) \
 		template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
 		FunctionResults operator()(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\

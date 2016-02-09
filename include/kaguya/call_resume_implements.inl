@@ -12,7 +12,7 @@ template<class Result, class...Args> Result call(Args&&... args)
 {
 	int argstart = lua_gettop(state_) + 1;
 	push(state_);
-	util::push_args(state_, standard::forward<Args>(args)...);
+	util::push_args(state_, std::forward<Args>(args)...);
 	int argnum = lua_gettop(state_) - argstart;
 	int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);
 	except::checkErrorAndThrow(result, state_);
@@ -26,7 +26,7 @@ template<class Result, class...Args> Result resume(Args&&... args)
 	{
 		argstart -= 1;
 	}
-	util::push_args(cor, standard::forward<Args>(args)...);
+	util::push_args(cor, std::forward<Args>(args)...);
 	int argnum = lua_gettop(cor) - argstart;
 	int result = util::lua_resume_compat(cor, argnum);
 	except::checkErrorAndThrow(result, cor);
@@ -38,11 +38,11 @@ template<class...Args> FunctionResults operator()(Args&&... args)
 	int t = type();
 	if (t == LUA_TTHREAD)
 	{
-		return resume<FunctionResults>(standard::forward<Args>(args)...);
+		return resume<FunctionResults>(std::forward<Args>(args)...);
 	}
 	else if (t == LUA_TFUNCTION)
 	{
-		return call<FunctionResults>(standard::forward<Args>(args)...);
+		return call<FunctionResults>(std::forward<Args>(args)...);
 	}
 	else
 	{
@@ -53,8 +53,8 @@ template<class...Args> FunctionResults operator()(Args&&... args)
 #else
 
 #define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_ARG_DEF(N) ,standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N))
+#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
+#define KAGUYA_PUSH_ARG_DEF(N) ,KAGUYA_PP_CAT(a,N)
 #define KAGUYA_CALL_DEF(N) \
 		template<class Result KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
 		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
@@ -131,12 +131,15 @@ KAGUYA_OP_FN_DEF(0)
 #define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PUSH_ARG_DEF(N) standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N)) 
+#define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
 
 KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
+#undef KAGUYA_CALL_ARGS
+#undef KAGUYA_FUNCTION_ARGS_DEF
+#undef KAGUYA_PUSH_ARG_DEF
 #undef KAGUYA_PP_TEMPLATE
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF

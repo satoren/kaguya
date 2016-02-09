@@ -220,11 +220,11 @@ namespace kaguya
 #define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
 #define KAGUYA_PUSH_DEF(N) c+=lua_type_traits<KAGUYA_PP_CAT(A,N) >::push(l, KAGUYA_PP_CAT(a,N)); 
 #define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline void push_args(lua_State *l,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+		inline int push_args(lua_State *l,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
 		{\
-			using standard::forward;\
 			int c =0;\
 			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF)\
+			return c;\
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_PUSH_ARG_DEF)
 #undef KAGUYA_PP_TEMPLATE
