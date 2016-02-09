@@ -33,7 +33,7 @@ namespace kaguya
 			ValueType(const std::string& v) :strvalue(v), ivalue(0), dvalue(0), type(str_value) {}
 			ValueType(const char* v) :strvalue(v), ivalue(0), dvalue(0), type(str_value) {}
 			std::string strvalue;
-			long long ivalue;
+			luaInt ivalue;
 			double dvalue;
 			enum { str_value, int_value, double_value } type;
 		};

@@ -523,7 +523,6 @@ namespace t_02_classreg
 	{
 		Prop mem;
 		~PropHolder() {
-			int A = 0;
 		}
 	};
 	void add_property_ref_check(kaguya::State& state)
@@ -553,10 +552,10 @@ namespace t_02_classreg
 
 namespace t_03_function
 {
-	int result = 0;
+	int arg = 0;
 	void free_standing_function(int r)
 	{
-		result = r;
+		arg = r;
 	}
 	int free_standing_function2()
 	{
@@ -568,7 +567,7 @@ namespace t_03_function
 		state["ABC"] = &free_standing_function;
 		state["ABC"](54);
 		state["free2"] = &free_standing_function2;
-		TEST_EQUAL(result, 54);
+		TEST_EQUAL(arg, 54);
 		TEST_CHECK(state["free2"]() == 12.0);
 	}
 
@@ -655,6 +654,15 @@ namespace t_03_function
 		return kaguya::standard::tuple<int, std::string>(12, "23");
 	}
 
+	void multireturn_pass_through_to_arg(int a, int b, int c, int d, int e)
+	{
+		TEST_EQUAL(a, 1);
+		TEST_EQUAL(b, 2);
+		TEST_EQUAL(c, 4);
+		TEST_EQUAL(d, 8);
+		TEST_EQUAL(e, 16);
+	}
+
 	void multi_return_function_test(kaguya::State& state)
 	{
 		state("multresfun =function() return 1,2,4,8,16 end");
@@ -676,10 +684,15 @@ namespace t_03_function
 		TEST_EQUAL(d, 8);
 		TEST_EQUAL(e, 16);
 
-		state["multresfun"] = kaguya::function(tuplefun);
 
-		state("a,b = multresfun()");
-		TEST_CHECK(state("assert(a == 12  and b == '23')"));
+		state["multireturn_pass_through_to_arg"] = kaguya::function(multireturn_pass_through_to_arg);
+		state["multireturn_pass_through_to_arg"](state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >());
+		state["multireturn_pass_through_to_arg"](state["multresfun"]());
+
+		state["multresfun2"] = kaguya::function(tuplefun);
+
+		state("a,b = multresfun2()");
+		TEST_CHECK(state("assert(a == 12  and b == '23')"));		
 	}
 
 	void vector_and_map_from_table_mapping(kaguya::State& state)
@@ -863,7 +876,7 @@ namespace t_03_function
 		state.newRef(9).push();
 		state.newRef(2).push();
 		
-		int r = call(state.state(), &free_standing_function);
+		call(state.state(), &free_standing_function);
 
 		lua_settop(state.state(), 0);
 		state.newRef(&foo).push();
@@ -908,6 +921,15 @@ namespace t_03_function
 		TEST_EQUAL(f(""), 2);
 		TEST_EQUAL(f(121), 3);
 	}
+
+
+	void result_to_table(kaguya::State& state)
+	{
+		state["result_to_table"] = kaguya::function(overload1);
+		state["result"] = state["result_to_table"]();
+		TEST_EQUAL(state["result"], 1);
+	}
+
 	
 
 	enum TestEnum
@@ -1171,6 +1193,7 @@ namespace t_04_lua_ref
 		state["value"]["abc"]["bbb"] = "test";
 		TEST_CHECK(state("assert(value.abc.bbb == 'test')"));
 		state["value"]["abc"]["ddd"] = state["value"]["abc"]["ccc"] = state["value"]["abc"]["bbb"];
+		TEST_CHECK(state("print(value.abc.ccc)"));
 		TEST_CHECK(state("assert(value.abc.ccc == 'test')"));
 		TEST_CHECK(state("assert(value.abc.ddd == 'test')"));
 
@@ -1677,6 +1700,7 @@ int main()
 
 		ADD_TEST(t_03_function::native_function_call_test);
 		ADD_TEST(t_03_function::overload);
+		ADD_TEST(t_03_function::result_to_table);
 
 		ADD_TEST(t_04_lua_ref::access);
 		ADD_TEST(t_04_lua_ref::newtable);

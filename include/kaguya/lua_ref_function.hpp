@@ -189,60 +189,9 @@ namespace kaguya
 	};
 
 
-	class FunctionResults
-	{
-		std::vector<LuaRef> results_;
-	public:
-		FunctionResults()
-		{
-			results_.resize(1);//for empty value
-		}
-		FunctionResults(std::vector<LuaRef> results)
-		{
-			std::swap(results_, results);
-			if (results_.empty())
-			{
-				results_.resize(1);//for empty value
-			}
-		}
-
-
-		template<typename T>
-		typename lua_type_traits<T>::get_type get()const
-		{
-			return results_.front().get<typename lua_type_traits<T>::get_type>();
-		}
-		template<typename T>
-		operator T()const {
-			return get<T>();
-		}
-
-		template<typename T>
-		bool operator == (const T v)const
-		{
-			return get<T>() == v;
-		}
-		template<typename T>
-		bool operator != (const T v)const
-		{
-			return !((*this) == v);
-		}
-		bool operator == (const char* v)const { return get<std::string>() == v; }
-
-		const std::vector<LuaRef>& get_result(int unused = 0)const
-		{
-			return results_;
-		}
-
-#define KAGUYA_DELEGATE_LUAREF results_.front()
-#include "kaguya/delegate_to_luaref.inl"
-#undef KAGUYA_DELEGATE_LUAREF
-	};
-
-
 	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
-		std::vector<LuaRef> results = res.get_result();
+		std::vector<LuaRef> results = res.get<std::vector<LuaRef> >();
 		
 		for (std::vector<LuaRef>::iterator it = results.end(); it != results.end(); ++it)
 		{
@@ -255,16 +204,15 @@ namespace kaguya
 	template<>	struct lua_type_traits<FunctionResults> {
 		static int push(lua_State* l, const FunctionResults& ref)
 		{
-			const std::vector<LuaRef>& v = ref.get_result();
-			for (std::vector<LuaRef>::const_iterator it = v.begin(); it != v.end(); ++it)
+			for (FunctionResults::const_iterator it = ref.cbegin(); it != ref.cend(); ++it)
 			{
 				it->push();
 			}
-			return static_cast<int>(v.size());
+			return static_cast<int>(ref.size());
 		}
 	};
-	template <unsigned I>
-	LuaRef get(const FunctionResults& res) { return (res.get_result().size() > I)?res.get_result()[I]: LuaRef(); }
+	template <unsigned int I>
+	LuaRef get(const FunctionResults& res) { return (res.size() > I)?res.at<LuaRef>(I): LuaRef(); }
 
 	template<>	struct lua_type_traits<LuaFunction> {
 		typedef LuaFunction get_type;
@@ -330,9 +278,6 @@ namespace kaguya
 		return ref.get<LuaRef>();
 	}
 
-	//!FunEvaluator is deleted. typedef for compatibility
-	typedef	FunctionResults FunEvaluator;
-
 	/**
 	* @brief table and function binder.
 	* state["table"]->*"fun"() is table:fun() in Lua
@@ -347,9 +292,9 @@ namespace kaguya
 		}
 
 #define KAGUYA_DELEGATE_LUAREF fun_
-#define KAGUYA__DELEGATE_FIRST_ARG self_
+#define KAGUYA_DELEGATE_FIRST_ARG self_
 #include "kaguya/delegate_to_luaref.inl"
-#undef KAGUYA__DELEGATE_FIRST_ARG
+#undef KAGUYA_DELEGATE_FIRST_ARG
 #undef KAGUYA_DELEGATE_LUAREF
 
 	private:
@@ -361,70 +306,4 @@ namespace kaguya
 	{
 		return mem_fun_binder(*this, key);
 	}
-}
-
-
-
-namespace kaguya
-{
-#if KAGUYA_USE_CPP11
-	template<class...Args> FunctionResults LuaRef::operator()(Args... args)
-	{
-		int t = type();
-		if (t == TYPE_THREAD)
-		{
-			return FunctionResults(resume<std::vector<LuaRef> >(standard::forward<Args>(args)...));
-		}
-		else if (t == TYPE_FUNCTION)
-		{
-			return FunctionResults(call<std::vector<LuaRef> >(standard::forward<Args>(args)...));
-		}
-		else
-		{
-			except::typeMismatchError(state_, " is not function or thread");
-			return FunctionResults();
-		}
-	}
-#else
-#define KAGUYA_TEMPLATE_PARAMETER(N)
-#define KAGUYA_FUNCTION_ARGS_DEF(N)
-#define KAGUYA_CALL_ARGS(N)
-
-#define KAGUYA_OP_FN_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults LuaRef::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-		int t = type(); \
-		if (t == TYPE_THREAD)\
-		{\
-			return FunctionResults(resume<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
-		}\
-		else if (t == TYPE_FUNCTION)\
-		{\
-			return FunctionResults(call<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
-		}\
-		else\
-		{\
-			except::typeMismatchError(state_, " is not function or thread"); \
-			return FunctionResults(); \
-		}\
-	}
-
-	KAGUYA_OP_FN_DEF(0)
-
-#undef KAGUYA_TEMPLATE_PARAMETER
-#undef KAGUYA_FUNCTION_ARGS_DEF
-#undef KAGUYA_CALL_ARGS
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
-#define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
-#define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
-
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) KAGUYA_PP_CAT(A,N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_ARG_DEF(N) standard::forward<KAGUYA_PP_CAT(A,N)>(KAGUYA_PP_CAT(a,N)) 
-
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
-#undef KAGUYA_OP_FN_DEF
-#undef KAGUYA_TEMPLATE_PARAMETER
-#endif
 }

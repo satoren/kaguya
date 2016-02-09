@@ -230,15 +230,25 @@ namespace kaguya
 		//@}
 
 		//! return element reference from global table
-		TableKeyReference<std::string> operator[](const std::string& str)
+		TableKeyReference operator[](const std::string& str)
 		{
-			return TableKeyReference<std::string>(globalTable(), LuaRef(state_, str));
+			int stack_top = lua_gettop(state_);
+			lua_type_traits<GlobalTable>::push(state_, GlobalTable());
+			lua_type_traits<std::string>::push(state_, str);
+			int table_index = stack_top + 1;
+			int key_index = stack_top + 2;
+			return TableKeyReference(state_, table_index, key_index, stack_top);
 		}
 
 		//! return element reference from global table
-		TableKeyReference<std::string> operator[](const char* str)
+		TableKeyReference operator[](const char* str)
 		{
-			return TableKeyReference<std::string>(globalTable(), LuaRef(state_, str));
+			int stack_top = lua_gettop(state_);
+			lua_type_traits<GlobalTable>::push(state_, GlobalTable());
+			lua_type_traits<const char*>::push(state_, str);
+			int table_index = stack_top + 1;
+			int key_index = stack_top + 2;
+			return TableKeyReference(state_, table_index, key_index, stack_top);
 		}
 
 		//! return global table
@@ -249,10 +259,18 @@ namespace kaguya
 
 		//! return new Lua reference from argument value
 		template<typename T>
-		LuaRef newRef(T value)
+		LuaRef newRef(const T& value)
 		{
-			return LuaRef(state_, standard::forward<T>(value));
+			return LuaRef(state_, value);
 		}
+#if KAGUYA_USE_CPP11
+		//! return new Lua reference from argument value
+		template<typename T>
+		LuaRef newRef(T&& value)
+		{
+			return LuaRef(state_, std::forward<T>(value));
+		}
+#endif
 
 		//! return new Lua table
 		LuaTable newTable()
