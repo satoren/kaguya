@@ -232,11 +232,6 @@ namespace kaguya
 		{
 			return util::get_result<Result>(state_, startIndex_);
 		}
-		template<>
-		FunctionResults get<FunctionResults>()const
-		{
-			return *this;
-		}
 		template<typename T>
 		operator T()const {
 			return get<T>();

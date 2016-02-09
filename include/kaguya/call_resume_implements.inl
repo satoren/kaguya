@@ -7,7 +7,7 @@ template<class Result, class...Args> Result call(Args&&... args)
 	int argnum = lua_gettop(state_) - argstart;
 	int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);
 	except::checkErrorAndThrow(result, state_);
-	return FunctionResults(state_, argstart).get<Result>();
+	return FunctionResults(state_, argstart);
 }
 template<class Result, class...Args> Result resume(Args&&... args)
 {
@@ -21,7 +21,7 @@ template<class Result, class...Args> Result resume(Args&&... args)
 	int argnum = lua_gettop(cor) - argstart;
 	int result = util::lua_resume_compat(cor, argnum);
 	except::checkErrorAndThrow(result, cor);
-	return FunctionResults(cor, argstart).get<Result>();
+	return FunctionResults(cor, argstart);
 }
 
 template<class...Args> FunctionResults operator()(Args&&... args)
@@ -56,7 +56,7 @@ template<class...Args> FunctionResults operator()(Args&&... args)
 			int argnum = lua_gettop(state_) - argstart;\
 			int result = lua_pcall(state_, argnum, LUA_MULTRET, 0);\
 			except::checkErrorAndThrow(result, state_);\
-			return FunctionResults(state_, argstart).get<Result>();\
+			return FunctionResults(state_, argstart);\
 		}
 
 
@@ -77,7 +77,7 @@ KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
 			int argnum = lua_gettop(cor) - argstart;\
 			int result = util::lua_resume_compat(cor, argnum);\
 			except::checkErrorAndThrow(result, cor);\
-			return FunctionResults(cor, argstart).get<Result>();\
+			return FunctionResults(cor, argstart);\
 		}
 
 KAGUYA_RESUME_DEF(0)
@@ -97,11 +97,11 @@ KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
 	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
 	{\
 		int t = type(); \
-		if (t == TYPE_THREAD)\
+		if (t == LUA_TTHREAD)\
 		{\
 			return FunctionResults(resume<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
 		}\
-		else if (t == TYPE_FUNCTION)\
+		else if (t == LUA_TFUNCTION)\
 		{\
 			return FunctionResults(call<std::vector<LuaRef> >(KAGUYA_CALL_ARGS(N))); \
 		}\
