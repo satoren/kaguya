@@ -25,8 +25,12 @@ cmake ..
 make
 ./test_runner
 ```
-
+If you want to use a non-system default library, add three option to cmake command
+```
+cmake -DLUA_INCLUDE_DIRS=path/to/lua/header/dir -DLUA_LIBRARY_DIRS=/abspath/to/lua/library/dir -DLUA_LIBRARIES=lualibname
+```
 ## Usage
+add "kaguya/include" directory to "header search path" of your project
 ### Create Lua context
 ```c++
 #include "kaguya/kaguya.hpp"
