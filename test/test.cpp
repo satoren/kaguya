@@ -1519,6 +1519,18 @@ namespace t_08_cxx11_feature
 			{
 				sum += arg;
 			}
+
+			TEST_EQUAL(args.size(), 10);
+			TEST_EQUAL(args[0], 1);
+			TEST_EQUAL(args[1], 2);
+			TEST_EQUAL(args[2], 3);
+			TEST_EQUAL(args[3], 4);
+			TEST_EQUAL(args[4], 5);
+			TEST_EQUAL(args[5], 6);
+			TEST_EQUAL(args[6], 7);
+			TEST_EQUAL(args[7], 8);
+			TEST_EQUAL(args[8], 9);
+			TEST_EQUAL(args[9], 10);
 			return sum;
 		});
 		TEST_EQUAL(state["sum"](1,2,3,4,5,6,7,8,9,10), 55);

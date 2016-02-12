@@ -386,10 +386,7 @@ namespace kaguya
 			}
 		}
 
-#if KAGUYA_USE_CPP11
-	private://cant resolve compile error on travis-ci g++ with c++03
-		//msg error: no matching function for call to 'forward(const t_02_classreg::ABC&)'
-#endif
+	private:
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_index_(src.key_index_)
 		{

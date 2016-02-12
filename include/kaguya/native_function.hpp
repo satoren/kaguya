@@ -11,6 +11,7 @@
 #include "kaguya/config.hpp"
 #include "kaguya/utility.hpp"
 #include "kaguya/type.hpp"
+#include "kaguya/lua_ref.hpp"
 
 #if KAGUYA_USE_CPP11
 #include "native_function_cxx11.hpp"
@@ -24,6 +25,10 @@ namespace kaguya
 	public:
 		VariadicArgType(lua_State* state, int startIndex) :state_(state), startIndex_(startIndex), endIndex_(lua_gettop(state) + 1)
 		{
+			if (startIndex_ > endIndex_)
+			{
+				endIndex_ = startIndex_;
+			}
 		}
 
 		template<typename T>
@@ -123,6 +128,26 @@ namespace kaguya
 		const_iterator cend()
 		{
 			return const_iterator(state_, endIndex_);
+		}
+
+
+		template<typename T>
+		typename lua_type_traits<T>::get_type at(size_t index)const
+		{
+			if (index < 0 || index >= size())
+			{
+				throw std::out_of_range("variadic arguments out of range");
+			}
+			return lua_type_traits<T>::get(state_, startIndex_ + static_cast<int>(index));
+		}
+
+		LuaRef operator[](size_t index)const
+		{
+			return at<LuaRef>(index);
+		}
+		size_t size()const
+		{
+			return endIndex_ - startIndex_;
 		}
 	private:
 		lua_State* state_;
