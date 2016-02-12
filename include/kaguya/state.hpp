@@ -103,14 +103,14 @@ namespace kaguya
 		/**
 		* @name loadfile
 		* @brief If there are no errors,compiled file as a Lua function and return.
-		*  Otherwise send error message to error handler and return nil reference 
+		*  Otherwise send error message to error handler and return nil reference
 		* @param file  file path of lua script
-		* @return reference of lua function 
+		* @return reference of lua function
 		*/
 		//@{
 		LuaFunction loadfile(const std::string& file)
 		{
-			return LuaFunction::loadfile(state_,file);
+			return LuaFunction::loadfile(state_, file);
 		}
 		LuaFunction loadfile(const char* file)
 		{
@@ -124,7 +124,7 @@ namespace kaguya
 		* @brief If there are no errors,compiled string as a Lua function and return.
 		*  Otherwise send error message to error handler and return nil reference
 		* @param str lua code
-		* @return reference of lua function 
+		* @return reference of lua function
 		*/
 		//@{
 		LuaFunction loadstring(const std::string& str)
@@ -133,7 +133,7 @@ namespace kaguya
 		}
 		LuaFunction loadstring(const char* str)
 		{
-			return LuaFunction::loadstring(state_,str);
+			return LuaFunction::loadstring(state_, str);
 		}
 		//@}
 
@@ -237,7 +237,7 @@ namespace kaguya
 			lua_type_traits<std::string>::push(state_, str);
 			int table_index = stack_top + 1;
 			int key_index = stack_top + 2;
-			return TableKeyReference(state_, table_index, key_index, stack_top);
+			return TableKeyReference(state_, table_index, key_index, stack_top, NoTypeCheck());
 		}
 
 		//! return element reference from global table
@@ -248,7 +248,7 @@ namespace kaguya
 			lua_type_traits<const char*>::push(state_, str);
 			int table_index = stack_top + 1;
 			int key_index = stack_top + 2;
-			return TableKeyReference(state_, table_index, key_index, stack_top);
+			return TableKeyReference(state_, table_index, key_index, stack_top, NoTypeCheck());
 		}
 
 		//! return global table
@@ -321,7 +321,7 @@ namespace kaguya
 			}
 			/**
 			* Performs an incremental step of garbage collection.
-			* @args the collector will perform as if that amount of memory (in KBytes) had been allocated by Lua. 
+			* @args the collector will perform as if that amount of memory (in KBytes) had been allocated by Lua.
 			*/
 			bool step(int size)
 			{

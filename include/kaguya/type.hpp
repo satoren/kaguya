@@ -568,6 +568,7 @@ namespace kaguya
 	struct GlobalTable {};
 	struct NilValue {};
 
+	struct NoTypeCheck {};
 
 	template<>	struct lua_type_traits<NewTable> {
 		static int push(lua_State* l, const NewTable& table)

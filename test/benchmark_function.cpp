@@ -119,7 +119,7 @@ namespace kaguya_api_benchmark______
 	void lua_table_bracket_operator_access(kaguya::State& state)
 	{
 		state("lua_table={value=0}");
-		kaguya::LuaRef lua_table = state["lua_table"];
+		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < 1000000; i++)
 		{
 			lua_table["value"] = i;
@@ -130,7 +130,7 @@ namespace kaguya_api_benchmark______
 	void lua_table_bracket_operator_assign(kaguya::State& state)
 	{
 		state("lua_table={value=0}");
-		kaguya::LuaRef lua_table = state["lua_table"];
+		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < 1000000; i++)
 		{
 			lua_table.setField("value",i);
@@ -141,7 +141,7 @@ namespace kaguya_api_benchmark______
 	void lua_table_bracket_operator_get(kaguya::State& state)
 	{
 		state("lua_table={value=0}");
-		kaguya::LuaRef lua_table = state["lua_table"];
+		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < 1000000; i++)
 		{
 			lua_table["value"] = i;

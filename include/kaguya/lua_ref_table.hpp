@@ -412,6 +412,19 @@ namespace kaguya
 			}
 		}
 
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
+		TableKeyReference(lua_State* state, int table_index, int key_index, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
+		{
+		}
+
+		template<typename KEY>
+		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_))
+		{
+			lua_type_traits<LuaRef>::push(state_, table);
+			lua_type_traits<KEY>::push(state_, key);
+			table_index_ = stack_top_ + 1;
+			key_index_ = stack_top_ + 2;
+		}
 		template<typename KEY>
 		TableKeyReference(const LuaRef& table,const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_))
 		{

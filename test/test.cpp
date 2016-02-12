@@ -1233,14 +1233,14 @@ namespace t_04_lua_ref
 			kaguya::LuaRef f = kaguya::LuaFunction::loadstring(state.state()
 				, "return function(a) return 22,66 end")();
 
-			kaguya::LuaRef forward = kaguya::LuaFunction::loadstring(state.state()
+			kaguya::LuaRef forwardf = kaguya::LuaFunction::loadstring(state.state()
 				, "return function(...) return ... end")();
 			int a = 0;int b = 0;
 			kaguya::tie(a, b) = f();
 			TEST_EQUAL(a , 22);
 			TEST_EQUAL(b , 66);
 			a = 0;b = 0;
-			kaguya::tie(a,b) = forward(f());
+			kaguya::tie(a,b) = forwardf(f());
 			TEST_EQUAL(a , 22);
 			TEST_EQUAL(b , 66);
 		}
