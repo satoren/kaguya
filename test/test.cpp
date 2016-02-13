@@ -1173,6 +1173,31 @@ namespace t_04_lua_ref
 		TEST_CHECK(d.size() >= sizeof(size_check_struct)); // fixme: determine exact size of userdata if possible
 	}
 
+	void lua_ref_size(kaguya::State& state)
+	{
+#define TEST_SIZE(IDENTIFIER, VALUE, LEN) \
+	state(#IDENTIFIER " = " #VALUE); \
+	kaguya::LuaRef IDENTIFIER = state[#IDENTIFIER]; \
+	TEST_CHECK(IDENTIFIER.size() == LEN);
+
+		TEST_SIZE(x, 17, 0);
+		TEST_SIZE(s, 'hello world!', 12);
+		TEST_SIZE(b, true, 0);
+		TEST_SIZE(n, nil, 0);
+		TEST_SIZE(f, function() return 3 end, 0);
+
+#undef TEST_SIZE
+
+		struct dummy
+		{
+			char data[15];
+		};
+
+		state["d"] = dummy();
+		kaguya::LuaRef d = state["d"];
+		TEST_CHECK(d.size() >= sizeof(dummy)); // fixme: determine exact size of userdata if possible
+	}
+
 	void function_env(kaguya::State& state)
 	{
 		kaguya::LuaFunction fun = state.loadstring("foo='bar'");
