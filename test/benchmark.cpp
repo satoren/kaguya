@@ -18,8 +18,8 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 		const std::string& test_name = it->first;
 
 
-		double total_time = 0;
-		static const int N = 4;
+		double mintime = std::numeric_limits<double>::max();
+		static const int N = 10;
 		for (int i = 0; i < N; ++i)
 		{
 			kaguya::State state;
@@ -28,10 +28,10 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 			it->second(state);
 
 			double end = state["os"]["clock"]();
-			total_time += end - start;
+			mintime = std::min(mintime, end - start);
 		}
 
-		std::cout << test_name << " average time:" << total_time/N << std::endl;
+		std::cout << test_name << " min time:" << mintime<< std::endl;
 	}
 }
 
