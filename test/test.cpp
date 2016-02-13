@@ -6,27 +6,36 @@
 
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #B );
-#define TEST_EQUAL(A,B)  if(!(A == B))\
+
+#define TEST_COMPARE(A,B,OP)  if(!(A OP B))\
 {\
 std::stringstream ss;\
 ss << "failed.\nfunction:" << __FUNCTION__ << std::endl \
 << " line:" << __LINE__<< std::endl \
-<< " CHECKCODE:"#A"==" #B << std::endl \
+<< " CHECKCODE:"#A #OP #B << std::endl \
 << " left:" << A << std::endl \
 << " right:" << B << std::endl; \
 	throw std::runtime_error(ss.str());\
 }
+#define TEST_EQUAL(A,B)  TEST_COMPARE(A,B,==)
+#define TEST_COMPARE_EQ(A,B)  TEST_COMPARE(A,B,==)
+#define TEST_COMPARE_NE(A,B)  TEST_COMPARE(A,B,!=)
+#define TEST_COMPARE_LT(A,B)  TEST_COMPARE(A,B,<)
+#define TEST_COMPARE_LE(A,B)  TEST_COMPARE(A,B,<=)
+#define TEST_COMPARE_GT(A,B)  TEST_COMPARE(A,B,>)
+#define TEST_COMPARE_GE(A,B)  TEST_COMPARE(A,B,>=)
+
 namespace t_01_primitive
 {
 	void bool_get(kaguya::State& state)
 	{
 		state("value = true");
-		TEST_EQUAL(state["value"] , true);
+		TEST_EQUAL(state["value"], true);
 	};
 	void int_get(kaguya::State& state)
 	{
 		state("value = 3");
-		TEST_EQUAL(state["value"] , int(3));
+		TEST_EQUAL(state["value"], int(3));
 	};
 	void string_get(kaguya::State& state)
 	{
@@ -219,7 +228,7 @@ namespace t_02_classreg
 			.addMember("getInt", &ABC::getInt)
 			.addMember("references", static_cast<ABC& (ABC::*)()>(&ABC::references))
 			.addMember("references", static_cast<const ABC& (ABC::*)()const>(&ABC::references))
-			.addMember("const_pointer", &ABC::const_pointer)			
+			.addMember("const_pointer", &ABC::const_pointer)
 			.addMember("pointer", &ABC::pointer)
 			.addMember("copy", &ABC::copy)
 			.addMember("shared_copy", &ABC::shared_copy)
@@ -400,9 +409,9 @@ namespace t_02_classreg
 		Base() :a(0) {};
 		int a;
 	};
-	struct Derived:Base
+	struct Derived :Base
 	{
-		Derived():b(0) {};
+		Derived() :b(0) {};
 		int b;
 	};
 
@@ -436,7 +445,7 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(1 == base:a())"));
 		TEST_CHECK(state("assert(1 == derived:a())"));
 		TEST_CHECK(state("assert(2 == derived:b())"));
-		TEST_EQUAL(derived.b , 2);
+		TEST_EQUAL(derived.b, 2);
 	}
 
 	int receive_shared_ptr_function(kaguya::standard::shared_ptr<Derived> d) {
@@ -466,15 +475,15 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(1 == base:a())"));
 		TEST_CHECK(state("assert(1 == derived:a())"));
 		TEST_CHECK(state("assert(2 == derived:b())"));
-		TEST_EQUAL(derived->b , 2);
+		TEST_EQUAL(derived->b, 2);
 		TEST_CHECK(state("assert(5 == receive_shared_ptr_function(derived))"));
-		TEST_EQUAL(derived->b , 5);
+		TEST_EQUAL(derived->b, 5);
 	}
 
 	struct shared_ptr_fun
 	{
 		kaguya::standard::shared_ptr<int>& ptr;
-		shared_ptr_fun(kaguya::standard::shared_ptr<int>& r):ptr(r){}
+		shared_ptr_fun(kaguya::standard::shared_ptr<int>& r) :ptr(r) {}
 		void operator()(kaguya::standard::shared_ptr<int> p)
 		{
 			ptr = p;
@@ -486,9 +495,9 @@ namespace t_02_classreg
 		kaguya::standard::shared_ptr<int> ptr(new int(5));
 		state["foo"] = kaguya::function<void(kaguya::standard::shared_ptr<int>)>(shared_ptr_fun(ptr));
 		state("foo(nil)");
-		TEST_EQUAL(ptr , 0);
+		TEST_EQUAL(ptr, 0);
 	}
-	
+
 
 
 	void add_property(kaguya::State& state)
@@ -511,12 +520,12 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(1 == base.a)"));
 		TEST_CHECK(state("assert(2 == derived.a)"));
 		TEST_CHECK(state("assert(3 == derived.b)"));
-		TEST_EQUAL(derived.b , 3);
+		TEST_EQUAL(derived.b, 3);
 	}
 
 	struct Prop
 	{
-		Prop() :a(0){}
+		Prop() :a(0) {}
 		int a;
 	};
 	struct PropHolder
@@ -538,7 +547,7 @@ namespace t_02_classreg
 		PropHolder prop;
 		state["prop"] = &prop;
 		TEST_CHECK(state("prop.mem.a=455"));
-		TEST_EQUAL(prop.mem.a , 455);
+		TEST_EQUAL(prop.mem.a, 455);
 
 		{//member retain check
 			state["prop"] = PropHolder();
@@ -587,7 +596,7 @@ namespace t_03_function
 		kaguya::LuaRef lfoo = state["Foo"];
 		lfoo["bar"] = kaguya::function(&Foo::setBar);
 		lfoo["bar"](&foo, "bar");
-		TEST_EQUAL(foo.bar , "bar");
+		TEST_EQUAL(foo.bar, "bar");
 
 		state["foo"] = &foo;
 
@@ -598,14 +607,14 @@ namespace t_03_function
 
 
 		(state["foo"]->*"setBar")("test2");
-		TEST_EQUAL(foo.bar , "test2");
+		TEST_EQUAL(foo.bar, "test2");
 #if KAGUYA_USE_CPP11
 		lfoo["bar"] = kaguya::function<void(std::string)>([&foo](std::string str) { foo.bar = str; });
 		TEST_CHECK(state("Foo.bar('test3')"));
-		TEST_EQUAL(foo.bar , "test3");
+		TEST_EQUAL(foo.bar, "test3");
 		lfoo["bar"] = kaguya::function([&foo](std::string str) { foo.bar = str; });
 		TEST_CHECK(state("Foo.bar('test4')"));
-		TEST_EQUAL(foo.bar , "test4");
+		TEST_EQUAL(foo.bar, "test4");
 #else
 #endif
 	}
@@ -639,7 +648,7 @@ namespace t_03_function
 		TEST_EQUAL(ptr->args[0].get<std::string>(), "hanaregumi");
 		TEST_EQUAL(ptr->args[1].get<std::string>(), "hana-uta");
 		TEST_EQUAL(ptr->args[2].get<int>(), 5);
-		
+
 		state("var = Vari.new('abc')");
 		ptr = state["var"];
 
@@ -677,7 +686,7 @@ namespace t_03_function
 
 
 		a = b = c = d = e = 0;
-		kaguya::tie(a, b, c, d, e) = state["multresfun"].call<kaguya::standard::tuple<int,int,int,int,int> >();
+		kaguya::tie(a, b, c, d, e) = state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >();
 		TEST_EQUAL(a, 1);
 		TEST_EQUAL(b, 2);
 		TEST_EQUAL(c, 4);
@@ -692,7 +701,7 @@ namespace t_03_function
 		state["multresfun2"] = kaguya::function(tuplefun);
 
 		state("a,b = multresfun2()");
-		TEST_CHECK(state("assert(a == 12  and b == '23')"));		
+		TEST_CHECK(state("assert(a == 12  and b == '23')"));
 	}
 
 	void vector_and_map_from_table_mapping(kaguya::State& state)
@@ -875,7 +884,7 @@ namespace t_03_function
 		state.newRef(6).push();
 		state.newRef(9).push();
 		state.newRef(2).push();
-		
+
 		call(state.state(), &free_standing_function);
 
 		lua_settop(state.state(), 0);
@@ -896,7 +905,7 @@ namespace t_03_function
 		});
 		TEST_EQUAL(foo.bar, "capturelambda");
 #endif
-		
+
 		lua_settop(state.state(), 0);
 	}
 
@@ -930,7 +939,7 @@ namespace t_03_function
 		TEST_EQUAL(state["result"], 1);
 	}
 
-	
+
 
 	enum TestEnum
 	{
@@ -971,7 +980,7 @@ namespace t_04_lua_ref
 		const maptype& map = abctable.map();
 		TEST_CHECK(map.size() == 4);
 
-		std::map<std::string,std::string> strmap = abctable.map<std::string, std::string>();
+		std::map<std::string, std::string> strmap = abctable.map<std::string, std::string>();
 
 		TEST_CHECK(strmap["d"] == "1");
 		TEST_CHECK(strmap["e"] == "3");
@@ -1046,10 +1055,10 @@ namespace t_04_lua_ref
 
 		state("tbl.retfun=function(tbl) return tbl.sum end");
 		TEST_CHECK((tbl->*"retfun")()(1, 2, 3, 4, 5, 6, 7, 8) == 36)
-	
-		//callable check
-		TEST_CHECK((tbl->*"retfun").call<kaguya::LuaFunction>()(1, 2, 3, 4, 5, 6, 7, 8) == 36)
-		TEST_CHECK((tbl->*"retfun")().call<int>(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+
+			//callable check
+			TEST_CHECK((tbl->*"retfun").call<kaguya::LuaFunction>()(1, 2, 3, 4, 5, 6, 7, 8) == 36)
+			TEST_CHECK((tbl->*"retfun")().call<int>(1, 2, 3, 4, 5, 6, 7, 8) == 36)
 	}
 
 	struct ob
@@ -1086,14 +1095,13 @@ namespace t_04_lua_ref
 		kaguya::LuaRef luanum2 = state.newRef(42);
 		kaguya::LuaRef luanum3 = state.newRef(422);
 
-		TEST_CHECK(!(luanum == luanum2));
-		TEST_CHECK(luanum != luanum2);
-		TEST_CHECK(!(luanum < luanum2));
-		TEST_CHECK(!(luanum <= luanum2));
-		TEST_CHECK(luanum > luanum2);
-		TEST_CHECK(luanum >= luanum2);
+		TEST_COMPARE_EQ(luanum, luanum3);
+		TEST_COMPARE_NE(luanum, luanum2);
+		TEST_COMPARE_LT(luanum2, luanum);
+		TEST_COMPARE_LE(luanum2, luanum);
+		TEST_COMPARE_GT(luanum, luanum2);
+		TEST_COMPARE_GE(luanum, luanum2);
 
-		TEST_CHECK(luanum == luanum3);
 		TEST_CHECK(!(luanum != luanum3));
 		TEST_CHECK(!(luanum < luanum3));
 		TEST_CHECK(luanum <= luanum3);
@@ -1243,12 +1251,12 @@ namespace t_04_lua_ref
 		TEST_CHECK(state("assert(value.abc.ccc == 'test')"));
 		TEST_CHECK(state("assert(value.abc.ddd == 'test')"));
 
-		TEST_CHECK(state["value"]["abc"]["ccc"] == state["value"]["abc"]["bbb"]);
-		TEST_CHECK(state["value"]["abc"]["ccc"] == "test");
+		TEST_COMPARE_EQ(state["value"]["abc"]["ccc"], state["value"]["abc"]["bbb"]);
+		TEST_COMPARE_EQ(state["value"]["abc"]["ccc"], "test");
 		TEST_CHECK(!(state["value"]["abc"]["ccc"] != state["value"]["abc"]["bbb"]));
 		TEST_CHECK(!(state["value"]["abc"]["ccc"] != "test"));
-		TEST_CHECK(state["value"]["abc"]["ccc"] != state["value"]["abc"]["def"]);
-		TEST_CHECK(state["value"]["abc"]["ccc"] != "tes");
+		TEST_COMPARE_NE(state["value"]["abc"]["ccc"], state["value"]["abc"]["def"]);
+		TEST_COMPARE_NE(state["value"]["abc"]["ccc"], "tes");
 	}
 
 	void metatable(kaguya::State& state)
@@ -1259,8 +1267,8 @@ namespace t_04_lua_ref
 		metatable_index["hana"] = "uta";
 		metatable["__index"] = metatable_index;
 		table.setMetatable(metatable);
-		TEST_EQUAL(table["hana"] , "uta");
-		TEST_EQUAL(table.getMetatable() , metatable);
+		TEST_EQUAL(table["hana"], "uta");
+		TEST_EQUAL(table.getMetatable(), metatable);
 	}
 
 
@@ -1272,7 +1280,7 @@ namespace t_04_lua_ref
 			table["x"] = 5;
 			table["other_x"] = 55;
 			int v = f(table, "x");
-			TEST_EQUAL(v , 55);
+			TEST_EQUAL(v, 55);
 		}
 
 		{
@@ -1281,14 +1289,14 @@ namespace t_04_lua_ref
 
 			kaguya::LuaRef forwardf = kaguya::LuaFunction::loadstring(state.state()
 				, "return function(...) return ... end")();
-			int a = 0;int b = 0;
+			int a = 0; int b = 0;
 			kaguya::tie(a, b) = f();
-			TEST_EQUAL(a , 22);
-			TEST_EQUAL(b , 66);
-			a = 0;b = 0;
-			kaguya::tie(a,b) = forwardf(f());
-			TEST_EQUAL(a , 22);
-			TEST_EQUAL(b , 66);
+			TEST_EQUAL(a, 22);
+			TEST_EQUAL(b, 66);
+			a = 0; b = 0;
+			kaguya::tie(a, b) = forwardf(f());
+			TEST_EQUAL(a, 22);
+			TEST_EQUAL(b, 66);
 		}
 
 
@@ -1339,8 +1347,8 @@ namespace t_06_state
 		kaguya::State state5(L);
 
 		state5["value"] = 1;
-		TEST_EQUAL(state["value"] , 1);
-		TEST_EQUAL(state5["value"] , state2["value"]);
+		TEST_EQUAL(state["value"], 1);
+		TEST_EQUAL(state5["value"], state2["value"]);
 
 		lua_close(L);
 	}
@@ -1553,10 +1561,10 @@ namespace t_08_cxx11_feature
 	{
 		state["ABC"] = kaguya::function([](int a) {return a * 2; });
 		int a = state["ABC"](54);
-		TEST_EQUAL(a , 108);
+		TEST_EQUAL(a, 108);
 
 		state["free2"] = kaguya::function([]() {return 12; });
-		TEST_EQUAL(state["free2"]() , 12.0);
+		TEST_EQUAL(state["free2"](), 12.0);
 
 
 		state["sum"] = kaguya::function([](kaguya::VariadicArgType args) {
@@ -1579,7 +1587,7 @@ namespace t_08_cxx11_feature
 			TEST_EQUAL(args[9], 10);
 			return sum;
 		});
-		TEST_EQUAL(state["sum"](1,2,3,4,5,6,7,8,9,10), 55);
+		TEST_EQUAL(state["sum"](1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 55);
 
 
 
@@ -1613,7 +1621,7 @@ namespace t_08_cxx11_feature
 		state["uniqueptr"] = std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(2));
 
 		const MoveOnlyClass* ref = state["uniqueptr"];
-		TEST_EQUAL(ref->member , 2);
+		TEST_EQUAL(ref->member, 2);
 
 		state("func =function(arg) return assert(arg.member == 5) end");
 		TEST_CHECK(state["func"](std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(5))) == true);
@@ -1783,7 +1791,7 @@ int main()
 		ADD_TEST(t_06_state::load_with_other_env);
 		ADD_TEST(t_06_state::no_standard_lib);
 		ADD_TEST(t_06_state::load_lib_constructor);
-		
+
 		ADD_TEST(t_07_any_type_test::any_type_test);
 
 
@@ -1795,10 +1803,10 @@ int main()
 		ADD_TEST(t_08_cxx11_feature::lambdafun);
 
 		ADD_TEST(t_08_cxx11_feature::put_unique_ptr);
-		
+
 		ADD_TEST(t_08_cxx11_feature::compare_null_ptr);
 
-		
+
 #endif
 
 		test_result = execute_test(testmap);

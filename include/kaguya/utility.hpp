@@ -194,6 +194,37 @@ namespace kaguya
 			return lua_resume(L, nargs);
 #endif
 		}
+
+
+
+		template<typename T>
+		inline bool pushCountCheck(lua_State* state,int count)
+		{
+			if (count != 1)
+			{
+				if (count > 1) { except::typeMismatchError(state, std::string("can not push multiple value:") + typeid(T).name()); }
+				if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); }
+				return false;
+			}
+			return true;
+		}
+		inline lua_State* toMainThread(lua_State* state)
+		{
+#if LUA_VERSION_NUM >= 502
+			if (state)
+			{
+				lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
+				lua_State* mainthread = lua_tothread(state, -1);
+				lua_pop(state, 1);
+				if (mainthread)
+				{
+					return mainthread;
+				}
+			}
+#endif
+			return state;
+		}
+
 #if KAGUYA_USE_CPP11
 		inline int push_args(lua_State *l)
 		{

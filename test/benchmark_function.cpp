@@ -96,7 +96,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_function=function(i)return i;end");
 
-		kaguya::LuaRef lua_function = state["lua_function"];
+		kaguya::LuaFunction lua_function = state["lua_function"];
 		for (int i = 0; i < 1000000; i++)
 		{
 			int r = lua_function(i);

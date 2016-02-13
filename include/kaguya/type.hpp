@@ -323,7 +323,7 @@ namespace kaguya
 	};
 	///! traits for nullptr
 	template<>	struct lua_type_traits<std::nullptr_t> {
-		typedef void* push_type;
+		typedef const std::nullptr_t& push_type;
 		typedef std::nullptr_t get_type;
 
 		static bool checkType(lua_State* l, int index)
@@ -342,7 +342,7 @@ namespace kaguya
 			return nullptr;
 		}
 
-		static int push(lua_State* l, push_type&& v)
+		static int push(lua_State* l, const std::nullptr_t& v)
 		{
 			lua_pushnil(l);
 			return 1;
@@ -605,4 +605,58 @@ namespace kaguya
 
 
 
+	template<typename Derived>
+	class LuaBasicTypeFunctions
+	{
+	public:
+		enum value_type
+		{
+			TYPE_NIL = LUA_TNIL,//!< nil type
+			TYPE_BOOL = LUA_TBOOLEAN,//!< boolean type
+			TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,//!< light userdata type
+			TYPE_NUMBER = LUA_TNUMBER,//!< number type
+			TYPE_STRING = LUA_TSTRING,//!< string type
+			TYPE_TABLE = LUA_TTABLE,//!< table type
+			TYPE_FUNCTION = LUA_TFUNCTION,//!< function type
+			TYPE_USERDATA = LUA_TUSERDATA,//!< userdata type
+			TYPE_THREAD = LUA_TTHREAD,//!< thread(coroutine) type
+		};
+
+		bool isNilref()const { return state_() == 0 || type_() == LUA_REFNIL; }
+
+		size_t size() const {
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_rawlen(state, pushStackIndex_(state));
+#else
+			return lua_objlen(state, pushStackIndex_(state));
+#endif
+		}
+
+		int type() const
+		{
+			lua_State* state = state_();
+			if (!state)
+			{
+				return LUA_TNONE;
+			}
+			util::ScopedSavedStack save(state);
+			return lua_type(state, pushStackIndex_(state));
+		}
+		const char* typeName()const
+		{
+			return lua_typename(state_(), type());
+		}
+
+	private:
+		lua_State* state_()const
+		{
+			return static_cast<const Derived*>(this)->state();
+		}
+		int pushStackIndex_(lua_State* state)const
+		{
+			return static_cast<const Derived*>(this)->pushStackIndex(state);
+		}
+	};
 };

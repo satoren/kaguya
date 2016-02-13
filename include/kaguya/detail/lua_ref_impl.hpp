@@ -1,0 +1,401 @@
+// Copyright satoren
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#pragma once
+
+#include <vector>
+#include <set>
+#include <map>
+#include <cassert>
+#include <algorithm>
+#include <ostream>
+#include "kaguya/config.hpp"
+#include "kaguya/error_handler.hpp"
+#include "kaguya/type.hpp"
+#include "kaguya/utility.hpp"
+
+
+namespace kaguya
+{
+	struct StackTop {};
+	namespace Ref
+	{
+		struct NoMainCheck {};
+
+		class StackRef
+		{
+			lua_State *state_;
+			int stack_index_;
+			mutable bool pop_;
+		public:
+			typedef NoMainCheck NoMainCheck;
+#if KAGUYA_USE_CPP11
+			StackRef(StackRef&& src) :state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
+			{
+				src.pop_ = false;
+			}
+#else
+			LuaStackRef(const LuaStackRef&src) : state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
+			{
+				src.pop_ = false;
+			}
+#endif
+			StackRef(lua_State* s, int index) :state_(s), stack_index_(index), pop_(true)
+			{
+			}
+			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(index), pop_(pop)
+			{
+			}
+			~StackRef()
+			{
+				if (state_ && pop_)
+				{
+					lua_settop(state_, stack_index_ - 1);
+				}
+			}
+			template<typename T>T get()const
+			{
+				return lua_type_traits<T>::get(state_, stack_index);
+			}
+			template<typename T>
+			operator T()const
+			{
+				return get<T>();
+			}
+			int push()const
+			{
+				lua_pushvalue(state_, stack_index_);
+				return 1;
+			}
+
+			int pushStackIndex(lua_State* state)const
+			{
+				if (state_ == state)
+				{
+					return stack_index_;
+				}
+				else
+				{
+					abort();//fixme
+				}
+			}
+			lua_State *state()const { return state_; }
+
+
+			/**
+			* @name relational operators
+			* @brief
+			*/
+			//@{
+			bool operator==(const StackRef& other)const
+			{
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state_, stack_index_, other.stack_index_, LUA_OPEQ) != 0;
+#else
+				return lua_equal(state_, stack_index_, other.stack_index_) != 0;
+#endif
+			}
+			bool operator<(const StackRef& other)const
+			{
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state_, stack_index_, other.stack_index_, LUA_OPLT) != 0;
+#else
+				return lua_lessthan(state_, stack_index_, other.stack_index_) != 0;
+#endif
+			}
+			bool operator<=(const StackRef& other)const
+			{
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state_, stack_index_, other.stack_index_, LUA_OPLE) != 0;
+#else
+				return lua_equal(state_, stack_index_, other.stack_index_) != 0 || lua_lessthan(state_, stack_index_, other.stack_index_) != 0;
+#endif
+			}
+			bool operator>=(const StackRef& other)const
+			{
+				return other <= *this;
+			}
+			bool operator>(const StackRef& other)const
+			{
+				return other < *this;
+			}
+			bool operator!=(const StackRef& other)const
+			{
+				return !(other == *this);
+			}
+			//@}
+		};
+
+
+		class RegistoryRef
+		{
+			typedef void (RegistoryRef::*bool_type)() const;
+			void this_type_does_not_support_comparisons() const {}
+		public:
+			typedef NoMainCheck NoMainCheck;
+
+			RegistoryRef(const RegistoryRef& src) :state_(src.state_)
+			{
+				if (!src.isNilref())
+				{
+					src.push(state_);
+					ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				}
+				else
+				{
+					ref_ = LUA_REFNIL;
+				}
+			}
+			RegistoryRef& operator =(const RegistoryRef& src)
+			{
+				unref();
+				state_ = src.state_;
+				if (!src.isNilref())
+				{
+					src.push(state_);
+					ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				}
+				else
+				{
+					ref_ = LUA_REFNIL;
+				}
+				return *this;
+			}
+#if KAGUYA_USE_RVALUE_REFERENCE
+			RegistoryRef(RegistoryRef&& src)throw() :state_(0), ref_(LUA_REFNIL)
+			{
+				swap(src);
+			}
+			RegistoryRef& operator =(RegistoryRef&& src)throw()
+			{
+				swap(src);
+				return *this;
+			}
+#endif
+
+			RegistoryRef() :state_(0), ref_(LUA_REFNIL) {}
+			RegistoryRef(lua_State* state) :state_(state), ref_(LUA_REFNIL) {}
+
+
+			RegistoryRef(lua_State* state, StackTop, NoMainCheck) :state_(state), ref_(LUA_REFNIL)
+			{
+				if (!state_) { return; }
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			}
+
+			RegistoryRef(lua_State* state, StackTop) :state_(state), ref_(LUA_REFNIL)
+			{
+				if (!state_) { return; }
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				state_ = util::toMainThread(state_);
+			}
+
+			void swap(RegistoryRef& other)throw()
+			{
+				std::swap(state_, other.state_);
+				std::swap(ref_, other.ref_);
+			}
+
+			template<typename T>
+			RegistoryRef(lua_State* state, const T& v, NoMainCheck) : state_(state), ref_(LUA_REFNIL)
+			{
+				if (!state_) { return; }
+				util::ScopedSavedStack save(state_);
+				int vc = util::push_args(state_, v);
+				if (!util::pushCountCheck<T>(state_, vc)) { return; }
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			}
+			template<typename T>
+			RegistoryRef(lua_State* state, const T& v) : state_(state), ref_(LUA_REFNIL)
+			{
+				if (!state_) { return; }
+				util::ScopedSavedStack save(state_);
+				int vc = util::push_args(state_, v);
+				if (!util::pushCountCheck<T>(state_, vc)) { return; }
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				state_ = util::toMainThread(state_);
+			}
+#if KAGUYA_USE_CPP11
+			template<typename T>
+			RegistoryRef(lua_State* state, T&& v, NoMainCheck) : state_(state), ref_(LUA_REFNIL)
+			{
+				if (!state_) { return; }
+				util::ScopedSavedStack save(state_);
+				int vc = util::push_args(state_, standard::forward<T>(v));
+				if (!util::pushCountCheck<T>(vc)) { return; }
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+			}
+			template<typename T>
+			RegistoryRef(lua_State* state, T&& v) : state_(state), ref_(LUA_REFNIL)
+			{
+				if (!state_) { return; }
+				util::ScopedSavedStack save(state_);
+				int vc = util::push_args(state_, standard::forward<T>(v));
+				if (!util::pushCountCheck<T>(state_, vc)) { return; }
+				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				state_ = util::toMainThread(state_);
+			}
+#endif
+			~RegistoryRef()
+			{
+				unref();
+			}
+
+			//push to Lua stack
+			int push()const
+			{
+				return push(state_);
+			}
+			int push(lua_State* state)const
+			{
+				if (isNilref())
+				{
+					lua_pushnil(state);
+					return 1;
+				}
+#if LUA_VERSION_NUM >= 502
+				if (state != state_)
+				{//state check
+					assert(util::toMainThread(state) == util::toMainThread(state_));
+				}
+#endif
+				lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
+				return 1;
+			}
+
+			int pushStackIndex(lua_State* state)const
+			{
+				push(state);
+				return lua_gettop(state);
+			}
+			lua_State *state()const { return state_; }
+
+			bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
+
+
+
+			template<typename T>
+			typename lua_type_traits<T>::get_type get()const
+			{
+				util::ScopedSavedStack save(state_);
+				return lua_type_traits<T>::get(state_, pushStackIndex(state_));
+			}
+
+			template<typename T>
+			operator T()const {
+				return get<T>();
+			}
+
+			operator bool_type() const
+			{
+				return (!isNilref() && get<bool>() == true) ? &RegistoryRef::this_type_does_not_support_comparisons : 0;
+			}
+
+			/**
+			* @name relational operators
+			* @brief
+			*/
+			//@{
+			bool operator==(const RegistoryRef& other)const
+			{
+				if (!state_ || !other.state_) { return !isNilref() == !other.isNilref(); }
+				util::ScopedSavedStack save(state_);
+				push(state_);
+				other.push(state_);
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state_, -1, -2, LUA_OPEQ) != 0;
+#else
+				return lua_equal(state_, -1, -2) != 0;
+#endif
+			}
+			bool operator<(const RegistoryRef& other)const
+			{
+				if (!state_ || !other.state_) { return !isNilref() < !other.isNilref(); }
+				util::ScopedSavedStack save(state_);
+				push(state_);
+				other.push(state_);
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state_, -2, -1, LUA_OPLT) != 0;
+#else
+				return lua_lessthan(state_, -2, -1) != 0;
+#endif
+			}
+			bool operator<=(const RegistoryRef& other)const
+			{
+				if (!state_ || !other.state_) { return !isNilref() <= !other.isNilref(); }
+				util::ScopedSavedStack save(state_);
+				push(state_);
+				other.push(state_);
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state_, -2, -1, LUA_OPLE) != 0;
+#else
+				return lua_equal(state_, -2, -1) != 0 || lua_lessthan(state_, -1, -2) != 0;
+#endif
+			}
+			bool operator>=(const RegistoryRef& other)const
+			{
+				return other <= *this;
+			}
+			bool operator>(const RegistoryRef& other)const
+			{
+				return other < *this;
+			}
+			bool operator!=(const RegistoryRef& other)const
+			{
+				return !(other == *this);
+			}
+			template<typename T>
+			bool operator == (const T& rhs)const
+			{
+				return rhs == *this;
+			}
+			template<typename T>
+			bool operator != (const T& rhs)const
+			{
+				return !(rhs == *this);
+			}
+			//@}
+
+		protected:
+			lua_State *state_;
+			int ref_;
+
+
+			void unref()
+			{
+				if (!isNilref())
+				{
+					luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+					state_ = 0;
+					ref_ = LUA_REFNIL;
+				}
+			}
+		};
+		template<typename T>
+		bool operator == (const T& lhs, const RegistoryRef& rhs)
+		{
+			try
+			{
+				return lhs == rhs.get<const T&>();
+			}
+			catch (const LuaTypeMismatch&)
+			{
+				return false;
+			}
+			return false;
+		}
+		template<typename T>
+		bool operator != (const T& lhs, const RegistoryRef& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		inline std::ostream& operator<<(std::ostream& os, const RegistoryRef& ref)
+		{
+			//fixme
+			return os;
+		}
+	}
+}
