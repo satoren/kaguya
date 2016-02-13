@@ -1149,6 +1149,31 @@ namespace t_04_lua_ref
 
 	}
 
+	void lua_ref_size(kaguya::State& state)
+	{
+#define TEST_SIZE(IDENTIFIER, VALUE, LEN) \
+	state(#IDENTIFIER " = " #VALUE); \
+	kaguya::LuaRef IDENTIFIER = state[#IDENTIFIER]; \
+	TEST_CHECK(IDENTIFIER.size() == LEN);
+
+		TEST_SIZE(x, 17, 0);
+		TEST_SIZE(s, 'hello world!', 12);
+		TEST_SIZE(b, true, 0);
+		TEST_SIZE(n, nil, 0);
+		TEST_SIZE(f, function() return 3 end, 0);
+
+#undef TEST_SIZE
+
+		struct dummy
+		{
+			char data[15];
+		};
+
+		state["d"] = dummy();
+		kaguya::LuaRef d = state["d"];
+		TEST_CHECK(d.size() >= sizeof(dummy)); // fixme: determine exact size of userdata if possible
+	}
+
 	void function_env(kaguya::State& state)
 	{
 		kaguya::LuaFunction fun = state.loadstring("foo='bar'");
@@ -1181,6 +1206,28 @@ namespace t_04_lua_ref
 		state["value"]["abc"]["def"] = 7;
 		state["value"]["abc"]["bbb"] = "test";
 		TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test')"));
+	}
+
+	void lua_table_size(kaguya::State& state)
+	{
+		kaguya::LuaTable table = state.newTable();
+		TEST_CHECK(table.size() == 0);
+
+		state("value = {1, 2, 'foo'}");
+		kaguya::LuaTable table2 = state["value"];
+		TEST_CHECK(table2.size() == 3);
+
+		state("value[3] = nil");
+		kaguya::LuaTable table3 = state["value"];
+		TEST_CHECK(table3.size() == 2);
+
+		state["value"] = kaguya::NewTable();
+		state["value"][1] = "foo";
+		state["value"][2] = "bar";
+		state["value"][99] = "baz";
+		state["value"]["index"] = "foo";
+		kaguya::LuaTable table4 = state["value"];
+		TEST_CHECK(table4.size() == 2);
 	}
 
 	void lua_table_reference(kaguya::State& state)
@@ -1722,9 +1769,11 @@ int main()
 		ADD_TEST(t_04_lua_ref::operator_equal_test);
 		ADD_TEST(t_04_lua_ref::typetest);
 		ADD_TEST(t_04_lua_ref::luafun_callback);
+		ADD_TEST(t_04_lua_ref::lua_ref_size);
 		ADD_TEST(t_04_lua_ref::function_env);
 		ADD_TEST(t_04_lua_ref::lua_table_get);
 		ADD_TEST(t_04_lua_ref::lua_table_set);
+		ADD_TEST(t_04_lua_ref::lua_table_size);
 		ADD_TEST(t_04_lua_ref::lua_table_reference);
 		ADD_TEST(t_04_lua_ref::luafun_loadstring);
 		ADD_TEST(t_04_lua_ref::metatable);
