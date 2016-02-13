@@ -1002,6 +1002,40 @@ namespace kaguya
 			}
 		}
 
+		/**
+		* @brief Equivalent to `#` operator for strings and tables with no metamethods.
+		* Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
+		* than tables, strings or userdatas return 0.
+		* @return Size of table, string length or userdata memory block size.
+		*/
+		std::size_t size()
+		{
+			if (ref_ == LUA_REFNIL)
+			{
+				return 0;
+			}
+			switch (type())
+			{
+				case TYPE_TABLE:
+				case TYPE_STRING:
+				case TYPE_LIGHTUSERDATA:
+				case TYPE_USERDATA:
+				{
+					util::ScopedSavedStack save(state_);
+					push(state_);
+					std::size_t res;
+#if LUA_VERSION_NUM >= 502
+					res = lua_rawlen(state_, -1);
+#else
+					res = lua_objlen(state_, -1);
+#endif
+					return res;
+				}
+				default:
+					break;
+			}
+			return 0;
+		}
 
 		/**
 		* @brief If type is table or userdata, return keys.
