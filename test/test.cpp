@@ -1148,6 +1148,10 @@ namespace t_04_lua_ref
 			&& callback_data[2] == 24 && callback_data[3] == 454)
 
 	}
+	struct size_check_struct
+	{
+		char data[22];
+	};
 
 	void lua_ref_size(kaguya::State& state)
 	{
@@ -1164,14 +1168,9 @@ namespace t_04_lua_ref
 
 #undef TEST_SIZE
 
-		struct dummy
-		{
-			char data[15];
-		};
-
-		state["d"] = dummy();
+		state["d"] = size_check_struct();
 		kaguya::LuaRef d = state["d"];
-		TEST_CHECK(d.size() >= sizeof(dummy)); // fixme: determine exact size of userdata if possible
+		TEST_CHECK(d.size() >= sizeof(size_check_struct)); // fixme: determine exact size of userdata if possible
 	}
 
 	void function_env(kaguya::State& state)
