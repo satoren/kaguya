@@ -239,10 +239,17 @@ namespace kaguya
 
 
 		template<typename T>
-		typename lua_type_traits<T>::get_type at(int index)const
+		typename lua_type_traits<T>::get_type at(size_t index)const
 		{
-			return lua_type_traits<T>::get(state_, startIndex_ + index);
+			if (index < 0 || index >= size())
+			{
+				throw std::out_of_range("function result out of range");
+			}
+			return lua_type_traits<T>::get(state_, startIndex_ + static_cast<int>(index));
 		}
+
+		LuaRef operator[](size_t index)const;
+
 		size_t size()const
 		{
 			return endIndex_ - startIndex_;
@@ -1210,6 +1217,11 @@ namespace kaguya
 	bool operator != (const T& lhs, const LuaRef& rhs)
 	{
 		return !(lhs == rhs);
+	}
+
+	inline LuaRef FunctionResults::operator[](size_t index)const
+	{
+		return at<LuaRef>(index);
 	}
 
 

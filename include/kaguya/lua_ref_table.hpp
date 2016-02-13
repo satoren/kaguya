@@ -386,10 +386,7 @@ namespace kaguya
 			}
 		}
 
-#if KAGUYA_USE_CPP11
-	private://cant resolve compile error on travis-ci g++ with c++03
-		//msg error: no matching function for call to 'forward(const t_02_classreg::ABC&)'
-#endif
+	private:
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_index_(src.key_index_)
 		{
@@ -415,6 +412,19 @@ namespace kaguya
 			}
 		}
 
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
+		TableKeyReference(lua_State* state, int table_index, int key_index, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
+		{
+		}
+
+		template<typename KEY>
+		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_))
+		{
+			lua_type_traits<LuaRef>::push(state_, table);
+			lua_type_traits<KEY>::push(state_, key);
+			table_index_ = stack_top_ + 1;
+			key_index_ = stack_top_ + 2;
+		}
 		template<typename KEY>
 		TableKeyReference(const LuaRef& table,const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_))
 		{

@@ -32,9 +32,6 @@ extern "C" {
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
-#if BOOST_VERSION >= 104800
-#include <boost/move/move.hpp>
-#endif
 #include "kaguya/preprocess.hpp"
 #endif
 
