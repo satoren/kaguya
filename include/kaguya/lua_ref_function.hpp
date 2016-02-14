@@ -141,30 +141,27 @@ namespace kaguya
 
 	class FunctionResults :public LuaVariantImpl<FunctionResults>
 	{
-		FunctionResults() :state_(0), startIndex_(0), endIndex_(0)
-		{
-		}
-		FunctionResults(lua_State* state) :state_(state), startIndex_(0), endIndex_(0)
-		{
-		}
 		FunctionResults(lua_State* state, int startIndex) :state_(state), startIndex_(startIndex), endIndex_(lua_gettop(state) + 1)
 		{
 		}
 		FunctionResults(lua_State* state, int startIndex, int endIndex) :state_(state), startIndex_(startIndex), endIndex_(endIndex)
 		{
 		}
+//		friend class LuaRef;
+//		friend class mem_fun_binder;
+//		friend class TableKeyReference;
+		friend class FunctionResultProxy;
+	public:
+		FunctionResults() :state_(0), startIndex_(0), endIndex_(0)
+		{
+		}
+		FunctionResults(lua_State* state) :state_(state), startIndex_(0), endIndex_(0)
+		{
+		}
 		FunctionResults(const FunctionResults&src) :state_(src.state_), startIndex_(src.startIndex_), endIndex_(src.endIndex_)
 		{
 			src.state_ = 0;
 		}
-		friend class LuaRef;
-		friend class mem_fun_binder;
-		friend class TableKeyReference;
-		friend class FunctionResultProxy;
-		template<typename Derived>friend class LuaThreadImpl;
-		template<typename Derived>friend class LuaFunctionImpl;
-		template<typename Derived>friend class LuaVariantImpl;
-	public:
 		~FunctionResults()
 		{
 			if (state_)
