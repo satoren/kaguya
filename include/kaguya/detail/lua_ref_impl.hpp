@@ -501,7 +501,7 @@ namespace kaguya
 		template<typename T>
 		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator!=(const RegistoryRef& lhs, const T& rhs)
 		{
-			return !(rhs == *this);
+			return !(lhs == rhs);
 		}
 
 		template<typename T>
@@ -530,7 +530,7 @@ namespace kaguya
 		template<typename T>
 		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator!=(const StackRef& lhs, const T& rhs)
 		{
-			return !(rhs == *this);
+			return !(lhs == rhs);
 		}
 
 		template<typename T>
