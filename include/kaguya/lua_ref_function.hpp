@@ -147,9 +147,6 @@ namespace kaguya
 		FunctionResults(lua_State* state, int startIndex, int endIndex) :state_(state), startIndex_(startIndex), endIndex_(endIndex)
 		{
 		}
-//		friend class LuaRef;
-//		friend class mem_fun_binder;
-//		friend class TableKeyReference;
 		friend class FunctionResultProxy;
 	public:
 		FunctionResults() :state_(0), startIndex_(0), endIndex_(0)

@@ -172,7 +172,6 @@ namespace kaguya
 
 		friend class LuaRef;
 		friend class State;
-		template<typename T> friend class LuaTableImpl;
 	
 		template<typename T>
 		operator T()const {
@@ -372,13 +371,21 @@ namespace kaguya
 			return rhs < *this;
 		}
 
-	private:
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_index_(src.key_index_)
 		{
 			src.state_ = 0;
 		}
-		
+
+		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
+		TableKeyReference(lua_State* state, int table_index, int key_index, int revstacktop) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
+		{
+			if (lua_type(state_, table_index_) != LUA_TTABLE)
+			{
+				except::typeMismatchError(state_, "this is not table");
+			}
+		}
+	private:
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
 		{
@@ -387,14 +394,6 @@ namespace kaguya
 			*this = table;
 		}
 
-		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(lua_State* state,int table_index,int key_index,int revstacktop) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
-		{
-			if (lua_type(state_, table_index_) != LUA_TTABLE)
-			{
-				except::typeMismatchError(state_, "this is not table");
-			}
-		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
 		TableKeyReference(lua_State* state, int table_index, int key_index, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
@@ -574,46 +573,6 @@ namespace kaguya
 		int key_index = lua_gettop(state);
 		return TableKeyReference(state, stackindex, key_index, stack_top);
 	}
-	/*
-	inline bool LuaRef::setMetatable(const LuaTable& table)
-	{
-		if (ref_ == LUA_REFNIL)
-		{
-			except::typeMismatchError(state_, "is nil");
-			return false;
-		}
-		util::ScopedSavedStack save(state_);
-		push();
-		int t = lua_type(state_, -1);
-		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
-		{
-			except::typeMismatchError(state_, typeName() + std::string("is not table"));
-			return false;
-		}
-		table.push();
-		return lua_setmetatable(state_, -2) != 0;
-	}
-
-	inline LuaTable LuaRef::getMetatable()const
-	{
-		if (ref_ == LUA_REFNIL)
-		{
-			except::typeMismatchError(state_, "is nil");
-			return LuaRef(state_);
-		}
-		util::ScopedSavedStack save(state_);
-		push();
-		int t = lua_type(state_, -1);
-		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
-		{
-			except::typeMismatchError(state_, typeName() + std::string("is not table"));
-			return LuaRef(state_);
-		}
-		lua_getmetatable(state_, -1);
-		return LuaRef(state_, StackTop(), NoMainCheck());
-	}
-	*/
-
 
 
 	template<>
