@@ -24,7 +24,9 @@ namespace kaguya
 	/**
 	* Reference of Lua function.
 	*/
-	class LuaFunction :public Ref::RegistoryRef, public LuaFunctionImpl<LuaFunction>, public LuaBasicTypeFunctions<LuaFunction>
+	class LuaFunction :public Ref::RegistoryRef
+		, public LuaFunctionImpl<LuaFunction>
+		, public LuaBasicTypeFunctions<LuaFunction>
 	{
 		void typecheck()
 		{
@@ -105,7 +107,9 @@ namespace kaguya
 	/**
 	* Reference of Lua thread(==coroutine).
 	*/
-	class LuaThread :public Ref::RegistoryRef, public LuaThreadImpl<LuaThread>, public LuaBasicTypeFunctions<LuaThread>
+	class LuaThread :public Ref::RegistoryRef
+		, public LuaThreadImpl<LuaThread>
+		, public LuaBasicTypeFunctions<LuaThread>
 	{
 		void typecheck()
 		{

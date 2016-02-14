@@ -198,8 +198,24 @@ namespace kaguya
 		LuaRef(const Ref::RegistoryRef& src) :Ref::RegistoryRef(src)
 		{
 		}
+		LuaRef(const LuaRef& src) :Ref::RegistoryRef(src)
+		{
+		}
+		LuaRef& operator =(const LuaRef& src)
+		{
+			static_cast<RegistoryRef&>(*this) = src;
+			return *this;
+		}
 
 #if KAGUYA_USE_CPP11
+
+		LuaRef(LuaRef&& src)throw() :Ref::RegistoryRef(std::move(src)){}
+
+		LuaRef& operator =(LuaRef&& src)throw()
+		{
+			swap(src);
+			return *this;
+		}
 
 		LuaRef(RegistoryRef&& src)throw() :Ref::RegistoryRef(std::move(src)){}
 		template<typename T>
@@ -269,12 +285,8 @@ namespace kaguya
 			return lua_type_traits<T>::checkType(state(), -1);
 		}
 
-		using Ref::RegistoryRef::operator==;
-		using Ref::RegistoryRef::operator!=;
-		using Ref::RegistoryRef::operator<=;
-		using Ref::RegistoryRef::operator>=;
-		using Ref::RegistoryRef::operator<;
-		using Ref::RegistoryRef::operator>;
+
+		
 
 		const void* native_pointer()const
 		{

@@ -77,10 +77,6 @@ namespace kaguya
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
 #endif
-
-
-		using LuaTableImpl<Derived>::operator[];
-		using LuaTableOrUserDataImpl<Derived>::operator[];
 	};
 
 }

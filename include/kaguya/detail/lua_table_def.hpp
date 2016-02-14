@@ -207,7 +207,17 @@ namespace kaguya
 		* @return reference of field value
 		*/
 		template<typename K>
-		LuaRef operator[](const K& key)const;
+		LuaRef operator[](K key)const;
+
+
+
+		/**
+		* @brief value = table[key];or table[key] = value;
+		* @param key key of table
+		* @return reference of field value
+		*/
+		template<typename K>
+		TableKeyReference<K> operator[](K key);
 		//@}
 	};
 
@@ -224,14 +234,6 @@ namespace kaguya
 			return static_cast<const Derived*>(this)->pushStackIndex(state);
 		}
 	public:
-
-		/**
-		* @brief value = table[key];or table[key] = value;
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename K>
-		TableKeyReference<K> operator[](K key);
 
 		/**
 		* @brief table[key] = value;

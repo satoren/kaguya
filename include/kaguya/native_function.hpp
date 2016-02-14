@@ -58,6 +58,10 @@ namespace kaguya
 			{
 				return lua_type_traits<T>::get(state, stack_index);
 			}
+			operator int()const
+			{
+				return get<int>();
+			}
 			template<typename T>T get()const
 			{
 				return lua_type_traits<T>::get(state, stack_index);

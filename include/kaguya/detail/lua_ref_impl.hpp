@@ -42,6 +42,12 @@ namespace kaguya
 			lua_State *state_;
 			int stack_index_;
 			mutable bool pop_;
+			friend bool operator==(const StackRef& lfs, const StackRef& rfs);
+			friend bool operator!=(const StackRef& lfs, const StackRef& rfs);
+			friend bool operator<=(const StackRef& lfs, const StackRef& rfs);
+			friend bool operator>=(const StackRef& lfs, const StackRef& rfs);
+			friend bool operator<(const StackRef& lfs, const StackRef& rfs);
+			friend bool operator>(const StackRef& lfs, const StackRef& rfs);
 		public:
 #if KAGUYA_USE_CPP11
 			StackRef(StackRef&& src) :state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
@@ -76,6 +82,13 @@ namespace kaguya
 			{
 				return get<T>();
 			}
+			operator int()const
+			{
+				return get<int>();
+			}
+
+			bool isNilref()const { return state_ == 0 || lua_type(state_, stack_index_) == LUA_TNIL; }
+
 			int push()const
 			{
 				lua_pushvalue(state_, stack_index_);
@@ -96,55 +109,66 @@ namespace kaguya
 			lua_State *state()const { return state_; }
 
 
-			/**
-			* @name relational operators
-			* @brief
-			*/
-			//@{
-			bool operator==(const StackRef& other)const
-			{
-#if LUA_VERSION_NUM >= 502
-				return lua_compare(state_, stack_index_, other.stack_index_, LUA_OPEQ) != 0;
-#else
-				return lua_equal(state_, stack_index_, other.stack_index_) != 0;
-#endif
-			}
-			bool operator<(const StackRef& other)const
-			{
-#if LUA_VERSION_NUM >= 502
-				return lua_compare(state_, stack_index_, other.stack_index_, LUA_OPLT) != 0;
-#else
-				return lua_lessthan(state_, stack_index_, other.stack_index_) != 0;
-#endif
-			}
-			bool operator<=(const StackRef& other)const
-			{
-#if LUA_VERSION_NUM >= 502
-				return lua_compare(state_, stack_index_, other.stack_index_, LUA_OPLE) != 0;
-#else
-				return lua_equal(state_, stack_index_, other.stack_index_) != 0 || lua_lessthan(state_, stack_index_, other.stack_index_) != 0;
-#endif
-			}
-			bool operator>=(const StackRef& other)const
-			{
-				return other <= *this;
-			}
-			bool operator>(const StackRef& other)const
-			{
-				return other < *this;
-			}
-			bool operator!=(const StackRef& other)const
-			{
-				return !(other == *this);
-			}
-			//@}
 		};
 
+		/**
+		* @name relational operators
+		* @brief
+		*/
+		//@{
+		inline bool operator==(const StackRef& lfs, const StackRef& rfs)
+		{
+			if (lfs.state_ != rfs.state_) { return lfs.state_ == rfs.state_; }
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(lfs.state_, lfs.stack_index_, rfs.stack_index_, LUA_OPEQ) != 0;
+#else
+			return lua_equal(lfs.state_, lfs.stack_index_, rfs.stack_index_) != 0;
+#endif
+		}
+		inline bool operator<(const StackRef& lfs, const StackRef& rfs)
+		{
+			if (lfs.state_ != rfs.state_) { return lfs.state_ < rfs.state_; }
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(lfs.state_, lfs.stack_index_, rfs.stack_index_, LUA_OPLT) != 0;
+#else
+			return lua_lessthan(lfs.state_, lfs.stack_index_, rfs.stack_index_) != 0;
+#endif
+		}
+		inline bool operator<=(const StackRef& lfs, const StackRef& rfs)
+		{
+			if (lfs.state_ != rfs.state_) { return lfs.state_ <= rfs.state_; }
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(lfs.state_, lfs.stack_index_, rfs.stack_index_, LUA_OPLE) != 0;
+#else
+			return lua_equal(lfs.state_, lfs.stack_index_, rfs.stack_index_) != 0 || lua_lessthan(lfs.state_, lfs.stack_index_, rfs.stack_index_) != 0;
+#endif
+		}
+		inline bool operator>=(const StackRef& lfs, const StackRef& rfs)
+		{
+			return rfs <= lfs;
+		}
+		inline bool operator>(const StackRef& lfs, const StackRef& rfs)
+		{
+			return rfs < lfs;
+		}
+		inline bool operator!=(const StackRef& lfs, const StackRef& rfs)
+		{
+			return !(rfs == lfs);
+		}
+		//@}
 
 		class RegistoryRef
 		{
 			typedef void (RegistoryRef::*bool_type)() const;
 			void this_type_does_not_support_comparisons() const {}
+
+			friend bool operator==(const RegistoryRef& lfs, const RegistoryRef& rfs);
+			friend bool operator!=(const RegistoryRef& lfs, const RegistoryRef& rfs);
+			friend bool operator<=(const RegistoryRef& lfs, const RegistoryRef& rfs);
+			friend bool operator>=(const RegistoryRef& lfs, const RegistoryRef& rfs);
+			friend bool operator<(const RegistoryRef& lfs, const RegistoryRef& rfs);
+			friend bool operator>(const RegistoryRef& lfs, const RegistoryRef& rfs);
+
 		public:
 
 			RegistoryRef(const RegistoryRef& src) :state_(src.state_)
@@ -304,71 +328,6 @@ namespace kaguya
 				return (!isNilref() && get<bool>() == true) ? &RegistoryRef::this_type_does_not_support_comparisons : 0;
 			}
 
-			/**
-			* @name relational operators
-			* @brief
-			*/
-			//@{
-			bool operator==(const RegistoryRef& other)const
-			{
-				if (!state_ || !other.state_) { return !isNilref() == !other.isNilref(); }
-				util::ScopedSavedStack save(state_);
-				push(state_);
-				other.push(state_);
-#if LUA_VERSION_NUM >= 502
-				return lua_compare(state_, -1, -2, LUA_OPEQ) != 0;
-#else
-				return lua_equal(state_, -1, -2) != 0;
-#endif
-			}
-			bool operator<(const RegistoryRef& other)const
-			{
-				if (!state_ || !other.state_) { return !isNilref() < !other.isNilref(); }
-				util::ScopedSavedStack save(state_);
-				push(state_);
-				other.push(state_);
-#if LUA_VERSION_NUM >= 502
-				return lua_compare(state_, -2, -1, LUA_OPLT) != 0;
-#else
-				return lua_lessthan(state_, -2, -1) != 0;
-#endif
-			}
-			bool operator<=(const RegistoryRef& other)const
-			{
-				if (!state_ || !other.state_) { return !isNilref() <= !other.isNilref(); }
-				util::ScopedSavedStack save(state_);
-				push(state_);
-				other.push(state_);
-#if LUA_VERSION_NUM >= 502
-				return lua_compare(state_, -2, -1, LUA_OPLE) != 0;
-#else
-				return lua_equal(state_, -2, -1) != 0 || lua_lessthan(state_, -1, -2) != 0;
-#endif
-			}
-			bool operator>=(const RegistoryRef& other)const
-			{
-				return other <= *this;
-			}
-			bool operator>(const RegistoryRef& other)const
-			{
-				return other < *this;
-			}
-			bool operator!=(const RegistoryRef& other)const
-			{
-				return !(other == *this);
-			}
-			template<typename T>
-			bool operator == (const T& rhs)const
-			{
-				return rhs == *this;
-			}
-			template<typename T>
-			bool operator != (const T& rhs)const
-			{
-				return !(rhs == *this);
-			}
-			//@}
-
 		protected:
 			lua_State *state_;
 			int ref_;
@@ -384,12 +343,154 @@ namespace kaguya
 				}
 			}
 		};
+
+
+		/**
+		* @name relational operators
+		* @brief
+		*/
+		//@{
+
+		inline bool operator==(const RegistoryRef& lfs, const RegistoryRef& rfs)
+		{
+			if (!lfs.state_ || !rfs.state_) { return !lfs.isNilref() == !rfs.isNilref(); }
+			util::ScopedSavedStack save(lfs.state_);
+			lfs.push(lfs.state_);
+			rfs.push(lfs.state_);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(lfs.state_, -1, -2, LUA_OPEQ) != 0;
+#else
+			return lua_equal(lfs.state_, -1, -2) != 0;
+#endif
+		}
+		inline bool operator<(const RegistoryRef& lfs, const RegistoryRef& rfs)
+		{
+			if (!lfs.state_ || !rfs.state_) { return !lfs.isNilref() == !rfs.isNilref(); }
+			util::ScopedSavedStack save(lfs.state_);
+			lfs.push(lfs.state_);
+			rfs.push(lfs.state_);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(lfs.state_, -2, -1, LUA_OPLT) != 0;
+#else
+			return lua_lessthan(lfs.state_, -2, -1) != 0;
+#endif
+		}
+		inline bool operator<=(const RegistoryRef& lfs, const RegistoryRef& rfs)
+		{
+			if (!lfs.state_ || !rfs.state_) { return !lfs.isNilref() == !rfs.isNilref(); }
+			util::ScopedSavedStack save(lfs.state_);
+			lfs.push(lfs.state_);
+			rfs.push(lfs.state_);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(lfs.state_, -2, -1, LUA_OPLE) != 0;
+#else
+			return lua_equal(lfs.state_, -2, -1) != 0 || lua_lessthan(lfs.state_, -1, -2) != 0;
+#endif
+		}
+		inline bool operator>=(const RegistoryRef& lfs, const RegistoryRef& rfs)
+		{
+			return rfs <= lfs;
+		}
+		inline bool operator>(const RegistoryRef& lfs, const RegistoryRef& rfs)
+		{
+			return rfs < lfs;
+		}
+		inline bool operator!=(const RegistoryRef& lfs, const RegistoryRef& rfs)
+		{
+			return !(rfs == lfs);
+		}
+
+
+		/**
+		* @name relational operators
+		* @brief
+		*/
+		//@{
+		inline bool operator==(const StackRef& lhs, const RegistoryRef& rhs)
+		{
+			if (!lhs.state() || !rhs.state()) { return !lhs.isNilref() == !rhs.isNilref(); }
+			lua_State* state = lhs.state();
+			util::ScopedSavedStack save(state);
+			int lhsIndex = lhs.pushStackIndex(state);
+			int rhsIndex = rhs.pushStackIndex(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(state, lhsIndex, rhsIndex, LUA_OPEQ) != 0;
+#else
+			return lua_equal(state_, lhsIndex, rhsIndex) != 0;
+#endif
+		}
+		inline bool operator<(const StackRef& lhs, const RegistoryRef& rhs)
+		{
+			if (!lhs.state() || !rhs.state()) { return !lhs.isNilref() < !rhs.isNilref(); }
+			lua_State* state = lhs.state();
+			util::ScopedSavedStack save(state);
+			int lhsIndex = lhs.pushStackIndex(state);
+			int rhsIndex = rhs.pushStackIndex(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(state, lhsIndex, rhsIndex, LUA_OPLT) != 0;
+#else
+			return lua_lessthan(state_, lhsIndex, rhsIndex) != 0;
+#endif
+		}
+		inline bool operator<=(const StackRef& lhs, const RegistoryRef& rhs)
+		{
+			if (!lhs.state() || !rhs.state()) { return !lhs.isNilref() <= !rhs.isNilref(); }
+			lua_State* state = lhs.state();
+			util::ScopedSavedStack save(state);
+			int lhsIndex = lhs.pushStackIndex(state);
+			int rhsIndex = rhs.pushStackIndex(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(state, lhsIndex, rhsIndex, LUA_OPLE) != 0;
+#else
+			return lua_equal(state_, lhsIndex, rhsIndex) != 0 || lua_lessthan(state_, -1, -2) != 0;
+#endif
+		}
+		inline bool operator>=(const StackRef& lhs, const RegistoryRef& rhs)
+		{
+			return !(lhs < rhs);
+		}
+		inline bool operator>(const StackRef& lhs, const RegistoryRef& rhs)
+		{
+			return !(lhs <= rhs);
+		}
+		inline bool operator!=(const StackRef& lhs, const RegistoryRef& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		inline bool operator==(const RegistoryRef& lhs, const StackRef& rhs)
+		{
+			return rhs == lhs;
+		}
+		inline bool operator<(const RegistoryRef& lhs, const StackRef& rhs)
+		{
+			return rhs > lhs;
+		}
+		inline bool operator<=(const RegistoryRef& lhs, const StackRef& rhs)
+		{
+			return rhs >= lhs;
+		}
+		inline bool operator>=(const RegistoryRef& lhs, const StackRef& rhs)
+		{
+			return rhs <= lhs;
+		}
+		inline bool operator>(const RegistoryRef& lhs, const StackRef& rhs)
+		{
+			return rhs < lhs;
+		}
+		inline bool operator!=(const RegistoryRef& lhs, const StackRef& rhs)
+		{
+			return rhs != lhs;
+		}
+
+#define KAGUYA_ENABLE_IF_NOT_LUAREF(RETTYPE) typename traits::enable_if<!traits::is_convertible<T*, RegistoryRef*>::value && !traits::is_convertible<T*, StackRef*>::value, RETTYPE>::type
+
 		template<typename T>
-		bool operator == (const T& lhs, const RegistoryRef& rhs)
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator==(const RegistoryRef& lhs, const T& rhs)
 		{
 			try
 			{
-				return lhs == rhs.get<const T&>();
+				return lhs.get<const T&>() == rhs;
 			}
 			catch (const LuaTypeMismatch&)
 			{
@@ -398,10 +499,51 @@ namespace kaguya
 			return false;
 		}
 		template<typename T>
-		bool operator != (const T& lhs, const RegistoryRef& rhs)
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator!=(const RegistoryRef& lhs, const T& rhs)
 		{
-			return !(lhs == rhs);
+			return !(rhs == *this);
 		}
+
+		template<typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator == (const T& lhs, const RegistoryRef& rhs)
+		{
+			return rhs == lhs;
+		}
+		template<typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator != (const T& lhs, const RegistoryRef& rhs)
+		{
+			return !(rhs == lhs);
+		}
+		template<typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator==(const StackRef& lhs, const T& rhs)
+		{
+			try
+			{
+				return lhs.get<const T&>() == rhs;
+			}
+			catch (const LuaTypeMismatch&)
+			{
+				return false;
+			}
+			return false;
+		}
+		template<typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator!=(const StackRef& lhs, const T& rhs)
+		{
+			return !(rhs == *this);
+		}
+
+		template<typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator == (const T& lhs, const StackRef& rhs)
+		{
+			return rhs == lhs;
+		}
+		template<typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator != (const T& lhs, const StackRef& rhs)
+		{
+			return !(rhs == lhs);
+		}
+		//@}
 
 		inline std::ostream& operator<<(std::ostream& os, const RegistoryRef& ref)
 		{

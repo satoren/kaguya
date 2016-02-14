@@ -19,7 +19,9 @@ namespace kaguya
 	class State;
 
 	//! Reference to Lua userdata
-	class  LuaUserData :public Ref::RegistoryRef,public LuaTableOrUserDataImpl<LuaUserData>, public LuaBasicTypeFunctions<LuaUserData>
+	class  LuaUserData :public Ref::RegistoryRef
+		,public LuaTableOrUserDataImpl<LuaUserData>
+		, public LuaBasicTypeFunctions<LuaUserData>
 	{
 	public:
 		operator LuaRef() {
@@ -47,16 +49,6 @@ namespace kaguya
 				Ref::RegistoryRef::unref();
 			}
 		}
-
-		using Ref::RegistoryRef::isNilref;
-		using Ref::RegistoryRef::operator==;
-		using Ref::RegistoryRef::operator!=;
-		using Ref::RegistoryRef::operator<=;
-		using Ref::RegistoryRef::operator>=;
-		using Ref::RegistoryRef::operator<;
-		using Ref::RegistoryRef::operator>;
-
-		using LuaTableOrUserDataImpl<LuaUserData>::operator[];
 	};
 
 
@@ -86,7 +78,10 @@ namespace kaguya
 	template<>	struct lua_type_traits<const LuaUserData&> :lua_type_traits<LuaUserData> {};
 
 
-	class LuaTable :public Ref::RegistoryRef ,public LuaTableImpl<LuaTable>, public LuaTableOrUserDataImpl<LuaTable>, public LuaBasicTypeFunctions<LuaTable>
+	class LuaTable :public Ref::RegistoryRef 
+		,public LuaTableImpl<LuaTable>
+		, public LuaTableOrUserDataImpl<LuaTable>
+		, public LuaBasicTypeFunctions<LuaTable>
 	{
 	public:
 		operator LuaRef() {
@@ -118,17 +113,6 @@ namespace kaguya
 				Ref::RegistoryRef::unref();
 			}
 		}
-
-		using Ref::RegistoryRef::isNilref;
-		using Ref::RegistoryRef::operator==;
-		using Ref::RegistoryRef::operator!=;
-		using Ref::RegistoryRef::operator<=;
-		using Ref::RegistoryRef::operator>=;
-		using Ref::RegistoryRef::operator<;
-		using Ref::RegistoryRef::operator>;
-
-		using LuaTableImpl<LuaTable>::operator[];
-		using LuaTableOrUserDataImpl<LuaTable>::operator[];
 	};
 
 	template<>	struct lua_type_traits<LuaTable> {
@@ -563,7 +547,7 @@ namespace kaguya
 	}
 
 	template<typename T> template<typename KEY>
-	LuaRef LuaTableOrUserDataImpl<T>::operator[](const KEY& key)const
+	LuaRef LuaTableOrUserDataImpl<T>::operator[](KEY key)const
 	{
 		return getField<LuaRef>(key);
 	}
@@ -585,7 +569,7 @@ namespace kaguya
 	}
 	
 	template<typename T> template <typename K>
-	TableKeyReference<K> LuaTableImpl<T>::operator[](K key)
+	TableKeyReference<K> LuaTableOrUserDataImpl<T>::operator[](K key)
 	{
 		lua_State* state = state_();
 		int stack_top = lua_gettop(state);
