@@ -156,10 +156,73 @@ namespace kaguya
 	};
 	template<>	struct lua_type_traits<const LuaTable&> :lua_type_traits<LuaTable> {};
 
+	struct table_proxy
+	{
+
+#if KAGUYA_USE_CPP11
+		template<typename V, typename KEY>
+		static void set(lua_State* state,int table_index, const KEY& key, V&& value)
+		{
+			lua_type_traits<KEY>::push(state, key);
+			lua_type_traits<typename traits::remove_reference<V>::type>::push(state, std::forward<V>(value));
+			lua_settable(state, table_index);
+		}
+		template<typename V>
+		static void set(lua_State* state, int table_index, const char* key, V&& value)
+		{
+			lua_type_traits<typename traits::remove_reference<V>::type>::push(state, std::forward<V>(value));
+			lua_setfield(state, table_index, key);
+		}
+		template<typename V>
+		static void set(lua_State* state, int table_index, const std::string& key, V&& value)
+		{
+			lua_type_traits<typename traits::remove_reference<V>::type>::push(state, std::forward<V>(value));
+			lua_setfield(state, table_index, key.c_str());
+		}
+
+#endif
+		template<typename V, typename KEY>
+		static void set(lua_State* state,int table_index, const KEY& key, const V& value)
+		{
+			lua_type_traits<KEY>::push(state, key);
+			lua_type_traits<V>::push(state, value);
+			lua_settable(state, table_index);
+		}
+		template<typename V>
+		static void set(lua_State* state, int table_index, const char* key, const V& value)
+		{
+			lua_type_traits<V>::push(state, value);
+			lua_setfield(state, table_index, key);
+		}
+		template<typename V>
+		static void set(lua_State* state, int table_index, const std::string& key, const V& value)
+		{
+			lua_type_traits<V>::push(state, value);
+			lua_setfield(state, table_index, key.c_str());
+		}
+
+		template<typename KEY>
+		static void get(lua_State* state,int table_index, const KEY& key)
+		{
+			lua_type_traits<KEY>::push(state, key);
+			lua_gettable(state, table_index);
+		}
+		static void get(lua_State* state, int table_index, const char* key)
+		{
+			lua_getfield(state, table_index, key);
+		}
+		static void get(lua_State* state, int table_index, const std::string& key)
+		{
+			lua_getfield(state, table_index, key.c_str());
+		}
+	};
+
+
 	/**
 	* This class is the type returned by members of non-const LuaRef(Table) when directly accessing its elements.
 	*/
-	class TableKeyReference: public LuaVariantImpl<TableKeyReference>
+	template<typename KEY>
+	class TableKeyReference: public LuaVariantImpl<TableKeyReference<KEY> >
 	{
 	public:
 
@@ -183,9 +246,7 @@ namespace kaguya
 		//! this is not copy.same assign from referenced value.
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
-			lua_pushvalue(state_, key_index_);
-			src.push();
-			lua_settable(state_, table_index_);
+			table_proxy::set(state_, table_index_, key_, src);
 			return *this;
 		}
 
@@ -194,9 +255,7 @@ namespace kaguya
 		template<typename T>
 		TableKeyReference& operator=(const T& src)
 		{
-			lua_pushvalue(state_, key_index_);
-			lua_type_traits<T>::push(state_,src);
-			lua_settable(state_, table_index_);
+			table_proxy::set(state_, table_index_, key_, src);
 
 			return *this;
 		}
@@ -204,10 +263,7 @@ namespace kaguya
 		template<typename T>
 		TableKeyReference& operator=(T&& src)
 		{
-			lua_pushvalue(state_, key_index_);
-			lua_type_traits<typename traits::remove_reference<T>::type>::push(state_, std::forward<T>(src));
-			lua_settable(state_, table_index_);
-
+			table_proxy::set(state_, table_index_, key_, std::forward<T>(src));
 			return *this;
 		}
 #endif
@@ -233,12 +289,10 @@ namespace kaguya
 		template<typename T>
 		void setFunction(T f)
 		{
-			lua_pushvalue(state_, key_index_);
-			lua_type_traits<FunctorType>::push(state_, FunctorType(f));
-			lua_settable(state_, table_index_);
+			table_proxy<KEY>::set(state_, table_index_, key_, FunctorType(f));
 		}
 
-		//deprecate
+		//deprecated
 		LuaRef getValue()const
 		{
 			util::ScopedSavedStack save(state_);
@@ -264,8 +318,8 @@ namespace kaguya
 				lua_pushnil(state_);
 				return 1;
 			}
-			lua_pushvalue(state_, key_index_);
-			lua_gettable(state_, table_index_);
+
+			table_proxy::get(state, table_index_, key_);
 			return 1;
 		}
 
@@ -372,18 +426,14 @@ namespace kaguya
 		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_index_(src.key_index_)
+		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_(src.key_)
 		{
 			src.state_ = 0;
 		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(lua_State* state, int table_index, int key_index, int revstacktop) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
+		TableKeyReference(lua_State* state, int table_index, KEY key, int revstacktop) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_(key)
 		{
-			if (lua_type(state_, table_index_) != LUA_TTABLE)
-			{
-				except::typeMismatchError(state_, "this is not table");
-			}
 		}
 	private:
 		template<typename T, typename P>
@@ -396,25 +446,21 @@ namespace kaguya
 
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(lua_State* state, int table_index, int key_index, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_index_(key_index)
+		TableKeyReference(lua_State* state, int table_index, const KEY& key, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_(key)
 		{
 		}
 
-		template<typename KEY>
-		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_))
+		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			lua_type_traits<LuaRef>::push(state_, table);
 			lua_type_traits<KEY>::push(state_, key);
 			table_index_ = stack_top_ + 1;
-			key_index_ = stack_top_ + 2;
 		}
-		template<typename KEY>
-		TableKeyReference(const LuaRef& table,const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_))
+		TableKeyReference(const LuaRef& table,const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			lua_type_traits<LuaRef>::push(state_, table);
 			lua_type_traits<KEY>::push(state_, key);
 			table_index_ = stack_top_ + 1;
-			key_index_ = stack_top_ + 2;
 			if (lua_type(state_, table_index_) != LUA_TTABLE)
 			{
 				except::typeMismatchError(state_, "this is not table");
@@ -424,10 +470,11 @@ namespace kaguya
 		mutable lua_State* state_;//mutable for RVO unsupported compiler
 		int stack_top_;
 		int table_index_;
-		int key_index_;
+		KEY key_;
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, const TableKeyReference& ref)
+	template<typename KEY>
+	inline std::ostream& operator<<(std::ostream& os, const TableKeyReference<KEY>& ref)
 	{
 		ref.get<LuaRef>().dump(os);
 		return os;
@@ -514,6 +561,13 @@ namespace kaguya
 	{
 		return getField<LuaRef>(key);
 	}
+
+	template<typename T> template<typename KEY>
+	LuaRef LuaTableOrUserDataImpl<T>::operator[](const KEY& key)const
+	{
+		return getField<LuaRef>(key);
+	}
+
 	template<typename T>
 	std::vector<LuaRef> LuaTableOrUserDataImpl<T>::values()const
 	{
@@ -531,20 +585,18 @@ namespace kaguya
 	}
 	
 	template<typename T> template <typename K>
-	TableKeyReference LuaTableImpl<T>::operator[](const K& key)
+	TableKeyReference<K> LuaTableImpl<T>::operator[](K key)
 	{
 		lua_State* state = state_();
 		int stack_top = lua_gettop(state);
 		int stackindex = pushStackIndex_(state);
-		lua_type_traits<K>::push(state, key);
-		int key_index = lua_gettop(state);
-		return TableKeyReference(state, stackindex, key_index, stack_top);
+		return TableKeyReference<K>(state, stackindex, key, stack_top);
 	}
 
 
-	template<>
-	struct lua_type_traits<TableKeyReference> {
-		static int push(lua_State* l, const TableKeyReference& ref)
+	template<typename KEY>
+	struct lua_type_traits<TableKeyReference<KEY> > {
+		static int push(lua_State* l, const TableKeyReference<KEY>& ref)
 		{
 			ref.push(l);
 			return 1;

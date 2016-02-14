@@ -26,6 +26,7 @@ namespace kaguya
 	class LuaTable;
 	class LuaFunction;
 	class LuaThread;
+	template<typename KEY>
 	class TableKeyReference;
 	class FunctionResults;
 	class mem_fun_binder;

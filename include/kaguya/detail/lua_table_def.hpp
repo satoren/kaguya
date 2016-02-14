@@ -21,6 +21,7 @@ namespace kaguya
 {
 	class LuaRef;
 	class LuaTable;
+	template<typename KEY>
 	class TableKeyReference;
 	class mem_fun_binder;
 
@@ -230,7 +231,7 @@ namespace kaguya
 		* @return reference of field value
 		*/
 		template<typename K>
-		TableKeyReference operator[](const K& key);
+		TableKeyReference<K> operator[](K key);
 
 		/**
 		* @brief table[key] = value;
