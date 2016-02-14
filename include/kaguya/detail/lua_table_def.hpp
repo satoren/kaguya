@@ -123,7 +123,7 @@ namespace kaguya
 			if (!state)
 			{
 				except::typeMismatchError(state, "is nil");
-				return lua_type_traits<T>::get_type();
+				return typename lua_type_traits<T>::get_type();
 			}
 			util::ScopedSavedStack save(state);
 			lua_getfield(state, pushStackIndex_(state), str);
@@ -139,24 +139,6 @@ namespace kaguya
 		typename lua_type_traits<T>::get_type getField(const std::string& str)const
 		{
 			return getField(str.c_str());
-		}
-		/**
-		* @brief value = table[key];
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename T>
-		typename lua_type_traits<T>::get_type getField(int index)const
-		{
-			if (!state_())
-			{
-				except::typeMismatchError(state_(), "is nil");
-				return;
-			}
-			util::ScopedSavedStack save(state_());
-			lua_type_traits<int>::push_(state_(), index);
-			lua_gettable(state_(), pushStackIndex_());
-			return lua_type_traits<T>::get(state_(), -1);
 		}
 		template<typename KEY>
 		LuaRef getField(const KEY& key)const;

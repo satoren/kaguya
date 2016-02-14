@@ -43,43 +43,24 @@ namespace kaguya
 		{
 			return lua_typename(state_(), type());
 		}
-		
+
 #if KAGUYA_USE_CPP11
 		template<class...Args> FunctionResults operator()(Args&&... args);
 #else
-		#define KAGUYA_TEMPLATE_PARAMETER(N)
+#define KAGUYA_TEMPLATE_PARAMETER(N)
 #define KAGUYA_FUNCTION_ARGS_DEF(N)
-#define KAGUYA_CALL_ARGS(N)
 #define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
 
 #define KAGUYA_OP_FN_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-			int t = type();\
-			if (t == LUA_TTHREAD)\
-			{\
-				return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-			}\
-			else if (t == LUA_TFUNCTION)\
-			{\
-				return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-			}\
-			else\
-			{\
-				except::typeMismatchError(state_(), " is not function or thread");\
-				return FunctionResults(state_());\
-			}\
-	}
+	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N));
 
 			KAGUYA_OP_FN_DEF(0)
 
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_FUNCTION_ARGS_DEF
-#undef KAGUYA_CALL_ARGS
 #define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
 #define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
-#define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
@@ -88,7 +69,6 @@ namespace kaguya
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
-#undef KAGUYA_CALL_ARGS
 #undef KAGUYA_FUNCTION_ARGS_DEF
 #undef KAGUYA_PUSH_ARG_DEF
 #undef KAGUYA_PP_TEMPLATE

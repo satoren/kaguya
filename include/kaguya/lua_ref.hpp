@@ -202,7 +202,7 @@ namespace kaguya
 
 		LuaRef(RegistoryRef&& src)throw() :Ref::RegistoryRef(std::move(src)){}
 		template<typename T>
-		LuaRef(lua_State* state, T&& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, std::move(v), NoMainCheck){}
+		LuaRef(lua_State* state, T&& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, std::move(v), Ref::NoMainCheck()){}
 		template<typename T>
 		LuaRef(lua_State* state, T&& v) : Ref::RegistoryRef(state,std::move(v)){}
 #endif

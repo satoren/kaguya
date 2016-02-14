@@ -16,6 +16,7 @@
 
 
 #include "kaguya/detail/lua_function_def.hpp"
+#include "kaguya/detail/lua_variant_def.hpp"
 
 namespace kaguya
 {
@@ -266,7 +267,7 @@ namespace kaguya
 		template<typename T>
 		typename lua_type_traits<T>::get_type result_at(size_t index)const
 		{
-			if (index < 0 || index >= result_size())
+			if (index >= result_size())
 			{
 				throw std::out_of_range("function result out of range");
 			}
@@ -331,13 +332,13 @@ namespace kaguya
 	template<typename Derived>template<class...Args>
 	FunctionResults LuaFunctionImpl<Derived>::operator()(Args&&... args)
 	{
-		return call<FunctionResults>(std::forward<Args>(args)...);
+		return this->template call<FunctionResults>(std::forward<Args>(args)...);
 	}
 
 	template<typename Derived>template<class...Args>
 	FunctionResults LuaThreadImpl<Derived>::operator()(Args&&... args)
 	{
-		return resume<FunctionResults>(std::forward<Args>(args)...);
+		return this->template resume<FunctionResults>(std::forward<Args>(args)...);
 	}
 	template<typename Derived>template<class...Args>
 	FunctionResults LuaVariantImpl<Derived>::operator()(Args&&... args)
@@ -345,11 +346,11 @@ namespace kaguya
 		int t = type();
 		if (t == LUA_TTHREAD)
 		{
-			return resume<FunctionResults>(std::forward<Args>(args)...);
+			return this->template resume<FunctionResults>(std::forward<Args>(args)...);
 		}
 		else if (t == LUA_TFUNCTION)
 		{
-			return call<FunctionResults>(std::forward<Args>(args)...);
+			return this->template call<FunctionResults>(std::forward<Args>(args)...);
 		}
 		else
 		{
@@ -398,7 +399,7 @@ namespace kaguya
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_FUNCTION_ARGS_DEF
 #undef KAGUYA_CALL_ARGS
-#define KAGUYA_TEMPLATE_PARAMETER(N)template<typename Derived> template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
+#define KAGUYA_TEMPLATE_PARAMETER(N) template<typename Derived> template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
 #define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
 #define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
 

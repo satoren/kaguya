@@ -134,7 +134,7 @@ namespace kaguya
 		template<typename T>
 		typename lua_type_traits<T>::get_type at(size_t index)const
 		{
-			if (index < 0 || index >= size())
+			if (index >= size())
 			{
 				throw std::out_of_range("variadic arguments out of range");
 			}

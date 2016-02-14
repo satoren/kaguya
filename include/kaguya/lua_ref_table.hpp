@@ -522,7 +522,7 @@ namespace kaguya
 		if (!state)
 		{
 			except::typeMismatchError(state, "is nil");
-			return false;
+			return LuaRef(state);
 		}
 		util::ScopedSavedStack save(state);
 		int stackindex = pushStackIndex_(state);
