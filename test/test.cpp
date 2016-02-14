@@ -3,6 +3,10 @@
 #include <sstream>
 #include "kaguya/kaguya.hpp"
 
+#ifdef _MSC_VER
+#define NOMINMAX // do not define min and max macros that conflict with standard lib
+#include <windows.h>
+#endif
 
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #B );
@@ -1810,6 +1814,13 @@ int main()
 #endif
 
 		test_result = execute_test(testmap);
+
+#ifdef _MSC_VER
+		if (IsDebuggerPresent())
+		{
+			system("pause");
+		}
+#endif
 	}
 	return test_result ? 0 : -1;
 }
