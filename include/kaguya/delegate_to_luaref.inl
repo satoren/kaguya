@@ -15,14 +15,8 @@
 		template<class Result, class... Args>
 		Result call(Args&&... args)
 		{
-			return KAGUYA_DELEGATE_LUAREF.template call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C std::forward<Args>(args)...);
+			return KAGUYA_DELEGATE_LUAREF.call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C std::forward<Args>(args)...);
 		}
-		template<class Result, class... Args>
-		Result resume(Args&&... args)
-		{
-			return KAGUYA_DELEGATE_LUAREF.template resume<Result>(KAGUYA_DELEGATE_FIRST_ARG_C std::forward<Args>(args)...);
-		}
-
 #else
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
@@ -54,28 +48,16 @@
 		template<class Result,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
 		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
 		{\
-			return KAGUYA_DELEGATE_LUAREF.template call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF));\
-		}
-#define KAGUYA_RESUME_DEF(N) \
-		template<class Result,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
-		Result resume(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
-		{\
-			return KAGUYA_DELEGATE_LUAREF.template resume<Result>(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF));\
+			return KAGUYA_DELEGATE_LUAREF.call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF));\
 		}
 
 		template<class Result>
 		Result call()
 		{
-			return KAGUYA_DELEGATE_LUAREF.template call<Result>(KAGUYA_DELEGATE_FIRST_ARG);
+			return KAGUYA_DELEGATE_LUAREF.call<Result>(KAGUYA_DELEGATE_FIRST_ARG);
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
 
-		template<class Result>
-		Result resume()
-		{
-			return KAGUYA_DELEGATE_LUAREF.template resume<Result>(KAGUYA_DELEGATE_FIRST_ARG);
-		}
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
 #undef KAGUYA_PP_TEMPLATE
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_PUSH_ARG_DEF

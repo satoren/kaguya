@@ -315,15 +315,15 @@ namespace kaguya
 	};
 
 	template<typename RetType>
-	RetType FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag)
+	inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag)
 	{
 		return FunctionResults(state, retindex).get<RetType>();
 	}
-	FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
+	inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
 	{
 		return FunctionResults(state, retindex);
 	}
-	void FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<void> tag)
+	inline void FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<void> tag)
 	{
 		FunctionResults(state, retindex);
 	}
