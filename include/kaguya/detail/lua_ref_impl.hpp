@@ -111,6 +111,7 @@ namespace kaguya
 				{
 					lua_pushvalue(state_,stack_index_);
 					lua_xmove(state_,state,1);
+					return lua_gettop(state);
 				}
 				else
 				{

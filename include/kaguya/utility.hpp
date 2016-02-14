@@ -185,7 +185,7 @@ namespace kaguya
 			printf("\n");  /* end the listing */
 		}
 
-		void stackValueDump(std::ostream& os, lua_State* state, int stackIndex, int max_recursive = 2)
+		inline void stackValueDump(std::ostream& os, lua_State* state, int stackIndex, int max_recursive = 2)
 		{
 			if (stackIndex < 0)
 			{
