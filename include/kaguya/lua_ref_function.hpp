@@ -491,18 +491,6 @@ namespace kaguya
 	template<>	struct lua_type_traits<const LuaThread&> :lua_type_traits<LuaThread> {};
 
 
-	inline LuaRef toLuaRef(const LuaFunction& ref)
-	{
-		return static_cast<const LuaRef&>(ref);
-	}
-	inline LuaRef toLuaRef(const LuaThread& ref)
-	{
-		return static_cast<const LuaRef&>(ref);
-	}
-	inline LuaRef toLuaRef(const FunctionResults& ref)
-	{
-		return ref.get<LuaRef>();
-	}
 
 	/**
 	* @brief table and function binder.

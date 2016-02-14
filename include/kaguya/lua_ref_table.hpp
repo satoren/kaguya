@@ -433,20 +433,6 @@ namespace kaguya
 		return os;
 	}
 
-	inline const LuaRef& toLuaRef(const LuaUserData& ref)
-	{
-		return static_cast<const LuaRef&>(ref);
-	}
-	inline LuaRef toLuaRef(const LuaTable& ref)
-	{
-		ref.push();
-		return LuaRef(ref.state(), StackTop());
-	}
-	inline LuaRef toLuaRef(const TableKeyReference& ref)
-	{
-		return ref.get<LuaRef>();
-	}
-
 	template<typename T>
 	inline bool LuaFunctionImpl<T>::setFunctionEnv(const LuaTable& env)
 	{
@@ -474,25 +460,6 @@ namespace kaguya
 		lua_getupvalue(state_(), stackIndex, 1);
 		return LuaTable(state_(), StackTop());
 	}
-
-	/*
-	inline TableKeyReference LuaRef::operator[](const LuaRef& key)
-	{
-		return TableKeyReference(*this, key);
-	}
-	inline TableKeyReference LuaRef::operator[](const char* str)
-	{
-		return TableKeyReference(*this, str);
-	}
-	inline TableKeyReference LuaRef::operator[](const std::string& str)
-	{
-		return TableKeyReference(*this, str);
-	}
-	inline TableKeyReference LuaRef::operator[](int index)
-	{
-		return TableKeyReference(*this, index);
-	}
-	*/
 
 	template<typename T>
 	bool LuaTableOrUserDataImpl<T>::setMetatable(const LuaTable& table)
