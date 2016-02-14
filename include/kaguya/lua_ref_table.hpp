@@ -289,7 +289,7 @@ namespace kaguya
 		template<typename T>
 		void setFunction(T f)
 		{
-			table_proxy<KEY>::set(state_, table_index_, key_, FunctorType(f));
+			table_proxy::set(state_, table_index_, key_, FunctorType(f));
 		}
 
 		//deprecated
