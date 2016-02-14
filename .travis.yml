@@ -25,5 +25,5 @@ env:
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && make test
 after_success:
-  - cd ../ && clang++ test/test.cpp -Iinclude `pkg-config lua5.2 --libs --cflags` -std=c++11 -coverage -o covtest -O0 && ./covtest
+  - cd ../ && ${CXX} test/test.cpp ${CXX_FLAGS} -Iinclude `pkg-config lua5.2 --libs --cflags` -coverage -o covtest -O0 && ./covtest
   - codecov
