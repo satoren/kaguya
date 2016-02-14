@@ -25,4 +25,4 @@ env:
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${COVERAGE_FLAG} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && make test
 after_success:
-  - codecov
+  - cd build/CMakeFiles/test_runner.dir/test/ && codecov
