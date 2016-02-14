@@ -43,7 +43,6 @@ namespace kaguya
 			int stack_index_;
 			mutable bool pop_;
 		public:
-			typedef NoMainCheck NoMainCheck;
 #if KAGUYA_USE_CPP11
 			StackRef(StackRef&& src) :state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
 			{
@@ -147,7 +146,6 @@ namespace kaguya
 			typedef void (RegistoryRef::*bool_type)() const;
 			void this_type_does_not_support_comparisons() const {}
 		public:
-			typedef NoMainCheck NoMainCheck;
 
 			RegistoryRef(const RegistoryRef& src) :state_(src.state_)
 			{

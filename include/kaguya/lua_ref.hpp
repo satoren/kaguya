@@ -210,7 +210,7 @@ namespace kaguya
 		LuaRef()  {}
 		LuaRef(lua_State* state) :Ref::RegistoryRef(state) {}
 
-		LuaRef(lua_State* state, StackTop, NoMainCheck) :Ref::RegistoryRef(state,StackTop(),Ref::NoMainCheck()){}
+		LuaRef(lua_State* state, StackTop, Ref::NoMainCheck) :Ref::RegistoryRef(state,StackTop(),Ref::NoMainCheck()){}
 
 		LuaRef(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
 		{

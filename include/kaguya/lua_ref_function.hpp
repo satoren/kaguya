@@ -161,9 +161,9 @@ namespace kaguya
 		friend class mem_fun_binder;
 		friend class TableKeyReference;
 		friend class FunctionResultProxy;
-		template<typename Derived>friend class LuaVariantImpl;
 		template<typename Derived>friend class LuaThreadImpl;
 		template<typename Derived>friend class LuaFunctionImpl;
+		template<typename Derived>friend class LuaVariantImpl;
 	public:
 		~FunctionResults()
 		{
@@ -368,12 +368,12 @@ namespace kaguya
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline FunctionResults LuaFunctionImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
 	{\
-			return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+			return this->template call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
 	}\
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline FunctionResults LuaThreadImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
 	{\
-			return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+			return this->template resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
 	}\
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline FunctionResults LuaVariantImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
@@ -381,11 +381,11 @@ namespace kaguya
 			int t = type();\
 			if (t == LUA_TTHREAD)\
 			{\
-				return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+				return this->template resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
 			}\
 			else if (t == LUA_TFUNCTION)\
 			{\
-				return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+				return this->template call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
 			}\
 			else\
 			{\

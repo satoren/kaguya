@@ -104,7 +104,7 @@ namespace kaguya
 			if (!state)
 			{
 				except::typeMismatchError(state, "is nil");
-				return lua_type_traits<T>::get_type();
+				return get_type();
 			}
 			util::ScopedSavedStack save(state);
 			lua_type_traits<KEY>::push_(state, index);
