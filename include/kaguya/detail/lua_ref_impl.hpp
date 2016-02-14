@@ -94,16 +94,27 @@ namespace kaguya
 				lua_pushvalue(state_, stack_index_);
 				return 1;
 			}
+			int push(lua_State* state)const
+			{
+				lua_pushvalue(state_, stack_index_);
+				if (state_ != state)
+				{
+					lua_pushvalue(state_, stack_index_);
+					lua_xmove(state_, state, 1);
+				}
+				return 1;
+			}
 
 			int pushStackIndex(lua_State* state)const
 			{
-				if (state_ == state)
+				if (state_ != state)
 				{
-					return stack_index_;
+					lua_pushvalue(state_,stack_index_);
+					lua_xmove(state_,state,1);
 				}
 				else
 				{
-					abort();//fixme
+					return stack_index_;
 				}
 			}
 			lua_State *state()const { return state_; }
@@ -124,7 +135,7 @@ namespace kaguya
 #else
 			return lua_equal(lfs.state_, lfs.stack_index_, rfs.stack_index_) != 0;
 #endif
-		}
+	}
 		inline bool operator<(const StackRef& lfs, const StackRef& rfs)
 		{
 			if (lfs.state_ != rfs.state_) { return lfs.state_ < rfs.state_; }
@@ -133,7 +144,7 @@ namespace kaguya
 #else
 			return lua_lessthan(lfs.state_, lfs.stack_index_, rfs.stack_index_) != 0;
 #endif
-		}
+}
 		inline bool operator<=(const StackRef& lfs, const StackRef& rfs)
 		{
 			if (lfs.state_ != rfs.state_) { return lfs.state_ <= rfs.state_; }
@@ -545,9 +556,21 @@ namespace kaguya
 		}
 		//@}
 
+		inline std::ostream& operator<<(std::ostream& os, const StackRef& ref)
+		{
+			lua_State* state = ref.state();
+			util::ScopedSavedStack save(state);
+			int stackIndex = ref.pushStackIndex(state);
+			util::stackValueDump(os, state, stackIndex);
+			return os;
+		}
 		inline std::ostream& operator<<(std::ostream& os, const RegistoryRef& ref)
 		{
-			//fixme
+			static const int DEFAULT_MAX_RECURSIVE = 2;
+			lua_State* state = ref.state();
+			util::ScopedSavedStack save(state);
+			int stackIndex = ref.pushStackIndex(state);
+			util::stackValueDump(os, state, stackIndex, DEFAULT_MAX_RECURSIVE);
 			return os;
 		}
 	}

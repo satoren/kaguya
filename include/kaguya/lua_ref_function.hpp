@@ -218,6 +218,7 @@ namespace kaguya
 			{
 				return !(*this == other);
 			}
+			int index() const { return stack_index; }
 		private:
 			lua_State* state;
 			int stack_index;
@@ -232,6 +233,14 @@ namespace kaguya
 		iterator end()
 		{
 			return iterator(state_, endIndex_);
+		}
+		const_iterator begin()const
+		{
+			return const_iterator(state_, startIndex_);
+		}
+		const_iterator end()const
+		{
+			return const_iterator(state_, endIndex_);
 		}
 		const_iterator cbegin()const
 		{
@@ -256,7 +265,9 @@ namespace kaguya
 		int pushStackIndex(lua_State* state)const {
 			if (state_ != state)
 			{
-				throw std::runtime_error("can not now");//fixme
+				lua_pushvalue(state_, startIndex_);
+				lua_xmove(state_, state, 1);
+				return lua_gettop(state);
 			}
 			return startIndex_;
 		}
@@ -292,11 +303,11 @@ namespace kaguya
 		//push first result
 		int push(lua_State* state)const
 		{
+			lua_pushvalue(state_, startIndex_);
 			if (state_ != state)
 			{
-				throw std::runtime_error("can not now");//fixme
+				lua_xmove(state_, state, 1);
 			}
-			lua_pushvalue(state, startIndex_);
 			return 1;
 		}
 		int type()const
@@ -417,13 +428,12 @@ namespace kaguya
 #undef KAGUYA_OP_FN_DEF
 #endif
 
-	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
+		inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
-		std::vector<LuaRef> results = res.get<std::vector<LuaRef> >();
-
-		for (std::vector<LuaRef>::iterator it = results.end(); it != results.end(); ++it)
+		for (FunctionResults::const_iterator it = res.begin(); it != res.end(); ++it)
 		{
-			it->dump(os); os << ",";
+			util::stackValueDump(os, res.state(), it.index(), 1);
+			os << ",";
 		}
 
 		return os;
@@ -436,7 +446,7 @@ namespace kaguya
 			int size = 0;
 			for (FunctionResults::const_iterator it = ref.cbegin(); it != ref.cend(); ++it)
 			{
-				size += it->push();
+				size += it->push(l);
 			}
 			return size;
 		}

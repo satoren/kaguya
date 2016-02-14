@@ -99,7 +99,7 @@ namespace kaguya
 #undef KAGUYA_GET_TUPLE_DEF
 #endif
 
-		template<class Result>
+			template<class Result>
 		inline Result get_result(lua_State* l, int startindex)
 		{
 			return get_result_impl(l, startindex, types::typetag<Result>());
@@ -114,7 +114,7 @@ namespace kaguya
 	/**
 	* Reference of Lua any type value.
 	*/
-	class LuaRef:public Ref::RegistoryRef, public LuaVariantImpl<LuaRef>
+	class LuaRef :public Ref::RegistoryRef, public LuaVariantImpl<LuaRef>
 	{
 		friend class LuaUserData;
 		friend class LuaTable;
@@ -124,7 +124,7 @@ namespace kaguya
 		typedef void (LuaRef::*bool_type)() const;
 		void this_type_does_not_support_comparisons() const {}
 
-		
+
 		static lua_State* toMainThread(lua_State* state)
 		{
 #if LUA_VERSION_NUM >= 502
@@ -140,57 +140,6 @@ namespace kaguya
 			}
 #endif
 			return state;
-		}
-
-		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
-		{
-			switch (type())
-			{
-			case LuaRef::TYPE_NIL:
-				os << "nil";
-				break;
-			case LuaRef::TYPE_BOOL:
-				os << get<bool>();
-				break;
-			case LuaRef::TYPE_NUMBER:
-				os << get<double>();
-				break;
-			case LuaRef::TYPE_STRING:
-				os << "'" << get<std::string>() << "'";
-				break;
-			case LuaRef::TYPE_TABLE:
-			{
-				const void* ptr = native_pointer();
-				if (outtable.count(ptr))
-				{
-					os << "{" << ptr << "}" << std::endl;
-					return;
-				}
-				outtable.insert(ptr);
-				os << "{";
-				std::map<LuaRef, LuaRef> table = map<LuaRef, LuaRef>();
-				bool first = true;
-				for (std::map<LuaRef, LuaRef>::iterator it = table.begin(); it != table.end(); it++)
-				{
-					if (first) { first = false; }
-					else { os << ","; }
-					it->first.dump_impl(os, nest + 1, outtable);
-					os << " = ";
-					it->second.dump_impl(os, nest + 1, outtable);
-				}
-				os << "}";
-			}
-			break;
-			case LuaRef::TYPE_LIGHTUSERDATA:
-			case LuaRef::TYPE_FUNCTION:
-			case LuaRef::TYPE_USERDATA:
-			case LuaRef::TYPE_THREAD:
-				os << typeName() << "(" << native_pointer() << ")";
-				break;
-			default:
-				os << "unknown type";
-				break;
-			}
 		}
 	public:
 
@@ -209,7 +158,7 @@ namespace kaguya
 
 #if KAGUYA_USE_CPP11
 
-		LuaRef(LuaRef&& src)throw() :Ref::RegistoryRef(std::move(src)){}
+		LuaRef(LuaRef&& src)throw() :Ref::RegistoryRef(std::move(src)) {}
 
 		LuaRef& operator =(LuaRef&& src)throw()
 		{
@@ -217,17 +166,17 @@ namespace kaguya
 			return *this;
 		}
 
-		LuaRef(RegistoryRef&& src)throw() :Ref::RegistoryRef(std::move(src)){}
+		LuaRef(RegistoryRef&& src)throw() :Ref::RegistoryRef(std::move(src)) {}
 		template<typename T>
-		LuaRef(lua_State* state, T&& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, std::move(v), Ref::NoMainCheck()){}
+		LuaRef(lua_State* state, T&& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, std::move(v), Ref::NoMainCheck()) {}
 		template<typename T>
-		LuaRef(lua_State* state, T&& v) : Ref::RegistoryRef(state,std::move(v)){}
+		LuaRef(lua_State* state, T&& v) : Ref::RegistoryRef(state, std::move(v)) {}
 #endif
 
-		LuaRef()  {}
+		LuaRef() {}
 		LuaRef(lua_State* state) :Ref::RegistoryRef(state) {}
 
-		LuaRef(lua_State* state, StackTop, Ref::NoMainCheck) :Ref::RegistoryRef(state,StackTop(),Ref::NoMainCheck()){}
+		LuaRef(lua_State* state, StackTop, Ref::NoMainCheck) :Ref::RegistoryRef(state, StackTop(), Ref::NoMainCheck()) {}
 
 		LuaRef(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
 		{
@@ -235,9 +184,9 @@ namespace kaguya
 
 
 		template<typename T>
-		LuaRef(lua_State* state, const T& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, v, Ref::NoMainCheck()){}
+		LuaRef(lua_State* state, const T& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, v, Ref::NoMainCheck()) {}
 		template<typename T>
-		LuaRef(lua_State* state, const T& v) : Ref::RegistoryRef(state, v){}
+		LuaRef(lua_State* state, const T& v) : Ref::RegistoryRef(state, v) {}
 
 		bool isNilref()const { return state() == 0 || ref_ == LUA_REFNIL; }
 
@@ -286,7 +235,7 @@ namespace kaguya
 		}
 
 
-		
+
 
 		const void* native_pointer()const
 		{
@@ -302,12 +251,6 @@ namespace kaguya
 				os << "  ";
 			}
 		}
-
-		void dump(std::ostream& os)const
-		{
-			std::set<const void*> table;
-			dump_impl(os, 0, table);
-		}
 	};
 
 
@@ -322,11 +265,6 @@ namespace kaguya
 	{
 		v.push(l);
 		return 1;
-	}
-	inline std::ostream& operator<<(std::ostream& os, const LuaRef& ref)
-	{
-		ref.dump(os);
-		return os;
 	}
 }
 

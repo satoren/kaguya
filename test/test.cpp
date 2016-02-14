@@ -431,6 +431,7 @@ namespace t_02_classreg
 
 		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
 			.addMember("b", &Derived::b)
+			.addStaticMember("test", derived_function)
 			);
 
 		Derived derived;
@@ -446,6 +447,7 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(1 == derived:a())"));
 		TEST_CHECK(state("assert(2 == derived:b())"));
 		TEST_EQUAL(derived.b, 2);
+		TEST_CHECK(state("assert(2 == derived.test(derived))"));
 	}
 
 	int receive_shared_ptr_function(kaguya::standard::shared_ptr<Derived> d) {
@@ -1270,6 +1272,50 @@ namespace t_04_lua_ref
 		TEST_EQUAL(table["hana"], "uta");
 		TEST_EQUAL(table.getMetatable(), metatable);
 	}
+	void stream_out_test(kaguya::State& state)
+	{
+		kaguya::LuaTable table = state.newTable();
+		table[1] = 231;
+		table[2] = 21;
+		table[3] = 2;
+		std::stringstream ss;
+		std::string text;
+		ss << table;
+		TEST_EQUAL(ss.str(), "{1=231,2=21,3=2}");
+		ss.str("");
+		ss << state.newRef(323);
+		text = ss.str();
+		TEST_EQUAL(text, "323");
+
+		ss.str("");
+		ss << state.newRef("test_text");
+		text = ss.str();
+		TEST_EQUAL(text, "'test_text'");
+
+		ss.str("");
+		ss << state.newRef(true);
+		text = ss.str();
+		TEST_EQUAL(text, "true");
+		ss.str("");
+		ss << state.newRef(false);
+		text = ss.str();
+		TEST_EQUAL(text, "false");
+		ss.str("");
+		ss << state.newRef((void*)(0));
+		text = ss.str();
+		TEST_EQUAL(text, "nil");
+
+		ss.str("");
+		ss << state.newRef(&stream_out_test);
+		text = ss.str();
+		TEST_EQUAL(text, "function");
+
+
+		ss.str("");
+		ss << state.newRef(&ss);
+		text = ss.str();
+		TEST_CHECK(text.compare(0,strlen("userdata"), "userdata") ==0);
+	}
 
 
 	void luafun_loadstring(kaguya::State& state)
@@ -1784,6 +1830,7 @@ int main()
 		ADD_TEST(t_04_lua_ref::lua_table_reference);
 		ADD_TEST(t_04_lua_ref::luafun_loadstring);
 		ADD_TEST(t_04_lua_ref::metatable);
+		ADD_TEST(t_04_lua_ref::stream_out_test);
 		ADD_TEST(t_05_error_handler::set_error_function);
 		ADD_TEST(t_05_error_handler::function_call_error);
 		ADD_TEST(t_06_state::other_state);
