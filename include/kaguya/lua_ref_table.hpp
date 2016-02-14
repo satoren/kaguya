@@ -476,7 +476,7 @@ namespace kaguya
 	template<typename KEY>
 	inline std::ostream& operator<<(std::ostream& os, const TableKeyReference<KEY>& ref)
 	{
-		ref.get<LuaRef>().dump(os);
+		ref.template get<LuaRef>().dump(os);
 		return os;
 	}
 
