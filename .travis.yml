@@ -18,11 +18,12 @@ addons:
     - g++-4.8
     - cmake
 env:
-  - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 
-  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++03 COVERAGE_FLAG=-DCOVERAGE_ENABLE=On
+  - BUILD_TYPE=Release CXX_FLAGS=-std=c++03
+  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++03
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++11
-  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++11 COVERAGE_FLAG=-DCOVERAGE_ENABLE=On
+  - BUILD_TYPE=Debug CXX_FLAGS=-std=c++11
 script:
-  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${COVERAGE_FLAG} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && make test
+  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && make test
 after_success:
-  - cd build/CMakeFiles/test_runner.dir/test/ && codecov
+  - cd ../ && clang++ test/test.cpp -Iinclude `pkg-config lua5.2 --libs --cflags` -std=c++11 -coverage -o covtest -O0 && ./covtest
+  - codecov

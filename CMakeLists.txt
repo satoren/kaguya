@@ -16,11 +16,6 @@ file(GLOB testSources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories("./")
 
-if(COVERAGE_ENABLE)
-add_definitions(-coverage)
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -coverage" )
-endif(COVERAGE_ENABLE)
-
 if(NOT MSVC)#-Wall nonsense on MSVC
 add_definitions("-Wall")
 #add_definitions("-std=c++11")
