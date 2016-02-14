@@ -58,7 +58,7 @@ namespace kaguya
 
 			Ref(lua_State* state, int index) :state_(state), ref_(LUA_REFNIL)
 			{
-				lua_pushvalue(state_,index);
+				lua_pushvalue(state_, index);
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			void swap(Ref& other)throw()
@@ -148,7 +148,7 @@ namespace kaguya
 #else
 			lua_pushstring(state, message);
 #endif
-	}
+		}
 
 		inline void stackDump(lua_State *L) {
 			int i;
@@ -185,6 +185,75 @@ namespace kaguya
 			printf("\n");  /* end the listing */
 		}
 
+		inline void stackValueDump(std::ostream& os, lua_State* state, int stackIndex, int max_recursive = 2)
+		{
+			if (stackIndex < 0)
+			{
+				stackIndex += lua_gettop(state) + 1;
+			}
+			util::ScopedSavedStack save(state);
+			int type = lua_type(state, stackIndex);
+			switch (type)
+			{
+			case LUA_TNONE:
+				os << "none";
+				break;
+			case LUA_TNIL:
+				os << "nil";
+				break;
+			case LUA_TBOOLEAN:
+				os << ((lua_toboolean(state, stackIndex) != 0)?"true":"false");
+				break;
+			case LUA_TNUMBER:
+				os << lua_tonumber(state, stackIndex);
+				break;
+			case LUA_TSTRING:
+				os << "'" << lua_tostring(state, stackIndex) << "'";
+				break;
+			case LUA_TTABLE:
+			{
+				os << "{";
+				if (max_recursive <= 1)
+				{
+					os << "...";
+				}
+				else
+				{
+					lua_pushnil(state);
+					if ((lua_next(state, stackIndex) != 0))
+					{
+						stackValueDump(os, state, -2, max_recursive - 1);
+						os << "=";
+						stackValueDump(os, state, -1, max_recursive - 1);
+						lua_pop(state, 1);//pop value
+
+						while (lua_next(state, stackIndex) != 0)
+						{
+							os << ",";
+							stackValueDump(os, state, -2, max_recursive - 1);
+							os << "=";
+							stackValueDump(os, state, -1, max_recursive - 1);
+							lua_pop(state, 1);//pop value
+						}
+					}
+				}
+				os << "}";
+			}
+			break;
+			case LUA_TUSERDATA:
+			case LUA_TLIGHTUSERDATA:
+			case LUA_TTHREAD:
+				os << lua_typename(state, type) << "(" << lua_topointer(state, stackIndex) << ")";
+				break;
+			case LUA_TFUNCTION:
+				os << lua_typename(state, type);
+				break;
+			default:
+				os << "unknown type value";
+				break;
+			}
+		}
+
 		inline int lua_resume_compat(lua_State *L, int nargs)
 		{
 			if (nargs < 0) { nargs = 0; }
@@ -194,6 +263,26 @@ namespace kaguya
 			return lua_resume(L, nargs);
 #endif
 		}
+
+
+
+		inline lua_State* toMainThread(lua_State* state)
+		{
+#if LUA_VERSION_NUM >= 502
+			if (state)
+			{
+				lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
+				lua_State* mainthread = lua_tothread(state, -1);
+				lua_pop(state, 1);
+				if (mainthread)
+				{
+					return mainthread;
+				}
+			}
+#endif
+			return state;
+		}
+
 #if KAGUYA_USE_CPP11
 		inline int push_args(lua_State *l)
 		{
@@ -233,4 +322,4 @@ namespace kaguya
 #undef KAGUYA_PUSH_ARG_DEF
 #endif
 		}
-}
+	}
