@@ -622,7 +622,7 @@ namespace kaguya
 			TYPE_THREAD = LUA_TTHREAD,//!< thread(coroutine) type
 		};
 
-		bool isNilref()const { return state_() == 0 || type_() == LUA_REFNIL; }
+		bool isNilref()const { return state_() == 0 || type() == LUA_REFNIL; }
 
 		size_t size() const {
 			lua_State* state = state_();

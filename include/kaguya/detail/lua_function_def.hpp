@@ -23,6 +23,15 @@ namespace kaguya
 
     class FunctionResults;
 
+	class FunctionResultProxy
+	{
+	public:
+		template<typename RetType>
+		static RetType ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag);
+		static FunctionResults ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag);
+		static void ReturnValue(lua_State* state, int retindex, types::typetag<void> tag);
+	};
+
 
 
 	template<typename Derived>
@@ -73,13 +82,10 @@ namespace kaguya
 			int argnum = lua_gettop(state) - argstart;
 			int result = lua_pcall(state, argnum, LUA_MULTRET, 0);
 			except::checkErrorAndThrow(result, state);
-			return FunctionResults::ReturnValue(state, argstart, types::typetag<Result>());
+			return FunctionResultProxy::ReturnValue(state, argstart, types::typetag<Result>());
 		}
 
-		template<class...Args> FunctionResults operator()(Args&&... args)
-		{
-			return call<FunctionResults>(std::forward<Args>(args)...);
-		}
+		template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 
 #define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)
@@ -96,7 +102,7 @@ namespace kaguya
 			int argnum = lua_gettop(state) - argstart;\
 			int result = lua_pcall(state, argnum, LUA_MULTRET, 0);\
 			except::checkErrorAndThrow(result, state);\
-			return FunctionResults::ReturnValue(state, argstart, types::typetag<Result>());\
+			return FunctionResultProxy::ReturnValue(state, argstart, types::typetag<Result>());\
 		}
 
 
@@ -115,10 +121,7 @@ namespace kaguya
 
 #define KAGUYA_OP_FN_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-			return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-	}
+	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N));
 
 			KAGUYA_OP_FN_DEF(0)
 
@@ -185,12 +188,9 @@ namespace kaguya
 			int argnum = lua_gettop(thread) - argstart;
 			int result = util::lua_resume_compat(thread, argnum);
 			except::checkErrorAndThrow(result, thread);
-			return FunctionResults::ReturnValue(thread, argstart, types::typetag<Result>());
+			return FunctionResultProxy::ReturnValue(thread, argstart, types::typetag<Result>());
 		}
-		template<class...Args> FunctionResults operator()(Args&&... args)
-		{
-			return resume<FunctionResults>(std::forward<Args>(args)...);
-		}
+		template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 
 
@@ -220,10 +220,10 @@ namespace kaguya
 			int argnum = lua_gettop(thread) - argstart;\
 			int result = util::lua_resume_compat(thread, argnum);\
 			except::checkErrorAndThrow(result, thread);\
-			return FunctionResults::ReturnValue(thread, argstart, types::typetag<Result>());\
+			return FunctionResultProxy::ReturnValue(thread, argstart, types::typetag<Result>());\
 		}
 
-			KAGUYA_RESUME_DEF(0)
+		KAGUYA_RESUME_DEF(0)
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
 
 #undef KAGUYA_PUSH_DEF
@@ -237,10 +237,7 @@ namespace kaguya
 
 #define KAGUYA_OP_FN_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-			return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-	}
+	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N));
 
 			KAGUYA_OP_FN_DEF(0)
 

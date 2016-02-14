@@ -141,18 +141,6 @@ namespace kaguya
 			return state;
 		}
 
-		template<typename T>
-		bool pushCountCheck(int count)
-		{
-			if (count != 1)
-			{
-				if (count > 1) { except::typeMismatchError(state_, std::string("can not push multiple value:") + typeid(T).name()); }
-				if (count == 0) { except::typeMismatchError(state_, std::string("can not push ") + typeid(T).name() + " value"); }
-				return false;
-			}
-			return true;
-		}
-
 		void dump_impl(std::ostream& os, int nest, std::set<const void*>& outtable)const
 		{
 			switch (type())

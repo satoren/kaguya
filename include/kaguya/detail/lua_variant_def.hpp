@@ -45,23 +45,7 @@ namespace kaguya
 		}
 		
 #if KAGUYA_USE_CPP11
-		template<class...Args> FunctionResults operator()(Args&&... args)
-		{
-			int t = type();
-			if (t == LUA_TTHREAD)
-			{
-				return resume<FunctionResults>(std::forward<Args>(args)...);
-			}
-			else if (t == LUA_TFUNCTION)
-			{
-				return call<FunctionResults>(std::forward<Args>(args)...);
-			}
-			else
-			{
-				except::typeMismatchError(state_(), " is not function or thread");
-				return FunctionResults(state_());
-			}
-		}
+		template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 		#define KAGUYA_TEMPLATE_PARAMETER(N)
 #define KAGUYA_FUNCTION_ARGS_DEF(N)

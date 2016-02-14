@@ -135,10 +135,10 @@ namespace kaguya
 	};
 
 
-    
-    
-    
-	class FunctionResults:public LuaVariantImpl<FunctionResults>
+
+
+
+	class FunctionResults :public LuaVariantImpl<FunctionResults>
 	{
 		FunctionResults() :state_(0), startIndex_(0), endIndex_(0)
 		{
@@ -159,6 +159,7 @@ namespace kaguya
 		friend class LuaRef;
 		friend class mem_fun_binder;
 		friend class TableKeyReference;
+		friend class FunctionResultProxy;
 		template<typename Derived>friend class LuaVariantImpl;
 		template<typename Derived>friend class LuaThreadImpl;
 		template<typename Derived>friend class LuaFunctionImpl;
@@ -173,7 +174,7 @@ namespace kaguya
 
 		struct reference :Ref::StackRef, public LuaVariantImpl<reference>
 		{
-			reference(lua_State* s, int index) :Ref::StackRef(s,index,false)
+			reference(lua_State* s, int index) :Ref::StackRef(s, index, false)
 			{
 			}
 
@@ -184,7 +185,7 @@ namespace kaguya
 		};
 		struct iterator
 		{
-			iterator(lua_State* s, int i): state(s), stack_index(i)
+			iterator(lua_State* s, int i) : state(s), stack_index(i)
 			{
 			}
 			reference operator*()const
@@ -252,13 +253,13 @@ namespace kaguya
 		operator T()const {
 			return get<T>();
 		}
-		lua_State* state()const {return state_;	}
+		lua_State* state()const { return state_; }
 		int pushStackIndex(lua_State* state)const {
 			if (state_ != state)
 			{
 				throw std::runtime_error("can not now");//fixme
 			}
-			return startIndex_; 
+			return startIndex_;
 		}
 
 
@@ -304,19 +305,6 @@ namespace kaguya
 			return lua_type(state_, startIndex_);
 		}
 
-		template<typename RetType>
-		static RetType ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag)
-		{
-			return FunctionResults(state, retindex).get<RetType>();
-		}
-		static FunctionResults ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
-		{
-			return FunctionResults(state, retindex);
-		}
-		static void ReturnValue(lua_State* state, int retindex, types::typetag<void> tag)
-		{
-			FunctionResults(state, retindex);
-		}
 
 	private:
 		mutable lua_State* state_;
@@ -324,6 +312,111 @@ namespace kaguya
 		int endIndex_;
 
 	};
+
+	template<typename RetType>
+	RetType FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag)
+	{
+		return FunctionResults(state, retindex).get<RetType>();
+	}
+	FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
+	{
+		return FunctionResults(state, retindex);
+	}
+	void FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<void> tag)
+	{
+		FunctionResults(state, retindex);
+	}
+
+#if KAGUYA_USE_CPP11
+	template<typename Derived>template<class...Args>
+	FunctionResults LuaFunctionImpl<Derived>::operator()(Args&&... args)
+	{
+		return call<FunctionResults>(std::forward<Args>(args)...);
+	}
+
+	template<typename Derived>template<class...Args>
+	FunctionResults LuaThreadImpl<Derived>::operator()(Args&&... args)
+	{
+		return resume<FunctionResults>(std::forward<Args>(args)...);
+	}
+	template<typename Derived>template<class...Args>
+	FunctionResults LuaVariantImpl<Derived>::operator()(Args&&... args)
+	{
+		int t = type();
+		if (t == LUA_TTHREAD)
+		{
+			return resume<FunctionResults>(std::forward<Args>(args)...);
+		}
+		else if (t == LUA_TFUNCTION)
+		{
+			return call<FunctionResults>(std::forward<Args>(args)...);
+		}
+		else
+		{
+			except::typeMismatchError(state_(), " is not function or thread");
+			return FunctionResults(state_());
+		}
+	}
+#else
+#define KAGUYA_TEMPLATE_PARAMETER(N)template<typename Derived>
+#define KAGUYA_FUNCTION_ARGS_DEF(N)
+#define KAGUYA_CALL_ARGS(N)
+#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
+
+#define KAGUYA_OP_FN_DEF(N) \
+	KAGUYA_TEMPLATE_PARAMETER(N)\
+	inline FunctionResults LuaFunctionImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
+	{\
+			return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+	}\
+	KAGUYA_TEMPLATE_PARAMETER(N)\
+	inline FunctionResults LuaThreadImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
+	{\
+			return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+	}\
+	KAGUYA_TEMPLATE_PARAMETER(N)\
+	inline FunctionResults LuaVariantImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
+	{\
+			int t = type();\
+			if (t == LUA_TTHREAD)\
+			{\
+				return resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+			}\
+			else if (t == LUA_TFUNCTION)\
+			{\
+				return call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+			}\
+			else\
+			{\
+				except::typeMismatchError(state_(), " is not function or thread");\
+				return FunctionResults(state_());\
+			}\
+	}
+
+	KAGUYA_OP_FN_DEF(0)
+
+#undef KAGUYA_TEMPLATE_PARAMETER
+#undef KAGUYA_FUNCTION_ARGS_DEF
+#undef KAGUYA_CALL_ARGS
+#define KAGUYA_TEMPLATE_PARAMETER(N)template<typename Derived> template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
+#define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
+#define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
+
+#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
+#define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
+
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
+#undef KAGUYA_OP_FN_DEF
+#undef KAGUYA_TEMPLATE_PARAMETER
+
+#undef KAGUYA_CALL_ARGS
+#undef KAGUYA_FUNCTION_ARGS_DEF
+#undef KAGUYA_PUSH_ARG_DEF
+#undef KAGUYA_PP_TEMPLATE
+#undef KAGUYA_PP_FARG
+#undef KAGUYA_CALL_DEF
+#undef KAGUYA_OP_FN_DEF
+#endif
 
 	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
@@ -350,7 +443,7 @@ namespace kaguya
 		}
 	};
 	template <unsigned int I>
-	LuaRef get(const FunctionResults& res) { return (res.result_size() > I)?res.result_at<LuaRef>(I): LuaRef(); }
+	LuaRef get(const FunctionResults& res) { return (res.result_size() > I) ? res.result_at<LuaRef>(I) : LuaRef(); }
 
 	template<>	struct lua_type_traits<LuaFunction> {
 		typedef LuaFunction get_type;

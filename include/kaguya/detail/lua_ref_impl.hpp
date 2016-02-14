@@ -19,6 +19,19 @@
 
 namespace kaguya
 {
+
+	template<typename T>
+	inline bool pushCountCheck(lua_State* state, int count)
+	{
+		if (count != 1)
+		{
+			if (count > 1) { except::typeMismatchError(state, std::string("can not push multiple value:") + typeid(T).name()); }
+			if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); }
+			return false;
+		}
+		return true;
+	}
+
 	struct StackTop {};
 	namespace Ref
 	{
@@ -37,7 +50,7 @@ namespace kaguya
 				src.pop_ = false;
 			}
 #else
-			LuaStackRef(const LuaStackRef&src) : state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
+			StackRef(const StackRef&src) : state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
 			{
 				src.pop_ = false;
 			}
@@ -57,7 +70,7 @@ namespace kaguya
 			}
 			template<typename T>T get()const
 			{
-				return lua_type_traits<T>::get(state_, stack_index);
+				return lua_type_traits<T>::get(state_, stack_index_);
 			}
 			template<typename T>
 			operator T()const
@@ -204,7 +217,7 @@ namespace kaguya
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
 				int vc = util::push_args(state_, v);
-				if (!util::pushCountCheck<T>(state_, vc)) { return; }
+				if (!pushCountCheck<T>(state_, vc)) { return; }
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			template<typename T>
@@ -213,7 +226,7 @@ namespace kaguya
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
 				int vc = util::push_args(state_, v);
-				if (!util::pushCountCheck<T>(state_, vc)) { return; }
+				if (!pushCountCheck<T>(state_, vc)) { return; }
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 				state_ = util::toMainThread(state_);
 			}
@@ -224,7 +237,7 @@ namespace kaguya
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
 				int vc = util::push_args(state_, standard::forward<T>(v));
-				if (!util::pushCountCheck<T>(vc)) { return; }
+				if (!pushCountCheck<T>(vc)) { return; }
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			template<typename T>
@@ -233,7 +246,7 @@ namespace kaguya
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
 				int vc = util::push_args(state_, standard::forward<T>(v));
-				if (!util::pushCountCheck<T>(state_, vc)) { return; }
+				if (!pushCountCheck<T>(state_, vc)) { return; }
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 				state_ = util::toMainThread(state_);
 			}

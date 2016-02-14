@@ -197,17 +197,6 @@ namespace kaguya
 
 
 
-		template<typename T>
-		inline bool pushCountCheck(lua_State* state,int count)
-		{
-			if (count != 1)
-			{
-				if (count > 1) { except::typeMismatchError(state, std::string("can not push multiple value:") + typeid(T).name()); }
-				if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); }
-				return false;
-			}
-			return true;
-		}
 		inline lua_State* toMainThread(lua_State* state)
 		{
 #if LUA_VERSION_NUM >= 502
