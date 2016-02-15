@@ -260,6 +260,9 @@ namespace kaguya
 			}
 		};
 
+		template<>
+		struct is_callable<FunctorType> : traits::integral_constant<bool, true> {};
+
 		inline FunctorType* pick_match_function(lua_State *l)
 		{
 			int argcount = lua_gettop(l);

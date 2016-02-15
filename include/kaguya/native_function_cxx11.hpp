@@ -79,7 +79,7 @@ namespace kaguya
 
 
 			template <typename T>
-			struct functor_f_signature : public functor_f_signature<decltype(&T::operator())> {};
+			struct functor_f_signature {};
 
 			template <typename T, typename Ret, typename... Args>
 			struct functor_f_signature<Ret(T::*)(Args...) const> {
@@ -274,6 +274,13 @@ namespace kaguya
 				typedef typename f_signature<F>::type fsigtype;
 				return arg_count<fsigtype>::value;
 			}
+
+			template< typename T, typename Enable = void>
+			struct is_callable : traits::integral_constant<bool, false> {};
+			template< typename T>
+			struct is_callable<T, typename traits::enable_if<
+				!traits::is_same<void, typename f_signature<T>::type>::value
+				, void>::type > : traits::integral_constant<bool, true> {};
 		};
 		using cpp11impl::call;
 		using cpp11impl::checkArgTypes;
@@ -281,13 +288,6 @@ namespace kaguya
 		using cpp11impl::argTypesName;
 		using cpp11impl::argCount;
 		using cpp11impl::constructor_signature_type;
-
-
-		template< typename T, typename Enable = void>
-		struct is_callable : traits::integral_constant<bool, true> {};
-		//can not compile at MSVC2015 . crash compiler
-//		struct is_callable : traits::integral_constant<bool, false> {};
-//		template< typename T>
-//		struct is_callable<T, typename cpp11impl::f_signature<T>::type> : traits::integral_constant<bool, true> {};
+		using cpp11impl::is_callable;
 	}
 }
