@@ -24,7 +24,7 @@ env:
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 LUALIB=luajit
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++11 LUALIB=luajit
 script:
-  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && make test
+  - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} && make && make test
 after_success:
   - cd ../ && ${CXX} test/test.cpp ${CXX_FLAGS} -Iinclude `pkg-config ${LUALIB} --libs --cflags` -coverage -o covtest -O0 && ./covtest
   - codecov
