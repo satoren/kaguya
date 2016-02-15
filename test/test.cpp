@@ -1168,7 +1168,7 @@ namespace t_04_lua_ref
 #define TEST_SIZE(IDENTIFIER, VALUE, LEN) \
 	state(#IDENTIFIER " = " #VALUE); \
 	kaguya::LuaRef IDENTIFIER = state[#IDENTIFIER]; \
-	TEST_CHECK(IDENTIFIER.size() == LEN);
+	TEST_EQUAL(IDENTIFIER.size() , LEN);
 
 		TEST_SIZE(x, 17, 0);
 		TEST_SIZE(s, 'hello world!', 12);

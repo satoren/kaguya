@@ -493,7 +493,12 @@ namespace kaguya
 	{
 		util::ScopedSavedStack save(state_());
 		int stackIndex = pushStackIndex_(state_());
+
+#if LUA_VERSION_NUM >= 502
 		lua_getupvalue(state_(), stackIndex, 1);
+#else
+		lua_getfenv(state_(), stackIndex);
+#endif
 		return LuaTable(state_(), StackTop());
 	}
 

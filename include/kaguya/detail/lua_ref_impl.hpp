@@ -370,9 +370,9 @@ namespace kaguya
 			lfs.push(lfs.state_);
 			rfs.push(lfs.state_);
 #if LUA_VERSION_NUM >= 502
-			return lua_compare(lfs.state_, -1, -2, LUA_OPEQ) != 0;
+			return lua_compare(lfs.state_, -2, -1, LUA_OPEQ) != 0;
 #else
-			return lua_equal(lfs.state_, -1, -2) != 0;
+			return lua_equal(lfs.state_, -2, -1) != 0;
 #endif
 		}
 		inline bool operator<(const RegistoryRef& lfs, const RegistoryRef& rfs)
@@ -396,7 +396,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 502
 			return lua_compare(lfs.state_, -2, -1, LUA_OPLE) != 0;
 #else
-			return lua_equal(lfs.state_, -2, -1) != 0 || lua_lessthan(lfs.state_, -1, -2) != 0;
+			return lua_equal(lfs.state_, -2, -1) != 0 || lua_lessthan(lfs.state_, -2, -1) != 0;
 #endif
 		}
 		inline bool operator>=(const RegistoryRef& lfs, const RegistoryRef& rfs)
@@ -428,7 +428,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 502
 			return lua_compare(state, lhsIndex, rhsIndex, LUA_OPEQ) != 0;
 #else
-			return lua_equal(state_, lhsIndex, rhsIndex) != 0;
+			return lua_equal(state, lhsIndex, rhsIndex) != 0;
 #endif
 		}
 		inline bool operator<(const StackRef& lhs, const RegistoryRef& rhs)
@@ -441,7 +441,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 502
 			return lua_compare(state, lhsIndex, rhsIndex, LUA_OPLT) != 0;
 #else
-			return lua_lessthan(state_, lhsIndex, rhsIndex) != 0;
+			return lua_lessthan(state, lhsIndex, rhsIndex) != 0;
 #endif
 		}
 		inline bool operator<=(const StackRef& lhs, const RegistoryRef& rhs)
@@ -454,7 +454,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 502
 			return lua_compare(state, lhsIndex, rhsIndex, LUA_OPLE) != 0;
 #else
-			return lua_equal(state_, lhsIndex, rhsIndex) != 0 || lua_lessthan(state_, -1, -2) != 0;
+			return lua_equal(state, lhsIndex, rhsIndex) != 0 || lua_lessthan(state, lhsIndex, rhsIndex) != 0;
 #endif
 		}
 		inline bool operator>=(const StackRef& lhs, const RegistoryRef& rhs)

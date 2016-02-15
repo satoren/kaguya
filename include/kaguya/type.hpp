@@ -627,10 +627,17 @@ namespace kaguya
 		size_t size() const {
 			lua_State* state = state_();
 			util::ScopedSavedStack save(state);
+			int index = pushStackIndex_(state);
 #if LUA_VERSION_NUM >= 502
-			return lua_rawlen(state, pushStackIndex_(state));
+			return lua_rawlen(state, index);
 #else
-			return lua_objlen(state, pushStackIndex_(state));
+
+			int type = lua_type(state,index);
+			if(type != TYPE_STRING && type != TYPE_TABLE && type != TYPE_USERDATA && type != TYPE_LIGHTUSERDATA)
+			{
+				return 0;
+			}
+			return lua_objlen(state, index);
 #endif
 		}
 
