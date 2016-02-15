@@ -3,6 +3,10 @@
 #include <sstream>
 #include "kaguya/kaguya.hpp"
 
+#ifdef _MSC_VER
+#define NOMINMAX // do not define min and max macros that conflict with standard lib
+#include <windows.h>
+#endif
 
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #B );
@@ -588,10 +592,16 @@ namespace t_03_function
 		void setBar(std::string b) { bar = b; }
 	};
 
+	std::string foo_add(const Foo& foo, const std::string& s)
+	{
+		return foo.bar + s;
+	}
+
 	void member_function_test(kaguya::State& state)
 	{
 		state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
 			.addMember("setBar", &Foo::setBar)
+			.addMember("add", &foo_add)
 			.addCodeChunkResult("luafunc", "return function(a,b) return a*b end")
 			);
 		Foo foo;
@@ -604,6 +614,8 @@ namespace t_03_function
 
 		state("foo:setBar('test')");
 		TEST_EQUAL(foo.bar, "test");
+
+		TEST_CHECK(state("assert(foo:add('_member') == 'test_member')"));
 
 		TEST_CHECK(state("assert(foo.luafunc(3,4) == 12)"));
 
@@ -1857,6 +1869,13 @@ int main()
 #endif
 
 		test_result = execute_test(testmap);
+
+#ifdef _MSC_VER
+		if (IsDebuggerPresent())
+		{
+			system("pause");
+		}
+#endif
 	}
 	return test_result ? 0 : -1;
 }
