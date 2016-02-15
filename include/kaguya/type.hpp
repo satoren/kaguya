@@ -623,7 +623,14 @@ namespace kaguya
 		};
 
 		bool isNilref_()const { return state_() == 0 || type() == LUA_REFNIL; }
-
+		
+		
+		/**
+		* @brief Equivalent to `#` operator for strings and tables with no metamethods.
+		* Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
+		* than tables, strings or userdatas return 0.
+		* @return Size of table, string length or userdata memory block size.
+		*/
 		size_t size() const {
 			lua_State* state = state_();
 			util::ScopedSavedStack save(state);
@@ -641,6 +648,7 @@ namespace kaguya
 #endif
 		}
 
+		//return type
 		int type() const
 		{
 			lua_State* state = state_();
@@ -651,6 +659,8 @@ namespace kaguya
 			util::ScopedSavedStack save(state);
 			return lua_type(state, pushStackIndex_(state));
 		}
+
+		//return type name
 		const char* typeName()const
 		{
 			return lua_typename(state_(), type());

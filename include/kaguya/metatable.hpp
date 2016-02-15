@@ -23,25 +23,48 @@ namespace kaguya
 	template<typename class_type, typename base_class_type = void>
 	struct ClassMetatable
 	{
-		struct ValueType
+		struct DataHolderBase
 		{
-			ValueType() :ivalue(0), dvalue(0), type(int_value) {}
-			ValueType(int v) :ivalue(v), dvalue(0), type(int_value) {}
-			ValueType(long long v) :ivalue(v), dvalue(0), type(int_value) {}
-			ValueType(float v) :ivalue(0), dvalue(v), type(double_value) {}
-			ValueType(double v) :ivalue(0), dvalue(v), type(double_value) {}
-			ValueType(const std::string& v) :strvalue(v), ivalue(0), dvalue(0), type(str_value) {}
-			ValueType(const char* v) :strvalue(v), ivalue(0), dvalue(0), type(str_value) {}
-			std::string strvalue;
-			luaInt ivalue;
-			double dvalue;
-			enum { str_value, int_value, double_value } type;
+			virtual int push_to_lua(lua_State* data)const = 0;
+			virtual ~DataHolderBase(){}
 		};
+		template<typename T>
+		struct DataHolder:DataHolderBase
+		{
+			DataHolder(const T& d):data(d) {}
+			T data;
+			virtual int push_to_lua(lua_State* state)const
+			{
+				return lua_type_traits<T>::push(state, data);
+			}
+		};
+		template<int N>
+		struct DataHolder<char[N]> :DataHolderBase {
+			std::string data;
+			DataHolder(const std::string& d) :data(d) {}
+			virtual int push_to_lua(lua_State* state)const
+			{
+				return lua_type_traits<std::string>::push(state, data);
+			}		
+		};
+#if KAGUYA_USE_CPP11
+		template<typename T>
+		struct MoveDataHolder :DataHolderBase
+		{
+			MoveDataHolder(T&& d) :data(std::move(d)) {}
+			T data;
+			virtual int push_to_lua(lua_State* state)const
+			{
+				return lua_type_traits<T>::push(state, std::move(data));
+			}
+		};
+#endif
+		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
 
 		typedef std::vector<FunctorType> FunctorOverloadType;
 		typedef std::map<std::string, FunctorOverloadType> FuncMapType;
 
-		typedef std::map<std::string, ValueType> ValueMapType;
+		typedef std::map<std::string, DataHolderType> MemberMapType;
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
 
@@ -151,9 +174,16 @@ namespace kaguya
 		}
 
 #if defined(_MSC_VER) && _MSC_VER <= 1800
+	//deprecated  rename to addMemberFunction
 		//can not write  Ret class_type::* f on MSC++2013
 		template<typename Fun>
 		ClassMetatable& addMember(const char* name, Fun f)
+		{
+			return addMemberFunction(name,f);
+		}
+		//can not write  Ret class_type::* f on MSC++2013
+		template<typename Fun>
+		ClassMetatable& addMemberFunction(const char* name, Fun f)
 		{
 			if (has_key(name, true))
 			{
@@ -164,8 +194,15 @@ namespace kaguya
 			return *this;
 		}
 #else
+	//deprecated  rename to addMemberFunction
 		template<typename Ret>
 		ClassMetatable& addMember(const char* name, Ret class_type::* f)
+		{
+			return addMemberFunction(name,f);
+		}
+
+		template<typename Ret>
+		ClassMetatable& addMemberFunction(const char* name, Ret class_type::* f)
 		{
 			if (has_key(name, true))
 			{
@@ -176,6 +213,7 @@ namespace kaguya
 			return *this;
 		}
 #endif
+		//add member property
 		template<typename Ret>
 		ClassMetatable& addProperty(const char* name, Ret class_type::* mem)
 		{
@@ -183,8 +221,15 @@ namespace kaguya
 			return addFunction((std::string("_prop_") + name).c_str(), mem);
 		}
 
+
+		//deprecated rename to addStaticFunction
 		template<typename Fun>
 		ClassMetatable& addStaticMember(const char* name, Fun f)
+		{
+			return addStaticFunction(name,f);
+		}
+		template<typename Fun>
+		ClassMetatable& addStaticFunction(const char* name, Fun f)
 		{
 			if (has_key(name, true))
 			{
@@ -204,17 +249,30 @@ namespace kaguya
 
 
 		template<typename Data>
-		ClassMetatable& addStaticField(const char* name, Data f)
+		ClassMetatable& addStaticField(const char* name,const Data& f)
 		{
 			if (has_key(name))
 			{
 				//already registerd
 				return *this;
 			}
-			addField(name, f);
+			member_map_[name] = DataHolderType(new DataHolder<Data>(f));
 			return *this;
 		}
 
+#if KAGUYA_USE_CPP11
+		template<typename Data>
+		ClassMetatable& addStaticField(const char* name, Data&& f)
+		{
+			if (has_key(name))
+			{
+				//already registerd
+				return *this;
+			}
+			member_map_[name] = DataHolderType(new MoveDataHolder<Data>(std::move(f)));
+			return *this;
+		}
+#endif
 	private:
 
 		bool has_key(const std::string& key, bool exclude_function = false)
@@ -223,7 +281,7 @@ namespace kaguya
 			{
 				return true;
 			}
-			if (value_map_.find(key) != value_map_.end())
+			if (member_map_.find(key) != member_map_.end())
 			{
 				return true;
 			}
@@ -236,25 +294,18 @@ namespace kaguya
 				lua_setfield(state, -2, name);
 			}
 		}
-		void registerField(lua_State* state, const char* name, const ValueType& value)const
+		void registerField(lua_State* state, const char* name, const DataHolderType& value)const
 		{
-			if (value.type == ValueType::str_value)
+			int count = value->push_to_lua(state);
+			if (count > 1)
 			{
-				lua_type_traits<std::string>::push(state, value.strvalue);
+				lua_pop(state,count - 1);
+				count = 1;
 			}
-			else if (value.type == ValueType::int_value)
+			if (count == 1)
 			{
-				lua_type_traits<luaInt>::push(state, value.ivalue);
+				lua_setfield(state, -2, name);
 			}
-			else if (value.type == ValueType::double_value)
-			{
-				lua_type_traits<double>::push(state, value.dvalue);
-			}
-			else
-			{
-				assert(false);
-			}
-			lua_setfield(state, -2, name);
 		}
 		void registerCodeChunk(lua_State* state, const char* name, std::string value)const
 		{
@@ -289,7 +340,7 @@ namespace kaguya
 					registerFunction(state, it->first.c_str(), it->second);
 				}
 			}
-			for (typename ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
+			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
 			{
 				if (!is_metafield(it->first))
 				{
@@ -317,7 +368,7 @@ namespace kaguya
 					registerFunction(state, it->first.c_str(), it->second);
 				}
 			}
-			for (typename ValueMapType::const_iterator it = value_map_.begin(); it != value_map_.end(); ++it)
+			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
 			{
 				if (is_metafield(it->first))
 				{
@@ -332,30 +383,6 @@ namespace kaguya
 				}
 			}
 		}
-		ClassMetatable& addField(const char* name, const std::string& str)
-		{
-			return addField(name, str.c_str());
-		}
-		ClassMetatable& addField(const char* name, const char* str)
-		{
-			value_map_[name] = ValueType(str);
-			return *this;
-		}
-		ClassMetatable& addField(const char* name, double v)
-		{
-			value_map_[name] = ValueType(v);
-			return *this;
-		}
-		ClassMetatable& addField(const char* name, long long v)
-		{
-			value_map_[name] = ValueType(v);
-			return *this;
-		}
-		ClassMetatable& addField(const char* name, int v)
-		{
-			value_map_[name] = ValueType(v);
-			return *this;
-		}
 		template<typename Fun>
 		ClassMetatable& addFunction(const char* name, Fun f)
 		{
@@ -364,7 +391,7 @@ namespace kaguya
 		}
 
 		FuncMapType function_map_;
-		ValueMapType value_map_;
+		MemberMapType member_map_;
 		CodeChunkMapType code_chunk_map_;
 		bool has_property_;
 	};
