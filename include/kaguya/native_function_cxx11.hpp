@@ -86,10 +86,23 @@ namespace kaguya
 				typedef invoke_signature_type<Ret, Args...> type;
 			};
 
-
+#if _MSC_VER
 			template <typename T>
 			struct f_signature : public functor_f_signature<decltype(&T::operator())> {};
+#else
 
+			template <typename T, typename Enable=void>
+			struct f_signature {};
+
+			template < typename T, typename = void>
+			struct has_operator_fn :std::false_type {};
+			template < typename T >
+			struct has_operator_fn<T, typename std::enable_if<!std::is_same<void, decltype(&T::operator())>::value>::type> :std::true_type {};
+
+			template <typename T>
+			struct f_signature<T,typename std::enable_if<has_operator_fn<T>::value>::type>
+				: public functor_f_signature<decltype(&T::operator())> {};
+#endif
 
 
 			template <typename T, typename Ret, typename... Args>
