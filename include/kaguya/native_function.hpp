@@ -14,9 +14,10 @@
 #include "kaguya/lua_ref.hpp"
 
 #if KAGUYA_USE_CPP11
-#include "native_function_cxx11.hpp"
+#include "kaguya/native_function_cxx11.hpp"
 #else
-#include "native_function_cxx03.hpp"
+#include "kaguya/preprocess.hpp"
+#include "kaguya/native_function_cxx03.hpp"
 #endif
 namespace kaguya
 {
@@ -378,12 +379,16 @@ namespace kaguya
 	template<typename FTYPE, typename T>
 	inline FunctorType function(const T&  f)
 	{
+		
+
+		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename std::decay<T>::type>::value, "argument need callable");
 		return FunctorType(standard::function<FTYPE>(f));
 	}
 #if KAGUYA_USE_CPP11
 	template<typename T>
 	inline FunctorType function(T&& f)
 	{
+		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::remove_reference<typename std::decay<T>::type>::type>::value, "argument need callable");
 		return FunctorType(std::forward<T>(f));
 	}
 
@@ -403,8 +408,16 @@ namespace kaguya
 		template<typename F, typename... Functions>
 		void push_back_r(FunctorOverloadType& v, const F& f, const Functions&... fns)
 		{
+			KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename std::decay<F>::type>::value, "argument need callable");
 			v.reserve(sizeof...(fns));
 			v.push_back(f);
+			push_back_r(v, fns...);
+		}
+		template<typename F, typename... Functions>
+		void push_back_r(FunctorOverloadType& v, F&& f, const Functions&... fns)
+		{
+			v.reserve(sizeof...(fns));
+			v.push_back(std::forward<T>(f));
 			push_back_r(v, fns...);
 		}
 	}
@@ -418,7 +431,7 @@ namespace kaguya
 #else
 
 #define KAGUYA_DEF_TEMPLATE(N) KAGUYA_PP_CAT(typename F,N)
-#define KAGUYA_PUSH_DEF(N) v.push_back(KAGUYA_PP_CAT(f,N));
+#define KAGUYA_PUSH_DEF(N) v.push_back(KAGUYA_PP_CAT(f,N));	KAGUYA_STATIC_ASSERT(nativefunction::is_callable<KAGUYA_PP_CAT(F,N)>::value, "argument need callabled");
 #define KAGUYA_ARG_DEF(N) KAGUYA_PP_CAT(F,N) KAGUYA_PP_CAT(f,N)
 #define KAGUYA_FOVERLOAD_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_DEF_TEMPLATE)>\
 		FunctorOverloadType overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_ARG_DEF))\

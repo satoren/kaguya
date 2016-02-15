@@ -16,11 +16,16 @@ namespace kaguya
 	{
 		namespace cpp03impl
 		{
+			template< typename T>
+			struct is_callable : traits::integral_constant<bool, false> {};
+
 			inline int call(lua_State* state, void(*f)())
 			{
 				f();
 				return 0;
 			}
+			template<>struct is_callable< void(*)()> : traits::integral_constant<bool, true> {};
+
 			inline bool checkArgTypes(lua_State* state, void(*f)())
 			{
 				return true;
@@ -43,6 +48,7 @@ namespace kaguya
 				f();
 				return 0;
 			}
+			template<>struct is_callable<standard::function<void()> > : traits::integral_constant<bool, true> {};
 			inline bool checkArgTypes(lua_State* state, standard::function<void()> f)
 			{
 				return true;
@@ -71,24 +77,29 @@ namespace kaguya
 #define KAGUYA_GET_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_GET_REP)
 
 #define KAGUYA_FUNC_DEF(N) void (*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
+#define KAGUYA_FUNC_TYPE(N) void (*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
 				f(KAGUYA_GET_REPEAT(N));\
 				return 0;\
-			}
+			}\
+			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};
 
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 #undef KAGUYA_CALL_FN_DEF
 #undef KAGUYA_FUNC_DEF
+#undef KAGUYA_FUNC_TYPE
 #define KAGUYA_FUNC_DEF(N) Ret (*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
+#define KAGUYA_FUNC_TYPE(N) Ret (*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
 				return lua_type_traits<Ret>::push(state, f(KAGUYA_GET_REPEAT(N)));\
 			}\
+			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
@@ -118,7 +129,9 @@ namespace kaguya
 #undef KAGUYA_CALL_FN_DEF
 #define KAGUYA_MEM_ATTRBUTE 
 #undef KAGUYA_FUNC_DEF
+#undef KAGUYA_FUNC_TYPE				
 #define KAGUYA_FUNC_DEF(N) void (ThisType::*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
+#define KAGUYA_FUNC_TYPE(N) void (ThisType::*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<typename ThisType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
@@ -126,7 +139,9 @@ namespace kaguya
 				KAGUYA_MEM_ATTRBUTE ThisType* this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::get(state, 1); \
 				(this_->*f)(KAGUYA_GET_REPEAT(N));\
 				return 0;\
-			}
+			}\
+			template<typename ThisType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};
+
 				KAGUYA_CALL_FN_DEF(0)
 				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 
@@ -140,7 +155,9 @@ namespace kaguya
 #undef KAGUYA_CALL_FN_DEF
 #define KAGUYA_MEM_ATTRBUTE 
 #undef KAGUYA_FUNC_DEF
+#undef KAGUYA_FUNC_TYPE
 #define KAGUYA_FUNC_DEF(N) Ret (ThisType::*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
+#define KAGUYA_FUNC_TYPE(N) Ret (ThisType::*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state,KAGUYA_FUNC_DEF(N))\
@@ -148,24 +165,25 @@ namespace kaguya
 				KAGUYA_MEM_ATTRBUTE ThisType* this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::get(state, 1); \
 				return lua_type_traits<Ret>::push(state, (this_->*f)(KAGUYA_GET_REPEAT(N)));\
 			}\
-			template<typename ThisType,typename Ret  KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
+			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
 				return lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::checkType(state, 1) \
 					KAGUYA_PP_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
-			template<typename ThisType,typename Ret  KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
 				return lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::strictCheckType(state, 1) \
 					KAGUYA_PP_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
-			template<typename ThisType,typename Ret  KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
 			{\
 				return typeid(ThisType).name() + std::string(",") KAGUYA_PP_REPEAT(N,KAGUYA_TYPENAME_REP);\
 			}\
-			template<typename ThisType,typename Ret  KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			int argCount(KAGUYA_FUNC_DEF(N))\
 			{\
 				return N  KAGUYA_GET_OFFSET;\
@@ -182,24 +200,32 @@ namespace kaguya
 #undef KAGUYA_GET_OFFSET
 #define KAGUYA_GET_OFFSET
 #undef KAGUYA_CALL_FN_DEF
+#undef KAGUYA_FUNC_DEF
+#undef KAGUYA_FUNC_TYPE
+#define KAGUYA_FUNC_DEF(N) const standard::function<void (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>& f
+#define KAGUYA_FUNC_TYPE(N) standard::function<void (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
-			inline int call(lua_State* state,const standard::function<void (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>& f)\
+			inline int call(lua_State* state,KAGUYA_FUNC_DEF(N))\
 			{\
 				f(KAGUYA_GET_REPEAT(N));\
 				return 0;\
-			}
+			}\
+			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N) > : traits::integral_constant<bool, true> {};
 
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 #undef KAGUYA_CALL_FN_DEF
 #undef KAGUYA_FUNC_DEF
+#undef KAGUYA_FUNC_TYPE
 #define KAGUYA_FUNC_DEF(N) const standard::function<Ret (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>& f
+#define KAGUYA_FUNC_TYPE(N) standard::function<Ret (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
 				return lua_type_traits<Ret>::push(state,f(KAGUYA_GET_REPEAT(N)));\
 			}\
+			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
@@ -243,6 +269,8 @@ namespace kaguya
 					return 0;
 				}
 			}
+			template<class MemType, class T>struct is_callable<MemType T::*> : traits::integral_constant<bool, true> {}; 
+
 			template<class MemType, class T>
 			bool checkArgTypes(lua_State* state, MemType T::* m)
 			{
@@ -287,7 +315,9 @@ namespace kaguya
 
 #undef KAGUYA_CALL_FN_DEF
 #undef KAGUYA_FUNC_DEF
+#undef KAGUYA_FUNC_TYPE
 #define KAGUYA_FUNC_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
+#define KAGUYA_FUNC_TYPE(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
@@ -298,6 +328,7 @@ namespace kaguya
 				class_userdata::setmetatable<ClassType>(state);\
 				return 1;\
 			}\
+			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {}; \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
@@ -330,5 +361,6 @@ namespace kaguya
 		using cpp03impl::argTypesName;
 		using cpp03impl::argCount;
 		using cpp03impl::constructor_signature_type;
+		using cpp03impl::is_callable;
 	}
 }
