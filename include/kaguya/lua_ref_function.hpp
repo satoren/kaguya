@@ -440,8 +440,11 @@ namespace kaguya
 	{
 		for (FunctionResults::const_iterator it = res.begin(); it != res.end(); ++it)
 		{
-			util::stackValueDump(os, res.state(), it.index(), 1);
-			os << ",";
+			if (it != res.begin())
+			{
+				os << ",";
+			}
+			util::stackValueDump(os, res.state(), it.index());
 		}
 
 		return os;

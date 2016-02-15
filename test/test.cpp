@@ -1339,7 +1339,9 @@ namespace t_04_lua_ref
 		std::stringstream ss;
 		std::string text;
 		ss << table;
-		TEST_EQUAL(ss.str(), "{1=231,2=21,3=2}");
+		text = ss.str();
+		TEST_EQUAL(text, "{1=231,2=21,3=2}");
+
 		ss.str("");
 		ss << table[1];
 		text = ss.str();
@@ -1373,6 +1375,16 @@ namespace t_04_lua_ref
 		text = ss.str();
 		TEST_EQUAL(text, "function");
 
+
+		ss.str("");
+		ss << state.loadstring("return {1,2,3,4,5}")();
+		text = ss.str();
+		TEST_EQUAL(text, "{1=1,2=2,3=3,4=4,5=5}");
+
+		ss.str("");
+		ss << state.loadstring("return {table={1,2,3,4,5}}")();
+		text = ss.str();
+		TEST_EQUAL(text, "{'table'={...}}");
 
 		ss.str("");
 		ss << state.newRef(&ss);

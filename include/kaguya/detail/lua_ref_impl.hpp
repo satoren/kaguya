@@ -567,11 +567,10 @@ namespace kaguya
 		}
 		inline std::ostream& operator<<(std::ostream& os, const RegistoryRef& ref)
 		{
-			static const int DEFAULT_MAX_RECURSIVE = 2;
 			lua_State* state = ref.state();
 			util::ScopedSavedStack save(state);
 			int stackIndex = ref.pushStackIndex(state);
-			util::stackValueDump(os, state, stackIndex, DEFAULT_MAX_RECURSIVE);
+			util::stackValueDump(os, state, stackIndex);
 			return os;
 		}
 	}
