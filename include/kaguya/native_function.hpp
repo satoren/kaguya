@@ -415,7 +415,7 @@ namespace kaguya
 		void push_back_r(FunctorOverloadType& v, F&& f, const Functions&... fns)
 		{
 			v.reserve(sizeof...(fns));
-			v.push_back(std::forward<T>(f));
+			v.push_back(std::forward<F>(f));
 			push_back_r(v, fns...);
 		}
 	}
