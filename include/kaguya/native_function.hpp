@@ -48,36 +48,16 @@ namespace kaguya
 			return result;
 		}
 
-		struct reference
+		struct reference :Ref::StackRef, public LuaVariantImpl<reference>
 		{
-			reference(lua_State* s, int index) :state(s), stack_index(index)
+			reference(lua_State* s, int index) :Ref::StackRef(s, index, false)
 			{
 			}
 
-			template<typename T>
-			operator T()const
+			const reference* operator->()const
 			{
-				return lua_type_traits<T>::get(state, stack_index);
+				return this;
 			}
-			operator int()const
-			{
-				return get<int>();
-			}
-			template<typename T>T get()const
-			{
-				return lua_type_traits<T>::get(state, stack_index);
-			}
-			int type() const
-			{
-				return lua_type(state, stack_index);
-			}
-			std::string typeName()const
-			{
-				return lua_typename(state, type());
-			}
-
-			lua_State* state;
-			int stack_index;
 		};
 		struct iterator
 		{
@@ -87,6 +67,10 @@ namespace kaguya
 			reference operator*()const
 			{
 				return reference(state_,stack_index_);
+			}
+			reference operator->()const
+			{
+				return reference(state_, stack_index_);
 			}
 			const iterator& operator++()
 			{
@@ -326,6 +310,9 @@ namespace kaguya
 			{
 				try {
 					return (*fun)->invoke(l);
+				}
+				catch (LuaTypeMismatch &) {
+					util::traceBack(l,(std::string("maybe...") + build_arg_error_message(l)).c_str());
 				}
 				catch (std::exception & e) {
 					util::traceBack(l, e.what());
