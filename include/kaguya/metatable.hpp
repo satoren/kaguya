@@ -186,8 +186,6 @@ namespace kaguya
 		template<typename Fun>
 		ClassMetatable& addStaticMember(const char* name, Fun f)
 		{
-			KAGUYA_STATIC_ASSERT(nativefunction::is_callable<Fun>::value,"argument need callable");
-
 			if (has_key(name, true))
 			{
 				//already registerd

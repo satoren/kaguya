@@ -255,13 +255,13 @@ namespace kaguya
 			template<typename F>
 			static base_ptr_ create(F fun)
 			{
+				KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename standard::decay<F>::type>::value, "argument need callable");
+
 				typedef FunInvoker<F> InvokerType;
 				return base_ptr_(new InvokerType(fun));
 			}
 		};
 
-		template<>
-		struct is_callable<FunctorType> : traits::integral_constant<bool, true> {};
 
 		inline FunctorType* pick_match_function(lua_State *l)
 		{
@@ -376,7 +376,6 @@ namespace kaguya
 	template<typename T>
 	inline FunctorType function(const T& f)
 	{
-		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename standard::decay<T>::type>::value, "argument need callable");
 		return FunctorType(f);
 	}
 
@@ -389,7 +388,6 @@ namespace kaguya
 	template<typename T>
 	inline FunctorType function(T&& f)
 	{
-		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::remove_reference<typename standard::decay<T>::type>::type>::value, "argument need callable");
 		return FunctorType(std::forward<T>(f));
 	}
 
@@ -409,7 +407,6 @@ namespace kaguya
 		template<typename F, typename... Functions>
 		void push_back_r(FunctorOverloadType& v, const F& f, const Functions&... fns)
 		{
-			KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename standard::decay<F>::type>::value, "argument need callable");
 			v.reserve(sizeof...(fns));
 			v.push_back(f);
 			push_back_r(v, fns...);
