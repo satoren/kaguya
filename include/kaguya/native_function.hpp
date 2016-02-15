@@ -130,9 +130,18 @@ namespace kaguya
 			return lua_type_traits<T>::get(state_, startIndex_ + static_cast<int>(index));
 		}
 
-		LuaRef operator[](size_t index)const
+		reference at(size_t index)const
 		{
-			return at<LuaRef>(index);
+			if (index >= size())
+			{
+				throw std::out_of_range("variadic arguments out of range");
+			}
+			return reference(state_, startIndex_ + static_cast<int>(index));
+		}
+
+		reference operator[](size_t index)const
+		{
+			return reference(state_, startIndex_ + static_cast<int>(index));
 		}
 		size_t size()const
 		{

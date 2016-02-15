@@ -73,7 +73,7 @@ namespace kaguya
 					lua_settop(state_, stack_index_ - 1);
 				}
 			}
-			template<typename T>T get()const
+			template<typename T>typename lua_type_traits<T>::get_type get()const
 			{
 				return lua_type_traits<T>::get(state_, stack_index_);
 			}

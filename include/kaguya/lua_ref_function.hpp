@@ -282,6 +282,14 @@ namespace kaguya
 			}
 			return lua_type_traits<T>::get(state_, startIndex_ + static_cast<int>(index));
 		}
+		reference result_at(size_t index)const
+		{
+			if (index >= result_size())
+			{
+				throw std::out_of_range("function result out of range");
+			}
+			return reference(state_, startIndex_ + static_cast<int>(index));
+		}
 
 		size_t result_size()const
 		{
@@ -452,7 +460,7 @@ namespace kaguya
 		}
 	};
 	template <unsigned int I>
-	LuaRef get(const FunctionResults& res) { return (res.result_size() > I) ? res.result_at<LuaRef>(I) : LuaRef(); }
+	FunctionResults::reference get(const FunctionResults& res) { return res.result_at(I); }
 
 	template<>	struct lua_type_traits<LuaFunction> {
 		typedef LuaFunction get_type;
