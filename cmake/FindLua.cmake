@@ -1,4 +1,12 @@
 
+if(LUA_SEARCH_LIB_NAME)
+  find_package(PkgConfig)
+  foreach(modulename ${LUA_SEARCH_LIB_NAME})
+    pkg_search_module(LUA ${modulename})
+  endforeach(modulename)
+endif(LUA_SEARCH_LIB_NAME)
+
+
 if(NOT LUA_INCLUDE_DIRS)
   #search local directory
   set(LOCAL_LUA_DIRECTORY lua-5.3.2)
