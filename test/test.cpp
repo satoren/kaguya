@@ -838,8 +838,10 @@ namespace t_03_function
 	{
 		TEST_EQUAL(pointer, 0);
 	}
+	std::string last_error_message;
 	void ignore_error_fun(int status, const char* message)
 	{
+		last_error_message = message? message:"";
 	}
 	void zero_to_nullpointer(kaguya::State& state)
 	{
@@ -924,13 +926,42 @@ namespace t_03_function
 		return 3;
 	}
 
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+	int overload4(const std::vector<int>& a)
+	{
+		return 4;
+	}
+#endif
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE	
+	int overload5(const std::map<std::string,std::string>& a)
+	{
+		return 5;
+	}
+#endif
+
+
 	void overload(kaguya::State& state)
 	{
-		state["overloaded_function"] = kaguya::overload(overload1, overload2, overload3);
+		state["overloaded_function"] = kaguya::overload(overload1, overload2, overload3
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+			, overload4
+#endif
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+			, overload5
+#endif
+			);
 		kaguya::LuaFunction f = state["overloaded_function"];
 		TEST_EQUAL(f(), 1);
 		TEST_EQUAL(f(""), 2);
 		TEST_EQUAL(f(121), 3);
+
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+		TEST_CHECK(state("assert(overloaded_function({3,4,2,4,5}) == 4)"));
+#endif
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+		TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}) == 5)"));
+#endif
+
 	}
 
 
@@ -973,10 +1004,10 @@ namespace t_04_lua_ref
 		state("abc={d =1,e=3,f=64,g='sss'}");
 		kaguya::LuaRef abctable = state["abc"];
 
-		TEST_CHECK(abctable["d"] == 1);
-		TEST_CHECK(abctable["e"] == 3);
-		TEST_CHECK(abctable["f"] == 64);
-		TEST_CHECK(abctable["g"] == std::string("sss"));
+		TEST_EQUAL(abctable["d"] , 1);
+		TEST_EQUAL(abctable["e"] , 3);
+		TEST_EQUAL(abctable["f"] , 64);
+		TEST_EQUAL(abctable["g"] , std::string("sss"));
 
 		typedef std::map<kaguya::LuaRef, kaguya::LuaRef> maptype;
 		const maptype& map = abctable.map();
@@ -984,11 +1015,11 @@ namespace t_04_lua_ref
 
 		std::map<std::string, std::string> strmap = abctable.map<std::string, std::string>();
 
-		TEST_CHECK(strmap["d"] == "1");
-		TEST_CHECK(strmap["e"] == "3");
-		TEST_CHECK(strmap["f"] == "64");
-		TEST_CHECK(strmap["g"] == "sss");
-		TEST_CHECK(strmap.size() == 4);
+		TEST_EQUAL(strmap["d"] , "1");
+		TEST_EQUAL(strmap["e"] , "3");
+		TEST_EQUAL(strmap["f"] , "64");
+		TEST_EQUAL(strmap["g"] , "sss");
+		TEST_EQUAL(strmap.size() , 4);
 
 		abctable.setField("a", "test");
 		TEST_CHECK(abctable["a"] == std::string("test"));
@@ -1249,7 +1280,6 @@ namespace t_04_lua_ref
 		state["value"]["abc"]["bbb"] = "test";
 		TEST_CHECK(state("assert(value.abc.bbb == 'test')"));
 		state["value"]["abc"]["ddd"] = state["value"]["abc"]["ccc"] = state["value"]["abc"]["bbb"];
-		TEST_CHECK(state("print(value.abc.ccc)"));
 		TEST_CHECK(state("assert(value.abc.ccc == 'test')"));
 		TEST_CHECK(state("assert(value.abc.ddd == 'test')"));
 
@@ -1282,6 +1312,11 @@ namespace t_04_lua_ref
 		std::string text;
 		ss << table;
 		TEST_EQUAL(ss.str(), "{1=231,2=21,3=2}");
+		ss.str("");
+		ss << table[1];
+		text = ss.str();
+		TEST_EQUAL(text, "231");
+
 		ss.str("");
 		ss << state.newRef(323);
 		text = ss.str();
