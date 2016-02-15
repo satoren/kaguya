@@ -47,6 +47,15 @@ namespace kaguya
 				return lua_type_traits<std::string>::push(state, data);
 			}		
 		};
+		template<int N>
+		struct DataHolder<const char[N]> :DataHolderBase {
+			std::string data;
+			DataHolder(const std::string& d) :data(d) {}
+			virtual int push_to_lua(lua_State* state)const
+			{
+				return lua_type_traits<std::string>::push(state, data);
+			}
+		};
 #if KAGUYA_USE_CPP11
 		template<typename T>
 		struct MoveDataHolder :DataHolderBase
@@ -56,6 +65,24 @@ namespace kaguya
 			virtual int push_to_lua(lua_State* state)const
 			{
 				return lua_type_traits<T>::push(state, std::move(data));
+			}
+		};
+		template<int N>
+		struct MoveDataHolder<char[N]> :DataHolderBase {
+			std::string data;
+			MoveDataHolder(const std::string& d) :data(d) {}
+			virtual int push_to_lua(lua_State* state)const
+			{
+				return lua_type_traits<std::string>::push(state, data);
+			}
+		};
+		template<int N>
+		struct MoveDataHolder<const char[N]> :DataHolderBase {
+			std::string data;
+			MoveDataHolder(const std::string& d) :data(d) {}
+			virtual int push_to_lua(lua_State* state)const
+			{
+				return lua_type_traits<std::string>::push(state, data);
 			}
 		};
 #endif
