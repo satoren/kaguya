@@ -830,6 +830,34 @@ namespace t_03_function
 		}
 	}
 
+	void corresult_to_main(kaguya::VariadicArgType args)
+	{
+		TEST_EQUAL(args.size(), 9);
+		TEST_EQUAL(args[0], 1);
+		TEST_EQUAL(args[1], 2);
+		TEST_EQUAL(args[2], 3);
+		TEST_EQUAL(args[3], 4);
+		TEST_EQUAL(args[4], 5);
+		TEST_EQUAL(args[5], 6);
+		TEST_EQUAL(args[6], 7);
+		TEST_EQUAL(args[7], 8);
+		TEST_EQUAL(args[8], 9);
+	}
+
+	void coroutine_stack(kaguya::State& state)
+	{
+		state["corresult_to_main"] = &corresult_to_main;
+		state["cor2"] = kaguya::NewThread();
+		kaguya::LuaRef cor2 = state["cor2"];
+		TEST_CHECK(state("corfun = function(arg)"
+			"for i = 1,arg do "
+			"coroutine.yield(1,2,3,4,5,6,7,8,9) "
+			"end "
+			"end"));
+		state["corresult_to_main"](cor2(state["corfun"], 10));
+	}
+	
+
 	void pointerfun(VariFoo* pointer)
 	{
 		TEST_EQUAL(pointer, 0);
@@ -1842,6 +1870,7 @@ int main()
 		ADD_TEST(t_03_function::vector_and_map_from_table_mapping);
 		ADD_TEST(t_03_function::vector_and_map_to_table_mapping);
 		ADD_TEST(t_03_function::coroutine);
+		ADD_TEST(t_03_function::coroutine_stack);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
 		ADD_TEST(t_03_function::arg_class_ref);
 
