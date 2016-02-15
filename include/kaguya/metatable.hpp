@@ -201,25 +201,6 @@ namespace kaguya
 		}
 
 #if defined(_MSC_VER) && _MSC_VER <= 1800
-	//deprecated  rename to addMemberFunction
-		//can not write  Ret class_type::* f on MSC++2013
-		template<typename Fun>
-		ClassMetatable& addMember(const char* name, Fun f)
-		{
-			return addMemberFunction(name,f);
-		}
-		//can not write  Ret class_type::* f on MSC++2013
-		template<typename Fun>
-		ClassMetatable& addMemberFunction(const char* name, Fun f)
-		{
-			if (has_key(name, true))
-			{
-				//already registerd
-				return *this;
-			}
-			addFunction(name, f);
-			return *this;
-		}
 #else
 	//deprecated  rename to addMemberFunction
 		template<typename Ret>
@@ -240,6 +221,35 @@ namespace kaguya
 			return *this;
 		}
 #endif
+		//deprecated  rename to addMemberFunction
+		template<typename Fun>
+		ClassMetatable& addMember(const char* name, Fun f)
+		{
+			return addMemberFunction(name, f);
+		}
+		template<typename Fun>
+		ClassMetatable& addMemberFunction(const char* name, Fun f)
+		{
+#if KAGUYA_USE_CPP11
+			typedef typename nativefunction::argument_type_get<0, Fun>::type first_arguments_type;
+
+			typedef typename traits::remove_cv<first_arguments_type>::type noncv_type;
+			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
+			typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
+
+			KAGUYA_STATIC_ASSERT(traits::is_convertible<class_type*, noncvpointerref_type*>::value
+				, "need first arguments type is class type");
+#endif
+
+			if (has_key(name, true))
+			{
+				//already registerd
+				return *this;
+			}
+			addFunction(name, f);
+			return *this;
+		}
+
 		//add member property
 		template<typename Ret>
 		ClassMetatable& addProperty(const char* name, Ret class_type::* mem)

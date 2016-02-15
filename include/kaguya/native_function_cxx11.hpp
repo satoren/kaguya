@@ -91,7 +91,7 @@ namespace kaguya
 			struct f_signature : public functor_f_signature<decltype(&T::operator())> {};
 #else
 
-			template <typename T, typename Enable=void>
+			template <typename T, typename Enable = void>
 			struct f_signature {};
 
 			template < typename T, typename = void>
@@ -100,7 +100,7 @@ namespace kaguya
 			struct has_operator_fn<T, typename std::enable_if<!std::is_same<void, decltype(&T::operator())>::value>::type> :std::true_type {};
 
 			template <typename T>
-			struct f_signature<T,typename std::enable_if<has_operator_fn<T>::value>::type>
+			struct f_signature<T, typename std::enable_if<has_operator_fn<T>::value>::type>
 				: public functor_f_signature<decltype(&T::operator())> {};
 #endif
 
@@ -294,6 +294,40 @@ namespace kaguya
 			struct is_callable<T, typename traits::enable_if<
 				!traits::is_same<void, typename f_signature<T>::type>::value
 				, void>::type > : traits::integral_constant<bool, true> {};
+
+			template<class arg1, class... args>
+			struct type_tuple {
+				typedef arg1 first_type;
+			};
+
+			template<std::size_t remain,class result, bool flag = remain <= 0>
+			struct type_get
+			{
+				typedef typename result::first_type type;
+			};
+
+			template<std::size_t remain, class arg, class... args >
+			struct type_get<remain,type_tuple<arg, args...> ,false>
+				: type_get<remain-1, type_tuple<args...> >
+			{
+			};
+			
+
+			template< typename F>
+			struct fsig_arg_to_type_tuple;
+
+			template<class Ret, class... Args>
+			struct fsig_arg_to_type_tuple<invoke_signature_type<Ret,Args...>>
+			{
+				typedef type_tuple<Args...> type;
+			};
+
+			template<int N, typename F>
+			struct argument_type_get
+			{
+				typedef typename type_get<N, typename fsig_arg_to_type_tuple<typename f_signature<F>::type>::type>::type type;
+
+			};
 		};
 		using cpp11impl::call;
 		using cpp11impl::checkArgTypes;
@@ -302,5 +336,7 @@ namespace kaguya
 		using cpp11impl::argCount;
 		using cpp11impl::constructor_signature_type;
 		using cpp11impl::is_callable;
+
+		using cpp11impl::argument_type_get;
 	}
 }

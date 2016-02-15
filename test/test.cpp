@@ -431,7 +431,7 @@ namespace t_02_classreg
 
 		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
 			.addMember("b", &Derived::b)
-			.addStaticMember("test", derived_function)
+			.addMember("test", derived_function)
 			);
 
 		Derived derived;
