@@ -41,16 +41,10 @@ namespace kaguya
 				(this_->*f)(std::forward<Args>(args)...);
 			}
 			template<class F, class... Args>
-			typename traits::enable_if<!traits::is_same<typename standard::result_of<F(Args...)>::type, void>::value, typename standard::result_of<F(Args...)>::type>::type
+			typename standard::result_of<F(Args...)>::type
 				invoke(const F& f, Args&&... args)
 			{
 				return f(std::forward<Args>(args)...);
-			}
-			template<class F, class... Args>
-			typename traits::enable_if<traits::is_same<typename standard::result_of<F(Args...)>::type, void>::value, void>::type
-				invoke(const F& f, Args&&... args)
-			{
-				f(std::forward<Args>(args)...);
 			}
 
 			template<std::size_t... indexes>
