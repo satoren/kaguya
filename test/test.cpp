@@ -717,12 +717,13 @@ namespace t_03_function
 		TEST_EQUAL(d, 8);
 		TEST_EQUAL(e, 16);
 
+		using kaguya::standard::get;
 		kaguya::standard::tuple<int, int, int, int, int> tuple_res = state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >();
-		TEST_EQUAL(std::get<0>(tuple_res), 1);
-		TEST_EQUAL(std::get<1>(tuple_res), 2);
-		TEST_EQUAL(std::get<2>(tuple_res), 4);
-		TEST_EQUAL(std::get<3>(tuple_res), 8);
-		TEST_EQUAL(std::get<4>(tuple_res), 16);
+		TEST_EQUAL(get<0>(tuple_res), 1);
+		TEST_EQUAL(get<1>(tuple_res), 2);
+		TEST_EQUAL(get<2>(tuple_res), 4);
+		TEST_EQUAL(get<3>(tuple_res), 8);
+		TEST_EQUAL(get<4>(tuple_res), 16);
 
 		state["multireturn_pass_through_to_arg"] = kaguya::function(multireturn_pass_through_to_arg);
 		state["multireturn_pass_through_to_arg"](state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >());
