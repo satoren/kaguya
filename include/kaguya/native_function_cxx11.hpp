@@ -172,7 +172,7 @@ namespace kaguya
 				typedef MemType T::*type;
 			};
 			template<class MemType, class T>
-			struct arg_count<MemType T::*> : traits::integral_constant<size_t, 1>
+			struct arg_count<MemType T::*> : traits::integral_constant<size_t, 2>
 			{};
 			template <typename T, typename MemType>
 			struct arg_index_range<MemType T::*> : index_range<1, 2> {};

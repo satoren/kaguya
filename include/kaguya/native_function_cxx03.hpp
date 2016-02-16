@@ -299,7 +299,7 @@ namespace kaguya
 			template<class MemType, class T>
 			int argCount(MemType T::*)
 			{
-				return 1;
+				return 2;
 			}
 			//@}
 

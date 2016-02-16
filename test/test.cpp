@@ -1035,27 +1035,6 @@ namespace t_03_function
 		state["result"] = state["result_to_table"]();
 		TEST_EQUAL(state["result"], 1);
 	}
-
-
-
-	enum TestEnum
-	{
-		Fooe = 0,
-		Bare = 1,
-		DoDoe = 32,
-	};
-	TestEnum enumdispatchtest(TestEnum arg)
-	{
-		assert(arg == Bare);
-		return DoDoe;
-	}
-	bool enumdispatch(kaguya::State& state)
-	{
-		state["enumfun"] = kaguya::function(&enumdispatchtest);
-		TestEnum result = state["enumfun"](Bare);
-
-		return result == DoDoe;
-	}
 }
 
 namespace t_04_lua_ref
