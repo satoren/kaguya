@@ -295,22 +295,29 @@ namespace kaguya
 				!traits::is_same<void, typename f_signature<T>::type>::value
 				, void>::type > : traits::integral_constant<bool, true> {};
 
-			template<class arg1, class... args>
+
+			template< class... args>
 			struct type_tuple {
+				typedef void first_type;
+			};
+			template<class arg1, class... args>
+			struct type_tuple<arg1,  args...> {
 				typedef arg1 first_type;
 			};
 
-			template<std::size_t remain,class result, bool flag = remain <= 0>
+
+			template<int remain,class result, bool flag = remain <= 0>
 			struct type_get
 			{
 				typedef typename result::first_type type;
 			};
 
-			template<std::size_t remain, class arg, class... args >
-			struct type_get<remain,type_tuple<arg, args...> ,false>
-				: type_get<remain-1, type_tuple<args...> >
+			template<int remain, class arg >
+			struct type_get<remain, type_tuple<arg>, false>
+				: type_get<remain - 1, type_tuple<void> >
 			{
 			};
+
 			
 
 			template< typename F>

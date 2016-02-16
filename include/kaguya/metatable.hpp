@@ -200,8 +200,6 @@ namespace kaguya
 			return *this;
 		}
 
-#if defined(_MSC_VER) && _MSC_VER <= 1800
-#else
 	//deprecated  rename to addMemberFunction
 		template<typename Ret>
 		ClassMetatable& addMember(const char* name, Ret class_type::* f)
@@ -220,7 +218,6 @@ namespace kaguya
 			addFunction(name, f);
 			return *this;
 		}
-#endif
 		//deprecated  rename to addMemberFunction
 		template<typename Fun>
 		ClassMetatable& addMember(const char* name, Fun f)
@@ -236,7 +233,6 @@ namespace kaguya
 			typedef typename traits::remove_cv<first_arguments_type>::type noncv_type;
 			typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
 			typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
-
 			KAGUYA_STATIC_ASSERT(traits::is_convertible<class_type*, noncvpointerref_type*>::value
 				, "need first arguments type is class type");
 #endif
