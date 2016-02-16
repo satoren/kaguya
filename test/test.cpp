@@ -288,6 +288,28 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(value:stringmember() == 'test')"));
 	}
 
+
+	void overload_member_function(kaguya::State& state)
+	{
+		state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
+			.addConstructor<int>()
+			.addMember("setmember", &ABC::intmember)
+			.addMember("setmember", &ABC::stringmember)
+			.addMember("intgdata", &ABC::intmember)
+			.addMember("stringdata", &ABC::stringmember)
+			);
+
+		TEST_CHECK(state("value = assert(ABC.new(64))"));
+		TEST_CHECK(state("assert(value:intgdata() == 64)"));
+
+		TEST_CHECK(state("value:setmember(4)"));
+		TEST_CHECK(state("assert(value:intgdata() == 4)"));
+
+		TEST_CHECK(state("value:setmember('test')"));
+		TEST_CHECK(state("assert(value:stringdata() == 'test')"));
+	}
+
+
 	void operator_bind(kaguya::State& state)
 	{
 		state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -695,6 +717,12 @@ namespace t_03_function
 		TEST_EQUAL(d, 8);
 		TEST_EQUAL(e, 16);
 
+		kaguya::standard::tuple<int, int, int, int, int> tuple_res = state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >();
+		TEST_EQUAL(std::get<0>(tuple_res), 1);
+		TEST_EQUAL(std::get<1>(tuple_res), 2);
+		TEST_EQUAL(std::get<2>(tuple_res), 4);
+		TEST_EQUAL(std::get<3>(tuple_res), 8);
+		TEST_EQUAL(std::get<4>(tuple_res), 16);
 
 		state["multireturn_pass_through_to_arg"] = kaguya::function(multireturn_pass_through_to_arg);
 		state["multireturn_pass_through_to_arg"](state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >());
@@ -966,6 +994,10 @@ namespace t_03_function
 		return 5;
 	}
 #endif
+	int overload6(void*)
+	{
+		return 6;
+	}
 
 
 	void overload(kaguya::State& state)
@@ -977,6 +1009,7 @@ namespace t_03_function
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 			, overload5
 #endif
+			, overload6
 			);
 		kaguya::LuaFunction f = state["overloaded_function"];
 		TEST_EQUAL(f(), 1);
@@ -989,6 +1022,8 @@ namespace t_03_function
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}) == 5)"));
 #endif
+		TEST_CHECK(state("assert(overloaded_function(nil) == 6)"));
+		TEST_EQUAL(f((void*)0), 6);
 
 	}
 
@@ -1080,6 +1115,11 @@ namespace t_04_lua_ref
 
 	void callfunction(kaguya::State& state)
 	{
+
+		int ret = state["math"]["abs"](-32);
+		TEST_CHECK(ret == 32);
+
+
 		kaguya::LuaTable globalTable = state.globalTable();
 		globalTable["tbl"] = kaguya::NewTable();
 		kaguya::LuaRef tbl = globalTable["tbl"];
@@ -1385,6 +1425,11 @@ namespace t_04_lua_ref
 		ss << state.loadstring("return {table={1,2,3,4,5}}")();
 		text = ss.str();
 		TEST_EQUAL(text, "{'table'={...}}");
+
+		ss.str("");
+		ss << state.loadstring("return 2,3")();
+		text = ss.str();
+		TEST_EQUAL(text, "2,3");
 
 		ss.str("");
 		ss << state.newRef(&ss);
@@ -1730,6 +1775,7 @@ namespace t_08_cxx11_feature
 		state("assert(overload(2) == 1)");//int version
 		state("assert(overload('2') == 2)");//string version
 		state("assert(overload() == 3)");//no argument version
+
 	}
 
 	void put_unique_ptr(kaguya::State& state)
@@ -1865,6 +1911,7 @@ int main()
 		ADD_TEST(t_02_classreg::overloaded_constructor);
 		ADD_TEST(t_02_classreg::copy_constructor);
 		ADD_TEST(t_02_classreg::data_member_bind);
+		ADD_TEST(t_02_classreg::overload_member_function);		
 		ADD_TEST(t_02_classreg::operator_bind);
 		ADD_TEST(t_02_classreg::add_field);
 		ADD_TEST(t_02_classreg::copyable_class_test);

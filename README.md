@@ -94,6 +94,30 @@ You can use for holding a Lua-value in native code.
   state("assert(tbl.value == 1)");
 ```
 
+##"call lua function
+```c++
+int ret = state["math"]["abs"](-32);//call math.abs of Lua function
+assert(ret == 32);
+//or
+auto ret = state["math"]["abs"].call<int>(-32);//call math.abs of Lua function
+assert(ret == 32);
+```
+
+### Multiple Results from Lua
+```c++
+		state("multresfun =function() return 1,2,4 end");//registering multiple results function
+    int a, b, c;
+		kaguya::tie(a, b, c) = state["multresfun"]();
+    assert(a == 1 && b == 2 && c == 4 );
+    //or
+		std::tuple<int,int,int> result_tuple = state["multresfun"].call<std::tuple<int,int,int>>();
+    TEST_EQUAL(std::get<0>(result_tuple), 1);
+		TEST_EQUAL(std::get<1>(result_tuple), 2);
+		TEST_EQUAL(std::get<2>(result_tuple), 4);
+    //or
+
+```
+
 ### Registering Classes
 ```c++
 struct ABC
@@ -210,6 +234,13 @@ state("overload('2')");//string version
 state["va_fun"] = kaguya::function([](kaguya::VariadicArgType arg) {for (auto v : arg) { std::cout << v.get<std::string>() << ","; }std::cout << std::endl; });//C++11 lambda
 state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
 
+```
+
+#### Multiple Results to Lua
+If return type of function is tuple, it returns the multiple results to Lua
+```c++
+state["multireturn"] = kaguya::function([]() { return std::tuple<int, int>(32, 34); });
+state("print(multireturn())");//32    34
 ```
 
 #### Coroutine
