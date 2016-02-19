@@ -121,11 +121,21 @@ namespace kaguya
 			util::ScopedSavedStack save(state);
 			if (class_userdata::newmetatable<class_type>(state))
 			{
-				LuaRef metatable(state, StackTop());
-
+				LuaTable metatable(state, StackTop());
+				metatable.push();
+				registerMember(state);
 
 				if (has_property_)
 				{
+					LuaRef indexfun = kaguya::LuaFunction::loadstring(state, "local arg = {...};local indextable = arg[1];"
+						"return function(table, index)"
+						" local propfun = indextable['_prop_'..index];"
+						" if propfun then return propfun(table) end "
+						" return indextable[index]"
+						" end")(metatable);
+
+					metatable.setField("__index", indexfun);
+
 					LuaRef newindexfn = LuaFunction::loadstring(state, "return function(table, index, value) "
 						"if type(table) == 'table' then rawset(table,index,value)"
 						" else "
@@ -133,25 +143,12 @@ namespace kaguya
 						" end"
 						" end")();
 					metatable.setField("__newindex", newindexfn);
-
-					LuaRef indextable = createIndexTable(state);
-
-					LuaRef indexfun = kaguya::LuaFunction::loadstring(state, "local arg = {...};local indextable = arg[1];"
-						"return function(table, index)"
-						" local propfun = indextable['_prop_'..index];"
-						" if propfun then return propfun(table) end "
-						" return indextable[index]"
-						" end")(indextable);
-
-					metatable.setField("__index", indexfun);
 				}
 				else
 				{
-					metatable.setField("__index", createIndexTable(state));
+					metatable.setField("__index", metatable);
 				}
 
-				metatable.push();
-				registerMetamethods(state);
 				if (!traits::is_void<base_class_type>::value)
 				{
 					class_userdata::setmetatable<base_class_type>(state);
@@ -343,72 +340,25 @@ namespace kaguya
 			if (!except::checkErrorAndThrow(status, state)) { return; }
 			lua_setfield(state, -2, name);
 		}
-		LuaRef createIndexTable(lua_State* state)const
-		{
-			util::ScopedSavedStack save(state);
-			LuaRef indexTable(state, NewTable());
-			indexTable.push();
-			registerMember(state);
-
-			if (!traits::is_void<base_class_type>::value)
-			{
-				class_userdata::setmetatable<base_class_type>(state);
-			}
-
-			return indexTable;
-		}
 
 		void registerMember(lua_State* state)const
 		{
 			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
 			{
-				if (!is_metafield(it->first))
-				{
-					registerFunction(state, it->first.c_str(), it->second);
-				}
+				registerFunction(state, it->first.c_str(), it->second);
 			}
 			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
 			{
-				if (!is_metafield(it->first))
-				{
-					registerField(state, it->first.c_str(), it->second);
-				}
+				registerField(state, it->first.c_str(), it->second);
 			}
 			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
 			{
-				if (!is_metafield(it->first))
-				{
-					registerCodeChunk(state, it->first.c_str(), it->second);
-				}
+				registerCodeChunk(state, it->first.c_str(), it->second);
 			}
 		}
 		static bool is_metafield(const std::string& name)
 		{
 			return name.compare(0, 2, "__") == 0;
-		}
-		void registerMetamethods(lua_State* state)const
-		{
-			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
-			{
-				if (is_metafield(it->first))
-				{
-					registerFunction(state, it->first.c_str(), it->second);
-				}
-			}
-			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
-			{
-				if (is_metafield(it->first))
-				{
-					registerField(state, it->first.c_str(), it->second);
-				}
-			}
-			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
-			{
-				if (is_metafield(it->first))
-				{
-					registerCodeChunk(state, it->first.c_str(), it->second);
-				}
-			}
 		}
 		template<typename Fun>
 		ClassMetatable& addFunction(const char* name, Fun f)

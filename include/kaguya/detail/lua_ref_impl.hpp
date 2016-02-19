@@ -48,7 +48,7 @@ namespace kaguya
 			friend bool operator>=(const StackRef& lfs, const StackRef& rfs);
 			friend bool operator<(const StackRef& lfs, const StackRef& rfs);
 			friend bool operator>(const StackRef& lfs, const StackRef& rfs);
-		public:
+		protected:
 #if KAGUYA_USE_CPP11
 			StackRef(StackRef&& src) :state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
 			{
@@ -73,6 +73,7 @@ namespace kaguya
 					lua_settop(state_, stack_index_ - 1);
 				}
 			}
+		public:
 			template<typename T>typename lua_type_traits<T>::get_type get()const
 			{
 				return lua_type_traits<T>::get(state_, stack_index_);
