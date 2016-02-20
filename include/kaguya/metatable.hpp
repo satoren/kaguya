@@ -157,7 +157,8 @@ namespace kaguya
 						" if type(table) == 'userdata' then "
 						" local propfun = metatable['_prop_'..index];"
 						" if propfun then return propfun(table,value) end "
-						" else rawset(table,index,value) end"
+						" end "
+						" rawset(table,index,value) "
 						" end")(metatable);
 					metatable.setField("__newindex", newindexfn);
 				}
@@ -166,10 +167,8 @@ namespace kaguya
 					metatable.setField("__index", metatable);
 				}
 
-				if (!traits::is_void<base_class_type>::value)
-				{
-					class_userdata::setmetatable<base_class_type>(state);
-				}
+
+				set_base_metatable(state, metatable, types::typetag<base_class_type>());
 
 				return metatable;
 			}
@@ -315,6 +314,24 @@ namespace kaguya
 		}
 #endif
 	private:
+		template<typename T,typename F>
+		static void* base_pointer_cast(void* from)
+		{
+			return static_cast<T*>(static_cast<F*>(from));
+		}
+
+		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<void>)const
+		{
+		}
+		template<class Base>
+		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<Base>)const
+		{
+			class_userdata::get_metatable<Base>(state);
+			metatable.setMetatable(LuaTable(state, StackTop()));
+
+			PointerConverter& pconverter = PointerConverter::get(state);
+			pconverter.add_function(metatableName<Base>(), metatableName<class_type>(), &base_pointer_cast<Base, class_type>);
+		}
 
 		bool has_key(const std::string& key, bool exclude_function = false)
 		{

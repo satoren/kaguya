@@ -183,7 +183,7 @@ namespace kaguya
 				T* this_ = lua_type_traits<T*>::get(state, 1);
 				if (!this_)
 				{
-					return -1;
+					throw LuaTypeMismatch("type mismatch!!");
 				}
 				if (lua_gettop(state) == 1)
 				{

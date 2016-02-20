@@ -436,12 +436,19 @@ namespace t_02_classreg
 		Derived() :b(0) {};
 		int b;
 	};
+	struct Derived2 :Derived
+	{
+		Derived2() :c(0) {};
+		int c;
+	};
 
 	int base_function(Base* b) {
+		TEST_CHECK(b);
 		b->a = 1;
 		return b->a;
 	}
 	int derived_function(Derived* d) {
+		TEST_CHECK(d);
 		d->b = 2;
 		return d->b;
 	}
@@ -455,24 +462,36 @@ namespace t_02_classreg
 			.addMember("b", &Derived::b)
 			.addStaticMember("test", derived_function)
 			);
+		state["Derived2"].setClass(kaguya::ClassMetatable<Derived2, Derived>()
+			.addMember("c", &Derived2::c)
+			.addStaticMember("test", derived_function)
+			);
 
+		Derived2 derived2;
 		Derived derived;
 		Base base;
 		state["base"] = &base;
 		state["derived"] = kaguya::standard::ref(derived);
+		state["derived2"] = kaguya::standard::ref(derived2);
 		state["base_function"] = &base_function;
 		state["derived_function"] = &derived_function;
 		TEST_CHECK(state("assert(1 == base_function(base))"));
 		TEST_CHECK(state("assert(1 == base_function(derived))"));
+		TEST_CHECK(state("assert(1 == base_function(derived2))"));
 		TEST_CHECK(state("assert(2 == derived_function(derived))"));
+		TEST_CHECK(state("assert(2 == derived_function(derived2))"));
 		TEST_CHECK(state("assert(1 == base:a())"));
 		TEST_CHECK(state("assert(1 == derived:a())"));
 		TEST_CHECK(state("assert(2 == derived:b())"));
+		TEST_CHECK(state("assert(1 == derived2:a())"));
+		TEST_CHECK(state("assert(2 == derived2:b())"));
 		TEST_EQUAL(derived.b, 2);
+		TEST_EQUAL(derived2.b, 2);
 		TEST_CHECK(state("assert(2 == derived.test(derived))"));
 	}
 
 	int receive_shared_ptr_function(kaguya::standard::shared_ptr<Derived> d) {
+		TEST_CHECK(d);
 		d->b = 5;
 		return d->b;
 	}
