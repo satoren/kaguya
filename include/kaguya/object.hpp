@@ -263,11 +263,8 @@ namespace kaguya
 
 		void add_function(const std::string& to_type, const std::string& from_type, convert_function_type f)
 		{
-//			function_map_[convert_map_key(to_type, from_type)] = f;
 			size_t findex = cvt_function_list_.size();
 			cvt_function_list_.push_back(f);
-
-
 
 			std::map<convert_map_key, std::vector<size_t> > add_map;
 			for (std::map<convert_map_key, std::vector<size_t> >::iterator it = function_index_map_.begin();
@@ -289,11 +286,9 @@ namespace kaguya
 				}
 			}
 			function_index_map_.insert(add_map.begin(), add_map.end());
+
 			std::vector<size_t> flist; flist.push_back(findex);
 			function_index_map_[convert_map_key(to_type, from_type)] = flist;
-
-
-
 		}
 
 		template<typename TO>

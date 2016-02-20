@@ -23,23 +23,6 @@ namespace kaguya
 		, public LuaTableOrUserDataImpl<LuaUserData>
 		, public LuaBasicTypeFunctions<LuaUserData>
 	{
-	public:
-		operator LuaRef() {
-			push(state());
-			return LuaRef(state(), StackTop());
-		}
-		LuaUserData(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
-		{
-		}
-		LuaUserData(lua_State* state, const NewTable& table) :Ref::RegistoryRef(state, table)
-		{
-		}
-		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NewTable())
-		{
-		}
-		LuaUserData()
-		{
-		}
 
 		void typecheck()
 		{
@@ -48,6 +31,27 @@ namespace kaguya
 				except::typeMismatchError(state(), "not user data");
 				Ref::RegistoryRef::unref();
 			}
+		}
+	public:
+		operator LuaRef() {
+			push(state());
+			return LuaRef(state(), StackTop());
+		}
+		LuaUserData(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
+		{
+			typecheck();
+		}
+		LuaUserData(lua_State* state, const NewTable& table) :Ref::RegistoryRef(state, table)
+		{
+			typecheck();
+		}
+		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NewTable())
+		{
+			typecheck();
+		}
+		LuaUserData()
+		{
+			typecheck();
 		}
 	};
 
@@ -83,6 +87,15 @@ namespace kaguya
 		, public LuaTableOrUserDataImpl<LuaTable>
 		, public LuaBasicTypeFunctions<LuaTable>
 	{
+
+		void typecheck()
+		{
+			if (type() != TYPE_TABLE)
+			{
+				except::typeMismatchError(state(), "not table");
+				Ref::RegistoryRef::unref();
+			}
+		}
 	public:
 		operator LuaRef() {
 			push(state());
@@ -103,15 +116,6 @@ namespace kaguya
 		LuaTable()
 		{
 			typecheck();
-		}
-
-		void typecheck()
-		{
-			if (type() != TYPE_TABLE)
-			{
-				except::typeMismatchError(state(), "not table");
-				Ref::RegistoryRef::unref();
-			}
 		}
 	};
 

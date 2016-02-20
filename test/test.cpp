@@ -513,7 +513,9 @@ namespace t_02_classreg
 		state["derived_function"] = &derived_function;
 		state["receive_shared_ptr_function"] = &receive_shared_ptr_function;
 		TEST_CHECK(state("assert(1 == base_function(base))"));
+		TEST_EQUAL(base->a, 1);
 		TEST_CHECK(state("assert(1 == base_function(derived))"));
+		TEST_EQUAL(derived->a, 1);
 		TEST_CHECK(state("assert(2 == derived_function(derived))"));
 		TEST_CHECK(state("assert(1 == base:a())"));
 		TEST_CHECK(state("assert(1 == derived:a())"));
@@ -541,7 +543,58 @@ namespace t_02_classreg
 		TEST_EQUAL(ptr, 0);
 	}
 
+	struct Base2
+	{
+		Base2() :b(0) {};
+		int b;
+		int test2() { return 1192; }
+		int test() { return 794; }
+	};
+	struct MultipleInheritance :Base, Base2
+	{
+		MultipleInheritance() :d(0) {};
+		int d;
+		int test() { return 1192; }
+		int test3() { return 710; }
+	};
 
+
+	void multiple_inheritance(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addProperty("a", &Base::a)
+			);
+		state["Base2"].setClass(kaguya::ClassMetatable<Base2>()
+			.addProperty("b", &Base2::b)
+			.addMember("test", &Base2::test)
+			.addMember("test2", &Base2::test2)
+			);
+		state["MultipleInheritance"].setClass(kaguya::ClassMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
+			.addMember("d", &MultipleInheritance::d)
+			.addProperty("propd", &MultipleInheritance::d)
+			.addMember("test", &MultipleInheritance::test)
+			.addMember("test3", &MultipleInheritance::test3));
+
+		MultipleInheritance data;
+
+		state["testobj"] = &data;
+		TEST_CHECK(state("testobj:d(3)"));
+		TEST_CHECK(state("assert(testobj:d() == 3)"));
+		TEST_EQUAL(data.d, 3);
+		TEST_CHECK(state("testobj.propd= 4"));
+		TEST_CHECK(state("assert(testobj.propd == 4)"));
+		TEST_EQUAL(data.d, 4);
+		TEST_CHECK(state("assert(testobj:test()==1192)"));
+		TEST_CHECK(state("assert(testobj:test2()==1192)"));
+		TEST_CHECK(state("assert(testobj:test3()==710)"));
+		TEST_CHECK(state("testobj.a= 1"));
+		TEST_CHECK(state("assert(testobj.a == 1)"));
+		TEST_EQUAL(data.a, 1);
+		TEST_CHECK(state("testobj.b= 2"));
+		TEST_CHECK(state("assert(testobj.b == 2)"));
+		TEST_EQUAL(data.b, 2);
+
+	}
 
 	void add_property(kaguya::State& state)
 	{
@@ -1927,6 +1980,7 @@ int main()
 		ADD_TEST(t_02_classreg::registering_derived_class);
 		ADD_TEST(t_02_classreg::registering_shared_ptr);
 		ADD_TEST(t_02_classreg::shared_ptr_null);
+		ADD_TEST(t_02_classreg::multiple_inheritance);		
 		ADD_TEST(t_02_classreg::add_property);
 		ADD_TEST(t_02_classreg::add_property_ref_check);
 		ADD_TEST(t_03_function::free_standing_function_test);
