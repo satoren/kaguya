@@ -197,11 +197,11 @@ namespace kaguya
 		}
 		virtual const std::type_info& type()
 		{
-			return metatableType<T::element_type>();
+			return metatableType<typename T::element_type>();
 		}
 		virtual const std::string& typeName()
 		{
-			return metatableName<T::element_type>();
+			return metatableName<typename T::element_type>();
 		}
 		virtual void* get()
 		{
@@ -330,8 +330,9 @@ namespace kaguya
 
 		static PointerConverter& get(lua_State* state)
 		{
+			static char kaguya_ptrcvt_key_ptr;
 			util::ScopedSavedStack save(state);
-			lua_pushlightuserdata(state, &get);
+			lua_pushlightuserdata(state, &kaguya_ptrcvt_key_ptr);
 			lua_gettable(state, LUA_REGISTRYINDEX);
 			if (lua_isuserdata(state, -1))
 			{
@@ -350,7 +351,7 @@ namespace kaguya
 				lua_pushvalue(state, -1);
 				lua_setfield(state, -2, "__index");
 				lua_setmetatable(state, -2);//set to userdata
-				lua_pushlightuserdata(state, &get);
+				lua_pushlightuserdata(state, &kaguya_ptrcvt_key_ptr);
 				lua_pushvalue(state, -2);
 				lua_settable(state, LUA_REGISTRYINDEX);
 				return *converter;
