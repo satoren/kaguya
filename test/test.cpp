@@ -527,10 +527,12 @@ namespace t_02_classreg
 	void add_property(kaguya::State& state)
 	{
 		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
 			.addProperty("a", &Base::a)
 			);
 
 		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
+			.addConstructor()
 			.addProperty("b", &Derived::b)
 			);
 
@@ -544,7 +546,13 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(1 == base.a)"));
 		TEST_CHECK(state("assert(2 == derived.a)"));
 		TEST_CHECK(state("assert(3 == derived.b)"));
+		TEST_EQUAL(base.a, 1);
+		TEST_EQUAL(derived.a, 2);
 		TEST_EQUAL(derived.b, 3);
+
+		TEST_CHECK(state("base2 = Base.new()"));
+		TEST_CHECK(state("base2.a=5"));
+		TEST_CHECK(state("assert(5 == base2.a)"));
 	}
 
 	struct Prop

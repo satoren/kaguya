@@ -90,12 +90,13 @@ namespace kaguya
 
 		typedef std::vector<FunctorType> FunctorOverloadType;
 		typedef std::map<std::string, FunctorOverloadType> FuncMapType;
+		typedef std::map<std::string, FunctorType> PropMapType;
 
 		typedef std::map<std::string, DataHolderType> MemberMapType;
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
 
-		ClassMetatable() :has_property_(false)
+		ClassMetatable()
 		{
 			FunctorType dtor(&class_userdata::destructor<ObjectWrapperBase>);
 			function_map_["__gc"].push_back(dtor);
@@ -125,23 +126,39 @@ namespace kaguya
 				metatable.push();
 				registerMember(state);
 
-				if (has_property_)
+				if (!property_map_.empty())
 				{
-					LuaRef indexfun = kaguya::LuaFunction::loadstring(state, "local arg = {...};local indextable = arg[1];"
+					for (PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
+					{
+						int count = lua_type_traits<FunctorType>::push(state, it->second);
+						if (count > 1)
+						{
+							lua_pop(state, count - 1);
+							count = 1;
+						}
+						if (count == 1)
+						{
+							lua_setfield(state, -2, ("_prop_" + it->first).c_str());
+						}
+					}
+					LuaFunction indexfun = kaguya::LuaFunction::loadstring(state, "local arg = {...};local metatable = arg[1];"
 						"return function(table, index)"
-						" local propfun = indextable['_prop_'..index];"
+						" if type(table) == 'userdata' then "
+						" local propfun = metatable['_prop_'..index];"
 						" if propfun then return propfun(table) end "
-						" return indextable[index]"
+						" end "
+						" return metatable[index]"
 						" end")(metatable);
 
 					metatable.setField("__index", indexfun);
 
-					LuaRef newindexfn = LuaFunction::loadstring(state, "return function(table, index, value) "
-						"if type(table) == 'table' then rawset(table,index,value)"
-						" else "
-						" table['_prop_'..index](table,value);"
-						" end"
-						" end")();
+					LuaFunction newindexfn = LuaFunction::loadstring(state, "local arg = {...};local metatable = arg[1];"
+						" return function(table, index, value) "
+						" if type(table) == 'userdata' then "
+						" local propfun = metatable['_prop_'..index];"
+						" if propfun then return propfun(table,value) end "
+						" else rawset(table,index,value) end"
+						" end")(metatable);
 					metatable.setField("__newindex", newindexfn);
 				}
 				else
@@ -241,8 +258,8 @@ namespace kaguya
 		template<typename Ret>
 		ClassMetatable& addProperty(const char* name, Ret class_type::* mem)
 		{
-			has_property_ = true;
-			return addFunction((std::string("_prop_") + name).c_str(), mem);
+			property_map_[name] = FunctorType(mem);
+			return *this;
 		}
 
 
@@ -313,7 +330,13 @@ namespace kaguya
 		}
 		void registerFunction(lua_State* state, const char* name, const FunctorOverloadType& func_array)const
 		{
-			if (lua_type_traits<FunctorOverloadType>::push(state, func_array))
+			int count = lua_type_traits<FunctorOverloadType>::push(state, func_array);
+			if (count > 1)
+			{
+				lua_pop(state, count - 1);
+				count = 1;
+			}
+			if (count == 1)
 			{
 				lua_setfield(state, -2, name);
 			}
@@ -368,8 +391,8 @@ namespace kaguya
 		}
 
 		FuncMapType function_map_;
+		PropMapType property_map_;
 		MemberMapType member_map_;
 		CodeChunkMapType code_chunk_map_;
-		bool has_property_;
 	};
 };
