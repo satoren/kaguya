@@ -266,6 +266,255 @@ namespace kaguya
 		v.push(l);
 		return 1;
 	}
+
+
+
+	//! Reference to Lua userdata
+	class  LuaUserData :public Ref::RegistoryRef
+		, public LuaTableOrUserDataImpl<LuaUserData>
+		, public LuaBasicTypeFunctions<LuaUserData>
+	{
+
+		void typecheck()
+		{
+			if (type() != TYPE_USERDATA)
+			{
+				except::typeMismatchError(state(), "not user data");
+				Ref::RegistoryRef::unref();
+			}
+		}
+	public:
+		operator LuaRef() {
+			push(state());
+			return LuaRef(state(), StackTop());
+		}
+		LuaUserData(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
+		{
+			typecheck();
+		}
+		LuaUserData(lua_State* state, const NewTable& table) :Ref::RegistoryRef(state, table)
+		{
+			typecheck();
+		}
+		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NewTable())
+		{
+			typecheck();
+		}
+		LuaUserData()
+		{
+			typecheck();
+		}
+	};
+
+
+	template<>	struct lua_type_traits<LuaUserData> {
+		typedef LuaUserData get_type;
+		typedef LuaUserData push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TUSERDATA;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TUSERDATA || lua_isnil(l, index);
+		}
+		static LuaUserData get(lua_State* l, int index)
+		{
+			lua_pushvalue(l, index);
+			return LuaUserData(l, StackTop());
+		}
+		static int push(lua_State* l, const LuaUserData& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+	};
+	template<>	struct lua_type_traits<const LuaUserData&> :lua_type_traits<LuaUserData> {};
+
+
+	class LuaTable :public Ref::RegistoryRef
+		, public LuaTableImpl<LuaTable>
+		, public LuaTableOrUserDataImpl<LuaTable>
+		, public LuaBasicTypeFunctions<LuaTable>
+	{
+
+		void typecheck()
+		{
+			if (type() != TYPE_TABLE)
+			{
+				except::typeMismatchError(state(), "not table");
+				Ref::RegistoryRef::unref();
+			}
+		}
+	public:
+		operator LuaRef() {
+			push(state());
+			return LuaRef(state(), StackTop());
+		}
+		LuaTable(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
+		{
+			typecheck();
+		}
+		LuaTable(lua_State* state, const NewTable& table) :Ref::RegistoryRef(state, table)
+		{
+			typecheck();
+		}
+		LuaTable(lua_State* state) :Ref::RegistoryRef(state, NewTable())
+		{
+			typecheck();
+		}
+		LuaTable()
+		{
+			typecheck();
+		}
+	};
+
+	template<>	struct lua_type_traits<LuaTable> {
+		typedef LuaTable get_type;
+		typedef LuaTable push_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_istable(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_istable(l, index) || lua_isnil(l, index);
+		}
+		static LuaTable get(lua_State* l, int index)
+		{
+			lua_pushvalue(l, index);
+			return LuaTable(l, StackTop());
+		}
+		static int push(lua_State* l, const LuaTable& ref)
+		{
+			ref.push(l);
+			return 1;
+		}
+	};
+	template<>	struct lua_type_traits<const LuaTable&> :lua_type_traits<LuaTable> {};
+
+
+
+	/**
+	* Reference of Lua function.
+	*/
+	class LuaFunction :public Ref::RegistoryRef
+		, public LuaFunctionImpl<LuaFunction>
+		, public LuaBasicTypeFunctions<LuaFunction>
+	{
+		void typecheck()
+		{
+			if (type() != TYPE_FUNCTION)
+			{
+				except::typeMismatchError(state(), "not function");
+				RegistoryRef::unref();
+			}
+		}
+
+	public:
+
+		LuaFunction(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
+		{
+			typecheck();
+		}
+		LuaFunction()
+		{
+			typecheck();
+		}
+
+		/**
+		* @name loadstring
+		* @brief load lua code .
+		* @param state pointer to lua_State
+		* @param luacode string
+		*/
+		static LuaFunction loadstring(lua_State* state, const std::string& luacode)
+		{
+			return loadstring(state, luacode.c_str());
+		}
+		/**
+		* @name loadstring
+		* @brief load lua code .
+		* @param state pointer to lua_State
+		* @param luacode string
+		*/
+		static LuaFunction loadstring(lua_State* state, const char* luacode)
+		{
+			util::ScopedSavedStack save(state);
+			int status = luaL_loadstring(state, luacode);
+
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state);
+				return LuaRef(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
+
+
+		/**
+		* @name loadfile
+		* @brief If there are no errors,compiled file as a Lua function and return.
+		*  Otherwise send error message to error handler and return nil reference
+		* @param file  file path of lua script
+		* @return reference of lua function
+		*/
+		static LuaFunction loadfile(lua_State* state, const std::string& file)
+		{
+			return loadfile(state, file.c_str());
+		}
+		static LuaFunction loadfile(lua_State* state, const char* file)
+		{
+			util::ScopedSavedStack save(state);
+
+			int status = luaL_loadfile(state, file);
+
+			if (status)
+			{
+				ErrorHandler::instance().handle(status, state);
+				return LuaRef(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
+	};
+
+	/**
+	* Reference of Lua thread(==coroutine).
+	*/
+	class LuaThread :public Ref::RegistoryRef
+		, public LuaThreadImpl<LuaThread>
+		, public LuaBasicTypeFunctions<LuaThread>
+	{
+		void typecheck()
+		{
+			if (type() != TYPE_THREAD)
+			{
+				except::typeMismatchError(state(), "not lua thread");
+				RegistoryRef::unref();
+			}
+		}
+	public:
+		LuaThread(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
+		{
+			typecheck();
+		}
+		LuaThread(lua_State* state, const NewThread& t) :Ref::RegistoryRef(state, t)
+		{
+			typecheck();
+		}
+		LuaThread(lua_State* state) :Ref::RegistoryRef(state, NewThread())
+		{
+			typecheck();
+		}
+		LuaThread()
+		{
+			typecheck();
+		}
+
+	};
+
 }
 
 
