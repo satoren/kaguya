@@ -217,6 +217,7 @@ namespace kaguya
 					// example: a = value.pointer_member; value = nil;
 					// a has value reference
 					// fixme not good implement this
+					/*
 					int top = lua_gettop(state);
 					if (top != count)
 					{
@@ -225,7 +226,7 @@ namespace kaguya
 							ObjectWrapperBase* wrapper = object_wrapper(state, i);
 							if (wrapper)
 							{
-								for (int arg = 1; arg < top - count; ++arg)
+								for (int arg = 1; arg < top - count + 1; ++arg)
 								{
 									if (lua_type(state, arg) == LUA_TUSERDATA)
 									{
@@ -236,7 +237,7 @@ namespace kaguya
 								}
 							}
 						}
-					}
+					}*/
 
 					return count;
 
