@@ -395,8 +395,6 @@ namespace kaguya
 	};
 	template<>	struct lua_type_traits<const LuaTable&> :lua_type_traits<LuaTable> {};
 
-
-
 	/**
 	* Reference of Lua function.
 	*/

@@ -358,16 +358,14 @@ namespace kaguya
 		void metatables(lua_State* state, LuaTable& base_meta_list, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			LuaTable meta(state, StackTop());
-			base_meta_list[base_meta_list.size() + 1] = meta;
+			base_meta_list.setField(base_meta_list.size() + 1, LuaTable(state, StackTop()));
 			pvtreg.add_function(metatableName<Base>(), metatableName<class_type>(), &base_pointer_cast<Base, class_type>);
 		}
 		template<typename Base, typename... Remain>
 		void metatables(lua_State* state, LuaTable& base_meta_list, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			LuaTable meta(state, StackTop());
-			base_meta_list[base_meta_list.size() + 1] = meta;
+			base_meta_list.setField(base_meta_list.size() + 1, LuaTable(state, StackTop()));
 			pvtreg.add_function(metatableName<Base>(), metatableName<class_type>(), &base_pointer_cast<Base, class_type>);
 			metatables(state, base_meta_list, pvtreg, types::typetag<MultipleBase<Remain...> >());
 		}
@@ -384,7 +382,7 @@ namespace kaguya
 #else
 #define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
 #define KAGUYA_GET_BASE_METATABLE(N) class_userdata::get_metatable<KAGUYA_PP_CAT(A,N)>(state);\
-		metabases[metabases.size() + 1] = LuaTable(state, StackTop());\
+		base_meta_list.setField(base_meta_list.size() + 1, LuaTable(state, StackTop())); \
 		pconverter.add_function(metatableName<KAGUYA_PP_CAT(A,N)>(), metatableName<class_type>(), &base_pointer_cast<KAGUYA_PP_CAT(A,N), class_type>);
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
