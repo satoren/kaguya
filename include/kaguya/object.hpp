@@ -276,32 +276,29 @@ namespace kaguya
 
 		void add_function(const std::string& to_type, const std::string& from_type, convert_function_type f)
 		{
-			size_t findex = cvt_function_list_.size();
-			cvt_function_list_.push_back(f);
-
-			std::map<convert_map_key, std::vector<size_t> > add_map;
-			for (std::map<convert_map_key, std::vector<size_t> >::iterator it = function_index_map_.begin();
-			it != function_index_map_.end(); ++it)
+			std::map<convert_map_key, std::vector<convert_function_type> > add_map;
+			for (std::map<convert_map_key, std::vector<convert_function_type> >::iterator it = function_map_.begin();
+			it != function_map_.end(); ++it)
 			{
 				if (it->first.first == from_type)
 				{
-					std::vector<size_t> newlist = it->second;
-					newlist.push_back(findex);
+					std::vector<convert_function_type> newlist = it->second;
+					newlist.push_back(f);
 					add_map[convert_map_key(to_type, it->first.second)] = newlist;
 				}
 
 				if (it->first.second == to_type)
 				{
-					std::vector<size_t> newlist;
-					newlist.push_back(findex);
+					std::vector<convert_function_type> newlist;
+					newlist.push_back(f);
 					newlist.insert(newlist.end(), it->second.begin(), it->second.end());
 					add_map[convert_map_key(it->first.first, from_type)] = newlist;
 				}
 			}
-			function_index_map_.insert(add_map.begin(), add_map.end());
+			function_map_.insert(add_map.begin(), add_map.end());
 
-			std::vector<size_t> flist; flist.push_back(findex);
-			function_index_map_[convert_map_key(to_type, from_type)] = flist;
+			std::vector<convert_function_type> flist; flist.push_back(f);
+			function_map_[convert_map_key(to_type, from_type)] = flist;
 		}
 
 		template<typename TO>
@@ -320,8 +317,8 @@ namespace kaguya
 			{
 				return from->get();
 			}
-			std::map<convert_map_key, std::vector<size_t> >::const_iterator match = function_index_map_.find(convert_map_key(to_metatable_name, from->typeName()));
-			if (match != function_index_map_.end())
+			std::map<convert_map_key, std::vector<convert_function_type> >::const_iterator match = function_map_.find(convert_map_key(to_metatable_name, from->typeName()));
+			if (match != function_map_.end())
 			{
 				return pcvt_list_apply(from->get(), match->second);
 			}
@@ -333,8 +330,8 @@ namespace kaguya
 			{
 				return from->cget();
 			}
-			std::map<convert_map_key, std::vector<size_t> >::const_iterator match = function_index_map_.find(convert_map_key(to_metatable_name, from->typeName()));
-			if (match != function_index_map_.end())
+			std::map<convert_map_key, std::vector<convert_function_type> >::const_iterator match = function_map_.find(convert_map_key(to_metatable_name, from->typeName()));
+			if (match != function_map_.end())
 			{
 				return pcvt_list_apply(const_cast<void*>(from->cget()), match->second);
 			}
@@ -380,11 +377,11 @@ namespace kaguya
 		}
 	private:
 
-		void* pcvt_list_apply(void* ptr, const std::vector<size_t>& flist)const
+		void* pcvt_list_apply(void* ptr, const std::vector<convert_function_type>& flist)const
 		{
-			for (std::vector<size_t>::const_iterator i = flist.begin();i != flist.end(); ++i)
+			for (std::vector<convert_function_type>::const_iterator i = flist.begin();i != flist.end(); ++i)
 			{
-				ptr = cvt_function_list_[*i](ptr);
+				ptr = (*i)(ptr);
 			}
 			return ptr;
 		}
@@ -392,8 +389,7 @@ namespace kaguya
 
 		PointerConverter() {}
 
-		std::vector<convert_function_type> cvt_function_list_;
-		std::map<convert_map_key, std::vector<size_t> > function_index_map_;
+		std::map<convert_map_key, std::vector<convert_function_type> > function_map_;
 		PointerConverter(PointerConverter&);
 		PointerConverter& operator=(PointerConverter&);
 	};
@@ -410,14 +406,13 @@ namespace kaguya
 				lua_pop(l, 2);
 				return metatable_name != 0;
 			}
-			lua_pop(l, 1);
 			return false;
 		}
 	}
 
 	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, const std::string& require_type = std::string())
 	{
-		if (lua_type(l, index) == LUA_TUSERDATA && detail::object_wrapper_type_check(l, index))
+		if (detail::object_wrapper_type_check(l, index))
 		{
 			ObjectWrapperBase* ptr = static_cast<ObjectWrapperBase*>(lua_touserdata(l, index));
 
