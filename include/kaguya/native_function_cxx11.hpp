@@ -20,18 +20,30 @@ namespace kaguya
 			template<class ThisType, class Res, class... FArgs, class... Args>
 			Res invoke(Res(ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
 			{
+				if (!this_)
+				{
+					throw LuaTypeMismatch("type mismatch!!");
+				}
 				return (this_->*f)(std::forward<Args>(args)...);
 			}
 
 			template<class ThisType, class... FArgs, class... Args>
 			void invoke(void (ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
 			{
+				if (!this_)
+				{
+					throw LuaTypeMismatch("type mismatch!!");
+				}
 				(this_->*f)(std::forward<Args>(args)...);
 			}
 
 			template<class ThisType, class Res, class... FArgs, class... Args>
 			Res invoke(Res(ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
 			{
+				if (!this_)
+				{
+					throw LuaTypeMismatch("type mismatch!!");
+				}
 				return (this_->*f)(std::forward<Args>(args)...);
 			}
 

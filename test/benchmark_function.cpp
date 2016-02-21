@@ -202,7 +202,7 @@ namespace original_api_no_type_check
 {
 	int static_native_function_binding(lua_State* L)
 	{
-		int arg = lua_tonumber(L,1);
+		int arg = static_cast<int>(lua_tonumber(L,1));
 		int result = test_native_function(arg);
 		lua_pushnumber(L,result);
 		return 1;

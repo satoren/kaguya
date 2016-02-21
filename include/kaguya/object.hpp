@@ -22,8 +22,8 @@ namespace kaguya
 	}
 
 #define KAGUYA_METATABLE_PREFIX "kaguya_object_type_"
-#define KAGUYA_METATABLE_TYPE_NAME_KEY "_kaguya_type_name"
-#define KAGUYA_METATABLE_BASE_TYPE_KEY "_kaguya_base_types"
+#define KAGUYA_METATABLE_TYPE_NAME_KEY -212114
+
 	template<typename T>
 	inline const std::string& metatableName()
 	{
@@ -65,7 +65,7 @@ namespace kaguya
 				lua_setfield(l, -2, "__name");
 #endif
 				lua_pushstring(l, metatableName<T>().c_str());
-				lua_setfield(l, -2, KAGUYA_METATABLE_TYPE_NAME_KEY);
+				lua_rawseti(l, -2, KAGUYA_METATABLE_TYPE_NAME_KEY);
 				return true;
 			}
 			return false;
@@ -103,6 +103,7 @@ namespace kaguya
 	struct ObjectWrapperBase
 	{
 		virtual bool is_native_type(const std::string& type) = 0;
+		virtual bool is_native_type(const std::type_info& type) = 0;
 
 		virtual const void* native_cget() = 0;
 		virtual void* native_get() = 0;
@@ -159,6 +160,10 @@ namespace kaguya
 		{
 			return metatableName<T>() == type;
 		}
+		virtual bool is_native_type(const std::type_info& type)
+		{
+			return metatableType<T>() == type;
+		}
 		virtual const std::type_info& type()
 		{
 			return metatableType<T>();
@@ -195,6 +200,10 @@ namespace kaguya
 		{
 			return metatableName<T>() == type;
 		}
+		virtual bool is_native_type(const std::type_info& type)
+		{
+			return metatableType<T>() == type;
+		}
 		virtual const std::type_info& type()
 		{
 			return metatableType<typename T::element_type>();
@@ -225,6 +234,10 @@ namespace kaguya
 		virtual bool is_native_type(const std::string& type)
 		{
 			return metatableName<T>() == type;
+		}
+		virtual bool is_native_type(const std::type_info& type)
+		{
+			return metatableType<T>() == type;
 		}
 		virtual const std::type_info& type()
 		{
@@ -294,28 +307,36 @@ namespace kaguya
 		template<typename TO>
 		TO* get_pointer(ObjectWrapperBase* from)const
 		{
-			if (metatableName<TO>() == from->typeName())
-			{
-				return static_cast<TO*>(from->get());
-			}
-			std::map<convert_map_key, std::vector<size_t> >::const_iterator match = function_index_map_.find(convert_map_key(metatableName<TO>(), from->typeName()));
-			if (match != function_index_map_.end())
-			{
-				return static_cast<TO*>(pcvt_list_apply(from->get(), match->second));
-			}
-			return 0;
+			return static_cast<TO*>(get_pointer(metatableName<TO>(), from));
 		}
 		template<typename TO>
 		const TO* get_const_pointer(ObjectWrapperBase* from)const
 		{
-			if (metatableName<TO>() == from->typeName())
+			return static_cast<const TO*>(get_const_pointer(metatableName<TO>(), from));
+		}
+		void* get_pointer(const std::string& to_metatable_name,ObjectWrapperBase* from)const
+		{
+			if (to_metatable_name == from->typeName())
 			{
-				return static_cast<const TO*>(from->cget());
+				return from->get();
 			}
-			std::map<convert_map_key, std::vector<size_t> >::const_iterator match = function_index_map_.find(convert_map_key(metatableName<TO>(), from->typeName()));
+			std::map<convert_map_key, std::vector<size_t> >::const_iterator match = function_index_map_.find(convert_map_key(to_metatable_name, from->typeName()));
 			if (match != function_index_map_.end())
 			{
-				return static_cast<const TO*>(pcvt_list_apply(const_cast<void*>(from->cget()), match->second));
+				return pcvt_list_apply(from->get(), match->second);
+			}
+			return 0;
+		}
+		const void* get_const_pointer(const std::string& to_metatable_name, ObjectWrapperBase* from)const
+		{
+			if (to_metatable_name == from->typeName())
+			{
+				return from->cget();
+			}
+			std::map<convert_map_key, std::vector<size_t> >::const_iterator match = function_index_map_.find(convert_map_key(to_metatable_name, from->typeName()));
+			if (match != function_index_map_.end())
+			{
+				return pcvt_list_apply(const_cast<void*>(from->cget()), match->second);
 			}
 			return 0;
 		}
@@ -377,58 +398,50 @@ namespace kaguya
 		PointerConverter& operator=(PointerConverter&);
 	};
 
-	inline bool recursive_base_type_check(lua_State* l, int index, const std::string& require_type)
-	{
-		if (lua_getmetatable(l, index))
-		{
-			lua_getfield(l, -1, "__name");
-			const char* metatable_name = lua_tostring(l, -1);
-			if (metatable_name)
-			{
-				if (require_type == metatable_name)
-				{
-					return true;
-				}
-				return recursive_base_type_check(l, -2, require_type);
-			}
-		}
-		return false;
-	}
 	namespace detail
 	{
-		inline bool object_type_check(lua_State* l, int index, const std::string& require_type)
+		inline bool object_wrapper_type_check(lua_State* l, int index)
 		{
 			if (lua_getmetatable(l, index))
 			{
-				lua_getfield(l, -1, KAGUYA_METATABLE_TYPE_NAME_KEY);
+				lua_rawgeti(l, -1, KAGUYA_METATABLE_TYPE_NAME_KEY);
 				const char* metatable_name = lua_tostring(l, -1);
-				if (metatable_name)
-				{
-					return true;
-				}
+
+				lua_pop(l, 2);
+				return metatable_name != 0;
 			}
+			lua_pop(l, 1);
 			return false;
 		}
 	}
 
 	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, const std::string& require_type = std::string())
 	{
-		if (lua_type(l, index) == LUA_TUSERDATA)
+		if (lua_type(l, index) == LUA_TUSERDATA && detail::object_wrapper_type_check(l, index))
 		{
-			util::ScopedSavedStack save(l);
+			ObjectWrapperBase* ptr = static_cast<ObjectWrapperBase*>(lua_touserdata(l, index));
 
-			void* ptr = lua_touserdata(l, index);
-			if (static_cast<ObjectWrapperBase*>(ptr)->is_native_type(require_type))
+			if (ptr && !require_type.empty())
 			{
-				return static_cast<ObjectWrapperBase*>(ptr);
+				if (ptr->is_native_type(require_type))
+				{
+					return ptr;
+				}
+				else if (ptr->typeName() == require_type)
+				{
+					return ptr;
+				}
+				else
+				{
+					PointerConverter& pcvt = PointerConverter::get(l);
+					return pcvt.get_const_pointer(require_type, ptr)? ptr:0;
+				}
 			}
-			else if (require_type.empty() || detail::object_type_check(l, index, require_type))
-			{
-				return static_cast<ObjectWrapperBase*>(ptr);
-			}
+			return ptr;
 		}
 		return 0;
 	}
+
 	template<class T>
 	T* get_pointer(lua_State* l, int index, types::typetag<T> tag)
 	{
@@ -444,14 +457,14 @@ namespace kaguya
 		}
 		else
 		{
-			ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
+			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
 			if (objwrapper)
 			{
-				if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableName<T>()))
+				if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableType<T>()))
 				{
 					return static_cast<T*>(objwrapper->native_get());
 				}
-				else if (objwrapper->typeName() == metatableName<T>())
+				else if (objwrapper->type() == metatableType<T>())
 				{
 					return static_cast<T*>(objwrapper->get());
 				}
@@ -479,14 +492,14 @@ namespace kaguya
 		}
 		else
 		{
-			ObjectWrapperBase* objwrapper = object_wrapper(l, index, metatableName<T>());
+			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
 			if (objwrapper)
 			{
-				if (objwrapper->is_native_type(metatableName<T>()))
+				if (objwrapper->is_native_type(metatableType<T>()))
 				{
 					return static_cast<const T*>(objwrapper->native_cget());
 				}
-				else if (objwrapper->typeName() == metatableName<T>())
+				else if (objwrapper->type() == metatableType<T>())
 				{
 					return static_cast<const T*>(objwrapper->cget());
 				}

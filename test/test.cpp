@@ -1775,6 +1775,7 @@ namespace t_08_cxx11_feature
 		state["moveonly"] = MoveOnlyClass(2);
 
 		const MoveOnlyClass* ref = state["moveonly"];
+		TEST_CHECK(ref);
 		TEST_CHECK(ref->member == 2);
 
 		state("func =function(arg) return assert(arg.member == 5) end");
@@ -1848,6 +1849,7 @@ namespace t_08_cxx11_feature
 		state["uniqueptr"] = std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(2));
 
 		const MoveOnlyClass* ref = state["uniqueptr"];
+		TEST_CHECK(ref);
 		TEST_EQUAL(ref->member, 2);
 
 		state("func =function(arg) return assert(arg.member == 5) end");
