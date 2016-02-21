@@ -2009,6 +2009,8 @@ int main()
 		ADD_TEST(t_03_function::coroutine);
 		ADD_TEST(t_03_function::coroutine_stack);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
+		ADD_TEST(t_03_function::noargs_to_nullpointer);
+		
 		ADD_TEST(t_03_function::arg_class_ref);
 
 		ADD_TEST(t_03_function::native_function_call_test);
