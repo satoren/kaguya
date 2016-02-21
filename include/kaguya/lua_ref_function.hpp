@@ -339,6 +339,13 @@ namespace kaguya
 			return size;
 		}
 	};
+
+	template<>	struct lua_type_traits<FunctionResults::reference> {
+		static int push(lua_State* l, const FunctionResults::reference& ref)
+		{
+			return ref.push(l);
+		}
+	};
 	template <unsigned int I>
 	FunctionResults::reference get(const FunctionResults& res) { return res.result_at(I); }
 

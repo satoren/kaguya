@@ -952,6 +952,12 @@ namespace t_03_function
 		TEST_EQUAL(args[7], 8);
 		TEST_EQUAL(args[8], 9);
 	}
+	void corresult_to_main2(kaguya::VariadicArgType args)
+	{
+		TEST_EQUAL(args.size(), 1);
+		TEST_EQUAL(args[0], 6);
+	}
+
 
 	void coroutine_stack(kaguya::State& state)
 	{
@@ -964,6 +970,10 @@ namespace t_03_function
 			"end "
 			"end"));
 		state["corresult_to_main"](cor2(state["corfun"], 10));
+
+
+		state["corresult_to_main2"] = &corresult_to_main2;
+		state["corresult_to_main2"](cor2(state["corfun"], 10).result_at(5));
 	}
 	
 
@@ -1490,6 +1500,11 @@ namespace t_04_lua_ref
 		ss << state.loadstring("return 2,3")();
 		text = ss.str();
 		TEST_EQUAL(text, "2,3");
+
+		ss.str("");
+		ss << state.loadstring("return 2,3")().result_at(0);
+		text = ss.str();
+		TEST_EQUAL(text, "2");
 
 		ss.str("");
 		ss << state.newRef(&ss);
