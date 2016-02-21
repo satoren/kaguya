@@ -152,7 +152,15 @@ struct Base
 {
 	int a;
 };
+struct Base2
+{
+	int a2;
+};
 struct Derived:Base
+{
+	int b;
+};
+struct MultipleInheritance:Base,Base2
 {
 	int b;
 };
@@ -167,6 +175,11 @@ state["Base"].setClass(kaguya::ClassMetatable<Base>()
   );
 state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
   .addMember("b", &Derived::b)
+  );
+
+//can use kaguya::MultipleBase<BaseTypes...> for multiple inheritance class
+state["MultipleInheritance"].setClass(kaguya::ClassMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
+  .addMember("b", &MultipleInheritance::b)
   );
 
 state["base_function"] = &base_function;
