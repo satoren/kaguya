@@ -590,10 +590,15 @@ namespace t_02_classreg
 		TEST_CHECK(state("testobj.a= 1"));
 		TEST_CHECK(state("assert(testobj.a == 1)"));
 		TEST_EQUAL(data.a, 1);
+		TEST_CHECK(state("testobj.a= 2"));
+		TEST_CHECK(state("assert(testobj.a == 2)"));
+		TEST_EQUAL(data.a, 2);
 		TEST_CHECK(state("testobj.b= 2"));
 		TEST_CHECK(state("assert(testobj.b == 2)"));
 		TEST_EQUAL(data.b, 2);
-
+		TEST_CHECK(state("testobj.b= 5"));
+		TEST_CHECK(state("assert(testobj.b == 5)"));
+		TEST_EQUAL(data.b, 5);
 	}
 
 	void add_property(kaguya::State& state)
@@ -625,6 +630,28 @@ namespace t_02_classreg
 		TEST_CHECK(state("base2 = Base.new()"));
 		TEST_CHECK(state("base2.a=5"));
 		TEST_CHECK(state("assert(5 == base2.a)"));
+	}
+	void add_property_case2(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
+			.addProperty("a", &Base::a)
+			);
+
+		state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
+			.addConstructor()
+			);
+
+		Derived derived;
+		Base base;
+		state["base"] = &base;
+		state["derived"] = kaguya::standard::ref(derived);
+		TEST_CHECK(state("base.a=1"));
+		TEST_CHECK(state("derived.a = 2"));
+		TEST_CHECK(state("assert(1 == base.a)"));
+		TEST_CHECK(state("assert(2 == derived.a)"));
+		TEST_EQUAL(base.a, 1);
+		TEST_EQUAL(derived.a, 2);
 	}
 
 	struct Prop
@@ -1997,8 +2024,9 @@ int main()
 		ADD_TEST(t_02_classreg::registering_derived_class);
 		ADD_TEST(t_02_classreg::registering_shared_ptr);
 		ADD_TEST(t_02_classreg::shared_ptr_null);
-		ADD_TEST(t_02_classreg::multiple_inheritance);		
+		ADD_TEST(t_02_classreg::multiple_inheritance);
 		ADD_TEST(t_02_classreg::add_property);
+		ADD_TEST(t_02_classreg::add_property_case2);
 		ADD_TEST(t_02_classreg::add_property_ref_check);
 		ADD_TEST(t_03_function::free_standing_function_test);
 		ADD_TEST(t_03_function::member_function_test);

@@ -128,7 +128,7 @@ namespace kaguya
 				metatable.push();
 				registerMember(state);
 
-				if (!property_map_.empty())
+				if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
 				{
 					for (PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
 					{
@@ -343,6 +343,7 @@ namespace kaguya
 				" for i = 1,#metabases do "
 				" local v = metabases[i][k] "
 				" if v then "
+				" t[k] = v "
 				" return v end "
 				" end"
 				" end")(metabases);
