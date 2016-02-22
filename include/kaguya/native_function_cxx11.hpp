@@ -193,16 +193,28 @@ namespace kaguya
 			int _call_apply(lua_State* state, MemType T::* m, unusedindex, MemType T::*)
 			{
 				T* this_ = lua_type_traits<T*>::get(state, 1);
-				if (!this_)
-				{
-					throw LuaTypeMismatch("type mismatch!!");
-				}
 				if (lua_gettop(state) == 1)
 				{
-					return lua_type_traits<MemType>::push(state, this_->*m);
+					if (!this_)
+					{
+						const T* this_ = lua_type_traits<const T*>::get(state, 1);
+						if (!this_)
+						{
+							throw LuaTypeMismatch("type mismatch!!");
+						}
+						return lua_type_traits<MemType>::push(state, this_->*m);
+					}
+					else
+					{
+						return lua_type_traits<MemType>::push(state, this_->*m);
+					}
 				}
 				else
 				{
+					if (!this_)
+					{
+						throw LuaTypeMismatch("type mismatch!!");
+					}
 					this_->*m = lua_type_traits<MemType>::get(state, 2);
 					return 0;
 				}

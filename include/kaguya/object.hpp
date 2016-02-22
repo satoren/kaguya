@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <typeinfo>
+#include <algorithm>
 
 #include "kaguya/config.hpp"
 #include "kaguya/traits.hpp"
@@ -262,10 +263,20 @@ namespace kaguya
 		virtual const void* native_cget() { return cget(); };
 		virtual void* native_get() { return get(); };
 
+		~ObjectPointerWrapper()
+		{
+			for (std::vector<std::pair<lua_State*, int> >::iterator i = retain_ref_.begin(); i != retain_ref_.end(); ++i)
+			{
+				luaL_unref(i->first, LUA_REGISTRYINDEX,i->second);
+			}
+		}
 
-		virtual void addRef(lua_State* state, int index) { retain_ref_.push_back(util::Ref(state, index)); };
+		virtual void addRef(lua_State* state, int index) { 
+			lua_pushvalue(state,index);
+			retain_ref_.push_back(std::pair<lua_State*, int>(state, luaL_ref(state, LUA_REGISTRYINDEX)));
+		};
 	private:
-		std::vector<util::Ref> retain_ref_;
+		std::vector<std::pair<lua_State*,int> > retain_ref_;
 	};
 
 	//for internal use

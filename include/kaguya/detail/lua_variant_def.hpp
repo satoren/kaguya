@@ -45,6 +45,21 @@ namespace kaguya
 			return lua_typename(state_(), type());
 		}
 
+		template<typename T>
+		bool typeTest()const
+		{
+			util::ScopedSavedStack save(state_());
+			return lua_type_traits<T>::strictCheckType(state_(), pushStackIndex_(state_()));
+		}
+		template<typename T>
+		bool weakTypeTest()const
+		{
+			util::ScopedSavedStack save(state_());
+			return lua_type_traits<T>::checkType(state_(), pushStackIndex_(state_()));
+		}
+
+
+
 #if KAGUYA_USE_CPP11
 		template<class...Args> FunctionResults operator()(Args&&... args);
 #else

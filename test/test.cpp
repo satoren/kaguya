@@ -615,6 +615,7 @@ namespace t_02_classreg
 
 		Derived derived;
 		Base base;
+		const Base* constbase = &base;
 		state["base"] = &base;
 		state["derived"] = kaguya::standard::ref(derived);
 		TEST_CHECK(state("base.a=1"));
@@ -630,6 +631,10 @@ namespace t_02_classreg
 		TEST_CHECK(state("base2 = Base.new()"));
 		TEST_CHECK(state("base2.a=5"));
 		TEST_CHECK(state("assert(5 == base2.a)"));
+
+		base.a = 3;
+		state["constbase"] = constbase;
+		TEST_CHECK(state("assert(3 == constbase.a)"));
 	}
 	void add_property_case2(kaguya::State& state)
 	{

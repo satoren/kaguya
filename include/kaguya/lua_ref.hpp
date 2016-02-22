@@ -219,22 +219,6 @@ namespace kaguya
 			return lua_gettop(state);
 		}
 
-		template<typename T>
-		bool typeTest()const
-		{
-			util::ScopedSavedStack save(state());
-			push();//push to stack
-			return lua_type_traits<T>::strictCheckType(state(), -1);
-		}
-		template<typename T>
-		bool weakTypeTest()const
-		{
-			util::ScopedSavedStack save(state());
-			push();//push to stack
-			return lua_type_traits<T>::checkType(state(), -1);
-		}
-
-
 
 
 		const void* native_pointer()const
