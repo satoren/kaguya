@@ -540,6 +540,19 @@ namespace t_02_classreg
 		TEST_EQUAL(derived->b, 5);
 		TEST_CHECK(state("assert(2 == shared_ptr_function(base))"));
 		TEST_EQUAL(base->a, 2);
+
+		state["shared_ptr_function"] = kaguya::overload(&receive_base_shared_ptr_function,&receive_shared_ptr_function);
+		TEST_CHECK(state("assert(5 == shared_ptr_function(derived))"));
+		TEST_EQUAL(derived->b, 5);
+		TEST_CHECK(state("assert(2 == shared_ptr_function(base))"));
+		TEST_EQUAL(base->a, 2);
+
+
+		//first function is always miss.second function typecheck
+		state["shared_ptr_function"] = kaguya::overload(&registering_derived_class, &receive_base_shared_ptr_function);
+		TEST_CHECK(state("assert(2 == shared_ptr_function(derived))"));
+		TEST_EQUAL(derived->a, 2);
+
 	}
 
 	struct shared_ptr_fun

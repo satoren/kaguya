@@ -24,7 +24,7 @@ namespace kaguya
 	template<typename T, typename Enable>
 	bool lua_type_traits<T, Enable>::strictCheckType(lua_State* l, int index)
 	{
-		return object_wrapper<T>(l, index) != 0;
+		return object_wrapper<T>(l, index, false) != 0;
 	}
 	template<typename T, typename Enable>
 	typename lua_type_traits<T, Enable>::get_type lua_type_traits<T, Enable>::get(lua_State* l, int index)
@@ -84,7 +84,7 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper<T>(l, index) != 0;
+			return object_wrapper<T>(l, index, false) != 0;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
@@ -131,7 +131,7 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper<T>(l, index) != 0;
+			return object_wrapper<T>(l, index, false) != 0;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
@@ -252,14 +252,14 @@ namespace kaguya
 		typedef const standard::shared_ptr<T>& push_type;
 		typedef standard::shared_ptr<T> get_type;
 
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper<get_type>(l, index, false) != 0;
+		}
 		static bool checkType(lua_State* l, int index)
 		{
 			return object_wrapper<get_type>(l, index) != 0 ||
 				lua_isnil(l, index);
-		}
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return object_wrapper<get_type>(l, index) != 0;
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -284,14 +284,14 @@ namespace kaguya
 		typedef const standard::shared_ptr<void>& push_type;
 		typedef standard::shared_ptr<void> get_type;
 
-		static bool checkType(lua_State* l, int index)
-		{
-			return object_wrapper<void>(l, index) != 0 ||
-				lua_isnil(l, index);
-		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper<void>(l, index) != 0;
+			return object_wrapper<get_type>(l, index, false) != 0;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return object_wrapper<get_type>(l, index) != 0 ||
+				lua_isnil(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -316,14 +316,14 @@ namespace kaguya
 		typedef std::unique_ptr<T, Deleter>&& push_type;
 		typedef std::unique_ptr<T, Deleter> get_type;
 
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper(l, index, metatableName<get_type>(), false) != 0;
+		}
 		static bool checkType(lua_State* l, int index)
 		{
 			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
 				lua_isnil(l, index);
-		}
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return object_wrapper(l, index, metatableName<get_type>()) != 0;
 		}
 		static get_type get(lua_State* l, int index)
 		{

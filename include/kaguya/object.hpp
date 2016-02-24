@@ -183,14 +183,14 @@ namespace kaguya
 		const std::type_info& type_;
 
 		const std::type_info& shared_ptr_type_;
-		
+
 		template<typename T>
 		ObjectSharedPointerWrapper(const standard::shared_ptr<T>& sptr) :object(sptr), type_(metatableType<T>()),
 			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<typename T>
 		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object(std::move(sptr)), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()){}
+			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()) {}
 #endif
 		virtual bool is_native_type(const std::type_info& type)
 		{
@@ -376,6 +376,23 @@ namespace kaguya
 		}
 
 
+		template<class T>
+		T* get_pointer(ObjectWrapperBase* from, types::typetag<T> tag)
+		{
+			return get_pointer<T>(from);
+		}
+		template<class T>
+		const T* get_pointer(ObjectWrapperBase* from, types::typetag<const T> tag)
+		{
+			return get_const_pointer<T>(from);
+		}
+		template<class T>
+		standard::shared_ptr<T> get_pointer(ObjectWrapperBase* from, types::typetag<standard::shared_ptr<T> > tag)
+		{
+			return get_shared_pointer<T>(from);
+		}
+
+
 		static int deleter(lua_State *state)
 		{
 			PointerConverter* ptr = (PointerConverter*)lua_touserdata(state, 1);
@@ -522,7 +539,7 @@ namespace kaguya
 	}
 
 	template<typename RequireType>
-	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index)
+	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index,bool convert = true)
 	{
 		if (detail::object_wrapper_type_check(l, index))
 		{
@@ -536,12 +553,12 @@ namespace kaguya
 			{
 				return ptr;
 			}
-			else
+			else if(convert)
 			{
 				PointerConverter& pcvt = PointerConverter::get(l);
-				return pcvt.get_const_pointer<RequireType>(ptr) ? ptr : 0;
+				return pcvt.get_pointer(ptr, types::typetag<RequireType>()) ? ptr : 0;
 			}
-			return ptr;
+			return 0;
 		}
 		return 0;
 	}
@@ -581,29 +598,6 @@ namespace kaguya
 		}
 		return 0;
 	}
-
-
-	template<class T>
-	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> tag)
-	{
-
-		ObjectWrapperBase* objwrapper = object_wrapper(l, index);
-		if (objwrapper)
-		{
-			if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableType<standard::shared_ptr<T> >()))
-			{
-				standard::shared_ptr<T>* ptr = static_cast<standard::shared_ptr<T>*>(objwrapper->native_get());
-				if (ptr) { return *ptr; }
-			}
-			else
-			{
-				PointerConverter& pcvt = PointerConverter::get(l);
-				return pcvt.get_shared_pointer<T>(objwrapper);
-			}
-		}
-		return standard::shared_ptr<T>();
-	}
-
 	template<class T>
 	const T* get_const_pointer(lua_State* l, int index, types::typetag<T> tag)
 	{
@@ -638,5 +632,28 @@ namespace kaguya
 			}
 		}
 		return 0;
+	}
+
+
+
+	template<class T>
+	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> tag)
+	{
+
+		ObjectWrapperBase* objwrapper = object_wrapper(l, index);
+		if (objwrapper)
+		{
+			if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableType<standard::shared_ptr<T> >()))
+			{
+				standard::shared_ptr<T>* ptr = static_cast<standard::shared_ptr<T>*>(objwrapper->native_get());
+				if (ptr) { return *ptr; }
+			}
+			else
+			{
+				PointerConverter& pcvt = PointerConverter::get(l);
+				return pcvt.get_shared_pointer<T>(objwrapper);
+			}
+		}
+		return standard::shared_ptr<T>();
 	}
 };
