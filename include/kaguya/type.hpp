@@ -19,12 +19,12 @@ namespace kaguya
 	template<typename T, typename Enable>
 	bool lua_type_traits<T, Enable>::checkType(lua_State* l, int index)
 	{
-		return object_wrapper(l, index, metatableName<T>()) != 0;
+		return object_wrapper<T>(l, index) != 0;
 	}
 	template<typename T, typename Enable>
 	bool lua_type_traits<T, Enable>::strictCheckType(lua_State* l, int index)
 	{
-		return object_wrapper(l, index, metatableName<T>()) != 0;
+		return object_wrapper<T>(l, index) != 0;
 	}
 	template<typename T, typename Enable>
 	typename lua_type_traits<T, Enable>::get_type lua_type_traits<T, Enable>::get(lua_State* l, int index)
@@ -84,7 +84,7 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<T>()) != 0;
+			return object_wrapper<T>(l, index) != 0;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
@@ -92,7 +92,7 @@ namespace kaguya
 			{
 				return true;
 			}
-			return object_wrapper(l, index, metatableName<T>()) != 0;
+			return object_wrapper<T>(l, index) != 0;
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -131,7 +131,7 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<T>()) != 0;
+			return object_wrapper<T>(l, index) != 0;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
@@ -143,7 +143,7 @@ namespace kaguya
 			{
 				return true;
 			}
-			return object_wrapper(l, index, metatableName<T>()) != 0;
+			return object_wrapper<T>(l, index) != 0;
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -254,32 +254,58 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
+			return object_wrapper<get_type>(l, index) != 0 ||
 				lua_isnil(l, index);
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>()) != 0;
+			return object_wrapper<get_type>(l, index) != 0;
 		}
 		static get_type get(lua_State* l, int index)
 		{
 			if (lua_isnil(l, index)) {
 				return get_type();
 			}
-			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
-			if (!pointer)
-			{
-				throw LuaTypeMismatch("type mismatch!!");
-			}
-			return *pointer;
+			get_type pointer = get_shared_pointer<T>(l, index, types::typetag<T>());
+			return pointer;
 		}
 
 		static int push(lua_State* l, push_type v)
 		{
-			typedef ObjectSmartPointerWrapper<standard::shared_ptr<T> > wrapper_type;
+			typedef ObjectSharedPointerWrapper wrapper_type;
 			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 			new(storage) wrapper_type(v);
 			class_userdata::setmetatable<T>(l);
+			return 1;
+		}
+	};
+	template<>
+	struct lua_type_traits<standard::shared_ptr<void> > {
+		typedef const standard::shared_ptr<void>& push_type;
+		typedef standard::shared_ptr<void> get_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return object_wrapper<void>(l, index) != 0 ||
+				lua_isnil(l, index);
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper<void>(l, index) != 0;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (lua_isnil(l, index)) {
+				return get_type();
+			}
+			return get_shared_pointer(l, index, types::typetag<void>());
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			typedef ObjectSharedPointerWrapper wrapper_type;
+			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+			new(storage) wrapper_type(v);
 			return 1;
 		}
 	};

@@ -331,7 +331,7 @@ namespace kaguya
 			metatable.setMetatable(LuaTable(state, StackTop()));
 
 			PointerConverter& pconverter = PointerConverter::get(state);
-			pconverter.add_function(metatableName<Base>(), metatableName<class_type>(), &base_pointer_cast<Base, class_type>);
+			pconverter.add_type_conversion<Base, class_type>();
 		}
 
 		void set_multiple_base(lua_State* state, LuaTable& metatable, const LuaTable& metabases)const
@@ -360,14 +360,14 @@ namespace kaguya
 		{
 			class_userdata::get_metatable<Base>(state);
 			metabases.setField(metabases.size() + 1, LuaTable(state, StackTop()));
-			pvtreg.add_function(metatableName<Base>(), metatableName<class_type>(), &base_pointer_cast<Base, class_type>);
+			pvtreg.add_type_conversion<Base, class_type>();
 		}
 		template<typename Base, typename... Remain>
 		void metatables(lua_State* state, LuaTable& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
 			metabases.setField(metabases.size() + 1, LuaTable(state, StackTop()));
-			pvtreg.add_function(metatableName<Base>(), metatableName<class_type>(), &base_pointer_cast<Base, class_type>);
+			pvtreg.add_type_conversion<Base, class_type>();
 			metatables(state, metabases, pvtreg, types::typetag<MultipleBase<Remain...> >());
 		}
 
@@ -384,7 +384,7 @@ namespace kaguya
 #define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
 #define KAGUYA_GET_BASE_METATABLE(N) class_userdata::get_metatable<KAGUYA_PP_CAT(A,N)>(state);\
 		metabases.setField(metabases.size() + 1, LuaTable(state, StackTop())); \
-		pconverter.add_function(metatableName<KAGUYA_PP_CAT(A,N)>(), metatableName<class_type>(), &base_pointer_cast<KAGUYA_PP_CAT(A,N), class_type>);
+		pconverter.add_type_conversion<KAGUYA_PP_CAT(A,N),class_type>();
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
