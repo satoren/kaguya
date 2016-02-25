@@ -76,6 +76,11 @@ namespace kaguya
 		template<class Result, class...Args> Result call(Args&&... args)
 		{
 			lua_State* state = state_();
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return Result();
+			}
 			int argstart = lua_gettop(state) + 1;
 			push_(state);
 			util::push_args(state, std::forward<Args>(args)...);
@@ -96,6 +101,11 @@ namespace kaguya
 		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
 		{\
 			lua_State* state = state_();\
+			if (!state)\
+			{\
+				except::typeMismatchError(state, "is nil");\
+				return Result();\
+			}\
 			int argstart = lua_gettop(state) + 1;\
 			push_(state);\
 			util::push_args(state KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_ARG_DEF));\

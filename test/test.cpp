@@ -579,6 +579,7 @@ namespace t_02_classreg
 		int b;
 		int test2() { return 1192; }
 		int test() { return 794; }
+		int consttest()const { return 794; }
 	};
 	struct MultipleInheritance :Base, Base2
 	{
@@ -586,6 +587,7 @@ namespace t_02_classreg
 		int d;
 		int test() { return 1192; }
 		int test3() { return 710; }
+		int consttest2()const { return 1560; }
 	};
 
 
@@ -598,11 +600,13 @@ namespace t_02_classreg
 			.addProperty("b", &Base2::b)
 			.addMember("test", &Base2::test)
 			.addMember("test2", &Base2::test2)
+			.addMember("consttest", &Base2::consttest)
 			);
 		state["MultipleInheritance"].setClass(kaguya::ClassMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
 			.addMember("d", &MultipleInheritance::d)
 			.addProperty("propd", &MultipleInheritance::d)
 			.addMember("test", &MultipleInheritance::test)
+			.addMember("consttest2", &MultipleInheritance::consttest2)
 			.addMember("test3", &MultipleInheritance::test3));
 
 		MultipleInheritance data;
@@ -617,6 +621,7 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(testobj:test()==1192)"));
 		TEST_CHECK(state("assert(testobj:test2()==1192)"));
 		TEST_CHECK(state("assert(testobj:test3()==710)"));
+		TEST_CHECK(state("assert(testobj:consttest()==794)"));
 		TEST_CHECK(state("testobj.a= 1"));
 		TEST_CHECK(state("assert(testobj.a == 1)"));
 		TEST_EQUAL(data.a, 1);
@@ -629,6 +634,11 @@ namespace t_02_classreg
 		TEST_CHECK(state("testobj.b= 5"));
 		TEST_CHECK(state("assert(testobj.b == 5)"));
 		TEST_EQUAL(data.b, 5);
+
+
+		state["constobj"] = static_cast<const MultipleInheritance*>(&data);
+		TEST_CHECK(state("assert(constobj:consttest()==794)"));
+		TEST_CHECK(state("assert(constobj:consttest2()==1560)"));
 	}
 
 	void add_property(kaguya::State& state)
@@ -1634,6 +1644,12 @@ namespace t_05_error_handler
 		state["errofun"](33);
 
 		TEST_CHECK(error_count == 1);
+		
+		kaguya::LuaRef f;
+		f.resume<void>();
+		f.call<void>();
+		TEST_COMPARE_EQ(f.threadStatus(), LUA_ERRRUN);
+		TEST_COMPARE_EQ(state.newRef(1).threadStatus(), LUA_ERRRUN);
 	}
 }
 
