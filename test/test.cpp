@@ -495,6 +495,11 @@ namespace t_02_classreg
 		d->b = 5;
 		return d->b;
 	}
+	int receive_base_shared_ptr_function(kaguya::standard::shared_ptr<Base> d) {
+		TEST_CHECK(d);
+		d->a = 2;
+		return d->a;
+	}
 	void registering_shared_ptr(kaguya::State& state)
 	{
 		state["Base"].setClass(kaguya::ClassMetatable<Base>()
@@ -512,6 +517,10 @@ namespace t_02_classreg
 		state["base_function"] = &base_function;
 		state["derived_function"] = &derived_function;
 		state["receive_shared_ptr_function"] = &receive_shared_ptr_function;
+		state["receive_base_shared_ptr_function"] = &receive_base_shared_ptr_function;
+
+
+
 		TEST_CHECK(state("assert(1 == base_function(base))"));
 		TEST_EQUAL(base->a, 1);
 		TEST_CHECK(state("assert(1 == base_function(derived))"));
@@ -523,6 +532,27 @@ namespace t_02_classreg
 		TEST_EQUAL(derived->b, 2);
 		TEST_CHECK(state("assert(5 == receive_shared_ptr_function(derived))"));
 		TEST_EQUAL(derived->b, 5);
+		TEST_CHECK(state("assert(2 == receive_base_shared_ptr_function(derived))"));
+		TEST_EQUAL(derived->a, 2);
+
+		state["shared_ptr_function"] = kaguya::overload(&receive_shared_ptr_function, &receive_base_shared_ptr_function);
+		TEST_CHECK(state("assert(5 == shared_ptr_function(derived))"));
+		TEST_EQUAL(derived->b, 5);
+		TEST_CHECK(state("assert(2 == shared_ptr_function(base))"));
+		TEST_EQUAL(base->a, 2);
+
+		state["shared_ptr_function"] = kaguya::overload(&receive_base_shared_ptr_function,&receive_shared_ptr_function);
+		TEST_CHECK(state("assert(5 == shared_ptr_function(derived))"));
+		TEST_EQUAL(derived->b, 5);
+		TEST_CHECK(state("assert(2 == shared_ptr_function(base))"));
+		TEST_EQUAL(base->a, 2);
+
+
+		//first function is always miss.second function typecheck
+		state["shared_ptr_function"] = kaguya::overload(&registering_derived_class, &receive_base_shared_ptr_function);
+		TEST_CHECK(state("assert(2 == shared_ptr_function(derived))"));
+		TEST_EQUAL(derived->a, 2);
+
 	}
 
 	struct shared_ptr_fun
