@@ -35,30 +35,6 @@ namespace kaguya
 			ScopedSavedStack(ScopedSavedStack const &);
 			ScopedSavedStack & operator=(ScopedSavedStack const &);
 		};
-
-		inline std::string argmentTypes(lua_State *state)
-		{
-			int top = lua_gettop(state);
-
-			std::string result = "";
-
-			for (int i = 1; i <= top; i++) {
-				if (i != 1)
-				{
-					result += ",";
-				}
-				if (lua_type(state, i) == LUA_TUSERDATA && luaL_getmetafield(state, i, "__name") == LUA_TSTRING)
-				{
-					result += lua_tostring(state, -1);
-					lua_pop(state, 1);
-				}
-				else
-				{
-					result += lua_typename(state, lua_type(state, i));
-				}
-			}
-			return result;
-		}
 		inline void traceBack(lua_State* state, const char* message, int level = 0)
 		{
 #if LUA_VERSION_NUM >= 502

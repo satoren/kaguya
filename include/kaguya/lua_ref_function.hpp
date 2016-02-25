@@ -313,7 +313,7 @@ namespace kaguya
 #undef KAGUYA_OP_FN_DEF
 #endif
 
-		inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
+	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
 		for (FunctionResults::const_iterator it = res.begin(); it != res.end(); ++it)
 		{

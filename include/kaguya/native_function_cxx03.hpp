@@ -273,7 +273,7 @@ namespace kaguya
 				}
 				else
 				{
-					if (!this_)
+					if (!this_ || !lua_type_traits<MemType>::checkType(state, 2))
 					{
 						throw LuaTypeMismatch("type mismatch!!");
 					}

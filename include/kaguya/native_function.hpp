@@ -297,9 +297,38 @@ namespace kaguya
 			}
 			return weak_match ? weak_match : argcount_unmatch;
 		}
+
+
+
+		inline std::string argmentTypes(lua_State *state)
+		{
+			int top = lua_gettop(state);
+
+			std::string result = "";
+
+			for (int i = 1; i <= top; i++) {
+				if (i != 1)
+				{
+					result += ",";
+				}
+
+
+				ObjectWrapperBase* object = object_wrapper(state, i);
+				if (object)
+				{
+					result += object->type().name();
+				}
+				else
+				{
+					result += lua_typename(state, lua_type(state, i));
+				}
+			}
+			return result;
+		}
+
 		inline std::string build_arg_error_message(lua_State *l)
 		{
-			std::string message = "argument not matching:" + util::argmentTypes(l) + "\t candidated\n";
+			std::string message = "Argument mismatch:" + argmentTypes(l) + "\t candidate is:\n";
 
 			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 			for (int i = 0; i < overloadnum; ++i)

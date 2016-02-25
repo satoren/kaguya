@@ -403,7 +403,6 @@ namespace kaguya
 		}
 		LuaFunction()
 		{
-			typecheck();
 		}
 
 		/**
