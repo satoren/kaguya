@@ -126,32 +126,30 @@ namespace kaguya
 	template<class T>
 	struct ObjectWrapper : ObjectWrapperBase
 	{
-		T object;
-
-		ObjectWrapper() :object() {}
+		ObjectWrapper() :object_() {}
 #if KAGUYA_USE_CPP11
 		template<class... Args>
-		ObjectWrapper(Args&&... args) : object(std::forward<Args>(args)...) {}
+		ObjectWrapper(Args&&... args) : object_(std::forward<Args>(args)...) {}
 #else
 
 		template<class Arg1>
-		ObjectWrapper(const Arg1& v1) : object(v1) {}
+		ObjectWrapper(const Arg1& v1) : object_(v1) {}
 		template<class Arg1, class Arg2>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2) : object(v1, v2) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2) : object_(v1, v2) {}
 		template<class Arg1, class Arg2, class Arg3>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3) : object(v1, v2, v3) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3) : object_(v1, v2, v3) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4) : object(v1, v2, v3, v4) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4) : object_(v1, v2, v3, v4) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5) : object(v1, v2, v3, v4, v5) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5) : object_(v1, v2, v3, v4, v5) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6) : object(v1, v2, v3, v4, v5, v6) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6) : object_(v1, v2, v3, v4, v5, v6) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7) : object(v1, v2, v3, v4, v5, v6, v7) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7) : object_(v1, v2, v3, v4, v5, v6, v7) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8) : object(v1, v2, v3, v4, v5, v6, v7, v8) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8) : object_(v1, v2, v3, v4, v5, v6, v7, v8) {}
 		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8, const Arg9& v9) : object(v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
+		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8, const Arg9& v9) : object_(v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
 
 #endif
 
@@ -166,30 +164,29 @@ namespace kaguya
 
 		virtual void* get()
 		{
-			return &object;
+			return &object_;
 		}
 		virtual const void* cget()
 		{
-			return &object;
+			return &object_;
 		}
 		virtual const void* native_cget() { return cget(); };
 		virtual void* native_get() { return get(); };
+
+	private:
+		T object_;
 	};
 
 
 	struct ObjectSharedPointerWrapper : ObjectWrapperBase
 	{
-		standard::shared_ptr<void> object;
-		const std::type_info& type_;
-
-		const std::type_info& shared_ptr_type_;
 
 		template<typename T>
-		ObjectSharedPointerWrapper(const standard::shared_ptr<T>& sptr) :object(sptr), type_(metatableType<T>()),
+		ObjectSharedPointerWrapper(const standard::shared_ptr<T>& sptr) :object_(sptr), type_(metatableType<T>()),
 			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<typename T>
-		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object(std::move(sptr)), type_(metatableType<T>()),
+		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object_(std::move(sptr)), type_(metatableType<T>()),
 			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()) {}
 #endif
 		virtual bool is_native_type(const std::type_info& type)
@@ -202,24 +199,30 @@ namespace kaguya
 		}
 		virtual void* get()
 		{
-			return object.get();
+			return object_.get();
 		}
 		virtual const void* cget()
 		{
-			return object.get();
+			return object_.get();
 		}
-		virtual const void* native_cget() { return &object; };
-		virtual void* native_get() { return &object; };
+		virtual const void* native_cget() { return &object_; };
+		virtual void* native_get() { return &object_; };
+
+		const standard::shared_ptr<void> object()const { return object_; }
+		const std::type_info& shared_ptr_type()const { return shared_ptr_type_; }
+	private:
+		standard::shared_ptr<void> object_;
+		const std::type_info& type_;
+
+		const std::type_info& shared_ptr_type_;
 	};
 
 	template<class T>
 	struct ObjectSmartPointerWrapper : ObjectWrapperBase
 	{
-		T object;
-
-		ObjectSmartPointerWrapper(const T& sptr) :object(sptr) {}
+		ObjectSmartPointerWrapper(const T& sptr) :object_(sptr) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
-		ObjectSmartPointerWrapper(T&& sptr) : object(std::move(sptr)) {}
+		ObjectSmartPointerWrapper(T&& sptr) : object_(std::move(sptr)) {}
 #endif
 		virtual bool is_native_type(const std::type_info& type)
 		{
@@ -231,22 +234,23 @@ namespace kaguya
 		}
 		virtual void* get()
 		{
-			return object.get();
+			return object_.get();
 		}
 		virtual const void* cget()
 		{
-			return object.get();
+			return object_.get();
 		}
-		virtual const void* native_cget() { return &object; };
-		virtual void* native_get() { return &object; };
+		virtual const void* native_cget() { return &object_; };
+		virtual void* native_get() { return &object_; };
+
+	private:
+		T object_;
 	};
 
 	template<class T>
 	struct ObjectPointerWrapper : ObjectWrapperBase
 	{
-		T* object;
-
-		ObjectPointerWrapper(T* ptr) :object(ptr) {}
+		ObjectPointerWrapper(T* ptr) :object_(ptr) {}
 
 		virtual bool is_native_type(const std::type_info& type)
 		{
@@ -262,11 +266,11 @@ namespace kaguya
 			{
 				return 0;
 			}
-			return const_cast<void*>(static_cast<const void*>(object));
+			return const_cast<void*>(static_cast<const void*>(object_));
 		}
 		virtual const void* cget()
 		{
-			return object;
+			return object_;
 		}
 		virtual const void* native_cget() { return cget(); };
 		virtual void* native_get() { return get(); };
@@ -284,6 +288,7 @@ namespace kaguya
 			retain_ref_.push_back(std::pair<lua_State*, int>(state, luaL_ref(state, LUA_REGISTRYINDEX)));
 		};
 	private:
+		T* object_;
 		std::vector<std::pair<lua_State*, int> > retain_ref_;
 	};
 
@@ -357,12 +362,12 @@ namespace kaguya
 			}
 			if (to_type == from->type())
 			{
-				return standard::static_pointer_cast<TO>(ptr->object);
+				return standard::static_pointer_cast<TO>(ptr->object());
 			}
-			std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> >::const_iterator match = shared_ptr_function_map_.find(convert_map_key(to_type.name(), ptr->shared_ptr_type_.name()));
+			std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> >::const_iterator match = shared_ptr_function_map_.find(convert_map_key(to_type.name(), ptr->shared_ptr_type().name()));
 			if (match != shared_ptr_function_map_.end())
 			{
-				return standard::static_pointer_cast<TO>(pcvt_list_apply(ptr->object, match->second));
+				return standard::static_pointer_cast<TO>(pcvt_list_apply(ptr->object(), match->second));
 			}
 			return standard::shared_ptr<TO>();
 		}
@@ -370,7 +375,7 @@ namespace kaguya
 		{
 			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
 			if (!ptr) {
-				return ptr->object;
+				return ptr->object();
 			}
 			return standard::shared_ptr<void>();
 		}
@@ -495,7 +500,12 @@ namespace kaguya
 		{
 			for (std::vector<shared_ptr_convert_function_type>::const_iterator i = flist.begin(); i != flist.end(); ++i)
 			{
+
+#if KAGUYA_USE_CPP11
+				ptr = (*i)(std::move(ptr));
+#else
 				ptr = (*i)(ptr);
+#endif
 			}
 			return ptr;
 		}
