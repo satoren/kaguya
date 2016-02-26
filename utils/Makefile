@@ -5,6 +5,9 @@ gen_push_tuple: push_tuple_generator.py
 
 gen_ref_tuple: ref_tuple_generator.py
 	python ref_tuple_generator.py > ../include/kaguya/gen/ref_tuple.inl
+    
+one_header_file: generate_one_header.py
+	python generate_one_header.py > ../kaguya.hpp
 
 clean:
 
