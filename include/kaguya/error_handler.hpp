@@ -49,8 +49,10 @@ namespace kaguya
 		{
 			lua_call(state, argnum, LUA_MULTRET);
 		}
-		catch (...)
+		catch (const LuaException& e)
 		{
+			return LUA_ERRRUN;
+//			return e.status();//status not changed at luajit 2.0.4
 		}
 		return lua_status(state);
 	}
