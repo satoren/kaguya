@@ -20,6 +20,10 @@ extern "C" {
 #endif
 #endif
 
+#ifndef KAGUYA_NO_SET_AT_PANIC
+#define KAGUYA_NO_SET_AT_PANIC 0
+#endif
+
 #if KAGUYA_USE_CPP11
 #include <functional>
 #include <tuple>
@@ -66,14 +70,6 @@ namespace kaguya
 
 #else
 		using namespace boost;
-
-		inline std::string to_string(int v)
-		{
-			char buffer[28] = { 0 };
-			snprintf(buffer, sizeof(buffer), "%d", v);
-			return buffer;
-		}
-
 #define KAGUYA_STATIC_ASSERT BOOST_STATIC_ASSERT_MSG
 #endif
 	}

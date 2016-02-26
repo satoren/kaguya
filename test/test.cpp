@@ -4,8 +4,14 @@
 #include "kaguya/kaguya.hpp"
 
 
+inline std::string to_string(int v)
+{
+	char buffer[28] = { 0 };
+	snprintf(buffer, sizeof(buffer), "%d", v);
+	return buffer;
+}
 
-#define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya::standard::to_string(__LINE__) + "\nCHECKCODE:" #B );
+#define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + to_string(__LINE__) + "\nCHECKCODE:" #B );
 
 #define TEST_COMPARE(A,B,OP)  if(!(A OP B))\
 {\

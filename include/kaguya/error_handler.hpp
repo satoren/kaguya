@@ -20,6 +20,42 @@ namespace kaguya
 	{
 		return lua_tostring(state, -1);
 	}
+
+
+
+#if KAGUYA_NO_SET_AT_PANIC
+	inline void set_at_panic_handler(lua_State* state)
+	{
+	}
+	inline int lua_pcall_wrap(lua_State* state, int argnum, int retnum)
+	{
+		int result = lua_pcall(state, argnum, retnum, 0);
+		return result;
+	}
+#else
+	inline int panic_handler(lua_State *state)
+	{
+		const char* errormessage = get_error_message(state);
+		throw LuaException(lua_status(state), errormessage);
+		return 0;
+	}
+	inline void set_at_panic_handler(lua_State* state)
+	{
+		lua_atpanic(state, panic_handler);
+	}
+	inline int lua_pcall_wrap(lua_State* state, int argnum, int retnum)
+	{
+		try
+		{
+			lua_call(state, argnum, LUA_MULTRET);
+		}
+		catch (...)
+		{
+		}
+		return lua_status(state);
+	}
+#endif
+
 	struct ErrorHandler
 	{
 		typedef standard::function<void(int, const char*)> function_type;
@@ -31,6 +67,14 @@ namespace kaguya
 			if (handler)
 			{
 				handler(0, message);
+			}
+		}
+		void handle(int status_code, const char* message, lua_State *state)
+		{
+			function_type handler = getHandler(state);
+			if (handler)
+			{
+				handler(status_code, message);
 			}
 		}
 		void handle(int status_code, lua_State *state)
@@ -67,6 +111,8 @@ namespace kaguya
 		}
 		void registerHandler(lua_State* state, function_type f)
 		{
+			
+			set_at_panic_handler(state);
 			if (state)
 			{
 				util::ScopedSavedStack save(state);
@@ -99,6 +145,7 @@ namespace kaguya
 			static ErrorHandler instance_;
 			return instance_;
 		}
+
 	private:
 		function_type* getFunctionPointer(lua_State* state)
 		{

@@ -445,7 +445,7 @@ namespace kaguya
 			util::ScopedSavedStack save(state);
 			int status = luaL_loadstring(state, value.c_str());
 			if (!except::checkErrorAndThrow(status, state)) { return; }
-			status = lua_pcall(state, 0, 1, 0);
+			status = lua_pcall_wrap(state, 0, 1);
 			if (!except::checkErrorAndThrow(status, state)) { return; }
 			lua_setfield(state, -2, name);
 		}
