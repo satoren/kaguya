@@ -126,12 +126,12 @@ namespace kaguya
 	template<class T>
 	struct ObjectWrapper : ObjectWrapperBase
 	{
-		ObjectWrapper() :object_() {}
 #if KAGUYA_USE_CPP11
 		template<class... Args>
 		ObjectWrapper(Args&&... args) : object_(std::forward<Args>(args)...) {}
 #else
 
+		ObjectWrapper() : object_() {}
 		template<class Arg1>
 		ObjectWrapper(const Arg1& v1) : object_(v1) {}
 		template<class Arg1, class Arg2>
