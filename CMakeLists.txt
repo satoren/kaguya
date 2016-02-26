@@ -8,7 +8,8 @@ link_directories(${LUA_LIBRARY_DIRS})
 include_directories("include")
 
 file(GLOB headers RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  include/kaguya/*.hpp)
+  include/kaguya/*.hpp
+  include/kaguya/detail/*.hpp)
 
 
 file(GLOB testSources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
