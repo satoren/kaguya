@@ -6,8 +6,8 @@
 
 inline std::string to_string(int v)
 {
-	char buffer[28] = { 0 };
-	snprintf(buffer, sizeof(buffer), "%d", v);
+	char buffer[64] = { 0 };
+	sprintf(buffer, "%d", v);
 	return buffer;
 }
 
