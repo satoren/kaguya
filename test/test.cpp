@@ -1826,6 +1826,72 @@ namespace t_07_any_type_test
 			TEST_CHECK(test(state, setvec, copy));
 		}
 	}
+
+	std::map<unsigned, unsigned> myMap;
+	int myVal;
+
+	class FooClass{
+	public:
+		void mapCallback(const std::map<unsigned, unsigned>& map)
+		{
+			myMap = map;
+		}
+		void mapOverload()
+		{
+			myMap.clear();
+		}
+		void mapOverload(const std::map<unsigned, unsigned>& map)
+		{
+			myMap = map;
+		}
+		void mapOverload(const std::map<unsigned, unsigned>& map, int val)
+		{
+			myMap = map;
+			myVal = val;
+		}
+	};
+
+	void testWrongClassUseWihMap(kaguya::State& state)
+	{
+		state["testMap"].setClass(kaguya::ClassMetatable<FooClass>()
+			.addMemberFunction("testMap", &FooClass::mapCallback)
+			.addMemberFunction("mapOverload", static_cast<void (FooClass::*)()>(&FooClass::mapOverload))
+			.addMemberFunction("mapOverload", static_cast<void (FooClass::*)(const std::map<unsigned, unsigned>&)>(&FooClass::mapOverload))
+			.addMemberFunction("mapOverload", static_cast<void (FooClass::*)(const std::map<unsigned, unsigned>&, int)>(&FooClass::mapOverload))
+			);
+		state["foo"] = FooClass();
+		state("myMap = {[1] = 2, [3] = 4, [5] = 6}");
+		try {
+			// This uses an invalid function call which should throw an error
+			state("foo.testMap(myMap)");
+			TEST_CHECK(false);
+		} catch(std::runtime_error&)
+		{}
+		TEST_CHECK(myMap.empty());
+		// This is the correct call
+		state("foo:testMap(myMap)");
+		TEST_EQUAL(myMap[1], 2);
+		TEST_EQUAL(myMap[3], 4);
+		TEST_EQUAL(myMap[5], 6);
+		state("foo:mapOverload()");
+		TEST_CHECK(myMap.empty());
+		try {
+			// This uses an invalid function call which should throw an error
+			state("foo.mapOverload(myMap)");
+			TEST_CHECK(false);
+		} catch(std::runtime_error&)
+		{}
+		state("foo:mapOverload(myMap)");
+		TEST_EQUAL(myMap[1], 2);
+		TEST_EQUAL(myMap[3], 4);
+		TEST_EQUAL(myMap[5], 6);
+		myMap.clear();
+		state("foo:mapOverload(myMap, 42)");
+		TEST_EQUAL(myMap[1], 2);
+		TEST_EQUAL(myMap[3], 4);
+		TEST_EQUAL(myMap[5], 6);
+		TEST_EQUAL(myVal, 42);
+	}
 }
 
 #if KAGUYA_USE_CPP11
@@ -2128,6 +2194,7 @@ int main()
 		ADD_TEST(t_06_state::load_lib_constructor);
 
 		ADD_TEST(t_07_any_type_test::any_type_test);
+		ADD_TEST(t_07_any_type_test::testWrongClassUseWihMap);
 
 
 
