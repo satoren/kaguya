@@ -266,6 +266,11 @@ namespace kaguya
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(2)));
 
+				//skip type check for performance
+//				if (!fun || !(*fun) || !(*fun)->checktype(l, false))
+//				{
+//					return 0;
+//				}
 				return fun;
 			}
 			FunctorType* weak_match = 0;

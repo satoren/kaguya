@@ -65,6 +65,11 @@ extern "C" {
 #endif
 
 
+#ifndef KAGUYA_SKIP_ARGUMENTS_TYPE_CHECK
+#define KAGUYA_SKIP_ARGUMENTS_TYPE_CHECK 0
+#endif
+
+
 namespace kaguya
 {
 	namespace standard

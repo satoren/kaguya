@@ -242,11 +242,6 @@ namespace kaguya
 
 	inline lua_type_traits<LuaRef>::get_type lua_type_traits<LuaRef>::get(lua_State* l, int index)
 	{
-		if (lua_gettop(l) < index)
-		{
-			except::OtherError(l, "Invalid stack index");
-			return LuaRef();
-		}
 		lua_pushvalue(l, index);
 		return LuaRef(l, StackTop());
 	}

@@ -515,6 +515,10 @@ namespace kaguya
 		static get_type get(lua_State* l, int index)
 		{
 			get_type result;
+			if (!checkType(l, index))
+			{
+				return result;
+			}
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			std::vector<LuaRef> values = table.values();
 			result.reserve(values.size());
@@ -578,6 +582,10 @@ namespace kaguya
 		static get_type get(lua_State* l, int index)
 		{
 			get_type result;
+			if(!checkType(l, index))
+			{
+				return result;
+			}
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			std::map<LuaRef, LuaRef> values = table.map();
 			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
