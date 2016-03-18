@@ -18,7 +18,8 @@ namespace kaguya
 
 	inline const char* get_error_message(lua_State *state)
 	{
-		return lua_tostring(state, -1);
+		const char* message = lua_tostring(state, -1);
+		return message ? message : "unknown error";
 	}
 
 
