@@ -78,8 +78,8 @@ namespace kaguya
 
 
 		static int default_panic(lua_State *L) {
-			lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
-				lua_tostring(L, -1));
+			fprintf(stderr, "PANIC: unprotected error in call to Lua API (%s)\n", lua_tostring(L, -1));
+			fflush(stderr);
 			return 0;  /* return to Lua to abort */
 		}
 		static void stderror_out(int status, const char* message)
@@ -98,7 +98,13 @@ namespace kaguya
 	public:
 
 		//! create Lua state with lua standard library
-		template<typename Allocator = DefaultAllocator>
+		State() :allocator_holder_(), state_(lua_newstate(&AllocatorFunction<DefaultAllocator>, allocator_holder_.get())), created_(true)
+		{
+			lua_atpanic(state_, &default_panic);
+			init();
+			openlibs();
+		}
+		template<typename Allocator>
 		State(standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
@@ -107,6 +113,12 @@ namespace kaguya
 		}
 
 		//! create Lua state with(or without) library
+		State(const LoadLibs& libs) : allocator_holder_(), state_(lua_newstate(&AllocatorFunction<DefaultAllocator>,0)), created_(true)
+		{
+			lua_atpanic(state_, &default_panic);
+			init();
+			openlibs(libs);
+		}
 		template<typename Allocator = DefaultAllocator>
 		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
