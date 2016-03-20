@@ -26,8 +26,10 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 		for (int i = 0; i < N; ++i)
 		{
 			double start = clockstate["os"]["clock"]();
-
-			it->second(kaguya::State());
+			{
+				kaguya::State state;
+				it->second(state);
+			}
 
 			double end = clockstate["os"]["clock"]();
 			mintime = std::min(mintime, end - start);
