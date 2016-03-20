@@ -21,8 +21,54 @@ namespace kaguya
 	typedef std::pair<std::string, lua_CFunction> LoadLib;
 	typedef std::vector<LoadLib> LoadLibs;
 	inline LoadLibs NoLoadLib() { return LoadLibs(); };
+
+	template<typename Allocator>
+	void * AllocatorFunction(void *ud,
+		void *ptr,
+		size_t osize,
+		size_t nsize)
+	{
+		Allocator* allocator = static_cast<Allocator*>(ud);
+		if (!allocator)
+		{
+			return std::realloc(ptr, nsize);
+		}
+		if (nsize == 0)
+		{
+			allocator->deallocate(ptr, osize);
+		}
+		else if (ptr)
+		{
+			return allocator->reallocate(ptr, nsize);
+		}
+		else
+		{
+			return allocator->allocate(nsize);
+		}
+		return 0;
+	}
+
+	struct DefaultAllocator
+	{
+		typedef void* pointer;
+		typedef size_t size_type;
+		pointer allocate(size_type n)
+		{
+			return std::malloc(n);
+		}
+		pointer reallocate(pointer p, size_type n)
+		{
+			return std::realloc(p,n);
+		}
+		void deallocate(pointer p, size_type n)
+		{
+			std::free(p);
+		}
+	};
+
 	class State
 	{
+		standard::shared_ptr<void> allocator_holder_;
 		lua_State *state_;
 		bool created_;
 
@@ -30,6 +76,12 @@ namespace kaguya
 		State(const State&);
 		State& operator =(const State&);
 
+
+		static int default_panic(lua_State *L) {
+			lua_writestringerror("PANIC: unprotected error in call to Lua API (%s)\n",
+				lua_tostring(L, -1));
+			return 0;  /* return to Lua to abort */
+		}
 		static void stderror_out(int status, const char* message)
 		{
 			std::cerr << message << std::endl;
@@ -46,18 +98,24 @@ namespace kaguya
 	public:
 
 		//! create Lua state with lua standard library
-		State() :state_(luaL_newstate()), created_(true)
+		template<typename Allocator = DefaultAllocator>
+		State(standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
+			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs();
 		}
 
 		//! create Lua state with(or without) library
-		State(const LoadLibs& libs) :state_(luaL_newstate()), created_(true)
+		template<typename Allocator = DefaultAllocator>
+		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
+			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs(libs);
 		}
+
+
 		State(lua_State* lua) :state_(lua), created_(false)
 		{
 			init();
