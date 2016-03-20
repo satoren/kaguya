@@ -15,8 +15,9 @@ namespace kaguya_api_benchmark______
 	void lua_table_bracket_operator_access(kaguya::State& state);
 	void lua_table_bracket_operator_assign(kaguya::State& state);
 	void lua_table_bracket_operator_get(kaguya::State& state);
-
 	void property_access(kaguya::State& state);
+
+	void lua_allocation(kaguya::State& state);
 }
 
 namespace original_api_no_type_check
@@ -24,4 +25,5 @@ namespace original_api_no_type_check
 	void call_native_function(kaguya::State& state);
 	void call_lua_function(kaguya::State& state);
 	void lua_table_access(kaguya::State& state);
+	void lua_allocation(kaguya::State& state);
 }

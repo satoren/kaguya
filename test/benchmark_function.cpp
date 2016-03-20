@@ -195,6 +195,15 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			"");
 	}
+	void lua_allocation(kaguya::State& state)
+	{
+		state("lua_table = { } "
+			"local times = 100000\n"
+			"for i=1,times do\n"
+			"lua_table['key'..i] =i\n"
+			"end\n"
+			"");
+	}
 }
 
 
@@ -207,13 +216,14 @@ namespace original_api_no_type_check
 		lua_pushnumber(L,result);
 		return 1;
 	}
-	void call_native_function(kaguya::State& state)
+	void call_native_function(kaguya::State& )
 	{
-		lua_State* s = state.state();
+		lua_State* s = luaL_newstate();
+		luaL_openlibs(s);
 		lua_pushcclosure(s, static_native_function_binding, 0);  /* closure with those upvalues */
 		lua_setglobal(s,"nativefun");
 
-		state(
+		luaL_dostring(s,
 			"local times = 1000000\n"
 			"for i=1,times do\n"
 			"local r = nativefun(i)\n"
@@ -222,10 +232,12 @@ namespace original_api_no_type_check
 			"end\n"
 			"end\n"
 			);
+		lua_close(s);
 	}
-	void call_lua_function(kaguya::State& state)
+	void call_lua_function(kaguya::State& )
 	{
-		lua_State* s = state.state();
+		lua_State* s = luaL_newstate();
+		luaL_openlibs(s);
 		luaL_dostring(s,"lua_function=function(i)return i;end");
 		lua_getglobal(s, "lua_function");
 		int funref = luaL_ref(s, LUA_REGISTRYINDEX);
@@ -238,23 +250,37 @@ namespace original_api_no_type_check
 			if (r != i) { throw std::logic_error(""); }
 			lua_pop(s, 1);
 		}
+		lua_close(s);
 	}
-	void lua_table_access(kaguya::State& state)
+	void lua_table_access(kaguya::State& )
 	{
-		lua_State* s = state.state();
+		lua_State* s = luaL_newstate();
+		luaL_openlibs(s);
 		luaL_dostring(s, "lua_table={value=0}");
 		for (int i = 0; i < 1000000; i++)
 		{
 			lua_getglobal(s, "lua_table");
-			lua_pushnumber(s,i);
-			lua_setfield(s,-2, "value");
+			lua_pushnumber(s, i);
+			lua_setfield(s, -2, "value");
 			lua_settop(s, 0);
 
 			lua_getglobal(s, "lua_table");
-			lua_getfield(s,-1, "value");
-			int v = static_cast<int>(lua_tonumber(s,-1));
+			lua_getfield(s, -1, "value");
+			int v = static_cast<int>(lua_tonumber(s, -1));
 			if (v != i) { throw std::logic_error(""); }
-			lua_settop(s,0);
+			lua_settop(s, 0);
 		}
+		lua_close(s);
+	}
+	void lua_allocation(kaguya::State& )
+	{
+		lua_State* s = luaL_newstate();
+		luaL_dostring(s, "lua_table = { } "
+			"local times = 100000\n"
+			"for i=1,times do\n"
+			"lua_table['key'..i] =i\n"
+			"end\n"
+			"");
+		lua_close(s);
 	}
 }

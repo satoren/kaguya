@@ -19,15 +19,17 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 
 
 		double mintime = std::numeric_limits<double>::max();
+
+		kaguya::State clockstate;
+
 		static const int N = 10;
 		for (int i = 0; i < N; ++i)
 		{
-			kaguya::State state;
-			double start = state["os"]["clock"]();
+			double start = clockstate["os"]["clock"]();
 
-			it->second(state);
+			it->second(kaguya::State());
 
-			double end = state["os"]["clock"]();
+			double end = clockstate["os"]["clock"]();
 			mintime = std::min(mintime, end - start);
 		}
 
@@ -55,7 +57,8 @@ int main()
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_access);
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_assign);
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_table_bracket_operator_get);
-	
+	ADD_BENCHMARK(kaguya_api_benchmark______::lua_allocation);
+	ADD_BENCHMARK(original_api_no_type_check::lua_allocation);
 
 
 	execute_benchmark(functionmap);
