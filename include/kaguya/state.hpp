@@ -98,7 +98,7 @@ namespace kaguya
 	public:
 
 		//! create Lua state with lua standard library
-		State() :allocator_holder_(), state_(lua_newstate(&AllocatorFunction<DefaultAllocator>, allocator_holder_.get())), created_(true)
+		State() :allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
 			init();
@@ -113,13 +113,13 @@ namespace kaguya
 		}
 
 		//! create Lua state with(or without) library
-		State(const LoadLibs& libs) : allocator_holder_(), state_(lua_newstate(&AllocatorFunction<DefaultAllocator>,0)), created_(true)
+		State(const LoadLibs& libs) : allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs(libs);
 		}
-		template<typename Allocator = DefaultAllocator>
+		template<typename Allocator>
 		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
