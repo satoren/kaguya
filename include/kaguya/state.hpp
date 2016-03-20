@@ -97,13 +97,24 @@ namespace kaguya
 
 	public:
 
-		//! create Lua state with lua standard library
+		//! 
+
+		/**
+		* @name constructor
+		* @brief create Lua state with lua standard library
+		*/
 		State() :allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs();
 		}
+
+		/**
+		* @name constructor
+		* @brief create Lua state with lua standard library. Can not use this constructor at luajit. error message is 'Must use luaL_newstate() for 64 bit target'
+		* @param allocator allocator for memory allocation @see DefaultAllocator
+		*/
 		template<typename Allocator>
 		State(standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
@@ -112,13 +123,24 @@ namespace kaguya
 			openlibs();
 		}
 
-		//! create Lua state with(or without) library
+		/**
+		* @name constructor
+		* @brief create Lua state with (or without) libraries.
+		* @param libs load libraries 
+		* e.g. LoadLibs libs;libs.push_back(LoadLib("libname",libfunction));State state(libs);
+		* e.g. State state({{"libname",libfunction}}); for c++ 11
+		*/
 		State(const LoadLibs& libs) : allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs(libs);
 		}
+		/**
+		* @name constructor
+		* @brief create Lua state with (or without) libraries. Can not use this constructor at luajit. error message is 'Must use luaL_newstate() for 64 bit target'
+		* @param allocator allocator for memory allocation @see DefaultAllocator
+		*/
 		template<typename Allocator>
 		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
@@ -128,6 +150,11 @@ namespace kaguya
 		}
 
 
+		/**
+		* @name constructor
+		* @brief construct using created lua_State. 
+		* @param lua created lua_State. It is not call lua_close() in this class
+		*/
 		State(lua_State* lua) :state_(lua), created_(false)
 		{
 			init();
@@ -140,28 +167,42 @@ namespace kaguya
 			}
 		}
 
+		/**
+		* @name setErrorHandler
+		* @brief set error handler for lua error.
+		*/
 		void setErrorHandler(standard::function<void(int statuscode, const char*message)> errorfunction)
 		{
 			util::ScopedSavedStack save(state_);
 			ErrorHandler::instance().registerHandler(state_, errorfunction);
 		}
 
-		//! load all lua standard library
+
+		/**
+		* @name openlibs
+		* @brief load all lua standard library
+		*/
 		void openlibs()
 		{
 			util::ScopedSavedStack save(state_);
 			luaL_openlibs(state_);
 		}
 
-		//! load lua library
+		/**
+		* @name openlib
+		* @brief load lua library
+		*/
 		void openlib(const LoadLib& lib)
 		{
 			util::ScopedSavedStack save(state_);
 
 			luaL_requiref(state_, lib.first.c_str(), lib.second, 1);
 		}
-
-		//! load lua libraries
+		
+		/**
+		* @name openlibs
+		* @brief load lua libraries
+		*/
 		void openlibs(const LoadLibs& libs)
 		{
 			for (LoadLibs::const_iterator it = libs.begin(); it != libs.end(); ++it)
