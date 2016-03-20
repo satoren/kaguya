@@ -374,7 +374,7 @@ namespace kaguya
 		standard::shared_ptr<void> get_shared_pointer(ObjectWrapperBase* from)const
 		{
 			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
-			if (!ptr) {
+			if (ptr) {
 				return ptr->object();
 			}
 			return standard::shared_ptr<void>();
