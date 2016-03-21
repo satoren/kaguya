@@ -25,6 +25,7 @@ namespace kaguya
 		public LuaBasicTypeFunctions<Derived>
 	{
 	private:
+
 		lua_State* state_()const
 		{
 			return static_cast<const Derived*>(this)->state();
@@ -48,14 +49,16 @@ namespace kaguya
 		template<typename T>
 		bool typeTest()const
 		{
-			util::ScopedSavedStack save(state_());
-			return lua_type_traits<T>::strictCheckType(state_(), pushStackIndex_(state_()));
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
 		}
 		template<typename T>
 		bool weakTypeTest()const
 		{
-			util::ScopedSavedStack save(state_());
-			return lua_type_traits<T>::checkType(state_(), pushStackIndex_(state_()));
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			return lua_type_traits<T>::checkType(state, pushStackIndex_(state));
 		}
 
 

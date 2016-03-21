@@ -639,8 +639,12 @@ namespace kaguya
 			TYPE_THREAD = LUA_TTHREAD,//!< thread(coroutine) type
 		};
 
-		bool isNilref_()const { return state_() == 0 || type() == LUA_REFNIL; }
-		
+		bool isNilref_()const {
+			int t = type();
+			return t == LUA_TNIL ||t == LUA_TNONE; }
+
+		typedef void (LuaBasicTypeFunctions::*bool_type)() const;
+		void this_type_does_not_support_comparisons() const {}
 		
 		/**
 		* @brief Equivalent to `#` operator for strings and tables with no metamethods.
@@ -683,7 +687,119 @@ namespace kaguya
 			return lua_typename(state_(), type());
 		}
 
-	private:
+
+		template<typename T>typename lua_type_traits<T>::get_type get()const
+		{
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			return lua_type_traits<T>::get(state, pushStackIndex_(state));
+		}
+		template<typename T>
+		typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+		{
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			int stackindex = pushStackIndex_(state);
+			if (allow_convertible)
+			{
+				was_valid = lua_type_traits<T>::checkType(state, stackindex);
+			}
+			else
+			{
+				was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+			}
+			if (was_valid)
+			{
+				return lua_type_traits<T>::get(state, stackindex);
+			}
+			else
+			{
+				return T();
+			}
+		}
+		template<typename T>
+		operator T()const
+		{
+			return get<T>();
+		}
+
+		operator bool_type() const
+		{
+			return (!isNilref() && get<bool>() == true) ? &LuaVariantImpl::this_type_does_not_support_comparisons : 0;
+		}
+
+
+		/**
+		* @name relational operators
+		* @brief
+		*/
+		//@{
+		template<typename OtherDrived>
+		inline bool operator==( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		{
+			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			int index = pushStackIndex_(state);
+			int rhsindex = rhs.pushStackIndex_(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(state, index, rhsindex, LUA_OPEQ) != 0;
+#else
+			return lua_equal(state, index, rhsindex) != 0;
+#endif
+		}
+		template<typename OtherDrived>
+		inline bool operator<( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		{
+			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() != !rhs.isNilref_(); }
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			int index = pushStackIndex_(state);
+			int rhsindex = rhs.pushStackIndex_(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(state, index, rhsindex, LUA_OPLT) != 0;
+#else
+			return lua_lessthan(state, index, rhsindex) != 0;
+#endif
+		}
+		template<typename OtherDrived>
+		inline bool operator<=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		{
+			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			int index = pushStackIndex_(state);
+			int rhsindex = rhs.pushStackIndex_(state);
+#if LUA_VERSION_NUM >= 502
+			return lua_compare(state, index, rhsindex, LUA_OPLE) != 0;
+#else
+			return lua_equal(state, index, rhsindex) != 0 || lua_lessthan(lfs.state_, index, rhsindex) != 0;
+#endif
+		}
+		template<typename OtherDrived>
+		inline bool operator>=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		{
+			return rhs <= (*this);
+		}
+		template<typename OtherDrived>
+		inline bool operator>(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		{
+			return rhs <  (*this);
+		}
+		template<typename OtherDrived>
+		inline bool operator!=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		{
+			return !this->operator==(rhs);
+		}
+		//@}
+
+		void dump(std::ostream& os)const
+		{
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			int stackIndex = pushStackIndex_(state);
+			util::stackValueDump(os, state, stackIndex);
+		}
 		lua_State* state_()const
 		{
 			return static_cast<const Derived*>(this)->state();
@@ -692,5 +808,55 @@ namespace kaguya
 		{
 			return static_cast<const Derived*>(this)->pushStackIndex(state);
 		}
+	private:
 	};
+
+
+
+	template<typename D>
+	inline std::ostream& operator<<(std::ostream& os, const LuaBasicTypeFunctions<D>& ref)
+	{
+		ref.dump(os);
+		return os;
+	}
+
+
+
+	/**
+	* @name relational operators
+	* @brief
+	*/
+	//@{
+
+#define KAGUYA_ENABLE_IF_NOT_LUAREF(RETTYPE) typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, RETTYPE>::type
+	template<typename D, typename T>
+	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator==(const LuaBasicTypeFunctions<D>& lhs, const T& rhs)
+	{
+		try
+		{
+			return lhs.get<const T&>() == rhs;
+		}
+		catch (const LuaTypeMismatch&)
+		{
+			return false;
+		}
+		return false;
+	}
+	template<typename D, typename T>
+	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator!=(const LuaBasicTypeFunctions<D>& lhs, const T& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	
+	template<typename D, typename T>
+	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator == (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
+	{
+		return rhs == lhs;
+	}
+	template<typename D, typename T>
+	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator != (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
+	{
+		return !(rhs == lhs);
+	}
+	//@}
 };
