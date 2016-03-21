@@ -251,13 +251,7 @@ namespace kaguya
 			lua_State *state()const { return state_; }
 
 			bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
-
-
-			operator bool_type() const
-			{
-				return (!isNilref()) ? &RegistoryRef::this_type_does_not_support_comparisons : 0;
-			}
-
+			
 		protected:
 			lua_State *state_;
 			int ref_;
