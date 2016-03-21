@@ -505,9 +505,9 @@ namespace kaguya
 		typedef std::vector<T, A> get_type;
 		typedef const std::vector<T, A>& push_type;
 
-		struct checkTypeForeatch
+		struct checkTypeForEach
 		{
-			checkTypeForeatch(bool& valid) :valid_(valid) {}
+			checkTypeForEach(bool& valid) :valid_(valid) {}
 			bool& valid_;
 			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
 			{
@@ -515,9 +515,9 @@ namespace kaguya
 				return valid_;
 			}
 		};
-		struct strictCheckTypeForeatch
+		struct strictCheckTypeForEach
 		{
-			strictCheckTypeForeatch(bool& valid) :valid_(valid) {}
+			strictCheckTypeForEach(bool& valid) :valid_(valid) {}
 			bool& valid_;
 			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
 			{
@@ -532,7 +532,7 @@ namespace kaguya
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 			
 			bool valid = true;
-			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForeatch(valid));
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForEach(valid));
 			return valid;
 		}
 		static bool strictCheckType(lua_State* l, int index)
@@ -541,7 +541,7 @@ namespace kaguya
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 
 			bool valid = true;
-			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForeatch(valid));
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForEach(valid));
 			return valid;
 		}
 
@@ -577,9 +577,9 @@ namespace kaguya
 		typedef std::map<K, V, C, A> get_type;
 		typedef const std::map<K, V, C, A>& push_type;
 
-		struct checkTypeForeatch
+		struct checkTypeForEach
 		{
-			checkTypeForeatch(bool& valid) :valid_(valid) {}
+			checkTypeForEach(bool& valid) :valid_(valid) {}
 			bool& valid_;
 			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
 			{
@@ -587,9 +587,9 @@ namespace kaguya
 				return valid_;
 			}
 		};
-		struct strictCheckTypeForeatch
+		struct strictCheckTypeForEach
 		{
-			strictCheckTypeForeatch(bool& valid) :valid_(valid) {}
+			strictCheckTypeForEach(bool& valid) :valid_(valid) {}
 			bool& valid_;
 			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
 			{
@@ -603,7 +603,7 @@ namespace kaguya
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 
 			bool valid = true;
-			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForeatch(valid));
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForEach(valid));
 			return valid;
 		}
 		static bool strictCheckType(lua_State* l, int index)
@@ -612,7 +612,7 @@ namespace kaguya
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 			
 			bool valid = true;
-			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForeatch(valid));
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForEach(valid));
 			return valid;
 		}
 
