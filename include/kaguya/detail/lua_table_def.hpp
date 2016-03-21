@@ -165,6 +165,34 @@ namespace kaguya
 				lua_pop(state_(), 1);//pop value
 			}
 		}
+
+
+		/**
+		* @brief foreach table fields
+		*/
+		template < class K, class V, class Fun> void foreach_table_breakable(Fun f)const
+		{
+			if (!state_())
+			{
+				except::typeMismatchError(state_(), "is nil");
+				return;
+			}
+			util::ScopedSavedStack save(state_());
+			int stackIndex = pushStackIndex_(state_());
+			lua_pushnil(state_());
+			while (lua_next(state_(), stackIndex) != 0)
+			{
+				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state_(), -1);
+				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state_(), -2);
+				bool cont = f(key, value);
+				lua_pop(state_(), 1);//pop value
+				if (!cont)
+				{
+					break;
+				}
+			}
+		}
+
 		/**
 		* @brief If type is table or userdata, return keys.
 		* @return field keys

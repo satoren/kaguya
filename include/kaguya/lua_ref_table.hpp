@@ -169,6 +169,28 @@ namespace kaguya
 			push(state_);
 			return lua_type_traits<T>::get(state_, -1);
 		}
+		template<typename T>
+		typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+		{
+			util::ScopedSavedStack save(state_);
+			push(state_);
+			if (allow_convertible)
+			{
+				was_valid = lua_type_traits<T>::checkType(state_, -1);
+			}
+			else
+			{
+				was_valid = lua_type_traits<T>::strictCheckType(state_, -1);
+			}
+			if (was_valid)
+			{
+				return lua_type_traits<T>::get(state_, -1);
+			}
+			else
+			{
+				return T();
+			}
+		}
 
 		int push(lua_State* state)const
 		{
@@ -483,33 +505,44 @@ namespace kaguya
 		typedef std::vector<T, A> get_type;
 		typedef const std::vector<T, A>& push_type;
 
+		struct checkTypeForeatch
+		{
+			checkTypeForeatch(bool& valid) :valid_(valid) {}
+			bool& valid_;
+			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
+			{
+				valid_ = k.typeTest<size_t>() && v.weakTypeTest<T>();
+				return valid_;
+			}
+		};
+		struct strictCheckTypeForeatch
+		{
+			strictCheckTypeForeatch(bool& valid) :valid_(valid) {}
+			bool& valid_;
+			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
+			{
+				valid_ = k.typeTest<size_t>() && v.typeTest<T>();
+				return valid_;
+			}
+		};
+
 		static bool checkType(lua_State* l, int index)
 		{
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				if (!it->first.typeTest<size_t>() || !it->second.weakTypeTest<T>())
-				{
-					return false;
-				}
-			}
-			return true;
+			
+			bool valid = true;
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForeatch(valid));
+			return valid;
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				if (!it->first.typeTest<size_t>() || !it->second.typeTest<T>())
-				{
-					return false;
-				}
-			}
-			return true;
+
+			bool valid = true;
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForeatch(valid));
+			return valid;
 		}
 
 		static get_type get(lua_State* l, int index)
@@ -517,16 +550,10 @@ namespace kaguya
 			get_type result;
 			if (!checkType(l, index))
 			{
+				except::typeMismatchError(l, std::string("type mismatch"));
 				return result;
 			}
-			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
-			std::vector<LuaRef> values = table.values();
-			result.reserve(values.size());
-			for (std::vector<LuaRef>::iterator it = values.begin(); it != values.end(); ++it)
-			{
-				result.push_back(it->get<T>());
-			}
-			return result;
+			return lua_type_traits<LuaRef>::get(l, index).values<T>();
 		}
 		static int push(lua_State* l, push_type v)
 		{
@@ -550,49 +577,54 @@ namespace kaguya
 		typedef std::map<K, V, C, A> get_type;
 		typedef const std::map<K, V, C, A>& push_type;
 
+		struct checkTypeForeatch
+		{
+			checkTypeForeatch(bool& valid) :valid_(valid) {}
+			bool& valid_;
+			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
+			{
+				valid_ = k.weakTypeTest<K>() && v.weakTypeTest<V>();
+				return valid_;
+			}
+		};
+		struct strictCheckTypeForeatch
+		{
+			strictCheckTypeForeatch(bool& valid) :valid_(valid) {}
+			bool& valid_;
+			bool operator()(const LuaStackRef& k, const LuaStackRef& v)
+			{
+				valid_ = k.typeTest<K>() && v.typeTest<V>();
+				return valid_;
+			}
+		};
 		static bool checkType(lua_State* l, int index)
 		{
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				if (!it->first.typeTest<K>() || !it->second.weakTypeTest<V>())
-				{
-					return false;
-				}
-			}
-			return true;
+
+			bool valid = true;
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForeatch(valid));
+			return valid;
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				if (!it->first.typeTest<K>() || !it->second.typeTest<V>())
-				{
-					return false;
-				}
-			}
-			return true;
+			
+			bool valid = true;
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForeatch(valid));
+			return valid;
 		}
 
 		static get_type get(lua_State* l, int index)
 		{
 			get_type result;
-			if(!checkType(l, index))
+			if (!checkType(l, index))
 			{
+				except::typeMismatchError(l, std::string("type mismatch"));
 				return result;
 			}
-			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
-			std::map<LuaRef, LuaRef> values = table.map();
-			for (std::map<LuaRef, LuaRef>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				result[it->first.get<K>()] = it->second.get<V>();
-			}
-			return result;
+			return lua_type_traits<LuaRef>::get(l, index).map<K, V>();
 		}
 		static int push(lua_State* l, push_type v)
 		{
