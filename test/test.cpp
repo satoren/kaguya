@@ -911,6 +911,7 @@ namespace t_03_function
 		TEST_EQUAL(b[3], 4);
 		TEST_EQUAL(b[4], 8);
 		TEST_EQUAL(b[5], 16);
+		TEST_CHECK(state["arraytablefn"]().typeTest<std::vector<int> >());
 #endif
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		state("tablefn =function() return {a=32,b=1,c=2} end");
@@ -919,6 +920,7 @@ namespace t_03_function
 		TEST_EQUAL(m["a"], 32);
 		TEST_EQUAL(m["b"], 1);
 		TEST_EQUAL(m["c"], 2);
+		TEST_CHECK(!state["tablefn"]().typeTest<std::vector<int> >());
 #endif
 	}
 
