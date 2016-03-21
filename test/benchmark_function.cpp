@@ -7,10 +7,6 @@ namespace
 	{
 		return arg;
 	}
-}
-
-namespace kaguya_api_benchmark______
-{
 	class SetGet
 	{
 	public:
@@ -27,6 +23,10 @@ namespace kaguya_api_benchmark______
 	private:
 		double _i;
 	};
+}
+
+namespace kaguya_api_benchmark______
+{
 	void simple_get_set(kaguya::State& state)
 	{
 		state["SetGet"].setClass(kaguya::ClassMetatable<SetGet>()
@@ -204,11 +204,84 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			"");
 	}
+
+
+	void vectormapping(kaguya::State& state)
+	{
+		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
+		kaguya::LuaTable lua_table = state["lua_table"];
+		for (int i = 0; i < 100000; i++)
+		{
+			std::vector<double> r = lua_table;
+		}
+	
+	}
 }
 
 
 namespace original_api_no_type_check
 {
+	int setget_new(lua_State* L)
+	{
+		void* ptr = lua_newuserdata(L, sizeof(SetGet));
+		new(ptr) SetGet();
+		luaL_setmetatable(L, "SetGet");
+		return 1;
+	}
+	int setget_set(lua_State* L)
+	{
+		SetGet* setget = static_cast<SetGet*>(luaL_checkudata(L, 1, "SetGet"));
+		setget->set(lua_tonumber(L,2));
+		return 0;
+	}
+	int setget_get(lua_State* L)
+	{
+		SetGet* setget = static_cast<SetGet*>(luaL_checkudata(L, 1, "SetGet"));
+		lua_pushnumber(L, setget->get());
+		return 1;
+	}
+
+	void simple_get_set(kaguya::State& )
+	{
+		lua_State* s = luaL_newstate();
+		luaL_openlibs(s);
+		luaL_newmetatable(s,"SetGet");
+
+		luaL_Reg funcs[] = 
+		{
+			{ "new",setget_new },
+			{ 0 ,0 },
+		};
+		luaL_setfuncs(s, funcs, 0);
+
+		lua_newtable(s);
+
+		luaL_Reg indexfuncs[] =
+		{
+			{ "set",setget_set },
+			{ "get",setget_get },
+			{ 0 ,0 },
+		};
+		luaL_setfuncs(s, indexfuncs, 0);
+		lua_setfield(s,-2,"__index");
+
+
+		lua_setglobal(s, "SetGet");
+
+		luaL_dostring(s,
+			"local getset = SetGet.new()\n"
+			"local times = 1000000\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+		lua_close(s);
+	}
+
+
 	int static_native_function_binding(lua_State* L)
 	{
 		int arg = static_cast<int>(lua_tonumber(L,1));

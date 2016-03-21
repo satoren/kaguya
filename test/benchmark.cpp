@@ -45,6 +45,7 @@ int main()
 	benchmark_function_map_t functionmap;
 #define ADD_BENCHMARK(function) functionmap.push_back(std::make_pair(#function,&function));
 	ADD_BENCHMARK(empty);
+	ADD_BENCHMARK(original_api_no_type_check::simple_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::property_access);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_contain_propery_member);
@@ -62,6 +63,8 @@ int main()
 	ADD_BENCHMARK(kaguya_api_benchmark______::lua_allocation);
 	ADD_BENCHMARK(original_api_no_type_check::lua_allocation);
 
+	ADD_BENCHMARK(kaguya_api_benchmark______::vectormapping);
+	
 
 	execute_benchmark(functionmap);
 
