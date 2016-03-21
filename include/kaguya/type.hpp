@@ -45,15 +45,6 @@ namespace kaguya
 		class_userdata::setmetatable<T>(l);
 		return 1;
 	}
-	template<typename T, typename Enable>
-	int lua_type_traits<T, Enable>::push(lua_State* l, NCRT& v)
-	{
-		typedef ObjectPointerWrapper<T> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(&v);
-		class_userdata::setmetatable<T>(l);
-		return 1;
-	}
 
 #if KAGUYA_USE_RVALUE_REFERENCE
 

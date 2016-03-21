@@ -79,7 +79,6 @@ namespace kaguya
 
 		static get_type get(lua_State* l, int index);
 		static int push(lua_State* l, push_type v);
-		static int push(lua_State* l, NCRT& v);
 #if KAGUYA_USE_RVALUE_REFERENCE
 		static int push(lua_State* l, NCRT&& v);
 #endif
@@ -90,4 +89,9 @@ namespace kaguya
 	template< typename T>
 	struct is_registerable<T, typename lua_type_traits<T>::Registerable> : traits::integral_constant<bool, true> {};
 
+
+	template< typename T, typename Enable = void>
+	struct is_usertype : traits::integral_constant<bool, false> {};
+	template< typename T>
+	struct is_usertype<T, typename lua_type_traits<T>::Registerable> : traits::integral_constant<bool, true> {};
 };

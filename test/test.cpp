@@ -362,9 +362,9 @@ namespace t_02_classreg
 		{
 			return member != rhs.member;
 		}
+		int member;
 	private:
 		CopyableClass();
-		int member;
 	};
 	void copyable_class_test(kaguya::State& state)
 	{
@@ -377,6 +377,12 @@ namespace t_02_classreg
 		TEST_CHECK(CopyableClass(2) == state["copy"]);
 		CopyableClass copy = state["copy"];
 		TEST_CHECK(copy == CopyableClass(2));
+
+		CopyableClass src(5);
+		state["copied"] = src;
+		src.member = 12;
+		CopyableClass copied = state["copied"];
+		TEST_CHECK(copied != src);
 	}
 
 
@@ -731,12 +737,12 @@ namespace t_02_classreg
 		TEST_CHECK(state("prop.mem.a=455"));
 		TEST_EQUAL(prop.mem.a, 455);
 
-		{//member retain check
-			state["prop"] = PropHolder();
-			TEST_CHECK(state("member = prop.mem"));
-			TEST_CHECK(state("prop = nil"));
-			state.garbageCollect();
-			TEST_CHECK(state("member.a = 3232"));
+		{//member retain not supported now
+//			state["prop"] = PropHolder();
+//			TEST_CHECK(state("member = prop.mem"));
+//			TEST_CHECK(state("prop = nil"));
+//			state.garbageCollect();
+//			TEST_CHECK(state("member.a = 3232"));
 		}
 	}
 }

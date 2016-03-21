@@ -264,11 +264,25 @@ namespace kaguya
 						{
 							throw LuaTypeMismatch("type mismatch!!");
 						}
-						return lua_type_traits<MemType>::push(state, this_->*m);
+						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
+						{
+							return lua_type_traits<standard::reference_wrapper<const MemType> >::push(state, standard::reference_wrapper<const MemType>(this_->*m));
+						}
+						else
+						{
+							return lua_type_traits<MemType>::push(state, this_->*m);
+						}
 					}
 					else
 					{
-						return lua_type_traits<MemType>::push(state, this_->*m);
+						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
+						{
+							return lua_type_traits<standard::reference_wrapper<MemType> >::push(state, standard::reference_wrapper<MemType>(this_->*m));
+						}
+						else
+						{
+							return lua_type_traits<MemType>::push(state, this_->*m);
+						}
 					}
 				}
 				else
