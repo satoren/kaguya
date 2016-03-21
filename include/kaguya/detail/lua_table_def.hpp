@@ -149,18 +149,19 @@ namespace kaguya
 		*/
 		template < class K, class V, class Fun> void foreach_table(Fun f)const
 		{
-			if (!state_())
+			lua_State* state = state_();
+			if (!state)
 			{
-				except::typeMismatchError(state_(), "is nil");
+				except::typeMismatchError(state, "is nil");
 				return;
 			}
-			util::ScopedSavedStack save(state_());
-			int stackIndex = pushStackIndex_(state_());
-			lua_pushnil(state_());
-			while (lua_next(state_(), stackIndex) != 0)
+			util::ScopedSavedStack save(state);
+			int stackIndex = pushStackIndex_(state);
+			lua_pushnil(state);
+			while (lua_next(state, stackIndex) != 0)
 			{
-				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state_(), -1);
-				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state_(), -2);
+				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
+				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
 				f(key, value);
 				lua_pop(state_(), 1);//pop value
 			}

@@ -422,7 +422,7 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
-			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
+			LuaStackRef table(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 			
 			bool valid = true;
@@ -431,7 +431,7 @@ namespace kaguya
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
+			LuaStackRef table(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 
 			bool valid = true;
@@ -441,13 +441,12 @@ namespace kaguya
 
 		static get_type get(lua_State* l, int index)
 		{
-			get_type result;
-			if (!checkType(l, index))
+			if (lua_type(l, index) != LUA_TTABLE)
 			{
 				except::typeMismatchError(l, std::string("type mismatch"));
-				return result;
+				return get_type();
 			}
-			return lua_type_traits<LuaRef>::get(l, index).values<T>();
+			return LuaStackRef(l, index).values<T>();
 		}
 		static int push(lua_State* l, push_type v)
 		{
@@ -493,7 +492,7 @@ namespace kaguya
 		};
 		static bool checkType(lua_State* l, int index)
 		{
-			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
+			LuaStackRef table(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 
 			bool valid = true;
@@ -502,7 +501,7 @@ namespace kaguya
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
+			LuaStackRef table(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
 			
 			bool valid = true;
@@ -512,13 +511,12 @@ namespace kaguya
 
 		static get_type get(lua_State* l, int index)
 		{
-			get_type result;
-			if (!checkType(l, index))
+			if (lua_type(l, index) != LUA_TTABLE)
 			{
 				except::typeMismatchError(l, std::string("type mismatch"));
-				return result;
+				return get_type();
 			}
-			return lua_type_traits<LuaRef>::get(l, index).map<K, V>();
+			return LuaStackRef(l, index).map<K, V>();
 		}
 		static int push(lua_State* l, push_type v)
 		{

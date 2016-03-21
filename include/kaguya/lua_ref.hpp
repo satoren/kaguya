@@ -279,6 +279,9 @@ namespace kaguya
 		LuaStackRef(lua_State* s, int index) :Ref::StackRef(s, index, false)
 		{
 		}
+		LuaStackRef(const LuaStackRef& src) :Ref::StackRef(Ref::StackRef::state_, Ref::StackRef::stack_index_,false)
+		{
+		}
 	};
 	inline lua_type_traits<LuaStackRef>::get_type lua_type_traits<LuaStackRef>::get(lua_State* l, int index)
 	{
