@@ -725,7 +725,7 @@ namespace kaguya
 
 		operator bool_type() const
 		{
-			return (!isNilref() && get<bool>() == true) ? &LuaVariantImpl::this_type_does_not_support_comparisons : 0;
+			return (!isNilref_() && get<bool>() == true) ? &LuaBasicTypeFunctions::this_type_does_not_support_comparisons : 0;
 		}
 
 
@@ -773,7 +773,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 502
 			return lua_compare(state, index, rhsindex, LUA_OPLE) != 0;
 #else
-			return lua_equal(state, index, rhsindex) != 0 || lua_lessthan(lfs.state_, index, rhsindex) != 0;
+			return lua_equal(state, index, rhsindex) != 0 || lua_lessthan(state, index, rhsindex) != 0;
 #endif
 		}
 		template<typename OtherDrived>
@@ -790,6 +790,25 @@ namespace kaguya
 		inline bool operator!=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
 			return !this->operator==(rhs);
+		}
+
+		template<typename T>
+		inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator==(const T& rhs)const
+		{
+			try
+			{
+				return get<const T&>() == rhs;
+			}
+			catch (const LuaTypeMismatch&)
+			{
+				return false;
+			}
+			return false;
+		}
+		template<typename T>
+		inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator!=( const T& rhs)const
+		{
+			return !((*this) == rhs);
 		}
 		//@}
 
@@ -829,25 +848,6 @@ namespace kaguya
 	//@{
 
 #define KAGUYA_ENABLE_IF_NOT_LUAREF(RETTYPE) typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, RETTYPE>::type
-	template<typename D, typename T>
-	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator==(const LuaBasicTypeFunctions<D>& lhs, const T& rhs)
-	{
-		try
-		{
-			return lhs.get<const T&>() == rhs;
-		}
-		catch (const LuaTypeMismatch&)
-		{
-			return false;
-		}
-		return false;
-	}
-	template<typename D, typename T>
-	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator!=(const LuaBasicTypeFunctions<D>& lhs, const T& rhs)
-	{
-		return !(lhs == rhs);
-	}
-	
 	template<typename D, typename T>
 	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator == (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
 	{

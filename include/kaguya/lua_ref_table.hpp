@@ -179,30 +179,15 @@ namespace kaguya
 			return push(state_);
 		}
 
-		operator LuaRef() const {
-			return get<LuaRef>();
-		}
-		operator LuaTable() const {
-			return get<LuaTable>();
-		}
-		operator LuaUserData() const {
-			return get<LuaUserData>();
-		}
-		operator LuaFunction() const {
-			return get<LuaFunction>();
-		}
-		operator LuaThread() const {
-			return get<LuaThread>();
-		}
 
 		/**
 		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
 		* @param function_name function_name in table
 		*/
-		mem_fun_binder operator->*(const char* function_name)
-		{
-			return get<LuaRef>()->*(function_name);
-		}
+//		mem_fun_binder operator->*(const char* function_name)
+//		{
+//			return get<LuaRef>()->*(function_name);
+//		}
 
 
 		int type()const
@@ -218,62 +203,6 @@ namespace kaguya
 			{
 				lua_settop(state_, stack_top_);
 			}
-		}
-
-		bool operator==(const TableKeyReference& rhs)
-		{
-			return get<LuaRef>() == rhs.get<LuaRef>();
-		}
-		bool operator!=(const TableKeyReference& rhs)
-		{
-			return !(*this == rhs);
-		}
-		bool operator<(const TableKeyReference& rhs)
-		{
-			return get<LuaRef>() < rhs.get<LuaRef>();
-		}
-		bool operator<=(const TableKeyReference& rhs)
-		{
-			return get<LuaRef>() <= rhs.get<LuaRef>();
-		}
-		bool operator>=(const TableKeyReference& rhs)
-		{
-			return !(*this <= rhs);
-		}
-		bool operator>(const TableKeyReference& rhs)
-		{
-			return !(*this < rhs);
-		}
-
-		template<typename T>
-		bool operator==(const T& rhs)
-		{
-			return get<T>() == rhs;
-		}
-		template<typename T>
-		bool operator!=(const T& rhs)
-		{
-			return !(*this == rhs);
-		}
-		template<typename T>
-		bool operator<(const T& rhs)
-		{
-			return get<T>() < rhs;
-		}
-		template<typename T>
-		bool operator<=(const T& rhs)
-		{
-			return get<T>() <= rhs;
-		}
-		template<typename T>
-		bool operator>=(const T& rhs)
-		{
-			return rhs <= *this;
-		}
-		template<typename T>
-		bool operator>(const T& rhs)
-		{
-			return rhs < *this;
 		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
