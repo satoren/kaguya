@@ -221,11 +221,23 @@ namespace kaguya_api_benchmark______
 
 namespace original_api_no_type_check
 {
+
+	void setmetatable(lua_State *L, const char *tname) {
+		luaL_getmetatable(L, tname);
+		lua_setmetatable(L, -2);
+	}
+	void setfuncs(lua_State *L, const luaL_Reg *l) {
+		for (; l->name != 0; l++) { 
+			lua_pushcclosure(L, l->func, 0); 
+			lua_setfield(L, -2, l->name);
+		}
+	}
+
 	int setget_new(lua_State* L)
 	{
 		void* ptr = lua_newuserdata(L, sizeof(SetGet));
 		new(ptr) SetGet();
-		luaL_setmetatable(L, "SetGet");
+		setmetatable(L, "SetGet");
 		return 1;
 	}
 	int setget_set(lua_State* L)
@@ -241,6 +253,7 @@ namespace original_api_no_type_check
 		return 1;
 	}
 
+
 	void simple_get_set(kaguya::State& )
 	{
 		lua_State* s = luaL_newstate();
@@ -252,7 +265,7 @@ namespace original_api_no_type_check
 			{ "new",setget_new },
 			{ 0 ,0 },
 		};
-		luaL_setfuncs(s, funcs, 0);
+		setfuncs(s, funcs);
 
 		lua_newtable(s);
 
@@ -262,7 +275,7 @@ namespace original_api_no_type_check
 			{ "get",setget_get },
 			{ 0 ,0 },
 		};
-		luaL_setfuncs(s, indexfuncs, 0);
+		setfuncs(s, indexfuncs);
 		lua_setfield(s,-2,"__index");
 
 
