@@ -162,12 +162,36 @@ namespace kaguya
 			push(state_);
 			return lua_type_traits<LuaRef>::get(state_, -1);
 		}
+
+
 		template<typename T>
 		typename lua_type_traits<T>::get_type get()const
 		{
 			util::ScopedSavedStack save(state_);
 			push(state_);
 			return lua_type_traits<T>::get(state_, -1);
+		}
+		template<typename T>
+		typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+		{
+			util::ScopedSavedStack save(state_);
+			push(state_);
+			if (allow_convertible)
+			{
+				was_valid = lua_type_traits<T>::checkType(state_, -1);
+			}
+			else
+			{
+				was_valid = lua_type_traits<T>::strictCheckType(state_, -1);
+			}
+			if (was_valid)
+			{
+				return lua_type_traits<T>::get(state_, -1);
+			}
+			else
+			{
+				return T();
+			}
 		}
 
 		int push(lua_State* state)const
@@ -517,6 +541,7 @@ namespace kaguya
 			get_type result;
 			if (!checkType(l, index))
 			{
+				except::typeMismatchError(l, std::string("type mismatch"));
 				return result;
 			}
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);
@@ -584,6 +609,7 @@ namespace kaguya
 			get_type result;
 			if(!checkType(l, index))
 			{
+				except::typeMismatchError(l, std::string("type mismatch"));
 				return result;
 			}
 			LuaRef table = lua_type_traits<LuaRef>::get(l, index);

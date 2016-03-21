@@ -837,6 +837,19 @@ namespace t_03_function
 		TEST_EQUAL(ptr->args[1].get<std::string>(), "hana-uta");
 		TEST_EQUAL(ptr->args[2].get<int>(), 5);
 
+		bool typevalid;
+		TEST_EQUAL(ptr->args[0].get<std::string>(typevalid), "hanaregumi");
+		TEST_CHECK(typevalid);
+		TEST_EQUAL(ptr->args[1].get<std::string>(typevalid), "hana-uta");
+		TEST_CHECK(typevalid);
+		TEST_EQUAL(ptr->args[2].get<int>(typevalid), 5);
+		TEST_CHECK(typevalid);
+		TEST_EQUAL(ptr->args[2].get<std::string>(typevalid), "5");
+		TEST_CHECK(typevalid);
+		ptr->args[2].get<std::string>(typevalid, false);
+		TEST_CHECK(!typevalid);
+
+
 		state("var = Vari.new('abc')");
 		ptr = state["var"];
 
@@ -1371,6 +1384,18 @@ namespace t_04_lua_ref
 		TEST_CHECK(luanum.typeTest<int>());
 		TEST_CHECK(!luanum.typeTest<std::string>());
 		TEST_CHECK(!luanum.typeTest<ob>());
+
+
+
+		bool typevalid;
+		TEST_EQUAL(luanum.get<std::string>(typevalid), "422");
+		TEST_CHECK(typevalid);
+		TEST_EQUAL(luanum.get<int>(typevalid), 422);
+		TEST_CHECK(typevalid);
+		luanum.get<std::string>(typevalid, false);
+		TEST_CHECK(!typevalid);
+
+
 	}
 
 

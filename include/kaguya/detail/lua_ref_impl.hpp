@@ -79,13 +79,29 @@ namespace kaguya
 				return lua_type_traits<T>::get(state_, stack_index_);
 			}
 			template<typename T>
+			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+			{
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state_, stack_index_);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state_, stack_index_);
+				}
+				if (was_valid)
+				{
+					return lua_type_traits<T>::get(state_, stack_index_);
+				}
+				else
+				{
+					return T();
+				}
+			}
+			template<typename T>
 			operator T()const
 			{
 				return get<T>();
-			}
-			operator int()const
-			{
-				return get<int>();
 			}
 
 			bool isNilref()const { return state_ == 0 || lua_type(state_, stack_index_) == LUA_TNIL; }
@@ -329,6 +345,28 @@ namespace kaguya
 			{
 				util::ScopedSavedStack save(state_);
 				return lua_type_traits<T>::get(state_, pushStackIndex(state_));
+			}
+			template<typename T>
+			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+			{
+				util::ScopedSavedStack save(state_);
+				int stackIndex = pushStackIndex(state_);
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state_, stackIndex);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state_, stackIndex);
+				}
+				if (was_valid)
+				{
+					return lua_type_traits<T>::get(state_, stackIndex);
+				}
+				else
+				{
+					return T();
+				}
 			}
 
 			template<typename T>
