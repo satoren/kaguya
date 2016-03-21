@@ -311,7 +311,7 @@ namespace kaguya
 		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 		{
 			except::typeMismatchError(state, lua_typename(state, t) + std::string("is not table"));
-			return LuaRef(state);
+			return false;
 		}
 		table.push();
 		return lua_setmetatable(state, stackindex) != 0;
