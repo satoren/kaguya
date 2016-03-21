@@ -797,7 +797,7 @@ namespace kaguya
 		{
 			try
 			{
-				return get<const T&>() == rhs;
+				return get<T>() == rhs;
 			}
 			catch (const LuaTypeMismatch&)
 			{
