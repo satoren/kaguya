@@ -128,15 +128,11 @@ namespace kaguya
 			return const_iterator(state_, endIndex_);
 		}
 
-
+		
 		template<class Result>
-		Result get()const
+		Result get_result()const
 		{
 			return util::get_result<Result>(state_, startIndex_);
-		}
-		template<typename T>
-		operator T()const {
-			return get<T>();
 		}
 		lua_State* state()const { return state_; }
 		int pushStackIndex(lua_State* state)const {
@@ -172,19 +168,7 @@ namespace kaguya
 		{
 			return endIndex_ - startIndex_;
 		}
-
-		template<typename T>
-		bool operator == (const T v)const
-		{
-			return get<T>() == v;
-		}
-		template<typename T>
-		bool operator != (const T v)const
-		{
-			return !((*this) == v);
-		}
-		bool operator == (const char* v)const { return get<std::string>() == v; }
-
+		
 		//push first result
 		int push(lua_State* state)const
 		{
@@ -211,7 +195,7 @@ namespace kaguya
 	template<typename RetType>
 	inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag)
 	{
-		return FunctionResults(state, retindex).get<RetType>();
+		return FunctionResults(state, retindex).get_result<RetType>();
 	}
 	inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
 	{

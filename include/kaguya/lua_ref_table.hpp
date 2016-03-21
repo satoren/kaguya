@@ -98,14 +98,7 @@ namespace kaguya
 
 		friend class LuaRef;
 		friend class State;
-
-		template<typename T>
-		operator T()const {
-			util::ScopedSavedStack save(state_);
-			push(state_);
-			return lua_type_traits<T>::get(state_, -1);
-		}
-
+		
 		//! this is not copy.same assign from referenced value.
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
@@ -162,35 +155,7 @@ namespace kaguya
 			push(state_);
 			return lua_type_traits<LuaRef>::get(state_, -1);
 		}
-		template<typename T>
-		typename lua_type_traits<T>::get_type get()const
-		{
-			util::ScopedSavedStack save(state_);
-			push(state_);
-			return lua_type_traits<T>::get(state_, -1);
-		}
-		template<typename T>
-		typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
-		{
-			util::ScopedSavedStack save(state_);
-			push(state_);
-			if (allow_convertible)
-			{
-				was_valid = lua_type_traits<T>::checkType(state_, -1);
-			}
-			else
-			{
-				was_valid = lua_type_traits<T>::strictCheckType(state_, -1);
-			}
-			if (was_valid)
-			{
-				return lua_type_traits<T>::get(state_, -1);
-			}
-			else
-			{
-				return T();
-			}
-		}
+
 
 		int push(lua_State* state)const
 		{
@@ -215,30 +180,15 @@ namespace kaguya
 			return push(state_);
 		}
 
-		operator LuaRef() const {
-			return get<LuaRef>();
-		}
-		operator LuaTable() const {
-			return get<LuaTable>();
-		}
-		operator LuaUserData() const {
-			return get<LuaUserData>();
-		}
-		operator LuaFunction() const {
-			return get<LuaFunction>();
-		}
-		operator LuaThread() const {
-			return get<LuaThread>();
-		}
 
 		/**
 		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
 		* @param function_name function_name in table
 		*/
-		mem_fun_binder operator->*(const char* function_name)
-		{
-			return get<LuaRef>()->*(function_name);
-		}
+//		mem_fun_binder operator->*(const char* function_name)
+//		{
+//			return get<LuaRef>()->*(function_name);
+//		}
 
 
 		int type()const
@@ -254,62 +204,6 @@ namespace kaguya
 			{
 				lua_settop(state_, stack_top_);
 			}
-		}
-
-		bool operator==(const TableKeyReference& rhs)
-		{
-			return get<LuaRef>() == rhs.get<LuaRef>();
-		}
-		bool operator!=(const TableKeyReference& rhs)
-		{
-			return !(*this == rhs);
-		}
-		bool operator<(const TableKeyReference& rhs)
-		{
-			return get<LuaRef>() < rhs.get<LuaRef>();
-		}
-		bool operator<=(const TableKeyReference& rhs)
-		{
-			return get<LuaRef>() <= rhs.get<LuaRef>();
-		}
-		bool operator>=(const TableKeyReference& rhs)
-		{
-			return !(*this <= rhs);
-		}
-		bool operator>(const TableKeyReference& rhs)
-		{
-			return !(*this < rhs);
-		}
-
-		template<typename T>
-		bool operator==(const T& rhs)
-		{
-			return get<T>() == rhs;
-		}
-		template<typename T>
-		bool operator!=(const T& rhs)
-		{
-			return !(*this == rhs);
-		}
-		template<typename T>
-		bool operator<(const T& rhs)
-		{
-			return get<T>() < rhs;
-		}
-		template<typename T>
-		bool operator<=(const T& rhs)
-		{
-			return get<T>() <= rhs;
-		}
-		template<typename T>
-		bool operator>=(const T& rhs)
-		{
-			return rhs <= *this;
-		}
-		template<typename T>
-		bool operator>(const T& rhs)
-		{
-			return rhs < *this;
 		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
@@ -418,7 +312,7 @@ namespace kaguya
 		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 		{
 			except::typeMismatchError(state, lua_typename(state, t) + std::string("is not table"));
-			return LuaRef(state);
+			return false;
 		}
 		table.push();
 		return lua_setmetatable(state, stackindex) != 0;
