@@ -553,7 +553,7 @@ namespace t_02_classreg
 		TEST_CHECK(state("assert(2 == shared_ptr_function(base))"));
 		TEST_EQUAL(base->a, 2);
 
-		state["shared_ptr_function"] = kaguya::overload(&receive_base_shared_ptr_function,&receive_shared_ptr_function);
+		state["shared_ptr_function"] = kaguya::overload(&receive_base_shared_ptr_function, &receive_shared_ptr_function);
 		TEST_CHECK(state("assert(5 == shared_ptr_function(derived))"));
 		TEST_EQUAL(derived->b, 5);
 		TEST_CHECK(state("assert(2 == shared_ptr_function(base))"));
@@ -745,6 +745,161 @@ namespace t_02_classreg
 //			TEST_CHECK(state("member.a = 3232"));
 		}
 	}
+
+	void object_take_copy(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
+			.addProperty("a", &Base::a)
+			);
+
+		TEST_CHECK(state("fn = function(object,value) object.a = value end"));
+		{
+			Base base;
+			base.a = 232;
+			state["obj"] = base;
+			TEST_CHECK(state("assert(obj.a==232)"));
+			TEST_CHECK(state("obj.a = 2"));
+			TEST_CHECK(state("assert(obj.a==2)"));
+			TEST_EQUAL(base.a, 232);
+
+			state.garbageCollect();
+			TEST_CHECK(state("assert(obj.a==2)"));
+
+			state["fn"](base, 54);
+			TEST_EQUAL(base.a, 232);
+		}
+		{//
+			Base basesrc;
+			Base& base = basesrc;
+			base.a = 232;
+			state["obj"] = base;
+			TEST_CHECK(state("assert(obj.a==232)"));
+			TEST_CHECK(state("obj.a = 2"));
+			TEST_CHECK(state("assert(obj.a==2)"));
+			TEST_EQUAL(base.a, 232);
+
+			state.garbageCollect();
+			TEST_CHECK(state("assert(obj.a==2)"));
+
+			state["fn"](base, 54);
+			TEST_EQUAL(base.a, 232);
+		}
+		{//
+			Base basesrc;
+			const Base& base = basesrc;
+			basesrc.a = 232;
+			state["obj"] = base;
+			TEST_CHECK(state("assert(obj.a==232)"));
+			TEST_CHECK(state("obj.a = 2"));
+			TEST_CHECK(state("assert(obj.a==2)"));
+			TEST_EQUAL(base.a, 232);
+
+			state.garbageCollect();
+			TEST_CHECK(state("assert(obj.a==2)"));
+
+			state["fn"](base, 54);
+			TEST_EQUAL(base.a, 232);
+		}
+	}
+	void object_take_pointer(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
+			.addProperty("a", &Base::a)
+			);
+		TEST_CHECK(state("fn = function(object,value) object.a = value end"));
+
+		Base base;
+		base.a = 232;
+		state["obj"] = &base;
+		TEST_CHECK(state("assert(obj.a==232)"));
+		TEST_CHECK(state("obj.a = 2"));
+		TEST_CHECK(state("assert(obj.a==2)"));
+		TEST_EQUAL(base.a, 2);
+
+		state.garbageCollect();
+		TEST_CHECK(state("assert(obj.a==2)"));
+
+		state["fn"](&base, 54);
+		TEST_EQUAL(base.a, 54);
+
+	}
+	void object_take_reference(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
+			.addProperty("a", &Base::a)
+			);
+		TEST_CHECK(state("fn = function(object,value) object.a = value end"));
+
+		Base base;
+		base.a = 232;
+		state["obj"] = kaguya::standard::ref(base);
+		TEST_CHECK(state("assert(obj.a==232)"));
+		TEST_CHECK(state("obj.a = 2"));
+		TEST_CHECK(state("assert(obj.a==2)"));
+		TEST_EQUAL(base.a, 2);
+
+		state.garbageCollect();
+		TEST_CHECK(state("assert(obj.a==2)"));
+
+		state["fn"](kaguya::standard::ref(base), 54);
+		TEST_EQUAL(base.a, 54);
+	}
+	void object_take_const_reference(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
+			.addProperty("a", &Base::a)
+			);
+		TEST_CHECK(state("fn = function(object,value) object.a = value end"));
+
+		Base basesrc;
+		basesrc.a = 232;
+		const Base* base = &basesrc;
+		state["obj"] = base;
+		TEST_CHECK(state("assert(obj.a==232)"));
+		//		TEST_CHECK(!state("obj.a = 2"));//cannot assign
+		TEST_CHECK(state("assert(obj.a==232)"));
+		TEST_EQUAL(base->a, 232);
+
+		basesrc.a = 22;
+		TEST_CHECK(state("assert(obj.a==22)"));
+
+		state.garbageCollect();
+		TEST_CHECK(state("assert(obj.a==22)"));
+
+		//		state["fn"](base, 54);//cannot assign
+		TEST_EQUAL(base->a, 22);
+	}
+	void object_take_const_pointer(kaguya::State& state)
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addConstructor()
+			.addProperty("a", &Base::a)
+			);
+		TEST_CHECK(state("fn = function(object,value) object.a = value end"));
+
+		Base basesrc;
+		basesrc.a = 232;
+		const Base& base = basesrc;
+		state["obj"] = kaguya::standard::ref(base);
+		TEST_CHECK(state("assert(obj.a==232)"));
+		//		TEST_CHECK(!state("obj.a = 2"));//cannot assign
+		TEST_CHECK(state("assert(obj.a==232)"));
+		TEST_EQUAL(base.a, 232);
+
+		basesrc.a = 22;
+		TEST_CHECK(state("assert(obj.a==22)"));
+
+		state.garbageCollect();
+		TEST_CHECK(state("assert(obj.a==22)"));
+
+		//		state["fn"](base, 54);//cannot assign
+		TEST_EQUAL(base.a, 22);
+	}
+
 }
 
 namespace t_03_function
@@ -1074,7 +1229,7 @@ namespace t_03_function
 		state["corresult_to_main2"] = &corresult_to_main2;
 		state["corresult_to_main2"](cor2(state["corfun"], 10).result_at(5));
 	}
-	
+
 
 	void pointerfun(VariFoo* pointer)
 	{
@@ -1087,7 +1242,7 @@ namespace t_03_function
 	std::string last_error_message;
 	void ignore_error_fun(int status, const char* message)
 	{
-		last_error_message = message? message:"";
+		last_error_message = message ? message : "";
 	}
 	void zero_to_nullpointer(kaguya::State& state)
 	{
@@ -1179,7 +1334,7 @@ namespace t_03_function
 	}
 #endif
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE	
-	int overload5(const std::map<std::string,std::string>& a)
+	int overload5(const std::map<std::string, std::string>& a)
 	{
 		return 5;
 	}
@@ -1236,10 +1391,10 @@ namespace t_04_lua_ref
 		state("abc={d =1,e=3,f=64,g='sss'}");
 		kaguya::LuaRef abctable = state["abc"];
 
-		TEST_EQUAL(abctable["d"] , 1);
-		TEST_EQUAL(abctable["e"] , 3);
-		TEST_EQUAL(abctable["f"] , 64);
-		TEST_EQUAL(abctable["g"] , std::string("sss"));
+		TEST_EQUAL(abctable["d"], 1);
+		TEST_EQUAL(abctable["e"], 3);
+		TEST_EQUAL(abctable["f"], 64);
+		TEST_EQUAL(abctable["g"], std::string("sss"));
 
 		typedef std::map<kaguya::LuaRef, kaguya::LuaRef> maptype;
 		const maptype& map = abctable.map();
@@ -1247,11 +1402,11 @@ namespace t_04_lua_ref
 
 		std::map<std::string, std::string> strmap = abctable.map<std::string, std::string>();
 
-		TEST_EQUAL(strmap["d"] , "1");
-		TEST_EQUAL(strmap["e"] , "3");
-		TEST_EQUAL(strmap["f"] , "64");
-		TEST_EQUAL(strmap["g"] , "sss");
-		TEST_EQUAL(strmap.size() , 4);
+		TEST_EQUAL(strmap["d"], "1");
+		TEST_EQUAL(strmap["e"], "3");
+		TEST_EQUAL(strmap["f"], "64");
+		TEST_EQUAL(strmap["g"], "sss");
+		TEST_EQUAL(strmap.size(), 4);
 
 		abctable.setField("a", "test");
 		TEST_CHECK(abctable["a"] == std::string("test"));
@@ -1620,7 +1775,7 @@ namespace t_04_lua_ref
 		ss.str("");
 		ss << state.newRef(&ss);
 		text = ss.str();
-		TEST_CHECK(text.compare(0,strlen("userdata"), "userdata") ==0);
+		TEST_CHECK(text.compare(0, strlen("userdata"), "userdata") == 0);
 	}
 
 
@@ -1683,7 +1838,7 @@ namespace t_05_error_handler
 		state["errofun"](33);
 
 		TEST_CHECK(error_count == 1);
-		
+
 		kaguya::LuaRef f;
 		f.resume<void>();
 		f.call<void>();
@@ -1863,7 +2018,7 @@ namespace t_07_any_type_test
 	std::map<unsigned, unsigned> myMap;
 	int myVal;
 
-	class FooClass{
+	class FooClass {
 	public:
 		void mapCallback(const std::map<unsigned, unsigned>& map)
 		{
@@ -1898,8 +2053,10 @@ namespace t_07_any_type_test
 			// This uses an invalid function call which should throw an error
 			state("foo.testMap(myMap)");
 			TEST_CHECK(false);
-		} catch(std::runtime_error&)
-		{}
+		}
+		catch (std::runtime_error&)
+		{
+		}
 		TEST_CHECK(myMap.empty());
 		// This is the correct call
 		state("foo:testMap(myMap)");
@@ -1912,8 +2069,10 @@ namespace t_07_any_type_test
 			// This uses an invalid function call which should throw an error
 			state("foo.mapOverload(myMap)");
 			TEST_CHECK(false);
-		} catch(std::runtime_error&)
-		{}
+		}
+		catch (std::runtime_error&)
+		{
+		}
 		state("foo:mapOverload(myMap)");
 		TEST_EQUAL(myMap[1], 2);
 		TEST_EQUAL(myMap[3], 4);
@@ -2171,7 +2330,7 @@ int main()
 		ADD_TEST(t_02_classreg::overloaded_constructor);
 		ADD_TEST(t_02_classreg::copy_constructor);
 		ADD_TEST(t_02_classreg::data_member_bind);
-		ADD_TEST(t_02_classreg::overload_member_function);		
+		ADD_TEST(t_02_classreg::overload_member_function);
 		ADD_TEST(t_02_classreg::operator_bind);
 		ADD_TEST(t_02_classreg::add_field);
 		ADD_TEST(t_02_classreg::copyable_class_test);
@@ -2184,6 +2343,14 @@ int main()
 		ADD_TEST(t_02_classreg::add_property);
 		ADD_TEST(t_02_classreg::add_property_case2);
 		ADD_TEST(t_02_classreg::add_property_ref_check);
+
+
+		ADD_TEST(t_02_classreg::object_take_copy);
+		ADD_TEST(t_02_classreg::object_take_pointer);
+		ADD_TEST(t_02_classreg::object_take_reference);
+		ADD_TEST(t_02_classreg::object_take_const_pointer);
+		ADD_TEST(t_02_classreg::object_take_const_reference);
+
 		ADD_TEST(t_03_function::free_standing_function_test);
 		ADD_TEST(t_03_function::member_function_test);
 		ADD_TEST(t_03_function::variadic_function_test);
@@ -2194,7 +2361,7 @@ int main()
 		ADD_TEST(t_03_function::coroutine_stack);
 		ADD_TEST(t_03_function::zero_to_nullpointer);
 		ADD_TEST(t_03_function::noargs_to_nullpointer);
-		
+
 		ADD_TEST(t_03_function::arg_class_ref);
 
 		ADD_TEST(t_03_function::native_function_call_test);
