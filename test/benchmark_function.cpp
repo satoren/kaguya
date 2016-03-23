@@ -206,7 +206,7 @@ namespace kaguya_api_benchmark______
 	}
 
 
-	void vectormapping(kaguya::State& state)
+	void table_to_vector(kaguya::State& state)
 	{
 		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
 		kaguya::LuaTable lua_table = state["lua_table"];
@@ -214,7 +214,16 @@ namespace kaguya_api_benchmark______
 		{
 			std::vector<double> r = lua_table;
 		}
-	
+	}
+	void table_to_vector_with_typecheck(kaguya::State& state)
+	{
+		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
+		kaguya::LuaTable lua_table = state["lua_table"];
+		for (int i = 0; i < 100000; i++)
+		{
+			bool was_valid;
+			std::vector<double> r = lua_table.get<std::vector<double> >(was_valid);
+		}
 	}
 }
 
