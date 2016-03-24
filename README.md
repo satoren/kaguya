@@ -59,9 +59,9 @@ extern "C" int luaopen_modulename(lua_State *L)
   state("a = 'test'");//load and execute from string
   state.dofile("path/to/luascript.lua");//load and execute from file
 
-  kaguya::LuaFunction f1 = state.loadFile("path/to/luascript.lua");//load file without execute
+  kaguya::LuaFunction f1 = state.loadfile("path/to/luascript.lua");//load file without execute
   f1();//execute
-  kaguya::LuaFunction f2 = state.loadFile("a = 'test'");//load string without execute
+  kaguya::LuaFunction f2 = state.loadstring("a = 'test'");//load string without execute
   f2();//execute
 ```
 
