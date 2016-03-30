@@ -1625,9 +1625,9 @@ namespace t_04_lua_ref
 		fun.setFunctionEnv(kaguya::NewTable());
 		fun();
 
-		TEST_CHECK("assert(foo == nil)");
+		TEST_CHECK(state("assert(foo == nil)"));
 		state["functionEnv"] = fun.getFunctionEnv();
-		TEST_CHECK("assert(functionEnv.foo == 'bar')");
+		TEST_CHECK(state("assert(functionEnv.foo == 'bar')"));
 	}
 
 
@@ -1776,6 +1776,26 @@ namespace t_04_lua_ref
 		ss << state.newRef(&ss);
 		text = ss.str();
 		TEST_CHECK(text.compare(0, strlen("userdata"), "userdata") == 0);
+	}
+
+
+	
+	void get_field(kaguya::State& state)
+	{
+		kaguya::LuaRef table = state.newTable();
+		state["testtable"] = table;
+		table.setField("3", 4);
+		TEST_CHECK(state("assert(testtable['3'] == 4)"));
+		table.setField(1, 32);
+		TEST_CHECK(state("assert(testtable[1] == 32)"));
+
+		TEST_EQUAL(table.getField("3"), 4);
+		TEST_EQUAL(table[1], 32);
+		TEST_EQUAL(table.getField(1), 32);
+		const kaguya::LuaRef& const_table = table;
+		TEST_EQUAL(const_table.getField("3"), 4);
+		TEST_EQUAL(const_table[1], 32);
+		TEST_EQUAL(const_table.getField(1), 32);
 	}
 
 
@@ -2385,6 +2405,7 @@ int main()
 		ADD_TEST(t_04_lua_ref::luafun_loadstring);
 		ADD_TEST(t_04_lua_ref::metatable);
 		ADD_TEST(t_04_lua_ref::stream_out_test);
+		ADD_TEST(t_04_lua_ref::get_field);
 		ADD_TEST(t_05_error_handler::set_error_function);
 		ADD_TEST(t_05_error_handler::function_call_error);
 		ADD_TEST(t_06_state::other_state);
