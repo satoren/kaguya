@@ -20,6 +20,7 @@
 namespace kaguya
 {
 	class LuaRef;
+	class LuaStackRef;
 	class LuaTable;
 	template<typename KEY>
 	class TableKeyReference;
@@ -143,7 +144,7 @@ namespace kaguya
 			return getField(str.c_str());
 		}
 		template<typename KEY>
-		LuaRef getField(const KEY& key)const;
+		LuaStackRef getField(const KEY& key)const;
 
 		/**
 		* @brief foreach table fields
@@ -253,7 +254,7 @@ namespace kaguya
 		* @return reference of field value
 		*/
 		template<typename K>
-		LuaRef operator[](K key)const;
+		LuaStackRef operator[](K key)const;
 
 
 

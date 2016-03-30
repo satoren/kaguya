@@ -346,15 +346,29 @@ namespace kaguya
 
 
 	template<typename T> template <typename KEY>
-	LuaRef LuaTableOrUserDataImpl<T>::getField(const KEY& key)const
+	LuaStackRef LuaTableOrUserDataImpl<T>::getField(const KEY& key)const
 	{
-		return getField<LuaRef>(key);
+		lua_State* state = state_();
+		typedef typename lua_type_traits<T>::get_type get_type;
+		if (!state)
+		{
+			except::typeMismatchError(state, "is nil");
+			return LuaStackRef();
+		}
+		if (push_(state))//push table
+		{
+			lua_type_traits<KEY>::push(state, key);//push key
+			lua_gettable(state, -2);//get table[key]
+			lua_remove(state, -3);//remove table
+			return LuaStackRef(state, -1,true);
+		}
+		return LuaStackRef();
 	}
 
 	template<typename T> template<typename KEY>
-	LuaRef LuaTableOrUserDataImpl<T>::operator[](KEY key)const
+	LuaStackRef LuaTableOrUserDataImpl<T>::operator[](KEY key)const
 	{
-		return getField<LuaRef>(key);
+		return getField(key);
 	}
 
 	template<typename T>
