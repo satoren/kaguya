@@ -170,6 +170,19 @@ namespace kaguya_api_benchmark______
 		}
 	}
 
+	void lua_table_bracket_const_operator_get(kaguya::State& state)
+	{
+		state("lua_table={value=0}");
+		kaguya::LuaTable lua_table = state["lua_table"];
+		const kaguya::LuaTable& const_lua_table = lua_table;
+		for (int i = 0; i < 1000000; i++)
+		{
+			lua_table["value"] = i;
+			int v = const_lua_table.getField("value");
+			if (v != i) { throw std::logic_error(""); }
+		}
+	}
+
 	struct Prop
 	{
 		Prop() :d(0) {}
