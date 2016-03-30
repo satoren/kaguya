@@ -276,12 +276,26 @@ namespace kaguya
 	class LuaStackRef :public Ref::StackRef, public LuaVariantImpl<LuaStackRef>
 	{
 	public:
+		LuaStackRef() :Ref::StackRef(0,0,false)
+		{
+		}
 		LuaStackRef(lua_State* s, int index) :Ref::StackRef(s, index, false)
 		{
 		}
-		LuaStackRef(const LuaStackRef& src) :Ref::StackRef(Ref::StackRef::state_, Ref::StackRef::stack_index_,false)
+		LuaStackRef(lua_State* s, int index,bool popAtDestruct) :Ref::StackRef(s, index, popAtDestruct)
 		{
 		}
+#if KAGUYA_USE_CPP11
+		LuaStackRef(LuaStackRef&& src) : Ref::StackRef(std::move(src))
+		{
+			src.pop_ = false;
+		}
+#else
+		LuaStackRef(const LuaStackRef&src) : Ref::StackRef(src)
+		{
+			src.pop_ = false;
+		}
+#endif
 	};
 	inline lua_type_traits<LuaStackRef>::get_type lua_type_traits<LuaStackRef>::get(lua_State* l, int index)
 	{
