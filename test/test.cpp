@@ -1010,7 +1010,14 @@ namespace t_03_function
 
 		TEST_CHECK(ptr);
 		TEST_EQUAL(ptr->args[0].get<std::string>(), "abc");
-	}
+
+		state("var = Vari.new('abc', 'def')");
+		ptr = state["var"];
+
+		TEST_CHECK(ptr);
+		TEST_EQUAL(ptr->args[0].get<std::string>(), "abc");
+		TEST_EQUAL(ptr->args[1].get<std::string>(), "def");
+    }
 
 
 
