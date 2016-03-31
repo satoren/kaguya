@@ -11,6 +11,19 @@ inline std::string to_string(int v)
 	return buffer;
 }
 
+std::vector<std::string> split(std::string s, const char delim)
+{
+    std::vector<std::string> result;
+    std::size_t pos;
+    while((pos = s.find(delim)) != std::string::npos)
+    {
+        result.push_back(s.substr(0, pos));
+        s = s.substr(pos + 1);
+    }
+    result.push_back(s);
+    return result;
+}
+
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + to_string(__LINE__) + "\nCHECKCODE:" #B );
 
 #define TEST_COMPARE(A,B,OP)  if(!(A OP B))\
@@ -1341,14 +1354,19 @@ namespace t_03_function
 	}
 #endif
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE	
-	int overload5(const std::map<std::string, std::string>& a)
-	{
-		return 5;
-	}
+    int overload5(const std::map<std::string, std::string>& a)
+    {
+        return 5;
+    }
+    // This function after the first to trigger weak type test
+    int overload6(const std::map<std::string, std::string>& a, int b)
+    {
+        return b;
+    }
 #endif
-	int overload6(void*)
+	int overload7(void*)
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -1360,9 +1378,10 @@ namespace t_03_function
 #endif
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 			, overload5
+            , overload6
 #endif
-			, overload6
-			);
+            , overload7
+            );
 		kaguya::LuaFunction f = state["overloaded_function"];
 		TEST_EQUAL(f(), 1);
 		TEST_EQUAL(f(""), 2);
@@ -1372,10 +1391,11 @@ namespace t_03_function
 		TEST_CHECK(state("assert(overloaded_function({3,4,2,4,5}) == 4)"));
 #endif
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-		TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}) == 5)"));
+        TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}) == 5)"));
+        TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}, 6) == 6)"));
 #endif
-		TEST_CHECK(state("assert(overloaded_function(nil) == 6)"));
-		TEST_EQUAL(f((void*)0), 6);
+		TEST_CHECK(state("assert(overloaded_function(nil) == 7)"));
+		TEST_EQUAL(f((void*)0), 7);
 
 	}
 
@@ -1942,6 +1962,64 @@ namespace t_06_state
 		}
 #endif
 	}
+
+    bool errorOccurred = false;
+    std::string lastMsg;
+    void registerError(int status, const char* message)
+    {
+        if(errorOccurred)
+            throw std::runtime_error("Should have reset errorOccurred");
+        errorOccurred = true;
+        lastMsg = message;
+    }
+
+    struct Foo{};
+
+    void foobar1(int){ throw std::runtime_error("MyRuntimeError"); }
+    void foobar2(int, int){}
+    void foobar3(int, Foo, int){}
+
+    void errorThrowing(kaguya::State& state)
+    {
+        state["foobar"] = kaguya::overload(foobar1, foobar2, foobar3);
+        state["Foo"].setClass(kaguya::ClassMetatable<Foo>().addConstructor());
+        state.setErrorHandler(registerError);
+        TEST_CHECK(!state("foobar()"));
+        TEST_EQUAL(errorOccurred, true);
+        TEST_CHECK(lastMsg.find("candidate is:") != std::string::npos);
+        lastMsg = lastMsg.substr(lastMsg.find("candidate is:\n"));
+        lastMsg = lastMsg.substr(0, lastMsg.find("stack "));
+        std::vector<std::string> parts = split(lastMsg, '\n');
+        TEST_EQUAL(parts.size(), 6);
+	std::string intName = typeid(int).name();
+        TEST_CHECK(parts[1].find(intName) != std::string::npos);
+        TEST_CHECK(parts[2].find(intName + "," + intName) != std::string::npos);
+        TEST_CHECK(parts[3].find(intName + "," + typeid(Foo).name() + "," + intName) != std::string::npos);
+
+        errorOccurred = false;
+        TEST_CHECK(!state("foobar(Foo.new(), 1, 1)"));
+        TEST_EQUAL(errorOccurred, true);
+        TEST_CHECK(lastMsg.find("candidate is:") != std::string::npos);
+
+        errorOccurred = false;
+        TEST_CHECK(!state("foobar(1)"));
+        TEST_EQUAL(errorOccurred, true);
+        TEST_CHECK(lastMsg.find("MyRuntimeError") != std::string::npos);
+
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
+        errorOccurred = false;
+        state["noTable"] = 5;
+        std::map<int, int> map = state["noTable"];
+        TEST_EQUAL(errorOccurred, true);
+        TEST_CHECK(lastMsg.find("type mismatch") != std::string::npos);
+
+        errorOccurred = false;
+        state["noTable"] = 5;
+        std::vector<int> vec = state["noTable"];
+        TEST_EQUAL(errorOccurred, true);
+        TEST_CHECK(lastMsg.find("type mismatch") != std::string::npos);
+#endif
+    }
 }
 
 namespace t_07_any_type_test
@@ -2419,7 +2497,8 @@ int main()
 		ADD_TEST(t_06_state::load_string);
 		ADD_TEST(t_06_state::load_with_other_env);
 		ADD_TEST(t_06_state::no_standard_lib);
-		ADD_TEST(t_06_state::load_lib_constructor);
+        ADD_TEST(t_06_state::load_lib_constructor);
+        ADD_TEST(t_06_state::errorThrowing);
 
 		ADD_TEST(t_07_any_type_test::any_type_test);
 		ADD_TEST(t_07_any_type_test::testWrongClassUseWihMap);
