@@ -10,4 +10,4 @@
 namespace kaguya
 {
 #include "kaguya/gen/ref_tuple.inl"
-};
+}

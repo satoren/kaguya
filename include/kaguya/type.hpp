@@ -636,7 +636,7 @@ namespace kaguya
 			TYPE_TABLE = LUA_TTABLE,//!< table type
 			TYPE_FUNCTION = LUA_TFUNCTION,//!< function type
 			TYPE_USERDATA = LUA_TUSERDATA,//!< userdata type
-			TYPE_THREAD = LUA_TTHREAD,//!< thread(coroutine) type
+			TYPE_THREAD = LUA_TTHREAD//!< thread(coroutine) type
 		};
 
 		bool isNilref_()const {
@@ -859,4 +859,4 @@ namespace kaguya
 		return !(rhs == lhs);
 	}
 	//@}
-};
+}

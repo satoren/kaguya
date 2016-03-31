@@ -224,4 +224,4 @@ namespace kaguya
 			return true;
 		}
 	}
-};
+}

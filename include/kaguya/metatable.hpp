@@ -481,4 +481,4 @@ namespace kaguya
 		MemberMapType member_map_;
 		CodeChunkMapType code_chunk_map_;
 	};
-};
+}

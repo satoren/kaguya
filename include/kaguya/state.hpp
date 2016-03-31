@@ -20,7 +20,7 @@ namespace kaguya
 {
 	typedef std::pair<std::string, lua_CFunction> LoadLib;
 	typedef std::vector<LoadLib> LoadLibs;
-	inline LoadLibs NoLoadLib() { return LoadLibs(); };
+	inline LoadLibs NoLoadLib() { return LoadLibs(); }
 
 	template<typename Allocator>
 	void * AllocatorFunction(void *ud,
@@ -527,4 +527,4 @@ namespace kaguya
 		*/
 		lua_State *state() { return state_; };
 	};
-};
+}

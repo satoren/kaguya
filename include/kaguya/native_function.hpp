@@ -470,7 +470,7 @@ namespace kaguya
 			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF);\
 			return v;\
 		}
-	KAGUYA_PP_REPEAT_DEF(9, KAGUYA_FOVERLOAD_DEF);
+	KAGUYA_PP_REPEAT_DEF(9, KAGUYA_FOVERLOAD_DEF)
 #undef KAGUYA_DEF_TEMPLATE
 #undef KAGUYA_PUSH_DEF
 #undef KAGUYA_FOVERLOAD_DEF
@@ -544,4 +544,4 @@ namespace kaguya
 		}
 	};
 
-};
+}
