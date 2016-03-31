@@ -94,4 +94,4 @@ namespace kaguya
 	struct is_usertype : traits::integral_constant<bool, false> {};
 	template< typename T>
 	struct is_usertype<T, typename lua_type_traits<T>::Registerable> : traits::integral_constant<bool, true> {};
-};
+}

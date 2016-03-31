@@ -666,4 +666,4 @@ namespace kaguya
 		}
 		return standard::shared_ptr<T>();
 	}
-};
+}

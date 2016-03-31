@@ -314,7 +314,7 @@ namespace kaguya
 			COSTAT_RUNNING,//!< coroutine is running
 			COSTAT_SUSPENDED,//!< coroutine is suspended
 			COSTAT_NORMAL,//!<
-			COSTAT_DEAD,//!< coroutine is dead
+			COSTAT_DEAD//!< coroutine is dead
 		};
 
 		/**
