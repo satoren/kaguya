@@ -275,6 +275,7 @@ namespace kaguya
 			}
 			FunctorType* weak_match = 0;
 			FunctorType* argcount_unmatch = 0;
+			int minArgDiv = 0;
 			for (int i = 0; i < overloadnum; ++i)
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
@@ -283,20 +284,21 @@ namespace kaguya
 					continue;
 				}
 				int fnarg = (*fun)->argsCount();
-				bool match_argcount = fnarg == argcount;
-				if (match_argcount && (*fun)->checktype(l, true))
+				int argDiv = argcount - fnarg;
+				if (!argDiv && (*fun)->checktype(l, true))
 				{
 					return fun;
 				}
-				else if (weak_match == 0 && (match_argcount || !argcount_unmatch) && (*fun)->checktype(l, false))
+				else if (!weak_match && (!argDiv || !argcount_unmatch || argDiv < minArgDiv) && (*fun)->checktype(l, false))
 				{
-					if (match_argcount)
+					if (!argDiv)
 					{
 						weak_match = fun;
 					}
 					else
 					{
 						argcount_unmatch = fun;
+                        minArgDiv = argDiv;
 					}
 				}
 			}
