@@ -3,25 +3,40 @@
 #include <sstream>
 #include "kaguya/kaguya.hpp"
 
-
-inline std::string to_string(int v)
+namespace
 {
-	char buffer[64] = { 0 };
-	sprintf(buffer, "%d", v);
-	return buffer;
-}
-
-std::vector<std::string> split(std::string s, const char delim)
-{
-    std::vector<std::string> result;
-    std::size_t pos;
-    while((pos = s.find(delim)) != std::string::npos)
+    inline std::string to_string(int v)
     {
-        result.push_back(s.substr(0, pos));
-        s = s.substr(pos + 1);
+    	char buffer[64] = { 0 };
+    	sprintf(buffer, "%d", v);
+    	return buffer;
     }
-    result.push_back(s);
-    return result;
+
+    std::vector<std::string> split(std::string s, const char delim)
+    {
+        std::vector<std::string> result;
+        std::size_t pos;
+        while((pos = s.find(delim)) != std::string::npos)
+        {
+            result.push_back(s.substr(0, pos));
+            s = s.substr(pos + 1);
+        }
+        result.push_back(s);
+        return result;
+    }
+    std::vector<std::string> remove_empty(const std::vector<std::string>& src)
+    {
+        std::vector<std::string> result;
+	result.reserve(src.size());
+        for(std::vector<std::string>::const_iterator i = src.begin();i!= src.end();++i)
+        {
+            if(!i->empty())
+            {
+                result.push_back(*i);
+            }
+        }
+        return result;
+    }
 }
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + to_string(__LINE__) + "\nCHECKCODE:" #B );
@@ -1989,8 +2004,8 @@ namespace t_06_state
         TEST_CHECK(lastMsg.find("candidate is:") != std::string::npos);
         lastMsg = lastMsg.substr(lastMsg.find("candidate is:\n"));
         lastMsg = lastMsg.substr(0, lastMsg.find("stack "));
-        std::vector<std::string> parts = split(lastMsg, '\n');
-        TEST_EQUAL(parts.size(), 6);
+        std::vector<std::string> parts = remove_empty(split(lastMsg, '\n'));
+        TEST_EQUAL(parts.size(), 4);
 	std::string intName = typeid(int).name();
         TEST_CHECK(parts[1].find(intName) != std::string::npos);
         TEST_CHECK(parts[2].find(intName + "," + intName) != std::string::npos);
