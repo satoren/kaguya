@@ -349,7 +349,6 @@ namespace kaguya
 	LuaStackRef LuaTableOrUserDataImpl<T>::getField(const KEY& key)const
 	{
 		lua_State* state = state_();
-		typedef typename lua_type_traits<T>::get_type get_type;
 		if (!state)
 		{
 			except::typeMismatchError(state, "is nil");

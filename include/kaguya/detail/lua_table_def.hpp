@@ -227,9 +227,9 @@ namespace kaguya
 			util::ScopedSavedStack save(state_());
 			int stackIndex = pushStackIndex_(state_());
 #if LUA_VERSION_NUM >= 502
-			int size = lua_rawlen(state_(), stackIndex);
+			size_t size = lua_rawlen(state_(), stackIndex);
 #else
-			int size = lua_objlen(state_(), stackIndex);
+			size_t size = lua_objlen(state_(), stackIndex);
 #endif
 			res.reserve(size);
 			foreach_table<void, V>(gettablevalue<V>(res));
