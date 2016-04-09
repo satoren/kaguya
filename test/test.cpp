@@ -342,7 +342,29 @@ namespace t_02_classreg
 		TEST_CHECK(state("value:setmember('test')"));
 		TEST_CHECK(state("assert(value:stringdata() == 'test')"));
 	}
-
+	struct Foo {
+		int func() { return 1; }
+		int func(int param) { return param; }
+	};
+	void overload_member_function2(kaguya::State& state)
+	{
+		state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
+			.addMemberFunction("func", static_cast<int (Foo::*)()>(&Foo::func))
+			.addMemberFunction("func", static_cast<int (Foo::*)(int)>(&Foo::func))
+			);
+		state["foo"] = Foo();
+		state("assert(foo:func() == 1)");
+		state("assert(foo:func(64) == 64)");
+	}
+	void overload_member_function3(kaguya::State& state)
+	{
+		state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
+			.addStaticField("func", kaguya::overload(static_cast<int (Foo::*)()>(&Foo::func), static_cast<int (Foo::*)(int)>(&Foo::func)))
+			);
+		state["foo"] = Foo();
+		state("assert(foo:func() == 1)");
+		state("assert(foo:func(32) == 32)");
+	}
 
 	void operator_bind(kaguya::State& state)
 	{
@@ -371,11 +393,13 @@ namespace t_02_classreg
 			.addStaticField("TEST", 1)
 			.addStaticField("TEST2", "343")
 			.addStaticField("TEST3", 133.23)
+			.addStaticField("TEST4", std::string("test"))
 			);
 
 		TEST_CHECK(state("assert(ABC.TEST == 1)"));
 		TEST_CHECK(state("assert(ABC.TEST2 == '343')"));
 		TEST_CHECK(state("assert(ABC.TEST3 == 133.23)"));
+		TEST_CHECK(state("assert(ABC.TEST4 == 'test')"));
 	}
 
 
@@ -2451,6 +2475,8 @@ int main()
 		ADD_TEST(t_02_classreg::copy_constructor);
 		ADD_TEST(t_02_classreg::data_member_bind);
 		ADD_TEST(t_02_classreg::overload_member_function);
+		ADD_TEST(t_02_classreg::overload_member_function2);
+		ADD_TEST(t_02_classreg::overload_member_function3);
 		ADD_TEST(t_02_classreg::operator_bind);
 		ADD_TEST(t_02_classreg::add_field);
 		ADD_TEST(t_02_classreg::copyable_class_test);
