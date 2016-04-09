@@ -1,0 +1,141 @@
+#include "kaguya/kaguya.hpp"
+#include "test_util.hpp"
+
+#if KAGUYA_USE_CPP11
+
+
+KAGUYA_TEST_GROUP_START(test_11_cxx11_feature)
+
+using namespace kaguya_test_util;
+
+enum class testenumclass
+{
+	Foo = 0,
+	Bar = 1,
+};
+
+
+KAGUYA_TEST_FUNCTION_DEF(enum_class_set)(kaguya::State& state)
+{
+	state["value"] = testenumclass::Foo;
+	TEST_CHECK(state("assert(value == 0)"));
+};
+KAGUYA_TEST_FUNCTION_DEF(enum_class_get)(kaguya::State& state)
+{
+	state("value = 1");
+	TEST_CHECK(state["value"] == testenumclass::Bar);
+};
+
+
+
+struct MoveOnlyClass
+{
+	MoveOnlyClass(int i) :member(i) {}
+	int member;
+
+	MoveOnlyClass(MoveOnlyClass&& src) :member(src.member) {}
+private:
+	MoveOnlyClass();
+	MoveOnlyClass(const MoveOnlyClass&);
+	MoveOnlyClass& operator=(const MoveOnlyClass&);
+};
+KAGUYA_TEST_FUNCTION_DEF(movable_class_test)(kaguya::State& state)
+{
+	state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
+		.addConstructor<int>()
+		.addProperty("member", &MoveOnlyClass::member)
+		);
+
+	state["moveonly"] = MoveOnlyClass(2);
+
+	const MoveOnlyClass* ref = state["moveonly"];
+	TEST_CHECK(ref);
+	TEST_CHECK(ref->member == 2);
+
+	state("func =function(arg) return assert(arg.member == 5) end");
+	state["func"](MoveOnlyClass(5));
+
+	state.newRef(MoveOnlyClass(5));
+}
+
+KAGUYA_TEST_FUNCTION_DEF(lambdafun)(kaguya::State& state)
+{
+	state["ABC"] = kaguya::function([](int a) {return a * 2; });
+	int a = state["ABC"](54);
+	TEST_EQUAL(a, 108);
+
+	state["free2"] = kaguya::function([]() {return 12; });
+	TEST_EQUAL(state["free2"](), 12.0);
+
+
+	state["sum"] = kaguya::function([](kaguya::VariadicArgType args) {
+		int sum = 0;
+		for (int arg : args)
+		{
+			sum += arg;
+		}
+
+		TEST_EQUAL(args.size(), 10);
+		TEST_EQUAL(args[0], 1);
+		TEST_EQUAL(args[1], 2);
+		TEST_EQUAL(args[2], 3);
+		TEST_EQUAL(args[3], 4);
+		TEST_EQUAL(args[4], 5);
+		TEST_EQUAL(args[5], 6);
+		TEST_EQUAL(args[6], 7);
+		TEST_EQUAL(args[7], 8);
+		TEST_EQUAL(args[8], 9);
+		TEST_EQUAL(args[9], 10);
+		return sum;
+	});
+	TEST_EQUAL(state["sum"](1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 55);
+
+
+
+	state["ssum"] = kaguya::function([](kaguya::VariadicArgType args) {
+		std::string sum;
+		for (std::string arg : args)
+		{
+			sum += arg;
+		}
+		return sum;
+	});
+	TEST_EQUAL(state["ssum"](1, 2, 3, 4, 5, 6, 7, 8, 9, 10), "12345678910");
+
+
+	state["overload"] = kaguya::overload([](int) {return 1; },
+		[](const std::string&) {return 2; },
+		[]() {return 3; }
+	);
+	state("assert(overload(2) == 1)");//int version
+	state("assert(overload('2') == 2)");//string version
+	state("assert(overload() == 3)");//no argument version
+
+}
+
+KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
+{
+	state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
+		.addConstructor<int>()
+		.addProperty("member", &MoveOnlyClass::member)
+		);
+
+	state["uniqueptr"] = std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(2));
+
+	const MoveOnlyClass* ref = state["uniqueptr"];
+	TEST_CHECK(ref);
+	TEST_EQUAL(ref->member, 2);
+
+	state("func =function(arg) return assert(arg.member == 5) end");
+	TEST_CHECK(state["func"](std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(5))) == true);
+
+}
+KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
+{
+	kaguya::LuaRef nullref = state.newRef(nullptr);
+	TEST_CHECK(nullref == nullptr);
+}
+
+KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
+
+#endif
