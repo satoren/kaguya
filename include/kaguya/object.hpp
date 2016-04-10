@@ -112,7 +112,7 @@ namespace kaguya
 
 		virtual const std::type_info& type() = 0;
 
-		virtual void addRef(lua_State* state, int index) {};
+//		virtual void addRef(lua_State* state, int index) {};
 
 		ObjectWrapperBase() {}
 		virtual ~ObjectWrapperBase() {}
@@ -277,19 +277,19 @@ namespace kaguya
 
 		~ObjectPointerWrapper()
 		{
-			for (std::vector<std::pair<lua_State*, int> >::iterator i = retain_ref_.begin(); i != retain_ref_.end(); ++i)
-			{
-				luaL_unref(i->first, LUA_REGISTRYINDEX, i->second);
-			}
+//			for (std::vector<std::pair<lua_State*, int> >::iterator i = retain_ref_.begin(); i != retain_ref_.end(); ++i)
+//			{
+//				luaL_unref(i->first, LUA_REGISTRYINDEX, i->second);
+//			}
 		}
 
-		virtual void addRef(lua_State* state, int index) {
-			lua_pushvalue(state, index);
-			retain_ref_.push_back(std::pair<lua_State*, int>(state, luaL_ref(state, LUA_REGISTRYINDEX)));
-		};
+//		virtual void addRef(lua_State* state, int index) {
+//			lua_pushvalue(state, index);
+//			retain_ref_.push_back(std::pair<lua_State*, int>(state, luaL_ref(state, LUA_REGISTRYINDEX)));
+//		};
 	private:
 		T* object_;
-		std::vector<std::pair<lua_State*, int> > retain_ref_;
+//		std::vector<std::pair<lua_State*, int> > retain_ref_;
 	};
 
 	//for internal use
@@ -441,12 +441,12 @@ namespace kaguya
 			for (std::map<convert_map_key, std::vector<convert_function_type> >::iterator it = function_map_.begin();
 			it != function_map_.end(); ++it)
 			{
-				if (it->first.first == from_type.name())
-				{
-					std::vector<convert_function_type> newlist = it->second;
-					newlist.push_back(f);
-					add_map[convert_map_key(to_type.name(), it->first.second)] = newlist;
-				}
+//				if (it->first.first == from_type.name())
+//				{
+//					std::vector<convert_function_type> newlist = it->second;
+//					newlist.push_back(f);
+//					add_map[convert_map_key(to_type.name(), it->first.second)] = newlist;
+//				}
 
 				if (it->first.second == to_type.name())
 				{
@@ -467,12 +467,12 @@ namespace kaguya
 			for (std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> >::iterator it = shared_ptr_function_map_.begin();
 			it != shared_ptr_function_map_.end(); ++it)
 			{
-				if (it->first.first == from_type.name())
-				{
-					std::vector<shared_ptr_convert_function_type> newlist = it->second;
-					newlist.push_back(f);
-					add_map[convert_map_key(to_type.name(), it->first.second)] = newlist;
-				}
+//				if (it->first.first == from_type.name())
+//				{
+//					std::vector<shared_ptr_convert_function_type> newlist = it->second;
+//					newlist.push_back(f);
+//					add_map[convert_map_key(to_type.name(), it->first.second)] = newlist;
+//				}
 
 				if (it->first.second == to_type.name())
 				{
