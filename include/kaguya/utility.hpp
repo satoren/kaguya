@@ -5,7 +5,6 @@
 #pragma once
 
 #include "kaguya/config.hpp"
-#include "kaguya/type.hpp"
 
 namespace kaguya
 {
@@ -223,7 +222,6 @@ namespace kaguya
 		{
 			int count = util::push_args(state, std::forward<T>(v));
 			if (count > 1) { lua_settop(state, lua_gettop(state) - (count - 1)); }
-			if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); return false; }
 			return count != 0;
 		}
 #else
@@ -232,7 +230,6 @@ namespace kaguya
 		{
 			int count = util::push_args(state, v);
 			if (count > 1) { lua_settop(state, lua_gettop(state) - (count - 1)); }
-			if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); return false; }
 			return count != 0;
 		}
 #endif
