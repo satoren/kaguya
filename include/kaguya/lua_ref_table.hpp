@@ -26,20 +26,20 @@ namespace kaguya
 		template<typename V, typename KEY>
 		static void set(lua_State* state, int table_index, const KEY& key, V&& value)
 		{
-			lua_type_traits<KEY>::push(state, key);
-			lua_type_traits<typename traits::remove_reference<V>::type>::push(state, std::forward<V>(value));
+			util::one_push(state, key);
+			util::one_push(state, std::forward<V>(value));
 			lua_settable(state, table_index);
 		}
 		template<typename V>
 		static void set(lua_State* state, int table_index, const char* key, V&& value)
 		{
-			lua_type_traits<typename traits::remove_reference<V>::type>::push(state, std::forward<V>(value));
+			util::one_push(state, std::forward<V>(value));
 			lua_setfield(state, table_index, key);
 		}
 		template<typename V>
 		static void set(lua_State* state, int table_index, const std::string& key, V&& value)
 		{
-			lua_type_traits<typename traits::remove_reference<V>::type>::push(state, std::forward<V>(value));
+			util::one_push(state, std::forward<V>(value));
 			lua_setfield(state, table_index, key.c_str());
 		}
 
@@ -47,27 +47,27 @@ namespace kaguya
 		template<typename V, typename KEY>
 		static void set(lua_State* state, int table_index, const KEY& key, const V& value)
 		{
-			lua_type_traits<KEY>::push(state, key);
-			lua_type_traits<V>::push(state, value);
+			util::one_push(state, key);
+			util::one_push(state, value);
 			lua_settable(state, table_index);
 		}
 		template<typename V>
 		static void set(lua_State* state, int table_index, const char* key, const V& value)
 		{
-			lua_type_traits<V>::push(state, value);
+			util::one_push(state, value);
 			lua_setfield(state, table_index, key);
 		}
 		template<typename V>
 		static void set(lua_State* state, int table_index, const std::string& key, const V& value)
 		{
-			lua_type_traits<V>::push(state, value);
+			util::one_push(state, value);
 			lua_setfield(state, table_index, key.c_str());
 		}
 
 		template<typename KEY>
 		static void get(lua_State* state, int table_index, const KEY& key)
 		{
-			lua_type_traits<KEY>::push(state, key);
+			util::one_push(state, key);
 			lua_gettable(state, table_index);
 		}
 		static void get(lua_State* state, int table_index, const char* key)

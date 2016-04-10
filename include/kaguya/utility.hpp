@@ -96,7 +96,7 @@ namespace kaguya
 				os << "nil";
 				break;
 			case LUA_TBOOLEAN:
-				os << ((lua_toboolean(state, stackIndex) != 0)?"true":"false");
+				os << ((lua_toboolean(state, stackIndex) != 0) ? "true" : "false");
 				break;
 			case LUA_TNUMBER:
 				os << lua_tonumber(state, stackIndex);
@@ -215,5 +215,28 @@ namespace kaguya
 #undef KAGUYA_PUSH_DEF
 #undef KAGUYA_PUSH_ARG_DEF
 #endif
+
+
+#if KAGUYA_USE_CPP11
+			template<typename T>
+		inline bool one_push(lua_State* state, T&& v)
+		{
+			int count = util::push_args(state, std::forward<T>(v));
+			if (count > 1) { lua_settop(state, lua_gettop(state) - (count - 1)); }
+			if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); return false; }
+			return count != 0;
 		}
+#else
+			template<typename T>
+		inline bool one_push(lua_State* state, const T& v)
+		{
+			int count = util::push_args(state, v);
+			if (count > 1) { lua_settop(state, lua_gettop(state) - (count - 1)); }
+			if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); return false; }
+			return count != 0;
+		}
+#endif
 	}
+
+
+}

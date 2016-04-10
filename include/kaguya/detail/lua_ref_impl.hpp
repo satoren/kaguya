@@ -19,19 +19,6 @@
 
 namespace kaguya
 {
-
-	template<typename T>
-	inline bool pushCountCheck(lua_State* state, int count)
-	{
-		if (count != 1)
-		{
-			if (count > 1) { except::typeMismatchError(state, std::string("can not push multiple value:") + typeid(T).name()); }
-			if (count == 0) { except::typeMismatchError(state, std::string("can not push ") + typeid(T).name() + " value"); }
-			return false;
-		}
-		return true;
-	}
-
 	struct StackTop {};
 	namespace Ref
 	{
@@ -61,7 +48,7 @@ namespace kaguya
 				src.pop_ = false;
 			}
 #endif
-			StackRef(lua_State* s, int index) :state_(s), stack_index_(to_absindex(s,index)), pop_(true)
+			StackRef(lua_State* s, int index) :state_(s), stack_index_(to_absindex(s, index)), pop_(true)
 			{
 			}
 			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(to_absindex(s, index)), pop_(pop)
@@ -99,8 +86,8 @@ namespace kaguya
 			{
 				if (state_ != state)
 				{
-					lua_pushvalue(state_,stack_index_);
-					lua_xmove(state_,state,1);
+					lua_pushvalue(state_, stack_index_);
+					lua_xmove(state_, state, 1);
 					return lua_gettop(state);
 				}
 				else
@@ -109,7 +96,7 @@ namespace kaguya
 				}
 			}
 			lua_State *state()const { return state_; }
-		};
+			};
 
 		class RegistoryRef
 		{
@@ -186,8 +173,7 @@ namespace kaguya
 			{
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
-				int vc = util::push_args(state_, v);
-				if (!pushCountCheck<T>(state_, vc)) { return; }
+				util::one_push(state_, v);
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			template<typename T>
@@ -195,8 +181,7 @@ namespace kaguya
 			{
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
-				int vc = util::push_args(state_, v);
-				if (!pushCountCheck<T>(state_, vc)) { return; }
+				util::one_push(state_, v);
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 				state_ = util::toMainThread(state_);
 			}
@@ -206,8 +191,7 @@ namespace kaguya
 			{
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
-				int vc = util::push_args(state_, standard::forward<T>(v));
-				if (!pushCountCheck<T>(vc)) { return; }
+				util::one_push(state_, standard::forward<T>(v));
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 			template<typename T>
@@ -215,8 +199,7 @@ namespace kaguya
 			{
 				if (!state_) { return; }
 				util::ScopedSavedStack save(state_);
-				int vc = util::push_args(state_, standard::forward<T>(v));
-				if (!pushCountCheck<T>(state_, vc)) { return; }
+				util::one_push(state_, standard::forward<T>(v));
 				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 				state_ = util::toMainThread(state_);
 			}
@@ -256,7 +239,7 @@ namespace kaguya
 			lua_State *state()const { return state_; }
 
 			bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
-			
+
 		protected:
 			lua_State *state_;
 			int ref_;
@@ -272,6 +255,6 @@ namespace kaguya
 				}
 			}
 		};
-		
+
+		}
 	}
-}

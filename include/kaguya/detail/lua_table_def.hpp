@@ -296,10 +296,8 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state);
 			int stackIndex = pushStackIndex_(state);
-			int kc = util::push_args(state, key);//push table key
-			int vc = util::push_args(state, value);//push value
-
-			if (!pushCountCheck<K>(state, kc) || !pushCountCheck<V>(state, vc)) { return; }
+			util::one_push(state, key);//push table key
+			util::one_push(state, value);//push value
 			lua_settable(state, stackIndex);//thistable[key] = value
 		}
 
@@ -314,13 +312,11 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state);
 			int stackIndex = pushStackIndex_(state);
-			int vc = util::push_args(state, value);//push value
-
-			if (!pushCountCheck<V>(state, vc)) { return; }
+			util::one_push(state, value);//push value
 			lua_setfield(state, stackIndex, key);//thistable[key] = value
 		}
 		template<typename V>
-		void setField(const std::string& key,const V& value)
+		void setField(const std::string& key, const V& value)
 		{
 			setField(key.c_str(), value);
 		}
@@ -339,10 +335,8 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state);
 			int stackIndex = pushStackIndex_(state);
-			int kc = util::push_args(state, std::forward<K>(key));//push table key
-			int vc = util::push_args(state, std::forward<V>(value));//push value
-
-			if (!pushCountCheck<K>(state_(), kc) || !pushCountCheck<V>(state, vc)) { return; }
+			util::one_push(state, std::forward<K>(key));//push table key
+			util::one_push(state, std::forward<V>(value));//push value
 			lua_settable(state, stackIndex);//thistable[key] = value
 		}
 		template<typename V>
@@ -356,9 +350,7 @@ namespace kaguya
 			}
 			util::ScopedSavedStack save(state);
 			int stackIndex = pushStackIndex_(state);
-			int vc = util::push_args(state, std::forward<V>(value));//push value
-
-			if (!pushCountCheck<V>(state, vc)) { return; }
+			util::one_push(state, std::forward<V>(value));//push value
 			lua_setfield(state, stackIndex, key);//thistable[key] = value
 		}
 		template<typename V>

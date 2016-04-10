@@ -451,4 +451,31 @@ KAGUYA_TEST_FUNCTION_DEF(luafun_loadstring)(kaguya::State& state)
 }
 
 
+KAGUYA_TEST_FUNCTION_DEF(put_multiple)(kaguya::State& state)
+{
+	kaguya::LuaRef v = state.newRef(kaguya::standard::tuple<int, int>(32, 22));
+	TEST_EQUAL(v, 32);
+	TEST_CHECK(v);
+	state["value"] = v;
+	TEST_EQUAL(state["value"], 32);
+	TEST_CHECK(state["value"]);
+	TEST_CHECK(state("assert(value == 32)"));
+
+	kaguya::LuaRef f = state.loadstring("return 22,66");
+	state["value"] = f();
+	TEST_EQUAL(state["value"], 22);
+	TEST_CHECK(state["value"]);
+	TEST_CHECK(state("assert(value == 22)"));
+
+
+	kaguya::tie(state["value1"], state["value2"]) = f();
+	TEST_EQUAL(state["value1"], 22);
+	TEST_CHECK(state["value1"]);
+	TEST_CHECK(state("assert(value1 == 22)"));
+	TEST_EQUAL(state["value2"], 66);
+	TEST_CHECK(state["value2"]);
+	TEST_CHECK(state("assert(value2 == 66)"));
+
+}
+
 KAGUYA_TEST_GROUP_END(test_05_lua_ref)

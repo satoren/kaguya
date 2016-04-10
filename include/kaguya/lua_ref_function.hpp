@@ -20,35 +20,39 @@
 
 namespace kaguya
 {
-	class FunctionResults :public LuaVariantImpl<FunctionResults>
+	class FunctionResults :public Ref::StackRef, public LuaVariantImpl<FunctionResults>
 	{
-		FunctionResults(lua_State* state, int startIndex) :state_(state), startIndex_(startIndex), endIndex_(lua_gettop(state) + 1)
+		FunctionResults(lua_State* state, int startIndex) :Ref::StackRef(state, startIndex, true),state_(state), resultCount_(lua_gettop(state) + 1 - startIndex)
 		{
 		}
-		FunctionResults(lua_State* state, int startIndex, int endIndex) :state_(state), startIndex_(startIndex), endIndex_(endIndex)
+		FunctionResults(lua_State* state, int startIndex, int endIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultCount_(endIndex - startIndex)
 		{
 		}
 		friend class FunctionResultProxy;
 	public:
-		FunctionResults() :state_(0), startIndex_(0), endIndex_(0)
+		FunctionResults() :Ref::StackRef(0, 0, true), state_(0), resultCount_(0)
 		{
 		}
-		FunctionResults(lua_State* state) :state_(state), startIndex_(0), endIndex_(0)
+		FunctionResults(lua_State* state) :Ref::StackRef(state, 0, true), state_(state), resultCount_(0)
 		{
 		}
-		FunctionResults(const FunctionResults&src) :state_(src.state_), startIndex_(src.startIndex_), endIndex_(src.endIndex_)
+#if KAGUYA_USE_CPP11
+		FunctionResults(FunctionResults&&src) : Ref::StackRef(std::move(src)), state_(src.state_), resultCount_(src.resultCount_)
 		{
 			src.state_ = 0;
 		}
+#else
+		FunctionResults(const FunctionResults&src) : Ref::StackRef(src), state_(src.state_), resultCount_(src.resultCount_)
+		{
+			src.state_ = 0;
+		}
+#endif
+
 		~FunctionResults()
 		{
-			if (state_)
-			{
-				lua_settop(state_, startIndex_ - 1);
-			}
 		}
 
-		struct reference :Ref::StackRef, public LuaVariantImpl<reference>
+		struct reference :public Ref::StackRef, public LuaVariantImpl<reference>
 		{
 			reference(lua_State* s, int index) :Ref::StackRef(s, index, false)
 			{
@@ -105,46 +109,36 @@ namespace kaguya
 
 		iterator begin()
 		{
-			return iterator(state_, startIndex_);
+			return iterator(state_, stack_index_);
 		}
 		iterator end()
 		{
-			return iterator(state_, endIndex_);
+			return iterator(state_, stack_index_ + resultCount_);
 		}
 		const_iterator begin()const
 		{
-			return const_iterator(state_, startIndex_);
+			return const_iterator(state_, stack_index_);
 		}
 		const_iterator end()const
 		{
-			return const_iterator(state_, endIndex_);
+			return const_iterator(state_, stack_index_ + resultCount_);
 		}
 		const_iterator cbegin()const
 		{
-			return const_iterator(state_, startIndex_);
+			return const_iterator(state_, stack_index_);
 		}
 		const_iterator cend()const
 		{
-			return const_iterator(state_, endIndex_);
+			return const_iterator(state_, stack_index_ + resultCount_);
 		}
 
 		
 		template<class Result>
 		Result get_result()const
 		{
-			return util::get_result<Result>(state_, startIndex_);
+			return util::get_result<Result>(state_, stack_index_);
 		}
 		lua_State* state()const { return state_; }
-		int pushStackIndex(lua_State* state)const {
-			if (state_ != state)
-			{
-				lua_pushvalue(state_, startIndex_);
-				lua_xmove(state_, state, 1);
-				return lua_gettop(state);
-			}
-			return startIndex_;
-		}
-
 
 		template<typename T>
 		typename lua_type_traits<T>::get_type result_at(size_t index)const
@@ -153,7 +147,7 @@ namespace kaguya
 			{
 				throw std::out_of_range("function result out of range");
 			}
-			return lua_type_traits<T>::get(state_, startIndex_ + static_cast<int>(index));
+			return lua_type_traits<T>::get(state_, stack_index_ + static_cast<int>(index));
 		}
 		reference result_at(size_t index)const
 		{
@@ -161,34 +155,18 @@ namespace kaguya
 			{
 				throw std::out_of_range("function result out of range");
 			}
-			return reference(state_, startIndex_ + static_cast<int>(index));
+			return reference(state_, stack_index_ + static_cast<int>(index));
 		}
 
 		size_t result_size()const
 		{
-			return endIndex_ - startIndex_;
+			return resultCount_;
 		}
 		
-		//push first result
-		int push(lua_State* state)const
-		{
-			lua_pushvalue(state_, startIndex_);
-			if (state_ != state)
-			{
-				lua_xmove(state_, state, 1);
-			}
-			return 1;
-		}
-		int type()const
-		{
-			return lua_type(state_, startIndex_);
-		}
-
 
 	private:
 		mutable lua_State* state_;
-		int startIndex_;
-		int endIndex_;
+		int resultCount_;
 
 	};
 
