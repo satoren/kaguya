@@ -467,15 +467,6 @@ KAGUYA_TEST_FUNCTION_DEF(put_multiple)(kaguya::State& state)
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 22)"));
 
-
-	kaguya::tie(state["value1"], state["value2"]) = f();
-	TEST_EQUAL(state["value1"], 22);
-	TEST_CHECK(state["value1"]);
-	TEST_CHECK(state("assert(value1 == 22)"));
-	TEST_EQUAL(state["value2"], 66);
-	TEST_CHECK(state["value2"]);
-	TEST_CHECK(state("assert(value2 == 66)"));
-
 }
 
 KAGUYA_TEST_GROUP_END(test_05_lua_ref)
