@@ -390,10 +390,17 @@ namespace kaguya
 			return LuaTable(state_, NewTable(reserve_array, reserve_record));
 		}
 
-		//! return new Lua thread
+		//! create new Lua thread
 		LuaThread newThread()
 		{
 			return LuaThread(state_);
+		}
+		//! create new Lua thread with function
+		LuaThread newThread(const LuaFunction& f)
+		{
+			LuaThread cor(state_);
+			cor.setFunction(f);
+			return cor;
 		}
 
 		//push to Lua stack

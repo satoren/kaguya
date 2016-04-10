@@ -539,17 +539,20 @@ namespace kaguya
 		}
 		LuaThread(lua_State* state, const NewThread& t) :Ref::RegistoryRef(state, t)
 		{
-			typecheck();
 		}
 		LuaThread(lua_State* state) :Ref::RegistoryRef(state, NewThread())
 		{
-			typecheck();
 		}
 		LuaThread()
 		{
-			typecheck();
 		}
-
+		void setFunction(const LuaFunction& f)
+		{
+			typecheck();
+			lua_State* corstate = get<lua_State*>();
+			lua_settop(corstate,0);
+			f.push(corstate);
+		}
 	};
 
 }

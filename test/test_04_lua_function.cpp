@@ -134,6 +134,21 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine)(kaguya::State& state)
 	}
 }
 
+KAGUYA_TEST_FUNCTION_DEF(coroutine_dead)(kaguya::State& state)
+{
+	kaguya::LuaThread emptycoroutine;
+	TEST_CHECK(emptycoroutine.isThreadDead());
+
+	TEST_CHECK(state("corfun = function(arg)"
+		"return 1 "
+		" end"));
+	kaguya::LuaThread cor = state.newThread(state["corfun"]);
+
+	TEST_CHECK(!cor.isThreadDead());
+	cor();
+	TEST_CHECK(cor.isThreadDead());
+}
+
 void corresult_to_main(kaguya::VariadicArgType args)
 {
 	TEST_EQUAL(args.size(), 9);

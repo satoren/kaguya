@@ -29,6 +29,13 @@ struct Foo
 	void setBar(std::string b) { bar = b; }
 };
 
+struct Bar
+{
+	std::string member;
+	Bar() {}
+	Bar(const std::string& data):member(data){}
+};
+
 KAGUYA_TEST_FUNCTION_DEF(member_function_test)(kaguya::State& state)
 {
 	state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
@@ -252,6 +259,14 @@ int overload7(void*)
 	return 7;
 }
 
+int overload8(Foo*)
+{
+	return 8;
+}
+int overload9(Bar*)
+{
+	return 9;
+}
 
 KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 {
@@ -259,11 +274,13 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 		, overload4
 #endif
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 		, overload5
 		, overload6
 #endif
 		, overload7
+		, overload8
+		, overload9
 		);
 	kaguya::LuaFunction f = state["overloaded_function"];
 	TEST_EQUAL(f(), 1);
@@ -273,13 +290,19 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 	TEST_CHECK(state("assert(overloaded_function({3,4,2,4,5}) == 4)"));
 #endif
-#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 	TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}) == 5)"));
 	TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}, 6) == 6)"));
 #endif
 	TEST_CHECK(state("assert(overloaded_function(nil) == 7)"));
 	TEST_EQUAL(f((void*)0), 7);
 
+
+	state["Foo"].setClass(kaguya::ClassMetatable<Foo>());
+	state["Bar"].setClass(kaguya::ClassMetatable<Bar>());
+
+	TEST_EQUAL(f(Foo()), 8);
+	TEST_EQUAL(f(Bar()), 9);
 }
 
 

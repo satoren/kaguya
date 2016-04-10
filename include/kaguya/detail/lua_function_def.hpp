@@ -325,7 +325,6 @@ namespace kaguya
 			lua_State* state = state_();
 			if (!state)
 			{
-				except::typeMismatchError(state, "is nil");
 				return COSTAT_DEAD;
 			}
 			util::ScopedSavedStack save(state);
