@@ -27,4 +27,5 @@ script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success:
   - cmake ../ -DCOVERAGE=1 && make test_coverage && ./test_coverage
-  - codecov --root CMakeFiles/test_coverage.dir/test/
+  - ls CMakeFiles/test_coverage.dir/test/
+  - codecov --gcov-root CMakeFiles/test_coverage.dir/test/
