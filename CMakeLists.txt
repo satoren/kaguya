@@ -28,7 +28,7 @@ set(TEST_SRCS test/test.cpp
 		test/test_04_lua_function.cpp
 		test/test_05_lua_ref.cpp
 		test/test_06_state.cpp
-		test/test_07_any_type_test.cpp		
+		test/test_07_vector_map_to_luatable.cpp		
 		test/test_11_cxx11_feature.cpp
 		)
 
