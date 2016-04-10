@@ -169,6 +169,21 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 
 	state["corresult_to_main2"] = &corresult_to_main2;
 	state["corresult_to_main2"](cor2(state["corfun"], 10).result_at(5));
+
+
+	TEST_CHECK(state("corfun = function(arg)"
+		"for i = 1,arg do "
+		"coroutine.yield({value=323}) "
+		"end "
+		"end"));
+
+
+	state["cor3"] = kaguya::NewThread();
+	state["value"] = state["cor3"](state["corfun"], 10).getField("value");
+	TEST_EQUAL(state["value"], 323);
+	TEST_CHECK(state["value"]);
+	TEST_CHECK(state("assert(value == 323)"));
+	TEST_EQUAL(state["value"], state["cor3"](state["corfun"], 10).getField("value"));
 }
 
 KAGUYA_TEST_GROUP_END(test_04_lua_function)
