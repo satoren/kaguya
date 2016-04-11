@@ -195,6 +195,9 @@ KAGUYA_TEST_FUNCTION_DEF(map_set)(kaguya::State& state)
 	state["value"] = setmap;
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state["value"] == setmap);
+
+	std::vector<std::string> v;
+	TEST_CHECK(state["value"] != v);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(vector_set)(kaguya::State& state)
@@ -205,6 +208,9 @@ KAGUYA_TEST_FUNCTION_DEF(vector_set)(kaguya::State& state)
 	state["value"] = setvec;
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state["value"] == setvec);
+
+	std::map<std::string, int> m;
+	TEST_CHECK(state["value"] != m);
 }
 KAGUYA_TEST_FUNCTION_DEF(vector_set2)(kaguya::State& state)
 {
@@ -214,6 +220,9 @@ KAGUYA_TEST_FUNCTION_DEF(vector_set2)(kaguya::State& state)
 	state["value"] = setvec;
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state["value"] == setvec);
+
+	std::map<std::string, int> m;
+	TEST_CHECK(state["value"] != m);
 }
 
 
