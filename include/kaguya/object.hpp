@@ -62,7 +62,7 @@ namespace kaguya
 			if (luaL_newmetatable(l, metatablename))
 			{
 #if LUA_VERSION_NUM < 503
-				lua_pushstring(l, metatableName<T>().c_str());
+				lua_pushstring(l, metatablename);
 				lua_setfield(l, -2, "__name");
 #endif
 				lua_pushstring(l, metatablename);
