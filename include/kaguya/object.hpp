@@ -57,23 +57,41 @@ namespace kaguya
 			util::ScopedSavedStack save(l);
 			return get_metatable<T>(l);
 		}
-		template<typename T>bool newmetatable(lua_State* l)
+		inline bool newmetatable(lua_State* l,const char* metatablename)
 		{
-			if (luaL_newmetatable(l, metatableName<T>().c_str()))
+			if (luaL_newmetatable(l, metatablename))
 			{
 #if LUA_VERSION_NUM < 503
 				lua_pushstring(l, metatableName<T>().c_str());
 				lua_setfield(l, -2, "__name");
 #endif
-				lua_pushstring(l, metatableName<T>().c_str());
+				lua_pushstring(l, metatablename);
 				lua_rawseti(l, -2, KAGUYA_METATABLE_TYPE_NAME_KEY);
 				return true;
 			}
 			return false;
 		}
+		template<typename T>bool newmetatable(lua_State* l)
+		{
+			return newmetatable(l, metatableName<T>().c_str());
+		}
 		template<typename T>void setmetatable(lua_State* l)
 		{
-			return luaL_setmetatable(l, metatableName<T>().c_str());
+			if (available_metatable<T>(l))
+			{
+				return luaL_setmetatable(l, metatableName<T>().c_str());
+			}
+			else
+			{
+				luaL_getmetatable(l, KAGUYA_METATABLE_PREFIX "unknown_type");
+
+				if(lua_isnil(l, -1))
+				{
+					lua_pop(l,1);
+					newmetatable(l, KAGUYA_METATABLE_PREFIX "unknown_type");
+				}
+				lua_setmetatable(l, -2);
+			}
 		}
 
 		template<typename T>T* test_userdata(lua_State* l, int index)

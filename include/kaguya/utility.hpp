@@ -221,7 +221,7 @@ namespace kaguya
 		inline bool one_push(lua_State* state, T&& v)
 		{
 			int count = util::push_args(state, std::forward<T>(v));
-			if (count > 1) { lua_settop(state, lua_gettop(state) - (count - 1)); }
+			if (count > 1) { lua_pop(state, count - 1); }
 			return count != 0;
 		}
 #else
@@ -229,7 +229,7 @@ namespace kaguya
 		inline bool one_push(lua_State* state, const T& v)
 		{
 			int count = util::push_args(state, v);
-			if (count > 1) { lua_settop(state, lua_gettop(state) - (count - 1)); }
+			if (count > 1) { lua_pop(state, count - 1); }
 			return count != 0;
 		}
 #endif
