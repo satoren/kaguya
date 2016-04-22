@@ -87,7 +87,7 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			T* pointer =  get_pointer(l, index, types::typetag<T>());
+			T* pointer = get_pointer(l, index, types::typetag<T>());
 			if (!pointer)
 			{
 				throw LuaTypeMismatch("type mismatch!!");
@@ -263,10 +263,17 @@ namespace kaguya
 
 		static int push(lua_State* l, push_type v)
 		{
-			typedef ObjectSharedPointerWrapper wrapper_type;
-			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-			new(storage) wrapper_type(v);
-			class_userdata::setmetatable<T>(l);
+			if (v)
+			{
+				typedef ObjectSharedPointerWrapper wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(v);
+				class_userdata::setmetatable<T>(l);
+			}
+			else
+			{
+				lua_pushnil(l);
+			}
 			return 1;
 		}
 	};
@@ -294,16 +301,23 @@ namespace kaguya
 
 		static int push(lua_State* l, push_type v)
 		{
-			typedef ObjectSharedPointerWrapper wrapper_type;
-			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-			new(storage) wrapper_type(v);
+			if (v)
+			{
+				typedef ObjectSharedPointerWrapper wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(v);
+			}
+			else
+			{
+				lua_pushnil(l);
+			}
 			return 1;
 		}
 	};
 
 #if KAGUYA_USE_CPP11
 	///! traits for unique_ptr
-	template<typename T,typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
+	template<typename T, typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
 		typedef std::unique_ptr<T, Deleter>&& push_type;
 		typedef std::unique_ptr<T, Deleter> get_type;
 
@@ -331,10 +345,18 @@ namespace kaguya
 
 		static int push(lua_State* l, push_type v)
 		{
-			typedef ObjectSmartPointerWrapper<std::unique_ptr<T,Deleter> > wrapper_type;
-			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-			new(storage) wrapper_type(std::forward<push_type>(v));
-			class_userdata::setmetatable<T>(l);
+			if (v)
+			{
+				typedef ObjectSmartPointerWrapper<std::unique_ptr<T, Deleter> > wrapper_type;
+				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+				new(storage) wrapper_type(std::forward<push_type>(v));
+				class_userdata::setmetatable<T>(l);
+			}
+			else
+			{
+				lua_pushnil(l);
+			}
+			return 1;
 			return 1;
 		}
 	};
@@ -641,11 +663,12 @@ namespace kaguya
 
 		bool isNilref_()const {
 			int t = type();
-			return t == LUA_TNIL ||t == LUA_TNONE; }
+			return t == LUA_TNIL || t == LUA_TNONE;
+		}
 
 		typedef void (LuaBasicTypeFunctions::*bool_type)() const;
 		void this_type_does_not_support_comparisons() const {}
-		
+
 		/**
 		* @brief Equivalent to `#` operator for strings and tables with no metamethods.
 		* Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
@@ -660,14 +683,14 @@ namespace kaguya
 			return lua_rawlen(state, index);
 #else
 
-			int type = lua_type(state,index);
-			if(type != TYPE_STRING && type != TYPE_TABLE && type != TYPE_USERDATA && type != TYPE_LIGHTUSERDATA)
+			int type = lua_type(state, index);
+			if (type != TYPE_STRING && type != TYPE_TABLE && type != TYPE_USERDATA && type != TYPE_LIGHTUSERDATA)
 			{
 				return 0;
 			}
 			return lua_objlen(state, index);
 #endif
-		}
+	}
 
 		//return type
 		int type() const
@@ -735,7 +758,7 @@ namespace kaguya
 		*/
 		//@{
 		template<typename OtherDrived>
-		inline bool operator==( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		inline bool operator==(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
 			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
 			lua_State* state = state_();
@@ -749,7 +772,7 @@ namespace kaguya
 #endif
 		}
 		template<typename OtherDrived>
-		inline bool operator<( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		inline bool operator<(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
 			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() != !rhs.isNilref_(); }
 			lua_State* state = state_();
@@ -763,7 +786,7 @@ namespace kaguya
 #endif
 		}
 		template<typename OtherDrived>
-		inline bool operator<=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		inline bool operator<=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
 			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
 			lua_State* state = state_();
@@ -777,17 +800,17 @@ namespace kaguya
 #endif
 		}
 		template<typename OtherDrived>
-		inline bool operator>=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		inline bool operator>=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
 			return rhs <= (*this);
 		}
 		template<typename OtherDrived>
 		inline bool operator>(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
-			return rhs <  (*this);
+			return rhs < (*this);
 		}
 		template<typename OtherDrived>
-		inline bool operator!=( const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+		inline bool operator!=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
 		{
 			return !this->operator==(rhs);
 		}
@@ -806,7 +829,7 @@ namespace kaguya
 			return false;
 		}
 		template<typename T>
-		inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator!=( const T& rhs)const
+		inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator!=(const T& rhs)const
 		{
 			return !((*this) == rhs);
 		}
@@ -828,7 +851,7 @@ namespace kaguya
 			return static_cast<const Derived*>(this)->pushStackIndex(state);
 		}
 	private:
-	};
+};
 
 
 

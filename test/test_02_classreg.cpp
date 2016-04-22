@@ -815,4 +815,27 @@ KAGUYA_TEST_FUNCTION_DEF(object_take_const_pointer)(kaguya::State& state)
 	//		state["fn"](base, 54);//cannot assign
 	TEST_EQUAL(base.a, 22);
 }
+
+KAGUYA_TEST_FUNCTION_DEF(null_shared_ptr)(kaguya::State& state)
+{
+	state["Base"].setClass(kaguya::ClassMetatable<Base>()
+		.addConstructor()
+		.addProperty("a", &Base::a)
+	);
+
+
+	state["test"] = kaguya::standard::shared_ptr<Base>();
+	TEST_CHECK(state("assert(test==nil)"));
+
+
+	state["test"] = kaguya::standard::shared_ptr<Derived>();
+
+	TEST_CHECK(state("assert(test==nil)"));
+
+	state["test"] = kaguya::standard::shared_ptr<void>();
+	TEST_CHECK(state("assert(test==nil)"));
+
+	kaguya::standard::shared_ptr<void> sptr = state["test"];
+	TEST_CHECK(!sptr);
+}
 KAGUYA_TEST_GROUP_END(test_02_classreg)

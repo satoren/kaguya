@@ -136,6 +136,16 @@ KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 	TEST_CHECK(nullref == nullptr);
 }
 
+
+
+KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
+{
+	state["Base"].setClass(kaguya::ClassMetatable<MoveOnlyClass>());
+
+	state["test"] =std::unique_ptr<MoveOnlyClass>();
+	TEST_CHECK(state("assert(test==nil)"));
+}
+
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
 
 #endif
