@@ -315,7 +315,7 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 		, overload10
 	);
 	kaguya::LuaFunction f2 = state["overloaded_function2"];
-	TEST_EQUAL(f2(std::function<int()>(overload1)), 10);
+	TEST_EQUAL(f2(kaguya::standard::function<int()>(overload1)), 10);
 }
 
 
