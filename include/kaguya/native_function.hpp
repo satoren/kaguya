@@ -546,4 +546,31 @@ namespace kaguya
 		}
 	};
 
+
+	template<typename T> struct lua_type_traits<standard::function<T> > {
+		typedef const standard::function<T>& push_type;
+		typedef standard::function<T> get_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TFUNCTION;
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_type(l, index) == LUA_TFUNCTION;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (lua_type(l, index) != LUA_TFUNCTION) {
+				return get_type();
+			}
+			lua_pushvalue(l, index);
+			return get_type(LuaFunction(l, StackTop()));
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			return lua_type_traits<FunctorType>::push(l, FunctorType(v));
+		}
+	};
 }
