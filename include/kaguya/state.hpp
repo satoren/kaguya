@@ -116,7 +116,7 @@ namespace kaguya
 		* @param allocator allocator for memory allocation @see DefaultAllocator
 		*/
 		template<typename Allocator>
-		State(standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
+		State(standard::shared_ptr<Allocator> allocator) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
 			init();
@@ -142,7 +142,7 @@ namespace kaguya
 		* @param allocator allocator for memory allocation @see DefaultAllocator
 		*/
 		template<typename Allocator>
-		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator = standard::make_shared<Allocator>()) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
+		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
 			lua_atpanic(state_, &default_panic);
 			init();
