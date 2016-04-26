@@ -267,6 +267,11 @@ int overload9(Bar*)
 {
 	return 9;
 }
+int overload10(const kaguya::standard::function<int()> fn)
+{
+	TEST_EQUAL(fn() , 1);
+	return 10;
+}
 
 KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 {
@@ -303,6 +308,14 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 
 	TEST_EQUAL(f(Foo()), 8);
 	TEST_EQUAL(f(Bar()), 9);
+
+
+
+	state["overloaded_function2"] = kaguya::overload(overload1, overload2, overload3
+		, overload10
+	);
+	kaguya::LuaFunction f2 = state["overloaded_function2"];
+	TEST_EQUAL(f2(std::function<int()>(overload1)), 10);
 }
 
 

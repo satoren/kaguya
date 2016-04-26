@@ -201,4 +201,15 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 	TEST_EQUAL(state["value"], state["cor3"](state["corfun"], 10).getField("value"));
 }
 
+void luacallback(const kaguya::standard::function<void(float)>& callback)
+{
+	callback(32.f);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(bind_to_std_function)(kaguya::State& state)
+{
+	state["luacallback"] = &luacallback;
+	state("luacallback(function(v) assert(32 == v) end)");
+}
+
 KAGUYA_TEST_GROUP_END(test_04_lua_function)
