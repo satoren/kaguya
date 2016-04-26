@@ -4,8 +4,6 @@
 
 KAGUYA_TEST_GROUP_START(test_05_lua_ref)
 using namespace kaguya_test_util;
-using namespace kaguya::standard;
-
 KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 {
 	kaguya::LuaRef ref(state.state(), "abc");
@@ -455,7 +453,7 @@ KAGUYA_TEST_FUNCTION_DEF(luafun_loadstring)(kaguya::State& state)
 
 KAGUYA_TEST_FUNCTION_DEF(put_multiple)(kaguya::State& state)
 {
-	kaguya::LuaRef v = state.newRef(tuple<int, int>(32, 22));
+	kaguya::LuaRef v = state.newRef(kaguya::standard::tuple<int, int>(32, 22));
 	TEST_EQUAL(v, 32);
 	TEST_CHECK(v);
 	state["value"] = v;

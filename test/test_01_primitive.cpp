@@ -5,7 +5,6 @@
 KAGUYA_TEST_GROUP_START(test_01_primitive)
 
 using namespace kaguya_test_util;
-using namespace kaguya::standard;
 
 KAGUYA_TEST_FUNCTION_DEF(bool_get)(kaguya::State& state)
 {

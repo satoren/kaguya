@@ -4,7 +4,6 @@
 
 KAGUYA_TEST_GROUP_START(test_04_lua_function)
 using namespace kaguya_test_util;
-using namespace kaguya::standard;
 
 KAGUYA_TEST_FUNCTION_DEF(function_call)(kaguya::State& state)
 {
@@ -30,7 +29,7 @@ KAGUYA_TEST_FUNCTION_DEF(multi_return_function_test)(kaguya::State& state)
 	TEST_EQUAL(e, 16);
 
 	a = b = c = d = e = 0;
-	kaguya::tie(a, b, c, d, e) = state["multresfun"].call<tuple<int, int, int, int, int> >();
+	kaguya::tie(a, b, c, d, e) = state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >();
 	TEST_EQUAL(a, 1);
 	TEST_EQUAL(b, 2);
 	TEST_EQUAL(c, 4);
@@ -38,7 +37,7 @@ KAGUYA_TEST_FUNCTION_DEF(multi_return_function_test)(kaguya::State& state)
 	TEST_EQUAL(e, 16);
 
 	using kaguya::standard::get;
-	tuple<int, int, int, int, int> tuple_res = state["multresfun"].call<tuple<int, int, int, int, int> >();
+	kaguya::standard::tuple<int, int, int, int, int> tuple_res = state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >();
 	TEST_EQUAL(get<0>(tuple_res), 1);
 	TEST_EQUAL(get<1>(tuple_res), 2);
 	TEST_EQUAL(get<2>(tuple_res), 4);
@@ -46,7 +45,7 @@ KAGUYA_TEST_FUNCTION_DEF(multi_return_function_test)(kaguya::State& state)
 	TEST_EQUAL(get<4>(tuple_res), 16);
 
 	state("multireturn_pass_through_to_arg = function(a,b,c,d,e) assert(a == 1,a) assert(b == 2,b) assert(c == 4,c) assert(d == 8,d) assert(e == 16,e) end");
-	state["multireturn_pass_through_to_arg"](state["multresfun"].call<tuple<int, int, int, int, int> >());
+	state["multireturn_pass_through_to_arg"](state["multresfun"].call<kaguya::standard::tuple<int, int, int, int, int> >());
 	state["multireturn_pass_through_to_arg"](state["multresfun"]());
 }
 
@@ -203,12 +202,12 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 }
 
 #if (defined(_MSC_VER) && _MSC_VER < 1900)//for MSVC2013 bug
-void luacallback(const function<int(float)>& callback)
+void luacallback(const kaguya::standard::function<int(float)>& callback)
 {
 	callback(32.f);
 }
 #else
-void luacallback(const function<void(float)>& callback)
+void luacallback(const kaguya::standard::function<void(float)>& callback)
 {
 	callback(32.f);
 }

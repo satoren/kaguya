@@ -3,7 +3,6 @@
 
 KAGUYA_TEST_GROUP_START(test_03_function)
 using namespace kaguya_test_util;
-using namespace kaguya::standard;
 
 int arg = 0;
 void free_standing_function(int r)
@@ -129,9 +128,9 @@ KAGUYA_TEST_FUNCTION_DEF(variadic_function_test)(kaguya::State& state)
 
 
 
-tuple<int, std::string> tuplefun()
+kaguya::standard::tuple<int, std::string> tuplefun()
 {
-	return tuple<int, std::string>(12, "23");
+	return kaguya::standard::tuple<int, std::string>(12, "23");
 }
 
 KAGUYA_TEST_FUNCTION_DEF(multi_return_function_test)(kaguya::State& state)
@@ -189,7 +188,7 @@ KAGUYA_TEST_FUNCTION_DEF(arg_class_ref)(kaguya::State& state)
 	Foo foo;
 	state["reffun"] = kaguya::function(reffun);
 
-	state["reffun"](ref(foo));
+	state["reffun"](kaguya::standard::ref(foo));
 	TEST_EQUAL(foo.bar, "BarBar");
 }
 
@@ -268,7 +267,7 @@ int overload9(Bar*)
 {
 	return 9;
 }
-int overload10(const function<int()> fn)
+int overload10(const kaguya::standard::function<int()> fn)
 {
 	TEST_EQUAL(fn() , 1);
 	return 10;
@@ -316,7 +315,7 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 		, overload10
 	);
 	kaguya::LuaFunction f2 = state["overloaded_function2"];
-	TEST_EQUAL(f2(function<int()>(overload1)), 10);
+	TEST_EQUAL(f2(kaguya::standard::function<int()>(overload1)), 10);
 }
 
 

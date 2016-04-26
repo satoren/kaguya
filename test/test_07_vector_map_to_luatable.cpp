@@ -1,10 +1,6 @@
 #include "kaguya/kaguya.hpp"
 #include "test_util.hpp"
 
-
-using namespace kaguya_test_util;
-using namespace kaguya::standard;
-
 KAGUYA_TEST_GROUP_START(test_07_vector_map_to_luatable)
 
 
