@@ -5,6 +5,8 @@ KAGUYA_TEST_GROUP_START(test_02_classreg)
 
 using namespace kaguya_test_util;
 
+using namespace kaguya::standard;
+
 struct ABC
 {
 	int intmember;
@@ -55,7 +57,7 @@ struct ABC
 	ABC& references() { return *this; }
 	ABC* pointer() { return this; }
 	const ABC* const_pointer()const { return this; }
-	kaguya::standard::shared_ptr<ABC> shared_copy() { return kaguya::standard::shared_ptr<ABC>(new ABC(*this)); }
+	shared_ptr<ABC> shared_copy() { return shared_ptr<ABC>(new ABC(*this)); }
 };
 
 KAGUYA_TEST_FUNCTION_DEF(default_constructor)(kaguya::State& state)
@@ -156,7 +158,7 @@ KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 
 
 	{
-		kaguya::standard::shared_ptr<ABC> shared_ptr(new ABC("shared_object", 53));
+		shared_ptr<ABC> shared_ptr(new ABC("shared_object", 53));
 		state["shared_object"] = shared_ptr;
 	}
 	TEST_CHECK(state("assert(shared_object:getInt() == 53)"));
@@ -350,7 +352,7 @@ KAGUYA_TEST_FUNCTION_DEF(registering_object_instance)(kaguya::State& state)
 	state["copy_abc"] = abc;
 	state("assert(43 == copy_abc:get_value())");
 	//or registering shared pointer
-	state["shared_abc"] = kaguya::standard::shared_ptr<ABC>(new ABC(43));//kaguya::standard::shared_ptr is std::shared_ptr or boost::shared_ptr.
+	state["shared_abc"] = shared_ptr<ABC>(new ABC(43));//shared_ptr is std::shared_ptr or boost::shared_ptr.
 	state("assert(43 == shared_abc:get_value())");
 }
 
@@ -399,8 +401,8 @@ KAGUYA_TEST_FUNCTION_DEF(registering_derived_class)(kaguya::State& state)
 	Derived derived;
 	Base base;
 	state["base"] = &base;
-	state["derived"] = kaguya::standard::ref(derived);
-	state["derived2"] = kaguya::standard::ref(derived2);
+	state["derived"] = ref(derived);
+	state["derived2"] = ref(derived2);
 	state["base_function"] = &base_function;
 	state["derived_function"] = &derived_function;
 	TEST_CHECK(state("assert(1 == base_function(base))"));
@@ -418,12 +420,12 @@ KAGUYA_TEST_FUNCTION_DEF(registering_derived_class)(kaguya::State& state)
 	TEST_CHECK(state("assert(2 == derived.test(derived))"));
 }
 
-int receive_shared_ptr_function(kaguya::standard::shared_ptr<Derived> d) {
+int receive_shared_ptr_function(shared_ptr<Derived> d) {
 	TEST_CHECK(d);
 	d->b = 5;
 	return d->b;
 }
-int receive_base_shared_ptr_function(kaguya::standard::shared_ptr<Base> d) {
+int receive_base_shared_ptr_function(shared_ptr<Base> d) {
 	TEST_CHECK(d);
 	d->a = 2;
 	return d->a;
@@ -438,8 +440,8 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 		.addMember("b", &Derived::b)
 		);
 
-	kaguya::standard::shared_ptr<Derived> derived(new Derived());
-	kaguya::standard::shared_ptr<Base> base(new Base());
+	shared_ptr<Derived> derived(new Derived());
+	shared_ptr<Base> base(new Base());
 	state["base"] = base;
 	state["derived"] = derived;
 	state["base_function"] = &base_function;
@@ -485,9 +487,9 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 
 struct shared_ptr_fun
 {
-	kaguya::standard::shared_ptr<int>& ptr;
-	shared_ptr_fun(kaguya::standard::shared_ptr<int>& r) :ptr(r) {}
-	void operator()(kaguya::standard::shared_ptr<int> p)
+	shared_ptr<int>& ptr;
+	shared_ptr_fun(shared_ptr<int>& r) :ptr(r) {}
+	void operator()(shared_ptr<int> p)
 	{
 		ptr = p;
 	}
@@ -495,8 +497,8 @@ struct shared_ptr_fun
 
 KAGUYA_TEST_FUNCTION_DEF(shared_ptr_null)(kaguya::State& state)
 {
-	kaguya::standard::shared_ptr<int> ptr(new int(5));
-	state["foo"] = kaguya::function<void(kaguya::standard::shared_ptr<int>)>(shared_ptr_fun(ptr));
+	shared_ptr<int> ptr(new int(5));
+	state["foo"] = kaguya::function<void(shared_ptr<int>)>(shared_ptr_fun(ptr));
 	state("foo(nil)");
 	TEST_EQUAL(ptr, 0);
 }
@@ -585,7 +587,7 @@ KAGUYA_TEST_FUNCTION_DEF(add_property)(kaguya::State& state)
 	Base base;
 	const Base* constbase = &base;
 	state["base"] = &base;
-	state["derived"] = kaguya::standard::ref(derived);
+	state["derived"] = ref(derived);
 	TEST_CHECK(state("base.a=1"));
 	TEST_CHECK(state("derived.a = 2"));
 	TEST_CHECK(state("derived.b=3"));
@@ -618,7 +620,7 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_case2)(kaguya::State& state)
 	Derived derived;
 	Base base;
 	state["base"] = &base;
-	state["derived"] = kaguya::standard::ref(derived);
+	state["derived"] = ref(derived);
 	TEST_CHECK(state("base.a=1"));
 	TEST_CHECK(state("derived.a = 2"));
 	TEST_CHECK(state("assert(1 == base.a)"));
@@ -751,7 +753,7 @@ KAGUYA_TEST_FUNCTION_DEF(object_take_reference)(kaguya::State& state)
 
 	Base base;
 	base.a = 232;
-	state["obj"] = kaguya::standard::ref(base);
+	state["obj"] = ref(base);
 	TEST_CHECK(state("assert(obj.a==232)"));
 	TEST_CHECK(state("obj.a = 2"));
 	TEST_CHECK(state("assert(obj.a==2)"));
@@ -760,7 +762,7 @@ KAGUYA_TEST_FUNCTION_DEF(object_take_reference)(kaguya::State& state)
 	state.garbageCollect();
 	TEST_CHECK(state("assert(obj.a==2)"));
 
-	state["fn"](kaguya::standard::ref(base), 54);
+	state["fn"](ref(base), 54);
 	TEST_EQUAL(base.a, 54);
 }
 KAGUYA_TEST_FUNCTION_DEF(object_take_const_reference)(kaguya::State& state)
@@ -800,7 +802,7 @@ KAGUYA_TEST_FUNCTION_DEF(object_take_const_pointer)(kaguya::State& state)
 	Base basesrc;
 	basesrc.a = 232;
 	const Base& base = basesrc;
-	state["obj"] = kaguya::standard::ref(base);
+	state["obj"] = ref(base);
 	TEST_CHECK(state("assert(obj.a==232)"));
 	//		TEST_CHECK(!state("obj.a = 2"));//cannot assign
 	TEST_CHECK(state("assert(obj.a==232)"));
@@ -824,18 +826,18 @@ KAGUYA_TEST_FUNCTION_DEF(null_shared_ptr)(kaguya::State& state)
 	);
 
 
-	state["test"] = kaguya::standard::shared_ptr<Base>();
+	state["test"] = shared_ptr<Base>();
 	TEST_CHECK(state("assert(test==nil)"));
 
 
-	state["test"] = kaguya::standard::shared_ptr<Derived>();
+	state["test"] = shared_ptr<Derived>();
 
 	TEST_CHECK(state("assert(test==nil)"));
 
-	state["test"] = kaguya::standard::shared_ptr<void>();
+	state["test"] = shared_ptr<void>();
 	TEST_CHECK(state("assert(test==nil)"));
 
-	kaguya::standard::shared_ptr<void> sptr = state["test"];
+	shared_ptr<void> sptr = state["test"];
 	TEST_CHECK(!sptr);
 }
 KAGUYA_TEST_GROUP_END(test_02_classreg)
