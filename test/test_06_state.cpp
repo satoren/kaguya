@@ -4,6 +4,7 @@
 KAGUYA_TEST_GROUP_START(test_06_state)
 
 using namespace kaguya_test_util;
+using namespace kaguya::standard;
 
 
 int error_count = 0;

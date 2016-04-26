@@ -555,6 +555,7 @@ namespace kaguya
 		}
 	};
 
+
 }
 
 
