@@ -199,7 +199,7 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 	TEST_EQUAL(state["value"], 323);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 323)"));
-	TEST_EQUAL(state["value"], state["cor3"](state["corfun"], 10).getField("value"));
+	TEST_EQUAL(state["value"], state["cor3"](state["corfun"], 10).getField<int>("value"));
 }
 
 #if (defined(_MSC_VER) && _MSC_VER < 1900)//for MSVC2013 bug
