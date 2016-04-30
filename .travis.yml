@@ -12,6 +12,7 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - kalakris-cmake
     packages:
     - liblua5.2-dev
     - libluajit-5.1-dev
