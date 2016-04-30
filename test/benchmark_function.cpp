@@ -7,6 +7,10 @@ namespace
 	{
 		return arg;
 	}
+	int test_native_function2(const std::string& arg)
+	{
+		return std::atoi(arg.c_str());
+	}
 	class SetGet
 	{
 	public:
@@ -14,6 +18,10 @@ namespace
 		void set(double i)
 		{
 			_i = i;
+		}
+		void setstr(const std::string& str)
+		{
+			_i = std::atof(str.c_str());
 		}
 		double get()const
 		{
@@ -34,6 +42,31 @@ namespace kaguya_api_benchmark______
 			.addMember("set", &SetGet::set)
 			.addMember("get", &SetGet::get)
 			);
+
+		state(
+			"local getset = SetGet.new()\n"
+			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
+			"local times = 1000000\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}
+	void overloaded_get_set(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::ClassMetatable<SetGet>()
+			.addConstructor()
+			.addMember("set", &SetGet::setstr)
+			.addMember("set", &SetGet::setstr)
+			.addMember("set", &SetGet::setstr)
+			.addMember("set", &SetGet::setstr)
+			.addMember("set", &SetGet::setstr)
+			.addMember("set", &SetGet::set)
+			.addMember("get", &SetGet::get)
+		);
 
 		state(
 			"local getset = SetGet.new()\n"
@@ -101,6 +134,21 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			);
 	}
+
+	void call_overloaded_function(kaguya::State& state)
+	{
+		state["nativefun"] = kaguya::overload(&test_native_function2,&test_native_function);
+		state(
+			"local times = 1000000\n"
+			"for i=1,times do\n"
+			"local r = nativefun(i)\n"
+			"if(r ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+		);
+	}
+
 	void call_lua_function(kaguya::State& state)
 	{
 		state("lua_function=function(i)return i;end");

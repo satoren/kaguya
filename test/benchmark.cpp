@@ -47,6 +47,7 @@ int main()
 	ADD_BENCHMARK(empty);
 	ADD_BENCHMARK(original_api_no_type_check::simple_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set);
+	ADD_BENCHMARK(kaguya_api_benchmark______::overloaded_get_set);	
 	ADD_BENCHMARK(kaguya_api_benchmark______::property_access);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_contain_propery_member);
 	ADD_BENCHMARK(kaguya_api_benchmark______::object_pointer_register_get_set);
