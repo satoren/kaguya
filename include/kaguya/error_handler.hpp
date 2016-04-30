@@ -64,7 +64,7 @@ namespace kaguya
 		typedef standard::function<void(int, const char*)> function_type;
 
 
-		void handle(const char* message, lua_State *state)
+		static void handle(const char* message, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
@@ -72,7 +72,7 @@ namespace kaguya
 				handler(0, message);
 			}
 		}
-		void handle(int status_code, const char* message, lua_State *state)
+		static void handle(int status_code, const char* message, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
@@ -80,7 +80,7 @@ namespace kaguya
 				handler(status_code, message);
 			}
 		}
-		void handle(int status_code, lua_State *state)
+		static void handle(int status_code, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
@@ -89,7 +89,7 @@ namespace kaguya
 			}
 		}
 
-		function_type getHandler(lua_State* state)
+		static function_type getHandler(lua_State* state)
 		{
 
 			function_type* funptr = getFunctionPointer(state);
@@ -101,7 +101,7 @@ namespace kaguya
 		}
 
 
-		void unregisterHandler(lua_State* state)
+		static void unregisterHandler(lua_State* state)
 		{
 			if (state)
 			{
@@ -112,14 +112,14 @@ namespace kaguya
 				}
 			}
 		}
-		void registerHandler(lua_State* state, function_type f)
+		static void registerHandler(lua_State* state, function_type f)
 		{
 			
 			set_at_panic_handler(state);
 			if (state)
 			{
 				util::ScopedSavedStack save(state);
-				lua_pushlightuserdata(state, this);
+				lua_pushlightuserdata(state, handlerRegistryKey());
 				if (class_userdata::newmetatable<function_type>(state))//register error handler destructor to Lua state
 				{
 					lua_pushcclosure(state, &error_handler_cleanner, 0);
@@ -143,19 +143,20 @@ namespace kaguya
 				}
 			}
 		}
-
-		static ErrorHandler& instance() {
-			static ErrorHandler instance_;
-			return instance_;
-		}
-
+		
 	private:
-		function_type* getFunctionPointer(lua_State* state)
+
+		static void* handlerRegistryKey()
+		{
+			static void* key;
+			return key;
+		}
+		static function_type* getFunctionPointer(lua_State* state)
 		{
 			if (state)
 			{
 				util::ScopedSavedStack save(state);
-				lua_pushlightuserdata(state, this);
+				lua_pushlightuserdata(state, handlerRegistryKey());
 				lua_gettable(state, LUA_REGISTRYINDEX);
 				function_type* ptr = (function_type*)lua_touserdata(state, -1);
 				return ptr;
@@ -180,14 +181,14 @@ namespace kaguya
 	{
 		inline void OtherError(lua_State *state, const std::string& message)
 		{
-			ErrorHandler::instance().handle(message.c_str(), state);
+			ErrorHandler::handle(message.c_str(), state);
 #if !KAGUYA_ERROR_NO_THROW
 			throw LuaKaguyaError(message);
 #endif
 		}
 		inline void typeMismatchError(lua_State *state, const std::string& message)
 		{
-			ErrorHandler::instance().handle(message.c_str(), state);
+			ErrorHandler::handle(message.c_str(), state);
 #if !KAGUYA_ERROR_NO_THROW
 			throw LuaTypeMismatch(message);
 #endif
@@ -196,7 +197,7 @@ namespace kaguya
 		{
 			if (status != 0 && status != LUA_YIELD)
 			{
-				ErrorHandler::instance().handle(status, state);
+				ErrorHandler::handle(status, state);
 #if !KAGUYA_ERROR_NO_THROW
 				const char* message = 0;
 				switch (status)

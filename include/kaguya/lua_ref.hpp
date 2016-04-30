@@ -484,7 +484,7 @@ namespace kaguya
 
 			if (status)
 			{
-				ErrorHandler::instance().handle(status, state);
+				ErrorHandler::handle(status, state);
 				return LuaRef(state);
 			}
 			return LuaFunction(state, StackTop());
@@ -510,7 +510,7 @@ namespace kaguya
 
 			if (status)
 			{
-				ErrorHandler::instance().handle(status, state);
+				ErrorHandler::handle(status, state);
 				return LuaRef(state);
 			}
 			return LuaFunction(state, StackTop());

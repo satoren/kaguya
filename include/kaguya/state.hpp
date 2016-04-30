@@ -88,7 +88,7 @@ namespace kaguya
 		}
 		void init()
 		{
-			if (!ErrorHandler::instance().getHandler(state_))
+			if (!ErrorHandler::getHandler(state_))
 			{
 				setErrorHandler(&stderror_out);
 			}
@@ -174,7 +174,7 @@ namespace kaguya
 		void setErrorHandler(standard::function<void(int statuscode, const char*message)> errorfunction)
 		{
 			util::ScopedSavedStack save(state_);
-			ErrorHandler::instance().registerHandler(state_, errorfunction);
+			ErrorHandler::registerHandler(state_, errorfunction);
 		}
 
 
@@ -268,7 +268,7 @@ namespace kaguya
 
 			if (status)
 			{
-				ErrorHandler::instance().handle(status, state_);
+				ErrorHandler::handle(status, state_);
 				return false;
 			}
 
@@ -285,7 +285,7 @@ namespace kaguya
 			status = lua_pcall_wrap(state_, 0, LUA_MULTRET);
 			if (status)
 			{
-				ErrorHandler::instance().handle(status, state_);
+				ErrorHandler::handle(status, state_);
 				return false;
 			}
 			return true;
@@ -306,7 +306,7 @@ namespace kaguya
 			int status = luaL_loadstring(state_, str);
 			if (status)
 			{
-				ErrorHandler::instance().handle(status, state_);
+				ErrorHandler::handle(status, state_);
 				return false;
 			}
 			if (!env.isNilref())
@@ -321,7 +321,7 @@ namespace kaguya
 			status = lua_pcall_wrap(state_, 0, LUA_MULTRET);
 			if (status)
 			{
-				ErrorHandler::instance().handle(status, state_);
+				ErrorHandler::handle(status, state_);
 				return false;
 			}
 			return true;
