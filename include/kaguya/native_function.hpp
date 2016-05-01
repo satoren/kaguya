@@ -396,10 +396,10 @@ namespace kaguya
 
 		template<typename F> int bindcfunction(lua_State *l)
 		{
-			F* fun = reinterpret_cast<F*>(lua_touserdata(l, lua_upvalueindex(1)));
+			F fun = reinterpret_cast<F>(lua_touserdata(l, lua_upvalueindex(1)));
 
 			try {
-				return call(l, *fun);
+				return call(l, fun);
 			}
 			catch (LuaTypeMismatch &) {
 				util::traceBack(l,(std::string("maybe...") + build_arg_error_message(l)).c_str());
@@ -549,7 +549,7 @@ namespace kaguya
 	{
 		static int push(lua_State* l, T f)
 		{
-			lua_pushlightuserdata(l,reinterpret_cast<void*>(&f));
+			lua_pushlightuserdata(l,reinterpret_cast<void*>(f));
 			lua_pushcclosure(l, &nativefunction::bindcfunction<T>, 1);
 			return 1;
 		}
