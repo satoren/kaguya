@@ -392,6 +392,13 @@ namespace kaguya
 				lua_setfield(state, -1, "__index");
 			}
 		}
+
+
+		template<typename F> int bindcfunction(lua_State *l)
+		{
+			F fun = static_cast<F>(lua_touserdata(l, lua_upvalueindex(1)));
+			return call(l, fun);
+		}
 	}
 
 	typedef nativefunction::FunctorType FunctorType;
@@ -525,7 +532,15 @@ namespace kaguya
 	
 	//specialize for c function
 	template<typename T> struct lua_type_traits < T
-		, typename traits::enable_if<traits::is_function<typename traits::remove_pointer<T>::type>::value>::type > :lua_type_traits<FunctorType> {};
+		, typename traits::enable_if<traits::is_function<typename traits::remove_pointer<T>::type>::value>::type >
+	{
+		static int push(lua_State* l, const T& f)
+		{
+			lua_pushlightuserdata(l,f);
+			lua_pushcclosure(l, &nativefunction::bindcfunction<T>, 1);
+			return 1;
+		}
+	};
 
 
 
