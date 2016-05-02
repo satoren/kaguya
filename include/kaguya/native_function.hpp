@@ -172,12 +172,48 @@ namespace kaguya
 
 	namespace nativefunction
 	{
+		static const int MAX_OVERLOAD_SCORE = 255;
+		template<typename Fn>uint8_t compute_function_matching_score(lua_State* state, const Fn& fn)
+		{
+			int argcount = lua_gettop(state);
+
+			if (strictCheckArgTypes(state, fn))
+			{
+				int fnargcount = argCount(fn);
+				if (argcount == fnargcount)
+				{
+					return MAX_OVERLOAD_SCORE;
+				}
+				else
+				{
+					return 100 - std::abs(argcount - fnargcount);
+				}
+			}
+			else if (checkArgTypes(state, fn))
+			{
+				int fnargcount = argCount(fn);
+				if (argcount == fnargcount)
+				{
+					return 200;
+				}
+				else
+				{
+					return 50 - std::abs(argcount - fnargcount);
+				}
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
 		struct BaseInvoker
 		{
 			virtual int argsCount()const = 0;
 			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
 			virtual std::string argumentTypeNames() = 0;
+			virtual uint8_t argsMatchingScore(lua_State* state)=0;
 			virtual ~BaseInvoker() {}
 		};
 
@@ -212,38 +248,15 @@ namespace kaguya
 				virtual int invoke(lua_State *state)
 				{
 					int count = call(state, func_);
-					
-					// If return pointer,return value retain first argment object
-					// example: a = value.pointer_member; value = nil;
-					// a has value reference
-					// fixme not good implement this
-					/*
-					int top = lua_gettop(state);
-					if (top != count)
-					{
-						for (int i = top - count + 1; i <= top; ++i)
-						{
-							ObjectWrapperBase* wrapper = object_wrapper(state, i);
-							if (wrapper)
-							{
-								for (int arg = 1; arg < top - count + 1; ++arg)
-								{
-									if (lua_type(state, arg) == LUA_TUSERDATA)
-									{
-										//return value retain arguments
-										wrapper->addRef(state, arg);
-									}
-
-								}
-							}
-						}
-					}*/
 
 					return count;
 
 				}
 				virtual std::string argumentTypeNames() {
 					return argTypesName(func_);
+				}
+				virtual uint8_t argsMatchingScore(lua_State* state){
+					return compute_function_matching_score(state, func_);
 				}
 			};
 			template<typename F>
@@ -259,7 +272,6 @@ namespace kaguya
 
 		inline FunctorType* pick_match_function(lua_State *l)
 		{
-			int argcount = lua_gettop(l);
 			int overloadnum = int(lua_tonumber(l, lua_upvalueindex(1)));
 
 			if (overloadnum == 1)
@@ -273,9 +285,8 @@ namespace kaguya
 //				}
 				return fun;
 			}
-			FunctorType* weak_match = 0;
-			FunctorType* argcount_unmatch = 0;
-			int minArgDiv = 0;
+			FunctorType* match_function = 0;
+			uint8_t match_score = 0;
 			for (int i = 0; i < overloadnum; ++i)
 			{
 				FunctorType* fun = static_cast<FunctorType*>(lua_touserdata(l, lua_upvalueindex(i + 2)));
@@ -283,26 +294,18 @@ namespace kaguya
 				{
 					continue;
 				}
-				int fnarg = (*fun)->argsCount();
-				int argDiv = argcount - fnarg;
-				if (!argDiv && (*fun)->checktype(l, true))
+				uint8_t score = (*fun)->argsMatchingScore(l);
+				if (match_score < score)
 				{
-					return fun;
-				}
-				else if (!weak_match && (!argDiv || !argcount_unmatch || argDiv < minArgDiv) && (*fun)->checktype(l, false))
-				{
-					if (!argDiv)
+					match_function = fun;
+					match_score = score;
+					if (match_score == MAX_OVERLOAD_SCORE)
 					{
-						weak_match = fun;
-					}
-					else
-					{
-						argcount_unmatch = fun;
-                        minArgDiv = argDiv;
+						return match_function;
 					}
 				}
 			}
-			return weak_match ? weak_match : argcount_unmatch;
+			return match_function;
 		}
 
 
@@ -392,26 +395,6 @@ namespace kaguya
 				lua_setfield(state, -1, "__index");
 			}
 		}
-
-
-		template<typename F> int bindcfunction(lua_State *l)
-		{
-			F fun = reinterpret_cast<F>(lua_touserdata(l, lua_upvalueindex(1)));
-
-			try {
-				return call(l, fun);
-			}
-			catch (LuaTypeMismatch &) {
-				util::traceBack(l,(std::string("maybe...") + build_arg_error_message(l)).c_str());
-			}
-			catch (std::exception & e) {
-				util::traceBack(l, e.what());
-			}
-			catch (...) {
-				util::traceBack(l, "Unknown exception");
-			}
-			return lua_error(l);
-		}
 	}
 
 	typedef nativefunction::FunctorType FunctorType;
@@ -419,41 +402,121 @@ namespace kaguya
 
 	typedef std::vector<FunctorType> FunctorOverloadType;
 
-	//deprecate
-	template<typename T>
-	inline FunctorType lua_function(T f)
-	{
-		return FunctorType(f);
-	}
 
-	template<typename T>
-	inline FunctorType function(const T& f)
-	{
-		return FunctorType(f);
-	}
-
-	template<typename FTYPE, typename T>
-	inline FunctorType function(const T&  f)
-	{
-		return FunctorType(standard::function<FTYPE>(f));
-	}
-#if KAGUYA_USE_CPP11
-	template<typename T>
-	inline FunctorType function(T&& f)
-	{
-		return FunctorType(std::forward<T>(f));
-	}
-
-	template<typename FTYPE, typename T>
-	inline FunctorType function(T&& f)
-	{
-		return FunctorType(standard::function<FTYPE>(std::forward<T>(f)));
-	}
-#endif
 
 #if KAGUYA_USE_CPP11
+
 	namespace detail
 	{
+		template<typename Fn, typename... Functions> void function_match_scoring(lua_State* state, uint8_t* score_array, int current_index, const Fn& fn)
+		{
+			score_array[current_index] = nativefunction::compute_function_matching_score(state, fn);
+		}
+		template<typename Fn, typename... Functions> void function_match_scoring(lua_State* state, uint8_t* score_array, int current_index,const Fn& fn, const Functions&... fns)
+		{
+			score_array[current_index] = nativefunction::compute_function_matching_score(state, fn);
+			if (score_array[current_index] < nativefunction::MAX_OVERLOAD_SCORE)
+			{
+				function_match_scoring(state, score_array, current_index + 1, fns...);
+			}
+		}
+		template<typename... Functions> int best_function_index(lua_State* state, const Functions&... fns)
+		{
+			static const int fncount = sizeof...(fns);
+			uint8_t score[fncount] = {};
+			function_match_scoring(state, score, 0, fns...);
+			uint8_t best_score = 0;
+			int best_score_index = -1;
+			for (int i = 0; i < fncount; ++i)
+			{
+				if (best_score < score[i])
+				{
+					best_score = score[i];
+					best_score_index = i;
+					if (best_score == nativefunction::MAX_OVERLOAD_SCORE)
+					{
+						break;
+					}
+				}
+			}
+			return best_score_index;
+		}
+		template<typename Fn> int invoke_index(lua_State* state, int index, int current_index, const Fn& fn)
+		{
+			if (index == current_index)
+			{
+				return nativefunction::call(state, fn);
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		template<typename Fn, typename... Functions> int invoke_index(lua_State* state, int index,int current_index, const Fn& fn, const Functions&... fns)
+		{
+			if (index == current_index)
+			{
+				return nativefunction::call(state, fn);
+			}
+			else
+			{
+				return invoke_index(state, index,current_index + 1, fns...);
+			}
+		}
+
+		template<typename Fun> int invoke(lua_State* state, const Fun& fn)
+		{
+			return nativefunction::call(state, fn);
+		}
+
+		template<typename Fun,typename... Functions> int invoke(lua_State* state, const Fun& fn,const Functions&... fns)
+		{
+			int index = best_function_index(state, fn,fns...);
+			if (index >= 0)
+			{
+				return invoke_index(state, index,0, fn, fns...);
+			}
+			else
+			{
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return 0;
+		}
+
+		template<typename TupleType, std::size_t ...S> int invoke_tuple_impl(lua_State* state, TupleType&& tuple, nativefunction::cpp11impl::index_tuple<S...>)
+		{
+			return invoke(state, std::get<S>(tuple)...);
+		}
+		template<typename TupleType> int invoke_tuple(lua_State* state, TupleType&& tuple)
+		{
+			typedef typename std::decay<TupleType>::type ttype;
+
+			typedef typename nativefunction::cpp11impl::index_range<0, std::tuple_size<ttype>::value>::type indexrange;
+
+			return invoke_tuple_impl(state, tuple, indexrange());
+		}
+
+		template<typename Fun> std::string arg_typename( const Fun& fn)
+		{
+			return nativefunction::argTypesName(fn);
+		}
+
+		template<typename Fun, typename... Functions> std::string arg_typename(const Fun& fn, const Functions&... fns)
+		{
+			return "\t\t"+nativefunction::argTypesName(fn) + "\n" + arg_typename(fns...);
+		}
+		template<typename TupleType, std::size_t ...S> std::string arg_typename_tuple_impl( TupleType&& tuple, nativefunction::cpp11impl::index_tuple<S...>)
+		{
+			return arg_typename(std::get<S>(tuple)...);
+		}
+		template<typename TupleType> std::string arg_typename_tuple( TupleType&& tuple)
+		{
+			typedef typename std::decay<TupleType>::type ttype;
+			typedef typename nativefunction::cpp11impl::index_range<0, std::tuple_size<ttype>::value>::type indexrange;
+
+			return arg_typename_tuple_impl(tuple, indexrange());
+		}
+
 		inline void push_back_r(FunctorOverloadType& v)
 		{
 		}
@@ -472,6 +535,109 @@ namespace kaguya
 			push_back_r(v, fns...);
 		}
 	}
+#define KAGUYA_NEW_OVERLOAD
+#ifdef KAGUYA_NEW_OVERLOAD
+
+	template<typename FunctionTuple>
+	struct FunctionOverloadType
+	{
+		FunctionTuple functions;
+		FunctionOverloadType(FunctionTuple&& t) :functions(t) {}
+	};
+
+
+	template<typename T>
+	inline FunctionOverloadType<standard::tuple<T> > function(T f)
+	{
+		return FunctionOverloadType<standard::tuple<T> >(standard::tuple<T>(f));
+	}
+
+	template<typename FTYPE, typename T>
+	inline FunctionOverloadType<standard::tuple<standard::function<FTYPE> > > function(T&& f)
+	{
+		return FunctionOverloadType<standard::tuple<standard::function<FTYPE>> >(standard::tuple<standard::function<FTYPE>>(standard::function<FTYPE>(std::forward<T>(f))));
+	}
+
+	template<typename... Functions>
+	FunctionOverloadType<standard::tuple<Functions...> > overload(Functions... fns)
+	{
+		return FunctionOverloadType<standard::tuple<Functions...> >(standard::tuple<Functions...>(fns...));
+	}
+
+
+
+	template<typename FunctionTuple>	struct lua_type_traits<FunctionOverloadType<FunctionTuple> > {
+		typedef FunctionOverloadType<FunctionTuple> userdatatype;
+		typedef const FunctionOverloadType<FunctionTuple>& push_type;
+
+
+		static std::string build_arg_error_message(lua_State *state,FunctionTuple* tuple)
+		{
+			return  "Argument mismatch:" + nativefunction::argmentTypes(state) + "\t candidate is:\n"
+				+ detail::arg_typename_tuple(*tuple);
+		}
+
+		static int invoke(lua_State *state)
+		{
+			FunctionTuple* t = static_cast<FunctionTuple*>(lua_touserdata(state, lua_upvalueindex(1)));
+
+			if (t)
+			{
+				try {
+					return detail::invoke_tuple(state, *t);
+				}
+				catch (LuaTypeMismatch &) {
+					util::traceBack(state, (std::string("maybe...") + build_arg_error_message(state, t)).c_str());
+				}
+				catch (std::exception & e) {
+					util::traceBack(state, e.what());
+				}
+				catch (...) {
+					util::traceBack(state, "Unknown exception");
+				}
+			}
+			return lua_error(state);
+		}
+
+		inline static int tuple_destructor(lua_State *state)
+		{
+			FunctionTuple* f = static_cast<FunctionTuple*>(lua_touserdata(state, 1));
+			if (f)
+			{
+				f->~FunctionTuple();
+			}
+			return 0;
+		}
+
+		static int push(lua_State* state, push_type fns)
+		{
+			void* ptr=lua_newuserdata(state, sizeof(FunctionTuple));
+			new(ptr) FunctionTuple(fns.functions);
+			lua_createtable(state, 0, 2);
+			lua_pushcclosure(state, &tuple_destructor, 0);
+			lua_setfield(state, -2, "__gc");
+			lua_pushvalue(state, -1);
+			lua_setfield(state, -1, "__index");
+			lua_setmetatable(state,-2);
+			lua_pushcclosure(state, &invoke, 1);
+
+			return 1;
+		}
+	};
+#else
+
+	template<typename T>
+	inline FunctorType function(T&& f)
+	{
+		return FunctorType(std::forward<T>(f));
+	}
+
+	template<typename FTYPE, typename T>
+	inline FunctorType function(T&& f)
+	{
+		return FunctorType(standard::function<FTYPE>(std::forward<T>(f)));
+	}
+
 	template<typename... Functions>
 	inline FunctorOverloadType overload(const Functions&... fns)
 	{
@@ -479,8 +645,26 @@ namespace kaguya
 		detail::push_back_r(v, fns...);
 		return v;
 	}
+#endif
 #else
+//deprecate
+template<typename T>
+inline FunctorType lua_function(T f)
+{
+	return FunctorType(f);
+}
 
+template<typename T>
+inline FunctorType function(const T& f)
+{
+	return FunctorType(f);
+}
+
+template<typename FTYPE, typename T>
+inline FunctorType function(const T&  f)
+{
+	return FunctorType(standard::function<FTYPE>(f));
+	}
 #define KAGUYA_DEF_TEMPLATE(N) KAGUYA_PP_CAT(typename F,N)
 #define KAGUYA_PUSH_DEF(N) v.push_back(KAGUYA_PP_CAT(f,N));
 #define KAGUYA_ARG_DEF(N) KAGUYA_PP_CAT(F,N) KAGUYA_PP_CAT(f,N)
@@ -549,9 +733,7 @@ namespace kaguya
 	{
 		static int push(lua_State* l, T f)
 		{
-			lua_pushlightuserdata(l,reinterpret_cast<void*>(f));
-			lua_pushcclosure(l, &nativefunction::bindcfunction<T>, 1);
-			return 1;
+			return util::one_push(l,function(f));
 		}
 	};
 
