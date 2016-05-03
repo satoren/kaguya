@@ -43,25 +43,14 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fsanitize=address -fno-omit-frame-pointe
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 endif(HAVE_FLAG_SANITIZE_ADDRESS)
 
-
-set(TEST_SRCS test/test.cpp
-		test/test_util.hpp
-		test/test_01_primitive.cpp
-		test/test_02_classreg.cpp
-		test/test_03_function.cpp
-		test/test_04_lua_function.cpp
-		test/test_05_lua_ref.cpp
-		test/test_06_state.cpp
-		test/test_07_vector_map_to_luatable.cpp
-		test/test_11_cxx11_feature.cpp
-		)
+file(GLOB TEST_SRCS files RELATIVE ${CMAKE_SOURCE_DIR} test/*.cpp)
 
 link_directories(${LUA_LIBRARY_DIRS})
 add_executable(test_runner
 				${TEST_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(test_runner ${LUA_LIBRARIES})
 
-set(BENCHMARK_SRCS test/benchmark.cpp test/benchmark_function.cpp test/benchmark_function.hpp)
+set(BENCHMARK_SRCS benchmark/benchmark.cpp benchmark/benchmark_function.cpp benchmark/benchmark_function.hpp)
 
 add_executable(benchmark ${BENCHMARK_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(benchmark ${LUA_LIBRARIES})
