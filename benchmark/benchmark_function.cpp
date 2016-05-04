@@ -37,16 +37,34 @@ namespace kaguya_api_benchmark______
 {
 	void simple_get_set(kaguya::State& state)
 	{
-		state["SetGet"].setClass(kaguya::ClassMetatable<SetGet>()
-			.addConstructor()
-			.addMember("set", &SetGet::set)
-			.addMember("get", &SetGet::get)
-			);
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.add("set", &SetGet::set)
+			.add("get", &SetGet::get)
+		);
 
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 1000000\n"
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}
+	void constructor_get_set(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+		);
+
+		state(
+			"local getset = SetGet.new()\n"
+			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -57,21 +75,16 @@ namespace kaguya_api_benchmark______
 	}
 	void overloaded_get_set(kaguya::State& state)
 	{
-		state["SetGet"].setClass(kaguya::ClassMetatable<SetGet>()
-			.addConstructor()
-			.addMember("set", &SetGet::setstr)
-			.addMember("set", &SetGet::setstr)
-			.addMember("set", &SetGet::setstr)
-			.addMember("set", &SetGet::setstr)
-			.addMember("set", &SetGet::setstr)
-			.addMember("set", &SetGet::set)
-			.addMember("get", &SetGet::get)
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.addOverloadedFunctions("set", &SetGet::setstr, &SetGet::setstr, &SetGet::setstr, &SetGet::setstr, &SetGet::setstr, &SetGet::set)
+			.addFunction("get", &SetGet::get)
 		);
 
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -82,17 +95,17 @@ namespace kaguya_api_benchmark______
 	}
 	void simple_get_set_contain_propery_member(kaguya::State& state)
 	{
-		state["SetGet"].setClass(kaguya::ClassMetatable<SetGet>()
-			.addConstructor()
-			.addMember("set", &SetGet::set)
-			.addMember("get", &SetGet::get)
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.addFunction("set", &SetGet::set)
+			.addFunction("get", &SetGet::get)
 			.addProperty("a", &SetGet::a)
 			);
 
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -103,16 +116,16 @@ namespace kaguya_api_benchmark______
 	}
 	void object_pointer_register_get_set(kaguya::State& state)
 	{
-		state["SetGet"].setClass(kaguya::ClassMetatable<SetGet>()
-			.addConstructor()
-			.addMember("set", &SetGet::set)
-			.addMember("get", &SetGet::get)
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.addFunction("set", &SetGet::set)
+			.addFunction("get", &SetGet::get)
 			);
 
 		SetGet getset;
 		state["getset"] = &getset;
 		state(
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -125,7 +138,7 @@ namespace kaguya_api_benchmark______
 	{
 		state["nativefun"] = &test_native_function;
 		state(
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"local r = nativefun(i)\n"
 			"if(r ~= i)then\n"
@@ -154,7 +167,7 @@ namespace kaguya_api_benchmark______
 		state("lua_function=function(i)return i;end");
 
 		kaguya::LuaRef lua_function = state["lua_function"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			int r = lua_function.call<int>(i);
 			if (r != i) { throw std::logic_error(""); }
@@ -165,7 +178,7 @@ namespace kaguya_api_benchmark______
 		state("lua_function=function(i)return i;end");
 
 		kaguya::LuaFunction lua_function = state["lua_function"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			int r = lua_function(i);
 			if (r != i) { throw std::logic_error(""); }
@@ -176,7 +189,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_table.setField("value", i);
 			int v = lua_table.getField<int>("value");
@@ -188,7 +201,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_table["value"] = i;
 			int v = lua_table["value"];
@@ -199,7 +212,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_table.setField("value",i);
 			int v = lua_table["value"];
@@ -210,7 +223,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_table["value"] = i;
 			int v = lua_table.getField<int>("value");
@@ -223,7 +236,7 @@ namespace kaguya_api_benchmark______
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
 		const kaguya::LuaTable& const_lua_table = lua_table;
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_table["value"] = i;
 			int v = const_lua_table.getField("value");
@@ -239,15 +252,15 @@ namespace kaguya_api_benchmark______
 	};
 	void property_access(kaguya::State& state)
 	{
-		state["Prop"].setClass(kaguya::ClassMetatable<Prop>()
-			.addConstructor()
+		state["Prop"].setClass(kaguya::UserdataMetatable<Prop>()
+			.setConstructors<Prop()>()
 			.addProperty("d", &Prop::d)
 			);
 
 		state(
 			"local getset = Prop.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"getset.d =i\n"
 			"if(getset.d ~= i)then\n"
@@ -271,7 +284,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 100000; i++)
+		for (int i = 0; i < 1000000; i++)
 		{
 			std::vector<double> r = lua_table;
 		}
@@ -280,7 +293,7 @@ namespace kaguya_api_benchmark______
 	{
 		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 100000; i++)
+		for (int i = 0; i < 1000000; i++)
 		{
 			bool was_valid;
 			std::vector<double> r = lua_table.get<std::vector<double> >(was_valid);
@@ -353,7 +366,7 @@ namespace original_api_no_type_check
 
 		luaL_dostring(s,
 			"local getset = SetGet.new()\n"
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -380,7 +393,7 @@ namespace original_api_no_type_check
 		lua_setglobal(s,"nativefun");
 
 		luaL_dostring(s,
-			"local times = 1000000\n"
+			"local times = 10000000\n"
 			"for i=1,times do\n"
 			"local r = nativefun(i)\n"
 			"if(r ~= i)then\n"
@@ -397,7 +410,7 @@ namespace original_api_no_type_check
 		luaL_dostring(s,"lua_function=function(i)return i;end");
 		lua_getglobal(s, "lua_function");
 		int funref = luaL_ref(s, LUA_REGISTRYINDEX);
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_rawgeti(s, LUA_REGISTRYINDEX, funref);
 			lua_pushnumber(s, i);
@@ -413,7 +426,7 @@ namespace original_api_no_type_check
 		lua_State* s = luaL_newstate();
 		luaL_openlibs(s);
 		luaL_dostring(s, "lua_table={value=0}");
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < 10000000; i++)
 		{
 			lua_getglobal(s, "lua_table");
 			lua_pushnumber(s, i);

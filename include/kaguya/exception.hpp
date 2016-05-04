@@ -25,6 +25,17 @@ namespace kaguya
 
 		~LuaException()throw() {}
 	};
+	class KaguyaException :public std::exception
+	{
+		std::string what_;
+		const char* what_c_;
+	public:
+		KaguyaException(const char* what)throw() : what_c_(what) {}
+		KaguyaException(const std::string& what) : what_(what), what_c_(0) {}
+		const char* what() const throw() { return what_c_ ? what_c_ : what_.c_str(); }
+
+		~KaguyaException()throw() {}
+	};
 	class LuaTypeMismatch :public LuaException {
 	public:
 		LuaTypeMismatch(const char* what)throw() :LuaException(0, what) {}

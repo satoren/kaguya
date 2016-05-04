@@ -124,7 +124,7 @@ void foobar3(int, Foo, int) {}
 KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 {
 	state["foobar"] = kaguya::overload(foobar1, foobar2, foobar3);
-	state["Foo"].setClass(kaguya::ClassMetatable<Foo>().addConstructor());
+	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>().setConstructors<Foo()>());
 	state.setErrorHandler(registerError);
 	TEST_CHECK(!state("foobar()"));
 	TEST_EQUAL(errorOccurred, true);

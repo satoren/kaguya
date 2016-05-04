@@ -41,8 +41,8 @@ private:
 };
 KAGUYA_TEST_FUNCTION_DEF(movable_class_test)(kaguya::State& state)
 {
-	state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
-		.addConstructor<int>()
+	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
+		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
 		);
 
@@ -115,8 +115,8 @@ KAGUYA_TEST_FUNCTION_DEF(lambdafun)(kaguya::State& state)
 
 KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
 {
-	state["MoveOnlyClass"].setClass(kaguya::ClassMetatable<MoveOnlyClass>()
-		.addConstructor<int>()
+	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
+		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
 		);
 
@@ -140,7 +140,7 @@ KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 
 KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
 {
-	state["Base"].setClass(kaguya::ClassMetatable<MoveOnlyClass>());
+	state["Base"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>());
 
 	state["test"] =std::unique_ptr<MoveOnlyClass>();
 	TEST_CHECK(state("assert(test==nil)"));

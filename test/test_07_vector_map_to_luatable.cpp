@@ -75,11 +75,12 @@ public:
 
 KAGUYA_TEST_FUNCTION_DEF(testWrongClassUseWihMap)(kaguya::State& state)
 {
-	state["testMap"].setClass(kaguya::ClassMetatable<FooClass>()
-		.addMemberFunction("testMap", &FooClass::mapCallback)
-		.addMemberFunction("mapOverload", static_cast<void (FooClass::*)()>(&FooClass::mapOverload))
-		.addMemberFunction("mapOverload", static_cast<void (FooClass::*)(const std::map<unsigned, unsigned>&)>(&FooClass::mapOverload))
-		.addMemberFunction("mapOverload", static_cast<void (FooClass::*)(const std::map<unsigned, unsigned>&, int)>(&FooClass::mapOverload))
+	state["testMap"].setClass(kaguya::UserdataMetatable<FooClass>()
+		.add("testMap", &FooClass::mapCallback)
+		.addOverloadedFunctions("mapOverload"
+			, static_cast<void (FooClass::*)()>(&FooClass::mapOverload)
+			, static_cast<void (FooClass::*)(const std::map<unsigned, unsigned>&)>(&FooClass::mapOverload)
+			, static_cast<void (FooClass::*)(const std::map<unsigned, unsigned>&, int)>(&FooClass::mapOverload))
 		);
 	state["foo"] = FooClass();
 	state("myMap = {[1] = 2, [3] = 4, [5] = 6}");

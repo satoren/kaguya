@@ -23,108 +23,6 @@ KAGUYA_TEST_FUNCTION_DEF(free_standing_function_test)(kaguya::State& state)
 	TEST_CHECK(state["free2"]() == 12.0);
 }
 
-struct Foo
-{
-	std::string bar;
-	void setBar(std::string b) { bar = b; }
-};
-
-struct Bar
-{
-	std::string member;
-	Bar() {}
-	Bar(const std::string& data):member(data){}
-};
-
-KAGUYA_TEST_FUNCTION_DEF(member_function_test)(kaguya::State& state)
-{
-	state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
-		.addMember("setBar", &Foo::setBar)
-		.addCodeChunkResult("luafunc", "return function(a,b) return a*b end")
-		);
-	Foo foo;
-	kaguya::LuaRef lfoo = state["Foo"];
-	lfoo["bar"] = kaguya::function(&Foo::setBar);
-	lfoo["bar"](&foo, "bar");
-	TEST_EQUAL(foo.bar, "bar");
-
-	state["foo"] = &foo;
-
-	state("foo:setBar('test')");
-	TEST_EQUAL(foo.bar, "test");
-
-	TEST_CHECK(state("assert(foo.luafunc(3,4) == 12)"));
-
-
-	(state["foo"]->*"setBar")("test2");
-	TEST_EQUAL(foo.bar, "test2");
-#if KAGUYA_USE_CPP11
-	lfoo["bar"] = kaguya::function<void(std::string)>([&foo](std::string str) { foo.bar = str; });
-	TEST_CHECK(state("Foo.bar('test3')"));
-	TEST_EQUAL(foo.bar, "test3");
-	lfoo["bar"] = kaguya::function([&foo](std::string str) { foo.bar = str; });
-	TEST_CHECK(state("Foo.bar('test4')"));
-	TEST_EQUAL(foo.bar, "test4");
-#else
-#endif
-}
-
-struct VariFoo
-{
-	std::vector<kaguya::LuaRef> args;
-
-	VariFoo() {}
-	VariFoo(kaguya::VariadicArgType a) :args(a) {
-
-	}
-
-	void variadic_arg_func(kaguya::VariadicArgType args)
-	{
-		this->args = args;
-	}
-
-};
-KAGUYA_TEST_FUNCTION_DEF(variadic_function_test)(kaguya::State& state)
-{
-	state["Vari"].setClass(kaguya::ClassMetatable<VariFoo>()
-		.addConstructor()
-		.addConstructorVariadicArg()
-		.addMember("variadicfun", &VariFoo::variadic_arg_func)
-		);
-	state("var = Vari.new()");
-	state("var:variadicfun('hanaregumi','hana-uta',5)");;
-	VariFoo* ptr = state["var"];
-	TEST_CHECK(ptr);
-	TEST_EQUAL(ptr->args[0].get<std::string>(), "hanaregumi");
-	TEST_EQUAL(ptr->args[1].get<std::string>(), "hana-uta");
-	TEST_EQUAL(ptr->args[2].get<int>(), 5);
-
-	bool typevalid;
-	TEST_EQUAL(ptr->args[0].get<std::string>(typevalid), "hanaregumi");
-	TEST_CHECK(typevalid);
-	TEST_EQUAL(ptr->args[1].get<std::string>(typevalid), "hana-uta");
-	TEST_CHECK(typevalid);
-	TEST_EQUAL(ptr->args[2].get<int>(typevalid), 5);
-	TEST_CHECK(typevalid);
-	TEST_EQUAL(ptr->args[2].get<std::string>(typevalid), "5");
-	TEST_CHECK(typevalid);
-	ptr->args[2].get<std::string>(typevalid, false);
-	TEST_CHECK(!typevalid);
-
-
-	state("var = Vari.new('abc')");
-	ptr = state["var"];
-
-	TEST_CHECK(ptr);
-	TEST_EQUAL(ptr->args[0].get<std::string>(), "abc");
-
-	state("var = Vari.new('abc', 'def')");
-	ptr = state["var"];
-
-	TEST_CHECK(ptr);
-	TEST_EQUAL(ptr->args[0].get<std::string>(), "abc");
-	TEST_EQUAL(ptr->args[1].get<std::string>(), "def");
-}
 
 
 
@@ -141,11 +39,11 @@ KAGUYA_TEST_FUNCTION_DEF(multi_return_function_test)(kaguya::State& state)
 	TEST_CHECK(state("assert(a == 12  and b == '23')"));
 }
 
-void pointerfun(VariFoo* pointer)
+void pointerfun(void* pointer)
 {
 	TEST_EQUAL(pointer, 0);
 }
-void const_pointerfun(const VariFoo* pointer)
+void const_pointerfun(const void* pointer)
 {
 	TEST_EQUAL(pointer, 0);
 }
@@ -175,23 +73,18 @@ KAGUYA_TEST_FUNCTION_DEF(noargs_to_nullpointer)(kaguya::State& state)
 	TEST_CHECK(state("const_pointerfun()"));
 }
 
-void reffun(Foo& ref)
+
+struct Foo
 {
-	ref.setBar("BarBar");
-}
-KAGUYA_TEST_FUNCTION_DEF(arg_class_ref)(kaguya::State& state)
+	std::string bar;
+	void setBar(std::string b) { bar = b; }
+};
+struct Bar
 {
-	state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
-		.addMember("setBar", &Foo::setBar)
-		);
-
-	Foo foo;
-	state["reffun"] = kaguya::function(reffun);
-
-	state["reffun"](kaguya::standard::ref(foo));
-	TEST_EQUAL(foo.bar, "BarBar");
-}
-
+	std::string member;
+	Bar() {}
+	Bar(const std::string& data) :member(data) {}
+};
 KAGUYA_TEST_FUNCTION_DEF(native_function_call_test)(kaguya::State& state)
 {
 	using namespace kaguya::nativefunction;
@@ -303,8 +196,8 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 	TEST_EQUAL(f((void*)0), 7);
 
 
-	state["Foo"].setClass(kaguya::ClassMetatable<Foo>());
-	state["Bar"].setClass(kaguya::ClassMetatable<Bar>());
+	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>());
+	state["Bar"].setClass(kaguya::UserdataMetatable<Bar>());
 
 	TEST_EQUAL(f(Foo()), 8);
 	TEST_EQUAL(f(Bar()), 9);

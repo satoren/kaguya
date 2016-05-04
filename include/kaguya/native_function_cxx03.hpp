@@ -343,7 +343,6 @@ namespace kaguya
 #undef KAGUYA_FUNC_DEF
 #undef KAGUYA_FUNC_TYPE
 #define KAGUYA_FUNC_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
-#define KAGUYA_FUNC_TYPE(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
 #define KAGUYA_CALL_FN_DEF(N) \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
@@ -354,7 +353,7 @@ namespace kaguya
 				class_userdata::setmetatable<ClassType>(state);\
 				return 1;\
 			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {}; \
+			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_DEF(N)> : traits::integral_constant<bool, true> {}; \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
@@ -379,7 +378,24 @@ namespace kaguya
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 
 
-			//@}
+				//@}
+			template<class ClassType, class FunType=void> struct functionToConstructorSignature;
+			
+#define KAGUYA_F_TO_CONSIG_TYPE_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
+#define KAGUYA_F_TO_CONSIG_DEF(N) \
+			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			struct functionToConstructorSignature<ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+			{\
+				typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
+			};\
+			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			struct functionToConstructorSignature<ClassType,ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+			{\
+				typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
+			};
+
+			KAGUYA_F_TO_CONSIG_DEF(0)
+			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_F_TO_CONSIG_DEF)
 		}
 		using cpp03impl::call;
 		using cpp03impl::checkArgTypes;
@@ -387,6 +403,7 @@ namespace kaguya
 		using cpp03impl::argTypesName;
 		using cpp03impl::argCount;
 		using cpp03impl::constructor_signature_type;
+		using cpp03impl::functionToConstructorSignature;
 		using cpp03impl::is_callable;
 	}
 }

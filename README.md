@@ -126,14 +126,17 @@ struct ABC
 	ABC(int value) :v(value) {}
 	int value()const { return v; }
 	void setValue(int v) { v_ = v; }
+	void overload1() {std::cout << "call overload1"<<std::endl }
+	void overload2(int) {std::cout << "call overload2"<<std::endl }
 private:
 	int v_;
 };
-state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
-	.addConstructor()
-	.addConstructor<int>()
-	.addMember("get_value", &ABC::value)
-	.addMember("set_value", &ABC::setValue)
+state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+	.setConstructors<ABC(),ABC(int)>()
+	.addFunction("get_value", &ABC::value)
+	.addFunction("set_value", &ABC::setValue)
+  .addOverloadedFunctions("overload", &ABC::overload1, &ABC::overload2)
+	.addStaticFunction("nonmemberfun", [](ABC* self,int){return 1;})//c++11 lambda function
 	);
 ```
 
@@ -145,6 +148,8 @@ abc = ABC.new(42)--call (int) constructor
 assert(42 == abc:get_value())
 abc:set_value(30)
 assert(30 == abc:get_value())
+abc:overload() -- call overload1
+abc:overload(1) --call overload2
 ```
 #### Registering inheritance
 ```c++
@@ -170,16 +175,16 @@ int base_function(Base* b) {
 }
 //
 kaguya::State state;
-state["Base"].setClass(kaguya::ClassMetatable<Base>()
-  .addMember("a", &Base::a)
+state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+  .addFunction("a", &Base::a)
   );
-state["Derived"].setClass(kaguya::ClassMetatable<Derived, Base>()
-  .addMember("b", &Derived::b)
+state["Derived"].setClass(kaguya::UserdataMetatable<Derived, Base>()
+  .addFunction("b", &Derived::b)
   );
 
 //can use kaguya::MultipleBase<BaseTypes...> for multiple inheritance class
-state["MultipleInheritance"].setClass(kaguya::ClassMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
-  .addMember("b", &MultipleInheritance::b)
+state["MultipleInheritance"].setClass(kaguya::UserdataMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
+  .addFunction("b", &MultipleInheritance::b)
   );
 
 state["base_function"] = &base_function;
@@ -190,11 +195,10 @@ state("assert(1 == derived:a())");//accessing Base member
 
 #### Registering object instance
 ```c++
-state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
-	.addConstructor()
-	.addConstructor<int>()
-	.addMember("get_value", &ABC::value)
-	.addMember("set_value", &ABC::setValue)
+state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+	.setConstructors<ABC(),ABC(int)>()
+	.addFunction("get_value", &ABC::value)
+	.addFunction("set_value", &ABC::setValue)
 	);
 	ABC abc(43);
   //register object pointer
@@ -209,7 +213,7 @@ state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 ```
 #### Object lifetime
 ```c++
-state["Base"].setClass(kaguya::ClassMetatable<Base>());
+state["Base"].setClass(kaguya::UserdataMetatable<Base>());
 Base base;
 
 //registering pointer. lifetime is same base
@@ -244,7 +248,7 @@ state("overload('2')");//string version
 
 #### Variadic arguments function
 ```c++
-state["va_fun"] = kaguya::function([](kaguya::VariadicArgType arg) {for (auto v : arg) { std::cout << v.get<std::string>() << ","; }std::cout << std::endl; });//C++11 lambda
+state["va_fun"] = kaguya::function([](kaguya::VariadicArgType args) {for (auto v : args) { std::cout << v.get<std::string>() << ","; }std::cout << std::endl; });//C++11 lambda
 state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
 
 ```

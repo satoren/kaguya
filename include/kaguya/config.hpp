@@ -63,10 +63,30 @@ extern "C" {
 #endif
 
 
-#ifndef KAGUYA_SKIP_ARGUMENTS_TYPE_CHECK
-#define KAGUYA_SKIP_ARGUMENTS_TYPE_CHECK 0
+#ifndef KAGUYA_DETECT_USE_DEPRECATED_FEATURE
+#define KAGUYA_DETECT_USE_DEPRECATED_FEATURE 0
 #endif
 
+
+#ifndef KAGUYA_DEPRECATED_FEATURE
+#if KAGUYA_USE_CPP11 && defined(__has_cpp_attribute)
+#if  __has_cpp_attribute(deprecated)
+//C++ standard depecated
+#define KAGUYA_DEPRECATED_FEATURE(MSG) [[deprecated(MSG)]]
+#endif
+#endif
+#endif
+#ifndef KAGUYA_DEPRECATED_FEATURE
+#if defined(_MSC_VER)
+//MSVC depecated
+#define KAGUYA_DEPRECATED_FEATURE(MSG) __declspec(deprecated(MSG)) 
+#elif defined(__GNUC__) || defined(__clang__)
+#define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated(MSG)))
+#elif
+#define KAGUYA_DEPRECATED_FEATURE(MSG)
+#endif
+
+#endif
 
 namespace kaguya
 {

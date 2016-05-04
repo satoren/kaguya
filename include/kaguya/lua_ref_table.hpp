@@ -141,6 +141,13 @@ namespace kaguya
 			set_class(reg);
 		}
 
+		//! register class metatable to lua and set to table
+		template<typename T, typename P>
+		void setClass(const UserdataMetatable<T, P>& reg)
+		{
+			set_class(reg);
+		}
+
 		//! set function 
 		template<typename T>
 		void setFunction(T f)
@@ -219,6 +226,14 @@ namespace kaguya
 	private:
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
+		{
+			LuaRef table(state_, NewTable());
+			table.setMetatable(reg.registerClass(state_));
+			*this = table;
+		}
+
+		template<typename T, typename P>
+		void set_class(const UserdataMetatable<T, P>& reg)
 		{
 			LuaRef table(state_, NewTable());
 			table.setMetatable(reg.registerClass(state_));
