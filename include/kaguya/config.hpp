@@ -82,7 +82,7 @@ extern "C" {
 #define KAGUYA_DEPRECATED_FEATURE(MSG) __declspec(deprecated(MSG)) 
 #elif defined(__GNUC__) || defined(__clang__)
 #define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated(MSG)))
-#elif
+#else
 #define KAGUYA_DEPRECATED_FEATURE(MSG)
 #endif
 
