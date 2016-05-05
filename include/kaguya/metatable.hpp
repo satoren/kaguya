@@ -207,7 +207,7 @@ namespace kaguya
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline UserdataMetatable& setConstructors()\
 	{\
-		member_map_["new"] = makeDataHolder(overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF)));\
+		member_map_["new"] = metatable_detail::makeDataHolder(overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF)));\
 		return *this;\
 	}
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_SET_CON_FN_DEF)
@@ -317,7 +317,7 @@ namespace kaguya
 				throw KaguyaException("already registerd.");\
 				return *this;\
 			}\
-			member_map_[name] = makeDataHolder(overload(KAGUYA_PP_ARG_REPEAT(N)));\
+			member_map_[name] = metatable_detail::makeDataHolder(overload(KAGUYA_PP_ARG_REPEAT(N)));\
 			return *this;\
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF)
