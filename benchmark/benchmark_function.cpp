@@ -414,7 +414,7 @@ namespace original_api_no_type_check
 		{
 			lua_rawgeti(s, LUA_REGISTRYINDEX, funref);
 			lua_pushnumber(s, i);
-			lua_call(s, 1, 1);
+			lua_pcall(s, 1, 1,0);
 			int r = static_cast<int>(lua_tonumber(s, -1));
 			if (r != i) { throw std::logic_error(""); }
 			lua_pop(s, 1);

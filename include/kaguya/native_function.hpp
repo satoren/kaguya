@@ -542,6 +542,7 @@ namespace kaguya
 		KAGUYA_TEMPLATE_PARAMETER(N)\
 		int invoke_tuple(lua_State* state, standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>& tuple)\
 		{\
+			if(N==1){return nativefunction::call(state,  standard::get<0>(tuple));}\
 			int32_t currentbestscore = 0;\
 			int32_t currentbestindex = -1;\
 			KAGUYA_PP_REPEAT(N, KAGUYA_FUNCTION_SCOREING);\
