@@ -332,13 +332,24 @@ namespace kaguya
 			struct is_callable<T, typename traits::enable_if<
 				!traits::is_same<void, typename f_signature<T>::type>::value
 				, void>::type > : traits::integral_constant<bool, true> {};
-		};
+
+			template<typename ClassType, typename... Args> struct functionToConstructorSignature;
+			template<typename ClassType, typename... Args> struct functionToConstructorSignature<ClassType(Args...) >
+			{
+				typedef constructor_signature_type<ClassType, Args...> type;
+			};
+			template<typename ClassType, typename... Args> struct functionToConstructorSignature<ClassType, ClassType(Args...) >//class type check version
+			{
+				typedef constructor_signature_type<ClassType, Args...> type;
+			};
+		}
 		using cpp11impl::call;
 		using cpp11impl::checkArgTypes;
 		using cpp11impl::strictCheckArgTypes;
 		using cpp11impl::argTypesName;
 		using cpp11impl::argCount;
 		using cpp11impl::constructor_signature_type;
+		using cpp11impl::functionToConstructorSignature;
 		using cpp11impl::is_callable;
 	}
 }

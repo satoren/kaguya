@@ -194,8 +194,9 @@ namespace kaguya
 			return c + push_args(l, std::forward<Args>(args)...);
 		}
 #else
-		inline void push_args(lua_State *l)
+		inline int push_args(lua_State *l)
 		{
+			return 0;
 		}
 
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
