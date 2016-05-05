@@ -5,33 +5,15 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-#include <typeinfo>
-#include <iostream>
-
-#include "kaguya/config.hpp"
-#include "kaguya/native_function.hpp"
-
-
-#include "kaguya/lua_ref_function.hpp"
-
 namespace kaguya
 {
-	template<class A1, class A2 = void
-		, class A3 = void, class A4 = void, class A5 = void
-		, class A6 = void, class A7 = void, class A8 = void,
-		class A9 = void>struct MultipleBase {
-	};
-}
 
-#include "kaguya/deprecated_metatable.hpp"
 
-namespace kaguya
-{
-	namespace metatable_detail
+	//!ClassMetatable is deprecated. use UserdataMetatable instead.
+	template<typename class_type, typename base_class_type = void>
+	struct ClassMetatable
 	{
+
 		struct DataHolderBase
 		{
 			virtual int push_to_lua(lua_State* data)const = 0;
@@ -94,31 +76,24 @@ namespace kaguya
 				return lua_type_traits<std::string>::push(state, data);
 			}
 		};
-		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
-		template<typename T>DataHolderType makeDataHolder(T&& d)
-		{
-			return DataHolderType(new MoveDataHolder<T>(std::move(d)));
-		}
 #endif
 		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
 		template<typename T>DataHolderType makeDataHolder(const T& d)
 		{
 			return DataHolderType(new DataHolder<T>(d));
 		}
-	}
 
-	template<typename class_type, typename base_class_type = void>
-	class UserdataMetatable
-	{
-		typedef std::map<std::string, metatable_detail::DataHolderType> PropMapType;
-		typedef std::map<std::string, metatable_detail::DataHolderType> MemberMapType;
+		typedef std::vector<FunctorType> FunctorOverloadType;
+		typedef std::map<std::string, FunctorOverloadType> FuncMapType;
+		typedef std::map<std::string, FunctorType> PropMapType;
+
+		typedef std::map<std::string, DataHolderType> MemberMapType;
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
-	public:
 
-		UserdataMetatable()
+		ClassMetatable()
 		{
-			add("__gc", &class_userdata::destructor<ObjectWrapperBase>);
+			addStaticFunction("__gc", &class_userdata::destructor<ObjectWrapperBase>);
 
 			KAGUYA_STATIC_ASSERT(is_registerable<class_type>::value || !traits::is_std_vector<class_type>::value, "std::vector is binding to lua-table by default.If you wants register for std::vector yourself,"
 				"please define KAGUYA_NO_STD_VECTOR_TO_TABLE");
@@ -142,9 +117,9 @@ namespace kaguya
 
 				if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
 				{
-					for (typename PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
+					for (PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
 					{
-						int count = it->second->push_to_lua(state);
+						int count = lua_type_traits<FunctorType>::push(state, it->second);
 						if (count > 1)
 						{
 							lua_pop(state, count - 1);
@@ -192,164 +167,140 @@ namespace kaguya
 			return LuaRef(state);
 		}
 
-
 #if KAGUYA_USE_CPP11
-		template<typename... ArgTypes>
-		UserdataMetatable& setConstructors()
+		template<typename... Args>
+		ClassMetatable& addConstructor()
 		{
-			member_map_["new"] = metatable_detail::makeDataHolder(overload(typename nativefunction::functionToConstructorSignature<class_type,ArgTypes>::type()...));
+			typedef typename nativefunction::constructor_signature_type<class_type, Args...> cons;
+			function_map_["new"].push_back(cons());
 			return *this;
 		}
 #else
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>		
-#define KAGUYA_SET_CON_TYPE_DEF(N) typename nativefunction::functionToConstructorSignature<class_type,KAGUYA_PP_CAT(A,N)>::type()
-#define KAGUYA_SET_CON_FN_DEF(N) \
+#define KAGUYA_TEMPLATE_PARAMETER(N)
+#define KAGUYA_ADD_CON_FN_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline UserdataMetatable& setConstructors()\
+	inline ClassMetatable& addConstructor()\
 	{\
-		member_map_["new"] = makeDataHolder(overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF)));\
+		typedef typename nativefunction::constructor_signature_type<class_type KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)> cons;\
+		function_map_["new"].push_back(cons());\
 		return *this;\
 	}
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_SET_CON_FN_DEF)
+		KAGUYA_ADD_CON_FN_DEF(0)
 #undef KAGUYA_TEMPLATE_PARAMETER
-#undef KAGUYA_SET_CON_FN_DEF
-#undef KAGUYA_SET_CON_TYPE_DEF
+#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
+			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_ADD_CON_FN_DEF)
+#undef KAGUYA_TEMPLATE_PARAMETER
+#undef KAGUYA_ADD_CON_FN_DEF
 
 #endif
+			//variadic arguments constructor(receive const std::vector<LuaRef>&)
+			//		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
+			ClassMetatable& addConstructorVariadicArg()
+		{
+			typedef typename nativefunction::constructor_signature_type<class_type, VariadicArgType> cons;
+			function_map_["new"].push_back(FunctorType(cons()));
+			return *this;
+		}
 
-
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+		//deprecated
+		//can not write  Ret class_type::* f on MSC++2013
+		template<typename Fun>
+		KAGUYA_DEPRECATED_FEATURE("ClassMetatable is deprecated. use UserdataMetatable instead.") ClassMetatable& addMember(const char* name, Fun f)
+		{
+			return addMemberFunction(name, f);
+		}
+		//deprecated
+		//can not write  Ret class_type::* f on MSC++2013
+		template<typename Fun>
+		ClassMetatable& addMemberFunction(const char* name, Fun f)
+		{
+			if (has_key(name, true))
+			{
+				//already registerd
+				return *this;
+			}
+			addFunction(name, f);
+			return *this;
+		}
+#else
+		//deprecated
+		template<typename Ret>
+		KAGUYA_DEPRECATED_FEATURE("ClassMetatable is deprecated. use UserdataMetatable instead.") ClassMetatable& addMember(const char* name, Ret class_type::* f)
+		{
+			return addMemberFunction(name, f);
+		}
+		template<typename Ret>
+		ClassMetatable& addMemberFunction(const char* name, Ret class_type::* f)
+		{
+			if (has_key(name, true))
+			{
+				//already registerd
+				return *this;
+			}
+			addFunction(name, f);
+			return *this;
+		}
+#endif
 		//add member property
 		template<typename Ret>
-		UserdataMetatable& addProperty(const char* name, Ret class_type::* mem)
+		ClassMetatable& addProperty(const char* name, Ret class_type::* mem)
+		{
+			property_map_[name] = FunctorType(mem);
+			return *this;
+		}
+
+
+		//! deprecated
+		template<typename Fun>
+		ClassMetatable& addStaticMember(const char* name, Fun f)
+		{
+			return addStaticFunction(name, f);
+		}
+		//! deprecated
+		template<typename Fun>
+		ClassMetatable& addStaticFunction(const char* name, Fun f)
+		{
+			if (has_key(name, true))
+			{
+				//already registerd
+				return *this;
+			}
+			addFunction(name, f);
+			return *this;
+		}
+
+		//add field to
+		ClassMetatable& addCodeChunkResult(const char* name, const std::string& lua_code_chunk)
+		{
+			code_chunk_map_[name] = lua_code_chunk;
+			return *this;
+		}
+
+
+		template<typename Data>
+		ClassMetatable& addStaticField(const char* name, const Data& f)
 		{
 			if (has_key(name))
 			{
 				//already registerd
 				return *this;
 			}
-			property_map_[name] = metatable_detail::makeDataHolder(function(mem));
-			return *this;
-		}
-
-		template<typename Fun>
-		UserdataMetatable& addStaticFunction(const char* name, Fun f)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd.");
-				return *this;
-			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
-			return *this;
-		}
-
-		//add field to 
-		UserdataMetatable& addCodeChunkResult(const char* name, const std::string& lua_code_chunk)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd.");
-				return *this;
-			}
-			code_chunk_map_[name] = lua_code_chunk;
+			member_map_[name] = DataHolderType(new DataHolder<Data>(f));
 			return *this;
 		}
 
 
-
-		template<typename Data>
-		UserdataMetatable& add(const char* name, const Data& d)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd.");
-				return *this;
-			}
-			member_map_[name] = metatable_detail::makeDataHolder(d);
-			return *this;
-		}
-		template<typename Ret>
-		UserdataMetatable& add(const char* name, Ret class_type::* f)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
-				return *this;
-			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
-			return *this;
-		}
 #if KAGUYA_USE_CPP11
-		template<typename... Funcs>
-		UserdataMetatable& addOverloadedFunctions(const char* name, Funcs... f)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd."); 
-				return *this;
-			}
-
-			member_map_[name] = metatable_detail::makeDataHolder(overload(f...));
-
-			return *this;
-		}
 		template<typename Data>
-		UserdataMetatable& add(const char* name, Data&& d)
+		ClassMetatable& addStaticField(const char* name, Data&& f)
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				//already registerd
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(std::forward<Data>(d));
-			return *this;
-		}
-#else
-
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PP_FUNCS(N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_ADD_OVERLOAD_FUNCTION_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline UserdataMetatable& addOverloadedFunctions(const char* name,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
-		{\
-			if (has_key(name))\
-			{\
-				throw KaguyaException("already registerd.");\
-				return *this;\
-			}\
-			member_map_[name] = makeDataHolder(overload(KAGUYA_PP_ARG_REPEAT(N)));\
-			return *this;\
-		}
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF)
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
-#undef KAGUYA_PP_FUNCS
-#undef KAGUYA_ADD_OVERLOAD_FUNCTION_DEF
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER <= 1800
-		//can not write  Ret class_type::* f on MSC++2013
-		template<typename Fun>
-		UserdataMetatable& addFunction(const char* name, Fun f)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
-				return *this;
-			}
-			member_map_[name] = makeDataHolder(function(f));
-			return *this;
-		}
-#else
-		template<typename Ret>
-		UserdataMetatable& addFunction(const char* name, Ret class_type::* f)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
-				return *this;
-			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
+			member_map_[name] = DataHolderType(new MoveDataHolder<Data>(std::move(f)));
 			return *this;
 		}
 #endif
@@ -437,19 +388,32 @@ namespace kaguya
 #undef KAGUYA_TYPE_CHECK_REP
 #endif
 
-		bool has_key(const std::string& key, bool exclude_function = false)
+			bool has_key(const std::string& key, bool exclude_function = false)
 		{
-			if (member_map_.find(key) != member_map_.end())
+			if (!exclude_function && function_map_.find(key) != function_map_.end())
 			{
 				return true;
 			}
-			if (property_map_.find(key) != property_map_.end())
+			if (member_map_.find(key) != member_map_.end())
 			{
 				return true;
 			}
 			return false;
 		}
-		void registerField(lua_State* state, const char* name, const metatable_detail::DataHolderType& value)const
+		void registerFunction(lua_State* state, const char* name, const FunctorOverloadType& func_array)const
+		{
+			int count = lua_type_traits<FunctorOverloadType>::push(state, func_array);
+			if (count > 1)
+			{
+				lua_pop(state, count - 1);
+				count = 1;
+			}
+			if (count == 1)
+			{
+				lua_setfield(state, -2, name);
+			}
+		}
+		void registerField(lua_State* state, const char* name, const DataHolderType& value)const
 		{
 			int count = value->push_to_lua(state);
 			if (count > 1)
@@ -462,7 +426,7 @@ namespace kaguya
 				lua_setfield(state, -2, name);
 			}
 		}
-		void registerCodeChunk(lua_State* state, const char* name,const std::string& value)const
+		void registerCodeChunk(lua_State* state, const char* name, std::string value)const
 		{
 			util::ScopedSavedStack save(state);
 			int status = luaL_loadstring(state, value.c_str());
@@ -474,6 +438,10 @@ namespace kaguya
 
 		void registerMember(lua_State* state)const
 		{
+			for (typename FuncMapType::const_iterator it = function_map_.begin(); it != function_map_.end(); ++it)
+			{
+				registerFunction(state, it->first.c_str(), it->second);
+			}
 			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
 			{
 				registerField(state, it->first.c_str(), it->second);
@@ -483,7 +451,13 @@ namespace kaguya
 				registerCodeChunk(state, it->first.c_str(), it->second);
 			}
 		}
-
+		template<typename Fun>
+		ClassMetatable& addFunction(const char* name, Fun f)
+		{
+			function_map_[name].push_back(FunctorType(f));
+			return *this;
+		}
+		FuncMapType function_map_;
 		PropMapType property_map_;
 		MemberMapType member_map_;
 		CodeChunkMapType code_chunk_map_;
