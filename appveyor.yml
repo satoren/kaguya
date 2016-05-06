@@ -1,6 +1,7 @@
 version: 1.0.{build}
 image: Visual Studio 2015
 configuration:
+- Debug
 - Release
 environment:
   matrix:
