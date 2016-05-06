@@ -13,7 +13,7 @@ file(GLOB KAGUYA_HEADER RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories("./")
 
-if(${ADDITIONAL_INCLUDE_PATH})
+if(ADDITIONAL_INCLUDE_PATH)
 include_directories(${ADDITIONAL_INCLUDE_PATH})
 endif()
 
