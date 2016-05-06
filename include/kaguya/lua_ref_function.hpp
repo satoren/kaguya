@@ -170,8 +170,8 @@ namespace kaguya
 
 	private:
 		mutable lua_State* state_;
-		int resultCount_;
 		int resultStatus_;
+		int resultCount_;
 
 	};
 
