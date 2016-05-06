@@ -613,8 +613,11 @@ namespace kaguya
 		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = "")
 		{
 			LuaLoadStreamWrapper wrapper(stream);
+#if LUA_VERSION_NUM >= 502
 			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname, 0);
-
+#else
+			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname);
+#endif
 			if (status)
 			{
 				ErrorHandler::handle(status, state);
