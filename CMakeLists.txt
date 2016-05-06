@@ -23,11 +23,11 @@ add_definitions("-Wall")
 endif(NOT MSVC)
 
 #check for address sanitizer support
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER 4.8)
       set(HAVE_FLAG_SANITIZE_ADDRESS TRUE)
     endif()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER 3.2)
       set(HAVE_FLAG_SANITIZE_ADDRESS TRUE)
     endif()
