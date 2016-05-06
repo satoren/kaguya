@@ -1,10 +1,18 @@
 version: 1.0.{build}
-os:
-- Visual Studio 2013
-- Visual Studio 2015
+image: Visual Studio 2015
 configuration:
 - Debug
 - Release
+environment:
+  matrix:
+  - CMAKE_GEN_TYPE: '"Visual Studio 14 2015"'
+  - CMAKE_GEN_TYPE: '"Visual Studio 12 2013"'
+  - CMAKE_GEN_TYPE: '"Visual Studio 11 2012"'
+    ADDITIONAL_INCLUDE_PATH: C:\Libraries\boost
+  - CMAKE_GEN_TYPE: '"Visual Studio 10 2010"'
+    ADDITIONAL_INCLUDE_PATH: C:\Libraries\boost
+  - CMAKE_GEN_TYPE: '"Visual Studio 9 2008"'
+    ADDITIONAL_INCLUDE_PATH: C:\Libraries\boost
 install:
 - ps: >-
     if(!(Test-Path -Path lua-5.3.2 )){
@@ -15,9 +23,9 @@ install:
     }
 cache: lua-5.3.2
 before_build:
-- cmd: cmake ./
+- cmd: cmake ./ -G %CMAKE_GEN_TYPE%
 build:
   project: Kaguya.sln
   verbosity: minimal
 test_script:
-- ctest -V
+- cmd: ctest -V

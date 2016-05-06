@@ -13,7 +13,7 @@ extern "C" {
 
 
 #ifndef KAGUYA_USE_CPP11
-#if defined(__cpp_decltype) || __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)
+#if defined(__cpp_decltype) || __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 #define KAGUYA_USE_CPP11 1
 #else
 #define KAGUYA_USE_CPP11 0

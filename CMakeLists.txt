@@ -11,8 +11,11 @@ file(GLOB KAGUYA_HEADER RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   include/kaguya/*.hpp
   include/kaguya/detail/*.hpp)
 
-
 include_directories("./")
+
+if(${ADDITIONAL_INCLUDE_PATH})
+include_directories(${ADDITIONAL_INCLUDE_PATH})
+endif()
 
 if(NOT MSVC)#-Wall nonsense on MSVC
 add_definitions("-Wall")
