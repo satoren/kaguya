@@ -23,7 +23,7 @@ install:
     }
 cache: lua-5.3.2
 before_build:
-- cmd: cmake ./ -G %CMAKE_GEN_TYPE%
+- cmd: cmake ./ -G %CMAKE_GEN_TYPE% -DADDITIONAL_INCLUDE_PATH=%ADDITIONAL_INCLUDE_PATH%
 build:
   project: Kaguya.sln
   verbosity: minimal
