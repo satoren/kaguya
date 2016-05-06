@@ -465,12 +465,12 @@ namespace kaguya
 			}
 		}
 
-		template<typename Fun> int invoke(lua_State* state, const Fun& fn)
+		template<typename Fun> int best_match_invoke(lua_State* state, const Fun& fn)
 		{
 			return nativefunction::call(state, fn);
 		}
 
-		template<typename Fun, typename... Functions> int invoke(lua_State* state, const Fun& fn, const Functions&... fns)
+		template<typename Fun, typename... Functions> int best_match_invoke(lua_State* state, const Fun& fn, const Functions&... fns)
 		{
 			int index = best_function_index(state, fn, fns...);
 			if (index >= 0)
@@ -486,7 +486,7 @@ namespace kaguya
 
 		template<typename TupleType, std::size_t ...S> int invoke_tuple_impl(lua_State* state, TupleType&& tuple, nativefunction::cpp11impl::index_tuple<S...>)
 		{
-			return invoke(state, std::get<S>(tuple)...);
+			return best_match_invoke(state, std::get<S>(tuple)...);
 		}
 		template<typename TupleType> int invoke_tuple(lua_State* state, TupleType&& tuple)
 		{
@@ -581,9 +581,6 @@ namespace kaguya
 	{
 		FunctionTuple functions;
 		FunctionInvokerType(const FunctionTuple& t) :functions(t) {}
-#if KAGUYA_USE_CPP11
-		FunctionInvokerType(FunctionTuple&& t) : functions(t) {}
-#endif
 	};
 	template<typename T>
 	inline FunctionInvokerType<standard::tuple<T> > function(T f)

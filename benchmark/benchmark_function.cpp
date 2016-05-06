@@ -39,8 +39,8 @@ namespace kaguya_api_benchmark______
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
 			.setConstructors<SetGet()>()
-			.add("set", &SetGet::set)
-			.add("get", &SetGet::get)
+			.addFunction("set", &SetGet::set)
+			.addFunction("get", &SetGet::get)
 		);
 
 		state(

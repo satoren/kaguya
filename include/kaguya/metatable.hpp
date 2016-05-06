@@ -118,7 +118,7 @@ namespace kaguya
 
 		UserdataMetatable()
 		{
-			add("__gc", &class_userdata::destructor<ObjectWrapperBase>);
+			addStaticFunction("__gc", &class_userdata::destructor<ObjectWrapperBase>);
 
 			KAGUYA_STATIC_ASSERT(is_registerable<class_type>::value || !traits::is_std_vector<class_type>::value, "std::vector is binding to lua-table by default.If you wants register for std::vector yourself,"
 				"please define KAGUYA_NO_STD_VECTOR_TO_TABLE");
@@ -258,7 +258,7 @@ namespace kaguya
 
 
 		template<typename Data>
-		UserdataMetatable& add(const char* name, const Data& d)
+		UserdataMetatable& addStaticField(const char* name, const Data& d)
 		{
 			if (has_key(name))
 			{
@@ -266,17 +266,6 @@ namespace kaguya
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(d);
-			return *this;
-		}
-		template<typename Ret>
-		UserdataMetatable& add(const char* name, Ret class_type::* f)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
-				return *this;
-			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
 			return *this;
 		}
 #if KAGUYA_USE_CPP11
@@ -294,7 +283,7 @@ namespace kaguya
 			return *this;
 		}
 		template<typename Data>
-		UserdataMetatable& add(const char* name, Data&& d)
+		UserdataMetatable& addStaticField(const char* name, Data&& d)
 		{
 			if (has_key(name))
 			{
@@ -337,7 +326,7 @@ namespace kaguya
 				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
-			member_map_[name] = makeDataHolder(function(f));
+			member_map_[name] = metatable_detail::makeDataHolder(function(f));
 			return *this;
 		}
 #else
@@ -351,6 +340,33 @@ namespace kaguya
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
 			return *this;
+		}
+#endif
+		
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+		//can not use add at MSVC2013
+#else
+		template<typename Data>
+		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
+			UserdataMetatable& add(const char* name, const Data& d)
+		{
+			return addStaticField(name, d);
+		}
+
+#if KAGUYA_USE_CPP11
+		template<typename Data>
+		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
+			UserdataMetatable& add(const char* name, Data&& d)
+		{
+			return addStaticField(name, d);
+		}
+#endif
+		template<typename Ret>
+		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addFunction instead.")
+		UserdataMetatable& add(const char* name, Ret class_type::* f)
+		{
+			return addFunction(name,f);
 		}
 #endif
 

@@ -196,8 +196,8 @@ KAGUYA_TEST_FUNCTION_DEF(luafun_callback)(kaguya::State& state)
 
 	state["CallbackTest"].setClass(kaguya::UserdataMetatable<CallbackTest>()
 		.setConstructors<CallbackTest()>()
-		.add("setCallback", &CallbackTest::setCallback)
-		.add("callCallback", &CallbackTest::callCallback));
+		.addFunction("setCallback", &CallbackTest::setCallback)
+		.addFunction("callCallback", &CallbackTest::callCallback));
 
 
 	state("callback = CallbackTest.new();"
