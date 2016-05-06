@@ -79,6 +79,13 @@ KAGUYA_TEST_FUNCTION_DEF(load_with_other_env)(kaguya::State& state)
 	TEST_CHECK(state("assert(foo == 'bar')"));
 
 	TEST_CHECK(state("assert(otherEnv.foo == 'dar')"));
+
+
+	std::stringstream sstream;
+	sstream << "foo = 'beer'";
+	TEST_CHECK(state.dostream(sstream, "streamchunk", state["otherEnv"]));
+	TEST_CHECK(state("assert(foo == 'bar')"));
+	TEST_CHECK(state("assert(otherEnv.foo == 'beer')"));
 }
 KAGUYA_TEST_FUNCTION_DEF(no_standard_lib)(kaguya::State&)
 {
@@ -148,6 +155,15 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 	TEST_EQUAL(errorOccurred, true);
 	TEST_CHECK(lastMsg.find("MyRuntimeError") != std::string::npos);
 
+	{
+		std::stringstream sstream;
+		sstream << "foobar(1)";
+		errorOccurred = false;
+		TEST_CHECK(!state.dostream(sstream, "streamchunk"));
+		TEST_EQUAL(errorOccurred, true);
+		TEST_CHECK(lastMsg.find("MyRuntimeError") != std::string::npos);
+	}
+
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 	errorOccurred = false;
 	state["noTable"] = 5;
@@ -161,6 +177,16 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 	TEST_EQUAL(errorOccurred, true);
 	TEST_CHECK(lastMsg.find("type mismatch") != std::string::npos);
 #endif
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
+{
+	std::stringstream sstream;
+	sstream << "value=true";
+
+	TEST_CHECK(state.dostream(sstream,"streamchunk"));
+	TEST_EQUAL(state["value"], true);
 }
 
 KAGUYA_TEST_GROUP_END(test_06_state)

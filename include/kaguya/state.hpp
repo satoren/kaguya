@@ -231,6 +231,49 @@ namespace kaguya
 
 
 		/**
+		* @name loadstream
+		* @brief If there are no errors,compiled stream as a Lua function and return.
+		*  Otherwise send error message to error handler and return nil reference
+		* @param stream stream of lua script
+		* @return reference of lua function
+		*/
+		//@{
+		LuaFunction loadstream(std::istream& stream,const std::string& chunkname="")
+		{
+			return loadstream(stream, chunkname.c_str());
+		}
+		LuaFunction loadstream(std::istream& stream, const char* chunkname="")
+		{
+			return LuaFunction::loadstream(state_, stream, chunkname);
+		}
+		//@}
+		/**
+		* @name dostream
+		* @brief Loads and runs the given stream.
+		* @param stream stream of lua script
+		* @param env execute env table
+		* @return If there are no errors, returns true.Otherwise return false
+		*/
+		//@{
+		bool dostream(std::istream& stream, const std::string& chunkname = "", const LuaTable& env = LuaTable())
+		{
+			return dostream(stream, chunkname.c_str(), env);
+		}
+		bool dostream(std::istream& stream, const char* chunkname = "", const LuaTable& env = LuaTable())
+		{
+			LuaFunction f = loadstream(stream,chunkname);
+			if (!env.isNilref())
+			{
+				f.setFunctionEnv(env);
+			}
+
+			FunctionResults ret= f.call<FunctionResults>();
+			return !ret.resultStatus();
+		}
+		//@}
+
+
+		/**
 		* @name loadstring
 		* @brief If there are no errors,compiled string as a Lua function and return.
 		*  Otherwise send error message to error handler and return nil reference

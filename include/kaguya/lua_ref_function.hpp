@@ -22,10 +22,10 @@ namespace kaguya
 {
 	class FunctionResults :public Ref::StackRef, public LuaVariantImpl<FunctionResults>
 	{
-		FunctionResults(lua_State* state, int startIndex) :Ref::StackRef(state, startIndex, true),state_(state), resultCount_(lua_gettop(state) + 1 - startIndex)
+		FunctionResults(lua_State* state,int return_status, int startIndex) :Ref::StackRef(state, startIndex, true),state_(state), resultStatus_(return_status), resultCount_(lua_gettop(state) + 1 - startIndex)
 		{
 		}
-		FunctionResults(lua_State* state, int startIndex, int endIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultCount_(endIndex - startIndex)
+		FunctionResults(lua_State* state,int return_status, int startIndex, int endIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(endIndex - startIndex)
 		{
 		}
 		friend class FunctionResultProxy;
@@ -162,26 +162,31 @@ namespace kaguya
 		{
 			return resultCount_;
 		}
-		
+
+		size_t resultStatus()const
+		{
+			return resultStatus_;
+		}
 
 	private:
 		mutable lua_State* state_;
+		int resultStatus_;
 		int resultCount_;
 
 	};
 
 	template<typename RetType>
-	inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag)
+	inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<RetType> tag)
 	{
-		return FunctionResults(state, retindex).get_result<RetType>();
+		return FunctionResults(state, return_status, retindex).get_result<RetType>();
 	}
-	inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag)
+	inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<FunctionResults> tag)
 	{
-		return FunctionResults(state, retindex);
+		return FunctionResults(state, return_status, retindex);
 	}
-	inline void FunctionResultProxy::ReturnValue(lua_State* state, int retindex, types::typetag<void> tag)
+	inline void FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<void> tag)
 	{
-		FunctionResults(state, retindex);
+		FunctionResults(state, return_status, retindex);
 	}
 
 #if KAGUYA_USE_CPP11
