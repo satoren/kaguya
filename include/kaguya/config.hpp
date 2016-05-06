@@ -90,6 +90,12 @@ extern "C" {
 
 namespace kaguya
 {
+#if defined(_MSC_VER) && _MSC_VER <= 1500
+	typedef unsigned char uint8_t;
+	typedef int int32_t;
+	typedef long long int64_t;
+#endif
+
 	namespace standard
 	{
 #if KAGUYA_USE_CPP11

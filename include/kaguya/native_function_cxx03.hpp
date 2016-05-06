@@ -16,8 +16,15 @@ namespace kaguya
 	{
 		namespace cpp03impl
 		{
+			
+#if defined(_MSC_VER) && _MSC_VER <= 1700
+			//can not detect callable at MSVC
+			template< typename T>
+			struct is_callable : traits::integral_constant<bool, true> {};
+#else
 			template< typename T>
 			struct is_callable : traits::integral_constant<bool, false> {};
+#endif
 
 			inline int call(lua_State* state, void(*f)())
 			{
@@ -295,7 +302,11 @@ namespace kaguya
 					return 0;
 				}
 			}
+#if defined(_MSC_VER) && _MSC_VER <= 1700
+			//can not detect callable at MSVC
+#else
 			template<class MemType, class T>struct is_callable<MemType T::*> : traits::integral_constant<bool, true> {}; 
+#endif
 
 			template<class MemType, class T>
 			bool checkArgTypes(lua_State* state, MemType T::* m)
