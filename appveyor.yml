@@ -11,8 +11,6 @@ environment:
     ADDITIONAL_INCLUDE_PATH: C:\Libraries\boost
   - CMAKE_GEN_TYPE: '"Visual Studio 10 2010"'
     ADDITIONAL_INCLUDE_PATH: C:\Libraries\boost
-  - CMAKE_GEN_TYPE: '"Visual Studio 9 2008"'
-    ADDITIONAL_INCLUDE_PATH: C:\Libraries\boost
 install:
 - ps: >-
     if(!(Test-Path -Path lua-5.3.2 )){
