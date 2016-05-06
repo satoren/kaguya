@@ -11,6 +11,7 @@
 #include <cassert>
 #include <algorithm>
 #include <ostream>
+#include <istream>
 #include "kaguya/config.hpp"
 #include "kaguya/error_handler.hpp"
 #include "kaguya/type.hpp"
@@ -507,6 +508,112 @@ namespace kaguya
 			util::ScopedSavedStack save(state);
 
 			int status = luaL_loadfile(state, file);
+
+			if (status)
+			{
+				ErrorHandler::handle(status, state);
+				return LuaRef(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
+
+
+		struct LuaLoadStreamWrapper
+		{
+			LuaLoadStreamWrapper(std::istream& stream) :preload_(false), stream_(stream)
+			{
+				buffer_.reserve(512);
+				skipComment();
+			}
+			std::vector<char> skipBom()
+			{
+				std::vector<char> preload;
+				preload.reserve(512);
+				const char* bomseq = "\xEF\xBB\xBF";
+				while (stream_.good())
+				{
+					int c = stream_.get();
+					preload.push_back(c);
+					if (c != *bomseq)
+					{
+						break;
+					}
+					bomseq++;
+					if ('\0' == *bomseq)
+					{
+						preload.clear();
+					}
+				}
+				return preload;
+			}
+			void skipComment()
+			{
+				std::vector<char> preload = skipBom();
+				if (!preload.empty() && preload.front() == '#')
+				{
+					std::vector<char>::iterator lf = std::find(preload.begin(), preload.end(), '\n');
+					if (lf != preload.end())
+					{
+						buffer_.assign(lf, preload.end());
+					}
+					else
+					{
+						std::string comment;
+						std::getline(stream_, comment);
+					}
+				}
+				else
+				{
+					buffer_.assign(preload.begin(), preload.end());
+				}
+				preload_ = !buffer_.empty();
+			}
+			
+
+			static const char *getdata(lua_State *, void *ud, size_t *size) {
+				LuaLoadStreamWrapper *loader = static_cast<LuaLoadStreamWrapper *>(ud);
+
+				if (loader->preload_)
+				{
+					loader->preload_ = false;
+				}
+				else
+				{
+					loader->buffer_.clear();
+				}
+
+				while (loader->stream_.good() && loader->buffer_.size() < loader->buffer_.capacity())
+				{
+					int c = loader->stream_.get();
+					if (!loader->stream_.eof())
+					{
+						loader->buffer_.push_back(c);
+					}
+				}
+				*size = loader->buffer_.size();
+				return loader->buffer_.empty()?0:&loader->buffer_[0];
+			}
+		private:
+			bool preload_;
+			std::vector<char> buffer_;
+			std::istream& stream_;
+		};
+
+		/**
+		* @name loadstream
+		* @brief If there are no errors,compiled stream as a Lua function and return.
+		*  Otherwise send error message to error handler and return nil reference
+		* @param file  file path of lua script
+		* @return reference of lua function
+		*/
+		static LuaFunction loadstream(lua_State* state, std::istream& stream, const std::string& chunkname = "")
+		{
+			return loadstream(state, stream, chunkname.c_str());
+		}
+		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = "")
+		{
+			LuaLoadStreamWrapper wrapper(stream);
+			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname, 0);
 
 			if (status)
 			{

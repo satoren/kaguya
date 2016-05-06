@@ -27,9 +27,9 @@ namespace kaguya
 	{
 	public:
 		template<typename RetType>
-		static RetType ReturnValue(lua_State* state, int retindex, types::typetag<RetType> tag);
-		static FunctionResults ReturnValue(lua_State* state, int retindex, types::typetag<FunctionResults> tag);
-		static void ReturnValue(lua_State* state, int retindex, types::typetag<void> tag);
+		static RetType ReturnValue(lua_State* state,int restatus, int retindex, types::typetag<RetType> tag);
+		static FunctionResults ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<FunctionResults> tag);
+		static void ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<void> tag);
 	};
 
 
@@ -86,7 +86,7 @@ namespace kaguya
 			int argnum = util::push_args(state, std::forward<Args>(args)...);
 			int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);
 			except::checkErrorAndThrow(result, state);
-			return FunctionResultProxy::ReturnValue(state, argstart, types::typetag<Result>());
+			return FunctionResultProxy::ReturnValue(state, result, argstart, types::typetag<Result>());
 		}
 
 		template<class...Args> FunctionResults operator()(Args&&... args);
@@ -110,7 +110,7 @@ namespace kaguya
 			int argnum = util::push_args(state KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_ARG_DEF));\
 			int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);\
 			except::checkErrorAndThrow(result, state);\
-			return FunctionResultProxy::ReturnValue(state, argstart, types::typetag<Result>());\
+			return FunctionResultProxy::ReturnValue(state,result, argstart, types::typetag<Result>());\
 		}
 
 
@@ -196,7 +196,7 @@ namespace kaguya
 			int argnum = lua_gettop(thread) - argstart;
 			int result = util::lua_resume_compat(thread, argnum);
 			except::checkErrorAndThrow(result, thread);
-			return FunctionResultProxy::ReturnValue(thread, argstart, types::typetag<Result>());
+			return FunctionResultProxy::ReturnValue(thread, result, argstart, types::typetag<Result>());
 		}
 		template<class...Args> FunctionResults operator()(Args&&... args);
 #else
@@ -228,7 +228,7 @@ namespace kaguya
 			int argnum = lua_gettop(thread) - argstart;\
 			int result = util::lua_resume_compat(thread, argnum);\
 			except::checkErrorAndThrow(result, thread);\
-			return FunctionResultProxy::ReturnValue(thread, argstart, types::typetag<Result>());\
+			return FunctionResultProxy::ReturnValue(thread,result, argstart, types::typetag<Result>());\
 		}
 
 		KAGUYA_RESUME_DEF(0)
