@@ -41,12 +41,6 @@ endif()
 if(CYGWIN OR WIN32)
       unset(HAVE_FLAG_SANITIZE_ADDRESS)
 endif()
-if(HAVE_FLAG_SANITIZE_ADDRESS)
-message(STATUS "address sanitizer enabled.")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fsanitize=address -fno-omit-frame-pointer")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
-endif(HAVE_FLAG_SANITIZE_ADDRESS)
 
 file(GLOB TEST_SRCS files RELATIVE ${CMAKE_SOURCE_DIR} test/*.cpp)
 
@@ -54,6 +48,12 @@ link_directories(${LUA_LIBRARY_DIRS})
 add_executable(test_runner
 				${TEST_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(test_runner ${LUA_LIBRARIES})
+
+if(HAVE_FLAG_SANITIZE_ADDRESS)
+message(STATUS "test_runner: address sanitizer enabled.")
+SET_TARGET_PROPERTIES(test_runner  PROPERTIES COMPILE_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
+SET_TARGET_PROPERTIES(test_runner  PROPERTIES LINK_FLAGS "-fsanitize=address")
+endif(HAVE_FLAG_SANITIZE_ADDRESS)
 
 set(BENCHMARK_SRCS benchmark/benchmark.cpp benchmark/benchmark_function.cpp benchmark/benchmark_function.hpp)
 
