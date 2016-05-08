@@ -426,19 +426,23 @@ namespace original_api_no_type_check
 		lua_State* s = luaL_newstate();
 		luaL_openlibs(s);
 		luaL_dostring(s, "lua_table={value=0}");
+
+		lua_getglobal(s, "lua_table");
+		int table_ref = luaL_ref(s, LUA_REGISTRYINDEX);//get lua_table reference
 		for (int i = 0; i < 10000000; i++)
 		{
-			lua_getglobal(s, "lua_table");
+			lua_rawgeti(s, LUA_REGISTRYINDEX, table_ref);
 			lua_pushnumber(s, i);
 			lua_setfield(s, -2, "value");
-			lua_settop(s, 0);
+			lua_settop(s,0);
 
-			lua_getglobal(s, "lua_table");
+			lua_rawgeti(s, LUA_REGISTRYINDEX, table_ref);
 			lua_getfield(s, -1, "value");
 			int v = static_cast<int>(lua_tonumber(s, -1));
 			if (v != i) { throw std::logic_error(""); }
 			lua_settop(s, 0);
 		}
+		luaL_unref(s, LUA_REGISTRYINDEX, table_ref);
 		lua_close(s);
 	}
 	void lua_allocation(kaguya::State& )
