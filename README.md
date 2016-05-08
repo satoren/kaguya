@@ -31,7 +31,14 @@ If you want to use a non-system default library, add three option to cmake comma
 cmake -DLUA_INCLUDE_DIRS=path/to/lua/header/dir -DLUA_LIBRARY_DIRS=/abspath/to/lua/library/dir -DLUA_LIBRARIES=lualibname
 ```
 ## Usage
-add "kaguya/include" directory to "header search path" of your project
+add "kaguya/include" directory to "header search path" of your project.
+
+Or generate one header file.
+```
+cd  utils
+python generate_one_header.py > ../kaguya.hpp
+```
+
 ### Create Lua context
 ```c++
 #include "kaguya/kaguya.hpp"
@@ -94,7 +101,7 @@ You can use for holding a Lua-value in native code.
   state("assert(tbl.value == 1)");
 ```
 
-##"call lua function
+## Call lua function
 ```c++
 int ret = state["math"]["abs"](-32);//call math.abs of Lua function
 assert(ret == 32);
