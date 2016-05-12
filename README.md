@@ -358,3 +358,15 @@ apple   3
   }
 };
   ```
+
+#### Handling Errors
+  Lua error encountered will write to the console by default, and it is customizable:
+  ``` c++
+    void HandleError(int errCode, const char * szError)
+    {
+	//customize your error handling, eg. write to file...
+    }
+    kaguya::State l;
+    l.setErrorHandler(HandleError);
+    l.dofile("./scripts/custom.lua"); // eg. accesing a file not existed will invoke HandleError above
+  ```
