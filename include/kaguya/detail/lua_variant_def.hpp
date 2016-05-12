@@ -25,7 +25,6 @@ namespace kaguya
 		public LuaBasicTypeFunctions<Derived>
 	{
 	private:
-
 		lua_State* state_()const
 		{
 			return static_cast<const Derived*>(this)->state();
@@ -35,16 +34,8 @@ namespace kaguya
 			return static_cast<const Derived*>(this)->pushStackIndex(state);
 		}
 	public:
-		int type() const
-		{
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			return lua_type(state, pushStackIndex_(state));
-		}
-		const char* typeName()const
-		{
-			return lua_typename(state_(), type());
-		}
+		using LuaBasicTypeFunctions<Derived>::type;
+		using LuaBasicTypeFunctions<Derived>::typeName;
 
 		template<typename T>
 		bool typeTest()const

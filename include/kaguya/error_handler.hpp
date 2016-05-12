@@ -91,7 +91,6 @@ namespace kaguya
 
 		static function_type getHandler(lua_State* state)
 		{
-
 			function_type* funptr = getFunctionPointer(state);
 			if (funptr)
 			{

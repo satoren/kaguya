@@ -197,7 +197,7 @@ namespace kaguya
 		template<typename... ArgTypes>
 		UserdataMetatable& setConstructors()
 		{
-			member_map_["new"] = metatable_detail::makeDataHolder(overload(typename nativefunction::functionToConstructorSignature<class_type,ArgTypes>::type()...));
+			addOverloadedFunctions("new", typename nativefunction::functionToConstructorSignature<class_type, ArgTypes>::type()...);
 			return *this;
 		}
 #else
@@ -207,7 +207,7 @@ namespace kaguya
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline UserdataMetatable& setConstructors()\
 	{\
-		member_map_["new"] = metatable_detail::makeDataHolder(overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF)));\
+		addOverloadedFunctions("new",KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF));\
 		return *this;\
 	}
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_SET_CON_FN_DEF)
@@ -224,7 +224,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				//already registerd
+				throw KaguyaException("already registerd.");
 				return *this;
 			}
 			property_map_[name] = metatable_detail::makeDataHolder(function(mem));
@@ -453,7 +453,7 @@ namespace kaguya
 #undef KAGUYA_TYPE_CHECK_REP
 #endif
 
-		bool has_key(const std::string& key, bool exclude_function = false)
+		bool has_key(const std::string& key)
 		{
 			if (member_map_.find(key) != member_map_.end())
 			{

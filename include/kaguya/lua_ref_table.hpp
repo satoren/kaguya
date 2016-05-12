@@ -152,7 +152,7 @@ namespace kaguya
 		template<typename T>
 		void setFunction(T f)
 		{
-			table_proxy::set(state_, table_index_, key_, FunctorType(f));
+			table_proxy::set(state_, table_index_, key_, kaguya::function(f));
 		}
 
 		//deprecated
@@ -227,6 +227,7 @@ namespace kaguya
 		template<typename T, typename P>
 		void set_class(const ClassMetatable<T, P>& reg)
 		{
+			nativefunction::reg_functor_destructor(state_);
 			LuaRef table(state_, NewTable());
 			table.setMetatable(reg.registerClass(state_));
 			*this = table;

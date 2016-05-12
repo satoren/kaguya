@@ -5,10 +5,10 @@
 
 #pragma once
 
+#include "deprecated_native_function.hpp"
+
 namespace kaguya
 {
-
-
 	//!ClassMetatable is deprecated. use UserdataMetatable instead.
 	template<typename class_type, typename base_class_type = void>
 	struct ClassMetatable

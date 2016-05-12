@@ -182,15 +182,15 @@ KAGUYA_TEST_FUNCTION_DEF(overload_member_function)(kaguya::State& state)
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 		.setConstructors<ABC(int)>()
 		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
-		.addFunction("intgdata", &ABC::intmember)
+		.addFunction("intdata", &ABC::intmember)
 		.addFunction("stringdata", &ABC::stringmember)
 		);
 
 	TEST_CHECK(state("value = assert(ABC.new(64))"));
-	TEST_CHECK(state("assert(value:intgdata() == 64)"));
+	TEST_CHECK(state("assert(value:intdata() == 64)"));
 
 	TEST_CHECK(state("value:setmember(4)"));
-	TEST_CHECK(state("assert(value:intgdata() == 4)"));
+	TEST_CHECK(state("assert(value:intdata() == 4)"));
 
 	TEST_CHECK(state("value:setmember('test')"));
 	TEST_CHECK(state("assert(value:stringdata() == 'test')"));

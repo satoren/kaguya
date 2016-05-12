@@ -647,6 +647,7 @@ namespace kaguya
 	template<typename Derived>
 	class LuaBasicTypeFunctions
 	{
+		template<class Other> friend class LuaBasicTypeFunctions;
 	public:
 		enum value_type
 		{
@@ -842,6 +843,7 @@ namespace kaguya
 			int stackIndex = pushStackIndex_(state);
 			util::stackValueDump(os, state, stackIndex);
 		}
+	private:
 		lua_State* state_()const
 		{
 			return static_cast<const Derived*>(this)->state();
@@ -850,7 +852,6 @@ namespace kaguya
 		{
 			return static_cast<const Derived*>(this)->pushStackIndex(state);
 		}
-	private:
 };
 
 

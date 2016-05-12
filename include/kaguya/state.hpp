@@ -92,7 +92,6 @@ namespace kaguya
 			{
 				setErrorHandler(&stderror_out);
 			}
-			nativefunction::reg_functor_destructor(state_);
 		}
 
 	public:
@@ -105,7 +104,7 @@ namespace kaguya
 		*/
 		State() :allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
-			lua_atpanic(state_, &default_panic);
+//			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs();
 		}
@@ -132,7 +131,7 @@ namespace kaguya
 		*/
 		State(const LoadLibs& libs) : allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
-			lua_atpanic(state_, &default_panic);
+//			lua_atpanic(state_, &default_panic);
 			init();
 			openlibs(libs);
 		}
