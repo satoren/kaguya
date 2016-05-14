@@ -286,7 +286,7 @@ namespace kaguya
 			int t = lua_type(state_, table_index_);
 			if (t != LUA_TTABLE)
 			{
-				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
+				except::typeMismatchError(state_, lua_typename(state_, t) + std::string(" is not table"));
 			}
 		}
 
