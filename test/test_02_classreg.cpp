@@ -176,6 +176,18 @@ KAGUYA_TEST_FUNCTION_DEF(data_member_bind)(kaguya::State& state)
 	TEST_CHECK(state("assert(value:stringmember() == 'test')"));
 }
 
+KAGUYA_TEST_FUNCTION_DEF(codechunkregtest)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.addStaticField("luafunc", kaguya::LuaCodeChunkResult("return function(a,b) return a*b end"))
+		.addStaticField("luafunc2", kaguya::LuaCodeChunk("local arg = {...}; return arg[1]*arg[2]"))
+	);
+	ABC abc;
+	state["abc"] = &abc;
+
+	TEST_CHECK(state("assert(abc.luafunc(3,4) == 12)"));
+	TEST_CHECK(state("assert(abc.luafunc2(3,4) == 12)"));
+}
 
 KAGUYA_TEST_FUNCTION_DEF(overload_member_function)(kaguya::State& state)
 {

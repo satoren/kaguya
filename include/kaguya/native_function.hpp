@@ -207,10 +207,6 @@ namespace kaguya
 				return 0;
 			}
 		}
-
-
-
-
 		inline std::string argmentTypes(lua_State *state)
 		{
 			int top = lua_gettop(state);
@@ -222,7 +218,6 @@ namespace kaguya
 				{
 					result += ",";
 				}
-
 
 				ObjectWrapperBase* object = object_wrapper(state, i);
 				if (object)
@@ -236,9 +231,7 @@ namespace kaguya
 			}
 			return result;
 		}
-
 	}
-
 
 
 
@@ -399,7 +392,7 @@ namespace kaguya
 #undef KAGUYA_FUNCTION_INVOKE
 #undef KAGUYA_FUNCTION_SCOREING
 
-		template<typename TupleType> int invoke_tuple(lua_State* state, TupleType& tuple)
+			template<typename TupleType> int invoke_tuple(lua_State* state, TupleType& tuple)
 		{
 			return 0;
 		}
@@ -459,7 +452,7 @@ namespace kaguya
 #endif
 
 
-	template<typename FunctionTuple> struct lua_type_traits<FunctionInvokerType<FunctionTuple> >
+		template<typename FunctionTuple> struct lua_type_traits<FunctionInvokerType<FunctionTuple> >
 	{
 		typedef FunctionInvokerType<FunctionTuple> userdatatype;
 		typedef const FunctionInvokerType<FunctionTuple>& push_type;

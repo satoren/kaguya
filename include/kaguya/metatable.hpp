@@ -30,6 +30,36 @@ namespace kaguya
 
 namespace kaguya
 {
+	struct LuaCodeChunk
+	{
+		LuaCodeChunk(const std::string& src) :code_(src) {}
+		LuaCodeChunk(const char* src) :code_(src) {}
+		std::string code_;
+	};
+
+	template<>	struct lua_type_traits<LuaCodeChunk> {
+		static int push(lua_State* state, const LuaCodeChunk& ref)
+		{
+			int status = luaL_loadstring(state, ref.code_.c_str());
+			if (!except::checkErrorAndThrow(status, state)) { return 0; }
+			return 1;
+		}
+	};
+	struct LuaCodeChunkResult : LuaCodeChunk {
+		LuaCodeChunkResult(const std::string& src) :LuaCodeChunk(src) {}
+		LuaCodeChunkResult(const char* src) :LuaCodeChunk(src) {}
+	};
+	template<>	struct lua_type_traits<LuaCodeChunkResult> {
+		static int push(lua_State* state, const LuaCodeChunkResult& ref)
+		{
+			int status = luaL_loadstring(state, ref.code_.c_str());
+			if (!except::checkErrorAndThrow(status, state)) { return 0; }
+			status = lua_pcall_wrap(state, 0, 1);
+			if (!except::checkErrorAndThrow(status, state)) { return 0; }
+			return 1;
+		}
+	};
+
 	namespace metatable_detail
 	{
 		struct DataHolderBase
@@ -231,6 +261,7 @@ namespace kaguya
 		}
 
 		//add field to 
+		KAGUYA_DEPRECATED_FEATURE("addCodeChunkResult is deprecated. use addStaticField(kaguya::LuaCodeChunkResult(\"luacode\")).")
 		UserdataMetatable& addCodeChunkResult(const char* name, const std::string& lua_code_chunk)
 		{
 			if (has_key(name))
@@ -238,7 +269,8 @@ namespace kaguya
 				throw KaguyaException("already registerd.");
 				return *this;
 			}
-			code_chunk_map_[name] = lua_code_chunk;
+			
+			member_map_[name] = metatable_detail::makeDataHolder(LuaCodeChunkResult(lua_code_chunk));
 			return *this;
 		}
 
@@ -465,44 +497,19 @@ namespace kaguya
 				lua_setfield(state, -2, name);
 			}
 		}
-		void registerCodeChunk(lua_State* state, const char* name,const std::string& value)const
-		{
-			util::ScopedSavedStack save(state);
-			int status = luaL_loadstring(state, value.c_str());
-			if (!except::checkErrorAndThrow(status, state)) { return; }
-			status = lua_pcall_wrap(state, 0, 1);
-			if (!except::checkErrorAndThrow(status, state)) { return; }
-			lua_setfield(state, -2, name);
-		}
-
 		void registerMember(lua_State* state)const
 		{
 			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
 			{
 				registerField(state, it->first.c_str(), it->second);
 			}
-			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
-			{
-				registerCodeChunk(state, it->first.c_str(), it->second);
-			}
-
 			for (typename PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
 			{
-				int count = it->second->push_to_lua(state);
-				if (count > 1)
-				{
-					lua_pop(state, count - 1);
-					count = 1;
-				}
-				if (count == 1)
-				{
-					lua_setfield(state, -2, ("_prop_" + it->first).c_str());
-				}
+				registerField(state, ("_prop_" + it->first).c_str(), it->second);
 			}
 		}
 
 		PropMapType property_map_;
 		MemberMapType member_map_;
-		CodeChunkMapType code_chunk_map_;
 	};
 }
