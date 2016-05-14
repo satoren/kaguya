@@ -142,19 +142,6 @@ namespace kaguya
 
 				if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
 				{
-					for (typename PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
-					{
-						int count = it->second->push_to_lua(state);
-						if (count > 1)
-						{
-							lua_pop(state, count - 1);
-							count = 1;
-						}
-						if (count == 1)
-						{
-							lua_setfield(state, -2, ("_prop_" + it->first).c_str());
-						}
-					}
 					LuaFunction indexfun = kaguya::LuaFunction::loadstring(state, "local arg = {...};local metatable = arg[1];"
 						"return function(table, index)"
 						//						" if type(table) == 'userdata' then "
@@ -455,11 +442,11 @@ namespace kaguya
 
 		bool has_key(const std::string& key)
 		{
-			if (member_map_.find(key) != member_map_.end())
+			if (member_map_.count(key) > 0 )
 			{
 				return true;
 			}
-			if (property_map_.find(key) != property_map_.end())
+			if (property_map_.count(key) > 0 )
 			{
 				return true;
 			}
@@ -497,6 +484,20 @@ namespace kaguya
 			for (typename CodeChunkMapType::const_iterator it = code_chunk_map_.begin(); it != code_chunk_map_.end(); ++it)
 			{
 				registerCodeChunk(state, it->first.c_str(), it->second);
+			}
+
+			for (typename PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
+			{
+				int count = it->second->push_to_lua(state);
+				if (count > 1)
+				{
+					lua_pop(state, count - 1);
+					count = 1;
+				}
+				if (count == 1)
+				{
+					lua_setfield(state, -2, ("_prop_" + it->first).c_str());
+				}
 			}
 		}
 
