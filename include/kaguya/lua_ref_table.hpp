@@ -43,6 +43,19 @@ namespace kaguya
 			lua_setfield(state, table_index, key.c_str());
 		}
 
+#if LUA_VERSION_NUM > 502
+		template<typename V>
+		static void set(lua_State* state, int table_index, luaInt key, V&& value)
+		{
+			util::one_push(state, std::forward<V>(value));
+			lua_seti(state, table_index, key);
+		}
+		template<typename V>
+		static void set(lua_State* state, int table_index, const int& key, V&& value)
+		{
+			set(state, table_index, luaInt(key), std::forward<V>(value));
+		}
+#endif
 #endif
 		template<typename V, typename KEY>
 		static void set(lua_State* state, int table_index, const KEY& key, const V& value)
@@ -63,6 +76,19 @@ namespace kaguya
 			util::one_push(state, value);
 			lua_setfield(state, table_index, key.c_str());
 		}
+#if LUA_VERSION_NUM > 502
+		template<typename V>
+		static void set(lua_State* state, int table_index, luaInt key, const V& value)
+		{
+			util::one_push(state, value);
+			lua_seti(state, table_index, key);
+		}
+		template<typename V>
+		static void set(lua_State* state, int table_index, const int& key, const V& value)
+		{
+			set(state, table_index, luaInt(key), value);
+		}
+#endif
 
 		template<typename KEY>
 		static void get(lua_State* state, int table_index, const KEY& key)
@@ -78,6 +104,18 @@ namespace kaguya
 		{
 			lua_getfield(state, table_index, key.c_str());
 		}
+
+
+#if LUA_VERSION_NUM > 502
+		static void get(lua_State* state, int table_index, luaInt key)
+		{
+			lua_geti(state, table_index, key);
+		}
+		static void get(lua_State* state, int table_index, const int& key)
+		{
+			lua_geti(state, table_index, key);
+		}
+#endif
 	};
 
 
@@ -98,7 +136,7 @@ namespace kaguya
 
 		friend class LuaRef;
 		friend class State;
-		
+
 		//! this is not copy.same assign from referenced value.
 		TableKeyReference& operator=(const TableKeyReference& src)
 		{
@@ -186,18 +224,7 @@ namespace kaguya
 		{
 			return push(state_);
 		}
-
-
-		/**
-		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
-		* @param function_name function_name in table
-		*/
-//		mem_fun_binder operator->*(const char* function_name)
-//		{
-//			return get<LuaRef>()->*(function_name);
-//		}
-
-
+		
 		int type()const
 		{
 			util::ScopedSavedStack save(state_);
@@ -236,9 +263,7 @@ namespace kaguya
 		template<typename T, typename P>
 		void set_class(const UserdataMetatable<T, P>& reg)
 		{
-			LuaRef table(state_, NewTable());
-			table.setMetatable(reg.registerClass(state_));
-			*this = table;
+			table_proxy::set(state_, table_index_, key_, reg.createMatatable(state_));
 		}
 
 
@@ -249,7 +274,7 @@ namespace kaguya
 
 		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
-			lua_type_traits<LuaRef>::push(state_, table);
+			lua_type_traits<LuaTable>::push(state_, table);
 			lua_type_traits<KEY>::push(state_, key);
 			table_index_ = stack_top_ + 1;
 		}
@@ -258,9 +283,10 @@ namespace kaguya
 			lua_type_traits<LuaRef>::push(state_, table);
 			lua_type_traits<KEY>::push(state_, key);
 			table_index_ = stack_top_ + 1;
-			if (lua_type(state_, table_index_) != LUA_TTABLE)
+			int t = lua_type(state_, table_index_);
+			if (t != LUA_TTABLE)
 			{
-				except::typeMismatchError(state_, "this is not table");
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
 			}
 		}
 
@@ -327,7 +353,7 @@ namespace kaguya
 		int t = lua_type(state, stackindex);
 		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 		{
-			except::typeMismatchError(state, lua_typename(state, t) + std::string("is not table"));
+			except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
 			return false;
 		}
 		table.push();
@@ -340,15 +366,15 @@ namespace kaguya
 		if (!state)
 		{
 			except::typeMismatchError(state, "is nil");
-			return LuaRef(state);
+			return LuaTable();
 		}
 		util::ScopedSavedStack save(state);
 		int stackindex = pushStackIndex_(state);
 		int t = lua_type(state, stackindex);
 		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
 		{
-			except::typeMismatchError(state, lua_typename(state, t) + std::string("is not table"));
-			return LuaRef(state);
+			except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
+			return LuaTable();
 		}
 		lua_getmetatable(state, stackindex);
 		return LuaTable(state, StackTop());
@@ -375,7 +401,7 @@ namespace kaguya
 			lua_type_traits<KEY>::push(state, key);//push key
 			lua_gettable(state, -2);//get table[key]
 			lua_remove(state, -3);//remove table
-			return LuaStackRef(state, -1,true);
+			return LuaStackRef(state, -1, true);
 		}
 		return LuaStackRef();
 	}
@@ -416,8 +442,7 @@ namespace kaguya
 	struct lua_type_traits<TableKeyReference<KEY> > {
 		static int push(lua_State* l, const TableKeyReference<KEY>& ref)
 		{
-			ref.push(l);
-			return 1;
+			return ref.push(l);
 		}
 	};
 
@@ -453,7 +478,7 @@ namespace kaguya
 		{
 			LuaStackRef table(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			
+
 			bool valid = true;
 			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(checkTypeForEach(valid));
 			return valid;
@@ -479,14 +504,14 @@ namespace kaguya
 		}
 		static int push(lua_State* l, push_type v)
 		{
-			LuaRef table(l, NewTable(int(v.size()), 0));
+			lua_createtable(l, int(v.size()), 0);
+			LuaStackRef table(l, -1);
 
 			int count = 1;//array is 1 origin in Lua
-			for (typename std::vector<T>::const_iterator it = v.begin(); it != v.end(); ++it)
+			for (typename std::vector<T, A>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
 				table.setField(count++, *it);
 			}
-			table.push(l);
 			return 1;
 		}
 	};
@@ -532,7 +557,7 @@ namespace kaguya
 		{
 			LuaStackRef table(l, index);
 			if (table.type() != LuaRef::TYPE_TABLE) { return false; }
-			
+
 			bool valid = true;
 			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(strictCheckTypeForEach(valid));
 			return valid;
@@ -549,12 +574,12 @@ namespace kaguya
 		}
 		static int push(lua_State* l, push_type v)
 		{
-			LuaRef table(l, NewTable(0, int(v.size())));
-			for (typename std::map<K, V>::const_iterator it = v.begin(); it != v.end(); ++it)
+			lua_createtable(l, 0, int(v.size()));
+			LuaStackRef table(l, -1);
+			for (typename std::map<K, V, C, A>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
 				table.setField(it->first, it->second);
 			}
-			table.push(l);
 			return 1;
 		}
 	};

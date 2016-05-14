@@ -35,45 +35,7 @@ namespace kaguya
 	class LuaRef;
 	class LuaStackRef;
 
-	template<>
-	struct lua_type_traits<LuaRef>
-	{
-		typedef LuaRef get_type;
-		typedef const LuaRef& push_type;
 
-		static bool checkType(lua_State* l, int index)
-		{
-			return true;
-		}
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return false;
-		}
-
-		static get_type get(lua_State* l, int index);
-		static int push(lua_State* l, push_type v);
-	};
-	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
-
-	template<>
-	struct lua_type_traits<LuaStackRef>
-	{
-		typedef LuaStackRef get_type;
-		typedef const LuaStackRef& push_type;
-
-		static bool checkType(lua_State* l, int index)
-		{
-			return true;
-		}
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return false;
-		}
-
-		static get_type get(lua_State* l, int index);
-		static int push(lua_State* l, push_type v);
-	};
-	template<>	struct lua_type_traits<const LuaStackRef&> :lua_type_traits<LuaStackRef> {};
 
 	namespace util
 	{
@@ -259,18 +221,33 @@ namespace kaguya
 	};
 
 
-
-
-	inline lua_type_traits<LuaRef>::get_type lua_type_traits<LuaRef>::get(lua_State* l, int index)
+	template<>
+	struct lua_type_traits<LuaRef>
 	{
-		lua_pushvalue(l, index);
-		return LuaRef(l, StackTop());
-	}
-	inline int lua_type_traits<LuaRef>::push(lua_State* l, lua_type_traits<LuaRef>::push_type v)
-	{
-		v.push(l);
-		return 1;
-	}
+		typedef LuaRef get_type;
+		typedef const LuaRef& push_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return false;
+		}
+
+		static get_type get(lua_State* l, int index)
+		{
+			lua_pushvalue(l, index);
+			return LuaRef(l, StackTop());
+		}
+		static int push(lua_State* l, push_type v)
+		{
+			return v.push(l);
+		}
+	};
+	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
+
 
 
 
@@ -298,18 +275,35 @@ namespace kaguya
 		}
 #endif
 	};
-	inline lua_type_traits<LuaStackRef>::get_type lua_type_traits<LuaStackRef>::get(lua_State* l, int index)
+
+
+
+	template<>
+	struct lua_type_traits<LuaStackRef>
 	{
-		return LuaStackRef(l, index);
-	}
-	inline int lua_type_traits<LuaStackRef>::push(lua_State* l, lua_type_traits<LuaStackRef>::push_type v)
-	{
-		v.push(l);
-		return 1;
-	}
+		typedef LuaStackRef get_type;
+		typedef const LuaStackRef& push_type;
 
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return false;
+		}
 
-
+		static get_type get(lua_State* l, int index)
+		{
+			return LuaStackRef(l, index);
+		}
+		static int push(lua_State* l, push_type v)
+		{
+			return v.push(l);
+		}
+	};
+	template<>	struct lua_type_traits<const LuaStackRef&> :lua_type_traits<LuaStackRef> {};
+	
 	//! Reference to Lua userdata
 	class  LuaUserData :public Ref::RegistoryRef
 		, public LuaTableOrUserDataImpl<LuaUserData>
@@ -367,8 +361,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, const LuaUserData& ref)
 		{
-			ref.push(l);
-			return 1;
+			return ref.push(l);
 		}
 	};
 	template<>	struct lua_type_traits<const LuaUserData&> :lua_type_traits<LuaUserData> {};
@@ -430,8 +423,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, const LuaTable& ref)
 		{
-			ref.push(l);
-			return 1;
+			return ref.push(l);
 		}
 	};
 	template<>	struct lua_type_traits<const LuaTable&> :lua_type_traits<LuaTable> {};
@@ -486,7 +478,7 @@ namespace kaguya
 			if (status)
 			{
 				ErrorHandler::handle(status, state);
-				return LuaRef(state);
+				lua_pushnil(state);
 			}
 			return LuaFunction(state, StackTop());
 		}
@@ -512,7 +504,7 @@ namespace kaguya
 			if (status)
 			{
 				ErrorHandler::handle(status, state);
-				return LuaRef(state);
+				lua_pushnil(state);
 			}
 			return LuaFunction(state, StackTop());
 		}
@@ -621,7 +613,7 @@ namespace kaguya
 			if (status)
 			{
 				ErrorHandler::handle(status, state);
-				return LuaRef(state);
+				lua_pushnil(state);
 			}
 			return LuaFunction(state, StackTop());
 		}

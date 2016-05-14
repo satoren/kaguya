@@ -11,6 +11,30 @@ namespace kaguya
 
 	namespace nativefunction
 	{
+		inline std::string argmentTypes(lua_State *state)
+		{
+			int top = lua_gettop(state);
+
+			std::string result = "";
+
+			for (int i = 1; i <= top; i++) {
+				if (i != 1)
+				{
+					result += ",";
+				}
+
+				ObjectWrapperBase* object = object_wrapper(state, i);
+				if (object)
+				{
+					result += object->type().name();
+				}
+				else
+				{
+					result += lua_typename(state, lua_type(state, i));
+				}
+			}
+			return result;
+		}
 
 		struct BaseInvoker
 		{

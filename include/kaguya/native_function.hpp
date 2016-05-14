@@ -207,29 +207,25 @@ namespace kaguya
 				return 0;
 			}
 		}
-		inline std::string argmentTypes(lua_State *state)
+		inline int pushArgmentTypeNames(lua_State *state, int top)
 		{
-			int top = lua_gettop(state);
-
-			std::string result = "";
-
 			for (int i = 1; i <= top; i++) {
 				if (i != 1)
 				{
-					result += ",";
+					lua_pushliteral(state, ",");
 				}
 
 				ObjectWrapperBase* object = object_wrapper(state, i);
 				if (object)
 				{
-					result += object->type().name();
+					lua_pushstring(state, object->type().name());
 				}
 				else
 				{
-					result += lua_typename(state, lua_type(state, i));
+					lua_pushstring(state, lua_typename(state, lua_type(state, i)));
 				}
 			}
-			return result;
+			return lua_gettop(state) - top;
 		}
 	}
 
@@ -326,26 +322,29 @@ namespace kaguya
 
 			return invoke_tuple_impl(state, tuple, indexrange());
 		}
-
-		template<typename Fun> std::string arg_typename(const Fun& fn)
+		
+		template<typename Fun> void  push_arg_typename(lua_State *state,const Fun& fn)
 		{
-			return nativefunction::argTypesName(fn);
+			lua_pushstring(state, nativefunction::argTypesName(fn).c_str());
 		}
 
-		template<typename Fun, typename... Functions> std::string arg_typename(const Fun& fn, const Functions&... fns)
+		template<typename Fun, typename... Functions> void  push_arg_typename(lua_State *state, const Fun& fn, const Functions&... fns)
 		{
-			return "\t\t" + nativefunction::argTypesName(fn) + "\n" + arg_typename(fns...);
+			lua_pushliteral(state, "\t\t");
+			lua_pushstring(state, nativefunction::argTypesName(fn).c_str());
+			lua_pushliteral(state, "\n");
+			push_arg_typename(state,fns...);
 		}
-		template<typename TupleType, std::size_t ...S> std::string arg_typename_tuple_impl(TupleType&& tuple, nativefunction::cpp11impl::index_tuple<S...>)
+		template<typename TupleType, std::size_t ...S> void  push_arg_typename_tuple_impl(lua_State *state, TupleType&& tuple, nativefunction::cpp11impl::index_tuple<S...>)
 		{
-			return arg_typename(std::get<S>(tuple)...);
+			return push_arg_typename(state,std::get<S>(tuple)...);
 		}
-		template<typename TupleType> std::string arg_typename_tuple(TupleType&& tuple)
+		template<typename TupleType>void push_arg_typename_tuple(lua_State *state, TupleType&& tuple)
 		{
 			typedef typename std::decay<TupleType>::type ttype;
 			typedef typename nativefunction::cpp11impl::index_range<0, std::tuple_size<ttype>::value>::type indexrange;
 
-			return arg_typename_tuple_impl(tuple, indexrange());
+			return push_arg_typename_tuple_impl(state,tuple, indexrange());
 		}
 	}
 
@@ -366,7 +365,7 @@ namespace kaguya
 		}\
 
 
-#define KAGUYA_ARG_TYPENAMES(N) + "\t\t" + nativefunction::argTypesName(standard::get<N-1>(tuple)) + "\n"
+#define KAGUYA_ARG_PUSH_TYPENAMES(N)lua_pushliteral(state, "\t\t"); lua_pushstring(state, nativefunction::argTypesName(standard::get<N-1>(tuple)).c_str());lua_pushliteral(state, "\n");
 #define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
 #define KAGUYA_TUPLE_INVOKE_DEF(N) \
 		KAGUYA_TEMPLATE_PARAMETER(N)\
@@ -380,10 +379,10 @@ namespace kaguya
 			throw LuaTypeMismatch("type mismatch!!"); \
 		}\
 		KAGUYA_TEMPLATE_PARAMETER(N)\
-		std::string arg_typename_tuple(standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>& tuple)\
+		void push_arg_typename_tuple(lua_State *state,standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>& tuple)\
 		{\
-			return std::string() KAGUYA_PP_REPEAT(N, KAGUYA_ARG_TYPENAMES);\
-		}
+			KAGUYA_PP_REPEAT(N, KAGUYA_ARG_PUSH_TYPENAMES);\
+		}\
 
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_TUPLE_INVOKE_DEF)
 #undef KAGUYA_TEMPLATE_PARAMETER
@@ -395,11 +394,6 @@ namespace kaguya
 			template<typename TupleType> int invoke_tuple(lua_State* state, TupleType& tuple)
 		{
 			return 0;
-		}
-
-		template<typename TupleType> std::string arg_typename_tuple(TupleType& tuple)
-		{
-			return "";
 		}
 	}
 #endif
@@ -456,12 +450,19 @@ namespace kaguya
 	{
 		typedef FunctionInvokerType<FunctionTuple> userdatatype;
 		typedef const FunctionInvokerType<FunctionTuple>& push_type;
-
-
-		static std::string build_arg_error_message(lua_State *state, FunctionTuple* tuple)
+		
+		static const char* build_arg_error_message(lua_State *state,const char* msg, FunctionTuple* tuple)
 		{
-			return  "Argument mismatch:" + nativefunction::argmentTypes(state) + "\t candidate is:\n"
-				+ detail::arg_typename_tuple(*tuple);
+			int stack_top = lua_gettop(state);
+			if (msg) { lua_pushstring(state, msg); }
+			lua_pushliteral(state, "Argument mismatch:");
+			nativefunction::pushArgmentTypeNames(state, stack_top);
+
+			lua_pushliteral(state, "\t candidate is:\n");
+			detail::push_arg_typename_tuple(state, *tuple);
+
+			lua_concat(state, lua_gettop(state) - stack_top);
+			return lua_tostring(state,-1);
 		}
 
 		static int invoke(lua_State *state)
@@ -474,7 +475,7 @@ namespace kaguya
 					return detail::invoke_tuple(state, *t);
 				}
 				catch (LuaTypeMismatch &) {
-					util::traceBack(state, (std::string("maybe...") + build_arg_error_message(state, t)).c_str());
+					util::traceBack(state, build_arg_error_message(state, "maybe...", t));
 				}
 				catch (std::exception & e) {
 					util::traceBack(state, e.what());

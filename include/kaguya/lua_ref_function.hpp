@@ -335,8 +335,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, const LuaFunction& ref)
 		{
-			ref.push(l);
-			return 1;
+			return ref.push(l);
 		}
 	};
 	template<>	struct lua_type_traits<const LuaFunction&> :lua_type_traits<LuaFunction> {};
@@ -360,8 +359,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, const LuaThread& ref)
 		{
-			ref.push(l);
-			return 1;
+			return ref.push(l);
 		}
 	};
 	template<>	struct lua_type_traits<const LuaThread&> :lua_type_traits<LuaThread> {};
@@ -391,9 +389,4 @@ namespace kaguya
 		LuaRef self_;//Table or Userdata
 		LuaFunction fun_;
 	};
-	/*
-	inline mem_fun_binder LuaRef::operator->*(const char* key)
-	{
-		return mem_fun_binder(*this, key);
-	}*/
 }

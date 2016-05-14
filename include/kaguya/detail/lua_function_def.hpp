@@ -278,7 +278,7 @@ namespace kaguya
 		/**
 		* @return state status
 		*/
-			int threadStatus()const
+		int threadStatus()const
 		{
 			lua_State* state = state_();
 			if (!state)

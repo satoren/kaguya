@@ -106,7 +106,7 @@ namespace kaguya
 				"Can not register specialized of type conversion class. e.g. std::tuple");
 		}
 
-		LuaRef registerClass(lua_State* state)const
+		LuaTable registerClass(lua_State* state)const
 		{
 			util::ScopedSavedStack save(state);
 			if (class_userdata::newmetatable<class_type>(state))
@@ -164,7 +164,7 @@ namespace kaguya
 			{
 				except::OtherError(state, typeid(class_type*).name() + std::string(" is already registered"));
 			}
-			return LuaRef(state);
+			return LuaTable();
 		}
 
 #if KAGUYA_USE_CPP11
