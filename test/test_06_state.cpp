@@ -102,12 +102,15 @@ KAGUYA_TEST_FUNCTION_DEF(load_lib_constructor)(kaguya::State&)
 		kaguya::State state(libs);
 		TEST_CHECK(state("assert(true)"));
 		TEST_CHECK(state("assert(math.abs(-2) == 2)"));
+		TEST_CHECK(lua_gettop(state.state()) == 0);//leak check
 	}
 #if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER>=1800)
 	{//use c++11 initializer list
 		kaguya::State state({ { "_G", luaopen_base },{ LUA_MATHLIBNAME, luaopen_math } });
 		TEST_CHECK(state("assert(true)"));
 		TEST_CHECK(state("assert(math.abs(-2) == 2)"));
+
+		TEST_CHECK(lua_gettop(state.state()) == 0);//leak check
 	}
 #endif
 }

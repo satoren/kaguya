@@ -325,7 +325,9 @@ namespace kaguya
 		
 		template<typename Fun> void  push_arg_typename(lua_State *state,const Fun& fn)
 		{
+			lua_pushliteral(state, "\t\t");
 			lua_pushstring(state, nativefunction::argTypesName(fn).c_str());
+			lua_pushliteral(state, "\n");
 		}
 
 		template<typename Fun, typename... Functions> void  push_arg_typename(lua_State *state, const Fun& fn, const Functions&... fns)

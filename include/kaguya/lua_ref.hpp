@@ -268,10 +268,29 @@ namespace kaguya
 		{
 			src.pop_ = false;
 		}
+		LuaStackRef& operator=(LuaStackRef&& src)
+		{
+			if (this != &src)
+			{
+				Ref::StackRef::operator=(std::move(src));
+				src.pop_ = false;
+			}
+			return *this;
+		}
+		LuaStackRef(const LuaStackRef&src) = delete;
 #else
 		LuaStackRef(const LuaStackRef&src) : Ref::StackRef(src)
 		{
 			src.pop_ = false;
+		}
+		LuaStackRef& operator=(const LuaStackRef&src)
+		{
+			if (this != &src)
+			{
+				Ref::StackRef::operator=(src);
+				src.pop_ = false;
+			}
+			return *this;
 		}
 #endif
 	};

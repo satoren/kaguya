@@ -13,6 +13,8 @@
 #include "kaguya/object.hpp"
 #include "kaguya/exception.hpp"
 
+#include "kaguya/push_tuple.hpp"
+
 namespace kaguya
 {
 	//default implements
@@ -564,11 +566,11 @@ namespace kaguya
 		}
 		static int push(lua_State* l, const char s[N])
 		{
-			lua_pushstring(l, s);
+			lua_pushlstring(l, s, s[N - 1] != '\0' ? N : N - 1);
 			return 1;
 		}
 	};
-	template<int N>	struct lua_type_traits<const char[N]> :lua_type_traits<const char*> {};
+	template<int N>	struct lua_type_traits<const char[N]> :lua_type_traits<char[N]> {};
 
 	template<>	struct lua_type_traits<std::string> {
 		typedef std::string get_type;
@@ -595,7 +597,6 @@ namespace kaguya
 		}
 	};
 
-#include "kaguya/gen/push_tuple.inl"
 
 	struct NewTable {
 		NewTable() :reserve_array_(0), reserve_record_(0) {}
@@ -691,7 +692,7 @@ namespace kaguya
 			}
 			return lua_objlen(state, index);
 #endif
-	}
+		}
 
 		//return type
 		int type() const
@@ -852,7 +853,7 @@ namespace kaguya
 		{
 			return static_cast<const Derived*>(this)->pushStackIndex(state);
 		}
-};
+	};
 
 
 
@@ -882,5 +883,6 @@ namespace kaguya
 	{
 		return !(rhs == lhs);
 	}
+#undef KAGUYA_ENABLE_IF_NOT_LUAREF
 	//@}
 }

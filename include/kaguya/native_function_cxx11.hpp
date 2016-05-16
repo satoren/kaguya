@@ -151,13 +151,14 @@ namespace kaguya
 				return b && all_true(args...);
 			}
 
-			inline std::string join(const char* delim)
+			inline void join(std::string& result, const char* delim)
 			{
-				return "";
 			}
-			template<class...Args>std::string join(const char* delim, const std::string& str, Args... args)
+			template<class Arg,class...Args>void join(std::string& result,const char* delim, const Arg& str,const Args&... args)
 			{
-				return str + delim + join(delim, args...);
+				result += str;
+				result += delim;
+				join(result,delim, args...);
 			}
 
 
@@ -174,7 +175,9 @@ namespace kaguya
 			template<class R, class... Args>
 			std::string _type_name_apply(invoke_signature_type<R, Args...>)
 			{
-				return join(",", typeid(Args).name()...);
+				std::string result;
+				join(result,",", typeid(Args).name()...);
+				return result;
 			}
 
 			///! for data member

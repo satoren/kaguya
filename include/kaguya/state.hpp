@@ -183,7 +183,6 @@ namespace kaguya
 		*/
 		void openlibs()
 		{
-			util::ScopedSavedStack save(state_);
 			luaL_openlibs(state_);
 		}
 
@@ -191,11 +190,10 @@ namespace kaguya
 		* @name openlib
 		* @brief load lua library
 		*/
-		void openlib(const LoadLib& lib)
+		LuaStackRef openlib(const LoadLib& lib)
 		{
-			util::ScopedSavedStack save(state_);
-
 			luaL_requiref(state_, lib.first.c_str(), lib.second, 1);
+			return LuaStackRef(state_, -1, true);
 		}
 		
 		/**

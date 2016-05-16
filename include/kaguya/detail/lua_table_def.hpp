@@ -43,37 +43,37 @@ namespace kaguya
 			return static_cast<const Derived*>(this)->push(state);
 		}
 
-		template<typename K>
+		template<typename K, typename A>
 		struct gettablekey
 		{
 			typedef K key_type;
 			typedef void value_type;
-			std::vector<K>& v_;
-			gettablekey(std::vector<K>&v) :v_(v) {}
+			std::vector<K, A>& v_;
+			gettablekey(std::vector<K, A>&v) :v_(v) {}
 			void operator ()(K key, const void*)
 			{
 				v_.push_back(key);
 			}
 		};
-		template<typename V>
+		template<typename V, typename A>
 		struct gettablevalue
 		{
 			typedef void key_type;
 			typedef V value_type;
-			std::vector<V>& v_;
-			gettablevalue(std::vector<V>&v) :v_(v) {}
+			std::vector<V, A>& v_;
+			gettablevalue(std::vector<V, A>&v) :v_(v) {}
 			void operator ()(const void*, V value)
 			{
 				v_.push_back(value);
 			}
 		};
-		template<typename K, typename V>
+		template<typename K, typename V, typename C, typename A>
 		struct gettablemap
 		{
 			typedef K key_type;
 			typedef V value_type;
-			std::map<K, V>& m_;
-			gettablemap(std::map<K, V>& m) :m_(m) {}
+			std::map<K, V, C, A>& m_;
+			gettablemap(std::map<K, V, C, A>& m) :m_(m) {}
 			void operator ()(K key, V value)
 			{
 				m_[key] = value;
@@ -207,10 +207,10 @@ namespace kaguya
 		* @brief If type is table or userdata, return keys.
 		* @return field keys
 		*/
-		template<typename K>
-		std::vector<K> keys()const
+		template<typename K, typename A>
+		std::vector<K, A> keys()const
 		{
-			std::vector<K> res;
+			std::vector<K, A> res;
 			util::ScopedSavedStack save(state_());
 			int stackIndex = pushStackIndex_(state_());
 #if LUA_VERSION_NUM >= 502
@@ -219,18 +219,23 @@ namespace kaguya
 			int size = lua_objlen(state_(), stackIndex);
 #endif
 			res.reserve(size);
-			foreach_table<K, void>(gettablekey<K>(res));
+			foreach_table<K, void>(gettablekey<K, A>(res));
 			return res;
+		}
+		template<typename K >
+		std::vector<K> keys()const
+		{
+			return keys<K, std::allocator<K> >();
 		}
 		std::vector<LuaRef> keys()const;
 		/**
 		* @brief If type is table or userdata, return values.
 		* @return field value
 		*/
-		template<typename V>
-		std::vector<V> values()const
+		template<typename V, typename A>
+		std::vector<V, A> values()const
 		{
-			std::vector<V> res;
+			std::vector<V, A> res;
 			util::ScopedSavedStack save(state_());
 			int stackIndex = pushStackIndex_(state_());
 #if LUA_VERSION_NUM >= 502
@@ -239,20 +244,35 @@ namespace kaguya
 			size_t size = lua_objlen(state_(), stackIndex);
 #endif
 			res.reserve(size);
-			foreach_table<void, V>(gettablevalue<V>(res));
+			foreach_table<void, V>(gettablevalue<V, A>(res));
 			return res;
+		}
+		template<typename V >
+		std::vector<V> values()const
+		{
+			return values<V, std::allocator<V> >();
 		}
 		std::vector<LuaRef> values()const;
 		/**
 		* @brief If type is table or userdata, return key value pair.
 		* @return key value pair
 		*/
+		template<typename K, typename V, typename C, typename A >
+		std::map<K, V, C, A> map()const
+		{
+			std::map<K, V, C, A> res;
+			foreach_table<K, V>(gettablemap<K, V, C, A>(res));
+			return res;
+		}
+		template<typename K, typename V, typename C >
+		std::map<K, V, C> map()const
+		{
+			return map < K, V, C, std::allocator<std::pair<const K, V> > >();
+		}
 		template<typename K, typename V>
 		std::map<K, V> map()const
 		{
-			std::map<K, V> res;
-			foreach_table<K, V>(gettablemap<K, V>(res));
-			return res;
+			return map<K, V, std::less<K> >();
 		}
 		std::map<LuaRef, LuaRef> map()const;
 		/**

@@ -1,6 +1,6 @@
 #pragma once
 
-
+//for c++03 implement
 	
 #define KAGUYA_PP_CAT(F,B) F##B
 #define KAGUYA_PP_REPEAT0(MACRO)

@@ -42,10 +42,31 @@ namespace kaguya
 			{
 				src.pop_ = false;
 			}
+			StackRef& operator=(StackRef&& src)
+			{
+				state_ = src.state_;
+				stack_index_ = src.stack_index_;
+				pop_ = src.pop_;
+
+				src.pop_ = false;
+				return *this;
+			}
+
+			StackRef(const StackRef&src) = delete;
+			StackRef& operator=(const StackRef&src) = delete;
 #else
 			StackRef(const StackRef&src) : state_(src.state_), stack_index_(src.stack_index_), pop_(src.pop_)
 			{
 				src.pop_ = false;
+			}
+			StackRef& operator=(const StackRef& src)
+			{
+				state_ = src.state_;
+				stack_index_ = src.stack_index_;
+				pop_ = src.pop_;
+
+				src.pop_ = false;
+				return *this;
 			}
 #endif
 			StackRef(lua_State* s, int index) :state_(s), stack_index_(to_absindex(s, index)), pop_(true)

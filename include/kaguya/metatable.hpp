@@ -79,20 +79,20 @@ namespace kaguya
 		};
 		template<int N>
 		struct DataHolder<char[N]> :DataHolderBase {
-			std::string data;
-			DataHolder(const std::string& d) :data(d) {}
+			char data[N];
+			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
 			virtual int push_to_lua(lua_State* state)const
 			{
-				return lua_type_traits<std::string>::push(state, data);
+				return lua_type_traits<char[N]>::push(state, data);
 			}
 		};
 		template<int N>
 		struct DataHolder<const char[N]> :DataHolderBase {
-			std::string data;
-			DataHolder(const std::string& d) :data(d) {}
+			char data[N];
+			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
 			virtual int push_to_lua(lua_State* state)const
 			{
-				return lua_type_traits<std::string>::push(state, data);
+				return lua_type_traits<char[N]>::push(state, data);
 			}
 		};
 #if KAGUYA_USE_CPP11
@@ -104,24 +104,6 @@ namespace kaguya
 			virtual int push_to_lua(lua_State* state)const
 			{
 				return lua_type_traits<T>::push(state, std::move(data));
-			}
-		};
-		template<int N>
-		struct MoveDataHolder<char[N]> :DataHolderBase {
-			std::string data;
-			MoveDataHolder(const std::string& d) :data(d) {}
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return lua_type_traits<std::string>::push(state, data);
-			}
-		};
-		template<int N>
-		struct MoveDataHolder<const char[N]> :DataHolderBase {
-			std::string data;
-			MoveDataHolder(const std::string& d) :data(d) {}
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return lua_type_traits<std::string>::push(state, data);
 			}
 		};
 		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
@@ -142,8 +124,6 @@ namespace kaguya
 	{
 		typedef std::map<std::string, metatable_detail::DataHolderType> PropMapType;
 		typedef std::map<std::string, metatable_detail::DataHolderType> MemberMapType;
-		typedef std::map<std::string, std::string> CodeChunkMapType;
-
 	public:
 
 		UserdataMetatable()

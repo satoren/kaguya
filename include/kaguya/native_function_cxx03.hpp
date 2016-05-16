@@ -43,7 +43,7 @@ namespace kaguya
 			}
 			inline std::string argTypesName(void(*f)())
 			{
-				return "void";
+				return "";
 			}
 			inline int argCount(void(*f)())
 			{
@@ -66,7 +66,7 @@ namespace kaguya
 			}
 			inline std::string argTypesName(standard::function<void()> f)
 			{
-				return "void";
+				return "";
 			}
 			inline int argCount(standard::function<void()> f)
 			{
