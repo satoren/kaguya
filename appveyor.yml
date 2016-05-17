@@ -33,8 +33,8 @@ build_script:
 
     cd build
 
-    cmake ../ -G %CMAKE_GEN_TYPE% -DADDITIONAL_INCLUDE_PATH=%ADDITIONAL_INCLUDE_PATH%
+    cmake ../ -G $env:CMAKE_GEN_TYPE -DADDITIONAL_INCLUDE_PATH="$env:ADDITIONAL_INCLUDE_PATH"
 
-    cmake --build . --config %CONFIGURATION%
+    cmake --build . --config $env:CONFIGURATION
 test_script:
 - ps: ctest -V
