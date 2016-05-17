@@ -22,10 +22,14 @@ install:
       7z x lua-5.3.2.tar.gz
       7z x lua-5.3.2.tar
     }
-cache: lua-5.3.2
+cache:
+- lua-5.3.2
+- build
 build_script:
-- cmd: >-
-    mkdir build
+- ps: >-
+    if(!(Test-Path -Path build )){
+      mkdir build
+    }
 
     cd build
 
@@ -33,4 +37,4 @@ build_script:
 
     cmake --build . --config %CONFIGURATION%
 test_script:
-- cmd: ctest -V
+- ps: ctest -V
