@@ -14,7 +14,7 @@ namespace
 	class SetGet
 	{
 	public:
-		SetGet() :_i(0.0) {}
+		SetGet() :a(0.0),_i(0.0){}
 		void set(double i)
 		{
 			_i = i;

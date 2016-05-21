@@ -22,22 +22,22 @@ namespace kaguya
 {
 	class FunctionResults :public Ref::StackRef, public LuaVariantImpl<FunctionResults>
 	{
-		FunctionResults(lua_State* state,int return_status, int startIndex) :Ref::StackRef(state, startIndex, true),state_(state), resultStatus_(return_status), resultCount_(lua_gettop(state) + 1 - startIndex)
+		FunctionResults(lua_State* state, int return_status, int startIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(lua_gettop(state) + 1 - startIndex)
 		{
 		}
-		FunctionResults(lua_State* state,int return_status, int startIndex, int endIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(endIndex - startIndex)
+		FunctionResults(lua_State* state, int return_status, int startIndex, int endIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(endIndex - startIndex)
 		{
 		}
 		friend class FunctionResultProxy;
 	public:
-		FunctionResults() :Ref::StackRef(0, 0, true), state_(0), resultCount_(0)
+		FunctionResults() :Ref::StackRef(0, 0, true), state_(0), resultStatus_(0), resultCount_(0)
 		{
 		}
-		FunctionResults(lua_State* state) :Ref::StackRef(state, 0, true), state_(state), resultCount_(0)
+		FunctionResults(lua_State* state) :Ref::StackRef(state, 0, true), state_(state), resultStatus_(0), resultCount_(0)
 		{
 		}
 #if KAGUYA_USE_CPP11
-		FunctionResults(FunctionResults&&src) : Ref::StackRef(std::move(src)), state_(src.state_), resultCount_(src.resultCount_)
+		FunctionResults(FunctionResults&&src) : Ref::StackRef(std::move(src)), state_(src.state_), resultStatus_(0), resultCount_(src.resultCount_)
 		{
 			src.state_ = 0;
 		}
@@ -132,7 +132,7 @@ namespace kaguya
 			return const_iterator(state_, stack_index_ + resultCount_);
 		}
 
-		
+
 		template<class Result>
 		Result get_result()const
 		{
@@ -280,7 +280,7 @@ namespace kaguya
 #undef KAGUYA_OP_FN_DEF
 #endif
 
-	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
+		inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
 		for (FunctionResults::const_iterator it = res.begin(); it != res.end(); ++it)
 		{
