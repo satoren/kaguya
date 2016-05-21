@@ -19,11 +19,24 @@ addons:
     - libboost-all-dev
     - g++-4.8
     - cmake
+  coverity_scan:
+    project:
+      name: "satoren/kaguya"
+      description: "Build submitted via Travis CI"
+    notification_email: satoreyo@hotmail.com
+    build_command_prepend: "cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}"
+    build_command:   "make"
+    branch_pattern: coverity_scan
 env:
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 LUALIB=lua5.2
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++11 LUALIB=lua5.2
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 LUALIB=luajit
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++11 LUALIB=luajit
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "umj8p2o6K6hci9qpVNmNCQtrzljYCYL9zhm8bjEkpdZYDw+jRNAv9BzlCQyQvRnmHpJzhLd2ikg/ACdf+Cc0MlMdN39JdQ71QM71FzwO44uZYug5F9KokSPc0Oj2M5IEiG3JFjmlKrxQhlEkGAqkwvudiIN6qEFm6ciXVEapYOHpfEXB64Lg6Lvb/CATgyHn+706TMJBSEGOBp070YgxB2Ant5kPy428vhdYN5kbVkzDHlCMAf11qrh+8/9RM1GDgqCYqE7YXuBTzh6osVwSk2tmofXflCbTSNbQTvWjP4YbTB04LPJCQWei/4vrYl8vrxUS3QNh+ttvowWE4k6TfoKYyVQ9Xgl5rPWLD6G20phhLX37MbEbYwVzDxSbLXD0YTlycku87xRnl98ErxK0jLBjIUCQUGjqr/gncOQNI9wQ5liLHN/gNbJcqIdWSkzGuiOPdJD7GRgVRpyLA4kk/YaFukDAew8GGb2QR/qusOuJuq+10QfGhstvZMpd35jXvkoE71VaqbTKtAy2NjCk8v2QXbvP72Bl1WqoabT6ZL8Kal5pJG9uLxz/rpCxqdsB0AWxz2ZHQReNIuvL9EnYTt4t7azZ1JRgsgZ8cV2+kfPXwCf1+m0iGJDqDshjbMBZbJ4DLwfPROOa/qdHwru6Tl+IQlUTY6PyPDVYXKlXDoo="
+
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success:
