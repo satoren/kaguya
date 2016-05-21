@@ -24,7 +24,7 @@ addons:
       name: "satoren/kaguya"
       description: "Build submitted via Travis CI"
     notification_email: satoreyo@hotmail.com
-    build_command_prepend: "mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}"
+    build_command_prepend: "mkdir covbuild && cd covbuild && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}"
     build_command:   "make"
     branch_pattern: coverity_scan
 env:
