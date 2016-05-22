@@ -260,7 +260,7 @@ KAGUYA_TEST_FUNCTION_DEF(lua_table_get)(kaguya::State& state)
 
 	TEST_CHECK(table["str"] == "gjgj" && table["in"] == "test" &&  table["out"] == 32);
 
-	table.isNilref();
+	TEST_CHECK(!table.isNilref());
 }
 
 KAGUYA_TEST_FUNCTION_DEF(lua_table_set)(kaguya::State& state)
