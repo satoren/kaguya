@@ -400,7 +400,7 @@ namespace kaguya
 		{
 			lua_type_traits<KEY>::push(state, key);//push key
 			lua_gettable(state, -2);//get table[key]
-			lua_remove(state, -3);//remove table
+			lua_remove(state, -2);//remove table
 			return LuaStackRef(state, -1, true);
 		}
 		return LuaStackRef();

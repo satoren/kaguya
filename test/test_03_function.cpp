@@ -219,4 +219,29 @@ KAGUYA_TEST_FUNCTION_DEF(result_to_table)(kaguya::State& state)
 	TEST_EQUAL(state["result"], 1);
 }
 
+void nested_function_call(kaguya::LuaStackRef function, kaguya::LuaStackRef value, kaguya::LuaStackRef value2)
+{
+	function(value, value2);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(nested_function_call_test)(kaguya::State& state)
+{
+	state["nested_function_call"] = kaguya::function(nested_function_call);
+
+	state("nested_function_call(function(value,value2) assert(value == 32);assert(value2 == 'text') end,32,'text')");
+}
+
+void nested_function_call2(kaguya::LuaStackRef function,const kaguya::LuaStackRef& table, kaguya::LuaStackRef value2)
+{
+	function(table["key"], value2);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(nested_function_call_test2)(kaguya::State& state)
+{
+	state["nested_function_call"] = kaguya::function(nested_function_call2);
+
+	state("nested_function_call(function(value,value2) assert(value==32);assert(value2 == 'text') end,{key=32},'text')");
+}
+
+
 KAGUYA_TEST_GROUP_END(test_03_function)
