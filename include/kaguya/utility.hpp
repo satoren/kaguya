@@ -263,8 +263,11 @@ namespace kaguya
 		}
 		inline int lua_rawgetp_compat(lua_State *L, int idx, const void* ptr)
 		{
-#if LUA_VERSION_NUM >= 502
+#if LUA_VERSION_NUM >= 503
 			return lua_rawgetp(L, idx, ptr);
+#elif LUA_VERSION_NUM >= 503
+			lua_rawgetp(L, idx, ptr);
+			return lua_type(L, -1);
 #else
 			int absidx = lua_absindex_compat(L, idx);
 			lua_pushlightuserdata(L, (void*)ptr);
