@@ -842,18 +842,33 @@ KAGUYA_TEST_FUNCTION_DEF(null_shared_ptr)(kaguya::State& state)
 	TEST_CHECK(!sptr);
 }
 
+int TestClass2_objectcount = 0;
 struct TestClass2
 {
 	TestClass2()
 	{
-		data.resize(100);
+		TestClass2_objectcount++;
+	}
+	TestClass2(const TestClass2& src):data(src.data)
+	{
+		TestClass2_objectcount++;
+	}
+	~TestClass2()
+	{
+		TestClass2_objectcount--;
 	}
 	std::vector<int> data;
 };
 
-KAGUYA_TEST_FUNCTION_DEF(not_registered_object)(kaguya::State& state)
+
+KAGUYA_TEST_FUNCTION_DEF(not_registered_object)(kaguya::State&)
 {
-	state["data"] = TestClass2();//need memory leak check e.g. valgrind
+	TEST_CHECK(TestClass2_objectcount == 0);
+	{
+		kaguya::State state;
+		state["data"] = TestClass2();
+	}
+	TEST_CHECK(TestClass2_objectcount==0);
 }
 
 KAGUYA_TEST_GROUP_END(test_02_classreg)
