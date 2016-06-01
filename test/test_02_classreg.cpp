@@ -286,9 +286,11 @@ KAGUYA_TEST_FUNCTION_DEF(copyable_class_test)(kaguya::State& state)
 {
 	state["CopyableClass"].setClass(kaguya::UserdataMetatable<CopyableClass>()
 		.setConstructors<CopyableClass(int)>()
-		.addStaticField("__eq", &CopyableClass::operator==)
+		.addFunction("__eq", &CopyableClass::operator==)
 		);
 	state["copy"] = CopyableClass(2);
+	state["copy2"] = CopyableClass(2);
+	TEST_CHECK(state("assert(copy2 == copy)"));
 	TEST_CHECK(state["copy"] == CopyableClass(2));
 	TEST_CHECK(CopyableClass(2) == state["copy"]);
 	CopyableClass copy = state["copy"];
@@ -299,6 +301,7 @@ KAGUYA_TEST_FUNCTION_DEF(copyable_class_test)(kaguya::State& state)
 	src.member = 12;
 	CopyableClass copied = state["copied"];
 	TEST_CHECK(copied != src);
+	TEST_CHECK(state("assert(copied ~= copy)"));
 }
 
 
@@ -323,7 +326,7 @@ KAGUYA_TEST_FUNCTION_DEF(noncopyable_class_test)(kaguya::State& state)
 {
 	state["NoncopyableClass"].setClass(kaguya::UserdataMetatable<NoncopyableClass>()
 		.setConstructors<NoncopyableClass(int)>()
-		.addStaticField("__eq", &NoncopyableClass::operator==)
+		.addFunction("__eq", &NoncopyableClass::operator==)
 		);
 
 	NoncopyableClass noncopy(2);
@@ -838,4 +841,19 @@ KAGUYA_TEST_FUNCTION_DEF(null_shared_ptr)(kaguya::State& state)
 	kaguya::standard::shared_ptr<void> sptr = state["test"];
 	TEST_CHECK(!sptr);
 }
+
+struct TestClass2
+{
+	TestClass2()
+	{
+		data.resize(100);
+	}
+	std::vector<int> data;
+};
+
+KAGUYA_TEST_FUNCTION_DEF(not_registered_object)(kaguya::State& state)
+{
+	state["data"] = TestClass2();//need memory leak check e.g. valgrind
+}
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)

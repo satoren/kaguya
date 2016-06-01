@@ -194,7 +194,7 @@ namespace kaguya
 			}
 			util::push_args(thread, std::forward<Args>(args)...);
 			int argnum = lua_gettop(thread) - argstart;
-			int result = util::lua_resume_compat(thread, argnum);
+			int result = compat::lua_resume_compat(thread, argnum);
 			except::checkErrorAndThrow(result, thread);
 			return FunctionResultProxy::ReturnValue(thread, result, argstart, types::typetag<Result>());
 		}
@@ -226,7 +226,7 @@ namespace kaguya
 			}\
 			util::push_args(thread KAGUYA_PP_REPEAT(N, KAGUYA_PUSH_ARG_DEF));\
 			int argnum = lua_gettop(thread) - argstart;\
-			int result = util::lua_resume_compat(thread, argnum);\
+			int result = compat::lua_resume_compat(thread, argnum);\
 			except::checkErrorAndThrow(result, thread);\
 			return FunctionResultProxy::ReturnValue(thread,result, argstart, types::typetag<Result>());\
 		}

@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "kaguya/config.hpp"
+#include "kaguya/utility.hpp"
 #include "kaguya/traits.hpp"
 #include "kaguya/exception.hpp"
 
@@ -23,7 +24,7 @@ namespace kaguya
 	}
 
 #define KAGUYA_METATABLE_PREFIX "kaguya_object_type_"
-#define KAGUYA_METATABLE_TYPE_NAME_KEY -212114
+	inline void* metatable_name_key() { static int key; return &key; }
 
 	template<typename T>
 	inline const std::string& metatableName()
@@ -45,79 +46,6 @@ namespace kaguya
 		return typeid(noncvpointerref_type*);
 	}
 
-	namespace class_userdata
-	{
-		template<typename T>bool get_metatable(lua_State* l)
-		{
-			luaL_getmetatable(l, metatableName<T>().c_str());
-			return !lua_isnil(l, -1);
-		}
-		template<typename T>bool available_metatable(lua_State* l)
-		{
-			util::ScopedSavedStack save(l);
-			return get_metatable<T>(l);
-		}
-		inline bool newmetatable(lua_State* l,const char* metatablename)
-		{
-			if (luaL_newmetatable(l, metatablename))
-			{
-#if LUA_VERSION_NUM < 503
-				lua_pushstring(l, metatablename);
-				lua_setfield(l, -2, "__name");
-#endif
-				lua_pushstring(l, metatablename);
-				lua_rawseti(l, -2, KAGUYA_METATABLE_TYPE_NAME_KEY);
-				return true;
-			}
-			return false;
-		}
-		template<typename T>bool newmetatable(lua_State* l)
-		{
-			return newmetatable(l, metatableName<T>().c_str());
-		}
-		template<typename T>void setmetatable(lua_State* l)
-		{
-			if (available_metatable<T>(l))
-			{
-				return luaL_setmetatable(l, metatableName<T>().c_str());
-			}
-			else
-			{
-				luaL_getmetatable(l, KAGUYA_METATABLE_PREFIX "unknown_type");
-
-				if(lua_isnil(l, -1))
-				{
-					lua_pop(l,1);
-					newmetatable(l, KAGUYA_METATABLE_PREFIX "unknown_type");
-				}
-				lua_setmetatable(l, -2);
-			}
-		}
-
-		template<typename T>T* test_userdata(lua_State* l, int index)
-		{
-			return static_cast<T*>(luaL_testudata(l, index, metatableName<T>().c_str()));
-		}
-
-		template<typename T>inline void destructor(T* pointer)
-		{
-			if (pointer)
-			{
-				pointer->~T();
-			}
-		}
-	}
-	inline bool available_metatable(lua_State* l, const char* t)
-	{
-		util::ScopedSavedStack save(l);
-		luaL_getmetatable(l, t);
-		return !lua_isnil(l, -1);
-	}
-	template<typename T>
-	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())
-	{
-		return class_userdata::available_metatable<T>(l);
-	}
 
 	struct ObjectWrapperBase
 	{
@@ -546,7 +474,7 @@ namespace kaguya
 		{
 			if (lua_getmetatable(l, index))
 			{
-				lua_rawgeti(l, -1, KAGUYA_METATABLE_TYPE_NAME_KEY);
+				compat::lua_rawgetp_compat(l, -1, metatable_name_key());
 				const char* metatable_name = lua_tostring(l, -1);
 
 				lua_pop(l, 2);
@@ -683,5 +611,81 @@ namespace kaguya
 			}
 		}
 		return standard::shared_ptr<T>();
+	}
+
+
+	namespace class_userdata
+	{
+		template<typename T>inline void destructor(T* pointer)
+		{
+			if (pointer)
+			{
+				pointer->~T();
+			}
+		}
+		template<typename T>bool get_metatable(lua_State* l)
+		{
+			luaL_getmetatable(l, metatableName<T>().c_str());
+			return !lua_isnil(l, -1);
+		}
+		template<typename T>bool available_metatable(lua_State* l)
+		{
+			util::ScopedSavedStack save(l);
+			return get_metatable<T>(l);
+		}
+		inline bool newmetatable(lua_State* l, const char* metatablename)
+		{
+			if (luaL_newmetatable(l, metatablename))
+			{
+#if LUA_VERSION_NUM < 503
+				lua_pushstring(l, metatablename);
+				lua_setfield(l, -2, "__name");
+#endif
+				lua_pushstring(l, metatablename);
+				compat::lua_rawsetp_compat(l, -2, metatable_name_key());
+				return true;
+			}
+			return false;
+		}
+		template<typename T>bool newmetatable(lua_State* l)
+		{
+			return newmetatable(l, metatableName<T>().c_str());
+		}
+
+
+		template<typename T>inline int deleter(lua_State *state)
+		{
+			T* ptr = (T*)lua_touserdata(state, 1);
+			ptr->~T();
+			return 0;
+		}
+		struct UnknownType {};
+		template<typename T>void setmetatable(lua_State* l)
+		{
+			//if not available metatable, set unknown class metatable
+			if (!get_metatable<T>(l))
+			{
+				lua_pop(l, 1);
+				if (!get_metatable<UnknownType>(l))
+				{
+					lua_pop(l, 1);
+					newmetatable<UnknownType>(l);
+					lua_pushcclosure(l, &deleter<ObjectWrapperBase>, 0);
+					lua_setfield(l, -2, "__gc");
+				}
+			}
+			lua_setmetatable(l, -2);
+		}
+
+		template<typename T>T* test_userdata(lua_State* l, int index)
+		{
+			return static_cast<T*>(luaL_testudata(l, index, metatableName<T>().c_str()));
+		}
+
+	}
+	template<typename T>
+	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())
+	{
+		return class_userdata::available_metatable<T>(l);
 	}
 }
