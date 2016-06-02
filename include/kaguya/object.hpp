@@ -364,9 +364,7 @@ namespace kaguya
 			else
 			{
 				void* ptr = lua_newuserdata(state, sizeof(PointerConverter));//dummy data for gc call
-				if (!ptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 				PointerConverter* converter = new(ptr) PointerConverter();
-				if (!converter) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 
 				lua_createtable(state, 0, 0);
 				lua_pushcclosure(state, &deleter, 0);

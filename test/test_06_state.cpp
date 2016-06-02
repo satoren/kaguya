@@ -192,4 +192,111 @@ KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 	TEST_EQUAL(state["value"], true);
 }
 
+
+
+struct CountLimitAllocator
+{
+	typedef void* pointer;
+	typedef size_t size_type;
+	size_type allocated_count;
+	size_type allocate_limit;
+	size_type allocate_block_max_size;
+	CountLimitAllocator() :allocated_count(0), allocate_limit(0), allocate_block_max_size(0) {}
+	CountLimitAllocator(size_type limit) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(0){}
+	CountLimitAllocator(size_type limit, size_type blockmax) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(blockmax){}
+	pointer allocate(size_type n)
+	{
+		if (allocate_limit != 0 && allocate_limit < allocated_count)
+		{
+			return 0;
+		}
+		if (allocate_block_max_size != 0 && allocate_block_max_size < n)
+		{
+			return 0;
+		}
+		allocated_count++;
+		return std::malloc(n);
+	}
+	pointer reallocate(pointer p, size_type n)
+	{
+		if (allocate_block_max_size != 0 && allocate_block_max_size < n)
+		{
+			return 0;
+		}
+		return std::realloc(p, n);
+	}
+	void deallocate(pointer p, size_type n)
+	{
+		if (p)
+		{
+			allocated_count--;
+		}
+		std::free(p);
+	}
+};
+
+struct alloctest { int data; };
+
+void throwError(int status,const char* message)
+{
+	kaguya::ErrorHandler::throwDefaultError(status, message);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
+{
+	kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator);
+	{
+		kaguya::State state(allocator);
+		if (!state.state())
+		{	//can not use allocator e.g. using luajit
+			return;
+		}
+		state.setErrorHandler(throwError);
+		state("a='abc'");
+		state["data"] = alloctest();
+		TEST_CHECK(allocator->allocated_count > 0);
+	}
+
+	TEST_CHECK(allocator->allocated_count == 0);
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
+{
+	for (size_t alloclimit = 32; alloclimit < 1024; ++alloclimit)
+	{
+
+		kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator(alloclimit));
+		kaguya::State state(allocator);
+		if (!state.state())
+		{	//can not use allocator e.g. using luajit
+			continue;
+		}
+		try
+		{
+			state.setErrorHandler(throwError);
+
+			state["Foo"].setClass(kaguya::UserdataMetatable<Foo>().setConstructors<Foo()>());
+
+			state["data"] = kaguya::NewTable();
+			Foo foodata;
+			for (size_t i = 0; i < alloclimit; ++i)
+			{
+				state("data[" +to_string(i) + "] ='abc'");
+				state["data"][i+ alloclimit*2] = alloctest();
+				state["data"][i+ alloclimit*3] = 1;
+				state["data"][i + alloclimit * 4] = "str";
+				state["data"][i + alloclimit * 5] = foodata;//copy
+				state["data"][i + alloclimit * 6] = &foodata;//ptr
+			}
+		}
+		catch (const kaguya::LuaMemoryError&)
+		{
+			continue;
+		}
+		TEST_CHECK(false);
+	}
+}
+
+
 KAGUYA_TEST_GROUP_END(test_06_state)

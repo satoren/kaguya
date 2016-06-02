@@ -41,15 +41,15 @@ namespace kaguya
 		LuaTypeMismatch(const char* what)throw() :LuaException(0, what) {}
 		LuaTypeMismatch(const std::string& what) :LuaException(0, what) {}
 	};
-#if !KAGUYA_ERROR_NO_THROW
+	class LuaMemoryError :public LuaException {
+	public:
+		LuaMemoryError(int status, const char* what)throw() :LuaException(status, what) {}
+		LuaMemoryError(int status, const std::string& what) :LuaException(status, what) {}
+	};
 	class LuaRuntimeError :public LuaException {
 	public:
 		LuaRuntimeError(int status, const char* what)throw() :LuaException(status, what) {}
 		LuaRuntimeError(int status, const std::string& what) :LuaException(status, what) {}
-	};
-	class LuaMemoryError :public LuaException {
-	public:
-		LuaMemoryError(int status, const char* what)throw() :LuaException(status, what) {}
 	};
 	class LuaRunningError :public LuaException {
 	public:
@@ -76,6 +76,12 @@ namespace kaguya
 	public:
 		LuaKaguyaError(const std::string& what) :LuaException(0, what) {}
 	};
-#endif
 
+	namespace except
+	{
+		void OtherError(lua_State *state, const std::string& message);
+		void typeMismatchError(lua_State *state, const std::string& message);
+		void memoryError(lua_State *state, const char* message);
+		bool checkErrorAndThrow(int status, lua_State *state);
+	}
 }

@@ -227,7 +227,11 @@ namespace kaguya
 #endif
 			~RegistoryRef()
 			{
-				unref();
+				try
+				{
+					unref();
+				}
+				catch (const std::exception&) {}//can't catch
 			}
 
 			//push to Lua stack
