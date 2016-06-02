@@ -161,6 +161,8 @@ KAGUYA_TEST_FUNCTION_DEF(typetest)(kaguya::State& state)
 	TEST_CHECK(!luanum.typeTest<std::string>());
 	TEST_CHECK(!luanum.typeTest<ob>());
 
+	TEST_CHECK(luanum.weakTypeTest<std::string>());
+	TEST_CHECK(!luanum.weakTypeTest<ob>());
 
 
 	bool typevalid;

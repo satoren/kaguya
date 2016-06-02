@@ -871,4 +871,34 @@ KAGUYA_TEST_FUNCTION_DEF(not_registered_object)(kaguya::State&)
 	TEST_CHECK(TestClass2_objectcount==0);
 }
 
+
+
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
+
+KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
+{
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("a", &Base::a)
+		.addFunction("fa", &Base::a)
+	);
+
+
+	state["test"] = Base();
+	TEST_CHECK(state("assert(test~=nil)"));
+
+	TEST_CHECK(state("test.fa(test)"));
+	TEST_CHECK(state("test:fa()"));
+
+	state.setErrorHandler(ignore_error_fun);
+	last_error_message = "";
+
+	state("test.fa()");//error
+	TEST_COMPARE_NE(last_error_message , "");
+}
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)
