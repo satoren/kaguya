@@ -117,7 +117,7 @@ namespace kaguya
 				}
 			}
 			lua_State *state()const { return state_; }
-			};
+		};
 
 		class RegistoryRef
 		{
@@ -231,7 +231,7 @@ namespace kaguya
 				{
 					unref();
 				}
-				catch (const std::exception&) {}//can't catch
+				catch (...) {}//can't throw at Destructor
 			}
 
 			//push to Lua stack
@@ -281,5 +281,5 @@ namespace kaguya
 			}
 		};
 
-		}
 	}
+}
