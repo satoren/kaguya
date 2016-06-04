@@ -220,7 +220,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			property_map_[name] = metatable_detail::makeDataHolder(function(mem));
@@ -232,7 +232,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
@@ -245,7 +245,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			
@@ -260,7 +260,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(d);
@@ -272,7 +272,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd."); 
+				throw KaguyaException("already registered."); 
 				return *this;
 			}
 
@@ -285,7 +285,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(std::forward<Data>(d));
@@ -301,7 +301,7 @@ namespace kaguya
 		{\
 			if (has_key(name))\
 			{\
-				throw KaguyaException("already registerd.");\
+				throw KaguyaException("already registered.");\
 				return *this;\
 			}\
 			member_map_[name] = metatable_detail::makeDataHolder(overload(KAGUYA_PP_ARG_REPEAT(N)));\
@@ -321,7 +321,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
@@ -333,7 +333,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
