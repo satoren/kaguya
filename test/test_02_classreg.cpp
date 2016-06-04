@@ -901,4 +901,48 @@ KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
 	TEST_COMPARE_NE(last_error_message , "");
 }
 
+
+
+KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.setConstructors<Base()>()
+			.addProperty("a", &Base::a)
+			.addFunction("a", &Base::a)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.setConstructors<Base()>()
+			.addProperty("a", &Base::a)
+		);
+		state["Base3"].setClass(kaguya::UserdataMetatable<Base>()
+			.setConstructors<Base()>()
+			.addProperty("a", &Base::a)
+		);
+	}
+	catch (const kaguya::LuaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("registered") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)

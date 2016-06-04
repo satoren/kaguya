@@ -90,6 +90,7 @@ KAGUYA_TEST_FUNCTION_DEF(load_with_other_env)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(no_standard_lib)(kaguya::State&)
 {
 	kaguya::State state(kaguya::NoLoadLib());
+	state.setErrorHandler(ignore_error_fun);
 	TEST_CHECK(!state("assert(true)"));//can not call assert
 }
 KAGUYA_TEST_FUNCTION_DEF(load_lib_constructor)(kaguya::State&)
@@ -237,11 +238,6 @@ struct CountLimitAllocator
 
 struct alloctest { int data; };
 
-void throwError(int status,const char* message)
-{
-	kaguya::ErrorHandler::throwDefaultError(status, message);
-}
-
 KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
 {
 	kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator);
@@ -251,7 +247,7 @@ KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
 		{	//can not use allocator e.g. using luajit
 			return;
 		}
-		state.setErrorHandler(throwError);
+		state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
 		state("a='abc'");
 		state["data"] = alloctest();
 		TEST_CHECK(allocator->allocated_count > 0);
@@ -263,7 +259,7 @@ KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
 
 KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
 {
-	for (size_t alloclimit = 32; alloclimit < 1024; ++alloclimit)
+	for (size_t alloclimit = 32; alloclimit < 512; ++alloclimit)
 	{
 
 		kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator(alloclimit));
@@ -274,7 +270,7 @@ KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
 		}
 		try
 		{
-			state.setErrorHandler(throwError);
+			state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
 
 			state["Foo"].setClass(kaguya::UserdataMetatable<Foo>().setConstructors<Foo()>());
 
@@ -298,5 +294,103 @@ KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
 	}
 }
 
+
+
+KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state("tes terror");//syntax_error
+	}
+	catch (const kaguya::LuaSyntaxError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("terror") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state("error('error message')");//error
+	}
+	catch (const kaguya::LuaRuntimeError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("error message") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+void throwUnknownError(int status, const char* message)
+{
+	kaguya::ErrorHandler::throwDefaultError(32323232, "unknown error");
+}
+KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(throwUnknownError);
+	try
+	{
+		state("error('')");//error
+	}
+	catch (const kaguya::LuaUnknownError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("unknown error") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+void throwErrorRunningError(int status, const char* message)
+{
+	throw kaguya::LuaErrorRunningError(LUA_ERRERR,"error handler error");
+}
+KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(throwErrorRunningError);
+	try
+	{
+		state("error('')");//error
+	}
+	catch (const kaguya::LuaErrorRunningError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("error handler error") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+#if LUA_VERSION_NUM >= 502
+KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
+{
+	try
+	{
+		kaguya::State state;
+		state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+		state("testtable ={}"
+			"meta ={__gc=function() error('gc error') end}"
+			"setmetatable(testtable,meta)"
+			"testtable={}"
+			);
+		state.gc().collect();
+	}
+	catch (const kaguya::LuaGCError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("gc error") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+#endif
 
 KAGUYA_TEST_GROUP_END(test_06_state)
