@@ -632,5 +632,10 @@ namespace kaguya
 		* @return lua_State*
 		*/
 		lua_State *state() { return state_; };
+
+		/**
+		* @brief check valid lua_State.
+		*/
+		bool isInvalid() const { return !state_; }
 	};
 }

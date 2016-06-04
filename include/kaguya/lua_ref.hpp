@@ -30,7 +30,7 @@ namespace kaguya
 	template<typename KEY>
 	class TableKeyReference;
 	class FunctionResults;
-	class mem_fun_binder;
+	class MemberFunctionBinder;
 
 	class LuaRef;
 	class LuaStackRef;
@@ -685,6 +685,22 @@ namespace kaguya
 #else
 namespace std
 {
+	template <> inline void swap(kaguya::LuaUserData& a, kaguya::LuaUserData& b)
+	{
+		a.swap(b);
+	}
+	template <> inline void swap(kaguya::LuaTable& a, kaguya::LuaTable& b)
+	{
+		a.swap(b);
+	}
+	template <> inline void swap(kaguya::LuaFunction& a, kaguya::LuaFunction& b)
+	{
+		a.swap(b);
+	}
+	template <> inline void swap(kaguya::LuaThread& a, kaguya::LuaThread& b)
+	{
+		a.swap(b);
+	}
 	template <> inline void swap(kaguya::LuaRef& a, kaguya::LuaRef& b)
 	{
 		a.swap(b);

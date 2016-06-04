@@ -29,11 +29,6 @@ namespace kaguya
 		class StackRef
 		{
 		protected:
-			static int to_absindex(lua_State *state, int idx) {
-				return (idx > 0 || (idx <= LUA_REGISTRYINDEX))
-					? idx
-					: lua_gettop(state) + 1 + (idx);
-			}
 			lua_State *state_;
 			int stack_index_;
 			mutable bool pop_;
@@ -69,10 +64,10 @@ namespace kaguya
 				return *this;
 			}
 #endif
-			StackRef(lua_State* s, int index) :state_(s), stack_index_(to_absindex(s, index)), pop_(true)
+			StackRef(lua_State* s, int index) :state_(s), stack_index_(compat::lua_absindex_compat(s, index)), pop_(true)
 			{
 			}
-			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(to_absindex(s, index)), pop_(pop)
+			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(compat::lua_absindex_compat(s, index)), pop_(pop)
 			{
 			}
 			~StackRef()

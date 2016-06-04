@@ -372,5 +372,4 @@ namespace kaguya
 		}
 		//@}
 	};
-
 }
