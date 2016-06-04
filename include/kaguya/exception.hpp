@@ -51,10 +51,10 @@ namespace kaguya
 		LuaRuntimeError(int status, const char* what)throw() :LuaException(status, what) {}
 		LuaRuntimeError(int status, const std::string& what) :LuaException(status, what) {}
 	};
-	class LuaRunningError :public LuaException {
+	class LuaErrorRunningError :public LuaException {
 	public:
-		LuaRunningError(int status, const char* what)throw() :LuaException(status, what) {}
-		LuaRunningError(int status, const std::string& what) :LuaException(status, what) {}
+		LuaErrorRunningError(int status, const char* what)throw() :LuaException(status, what) {}
+		LuaErrorRunningError(int status, const std::string& what) :LuaException(status, what) {}
 	};
 	class LuaGCError :public LuaException {
 	public:
@@ -70,11 +70,6 @@ namespace kaguya
 	class LuaSyntaxError :public LuaException {
 	public:
 		LuaSyntaxError(int status, const std::string& what) :LuaException(status, what) {}
-	};
-
-	class LuaKaguyaError :public LuaException {
-	public:
-		LuaKaguyaError(const std::string& what) :LuaException(0, what) {}
 	};
 
 	namespace except

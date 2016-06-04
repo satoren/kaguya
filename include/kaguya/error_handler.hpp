@@ -163,7 +163,7 @@ namespace kaguya
 			case LUA_ERRMEM:
 				throw LuaMemoryError(status, message ? std::string(message) : "lua memory allocation error");
 			case LUA_ERRERR:
-				throw LuaRunningError(status, message ? std::string(message) : "unknown error");
+				throw LuaErrorRunningError(status, message ? std::string(message) : "unknown error running error");
 #if LUA_VERSION_NUM >= 502
 			case LUA_ERRGCMM:
 				throw LuaGCError(status, message ? std::string(message) : "unknown gc error");
@@ -214,7 +214,7 @@ namespace kaguya
 				return;
 			}
 #if !KAGUYA_ERROR_NO_THROW
-			throw LuaKaguyaError(message);
+			throw KaguyaException(message);
 #endif
 		}
 		inline void typeMismatchError(lua_State *state, const std::string& message)
