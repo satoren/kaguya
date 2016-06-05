@@ -331,7 +331,8 @@ namespace kaguya
 
 		void typecheck()
 		{
-			if (type() != TYPE_USERDATA)
+			int t = type();
+			if (t != TYPE_USERDATA && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not user data");
 				Ref::RegistoryRef::unref();
@@ -394,7 +395,8 @@ namespace kaguya
 
 		void typecheck()
 		{
-			if (type() != TYPE_TABLE)
+			int t = type();
+			if (t != TYPE_TABLE && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not table");
 				Ref::RegistoryRef::unref();
@@ -456,7 +458,8 @@ namespace kaguya
 	{
 		void typecheck()
 		{
-			if (type() != TYPE_FUNCTION)
+			int t = type();
+			if (t != TYPE_FUNCTION && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not function");
 				RegistoryRef::unref();
@@ -647,7 +650,8 @@ namespace kaguya
 	{
 		void typecheck()
 		{
-			if (type() != TYPE_THREAD)
+			int t = type();
+			if (t != TYPE_THREAD && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not lua thread");
 				RegistoryRef::unref();
