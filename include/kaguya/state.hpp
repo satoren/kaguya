@@ -317,7 +317,12 @@ namespace kaguya
 		}
 		bool dostream(std::istream& stream, const char* chunkname = "", const LuaTable& env = LuaTable())
 		{
+			util::ScopedSavedStack save(state_);
 			LuaFunction f = loadstream(stream,chunkname);
+			if (!f)
+			{//load failed
+				return false;
+			}
 			if (!env.isNilref())
 			{
 				f.setFunctionEnv(env);
