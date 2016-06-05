@@ -11,6 +11,14 @@ void error_fun(int status, const char* message)
 {
 	error_count++;
 }
+
+
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
+
 KAGUYA_TEST_FUNCTION_DEF(set_error_function)(kaguya::State& state)
 {
 	error_count = 0;
@@ -55,9 +63,6 @@ KAGUYA_TEST_FUNCTION_DEF(other_state)(kaguya::State& unused)
 	lua_close(L);
 }
 
-void ignore_error_fun(int status, const char* message)
-{
-}
 KAGUYA_TEST_FUNCTION_DEF(load_string)(kaguya::State& state)
 {
 	kaguya::LuaRef luafun = state.loadstring("assert(11 == 11);return true");
@@ -367,6 +372,23 @@ KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
 	}
 	TEST_CHECK(false);
 }
+
+
+
+KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	{
+		last_error_message = "";
+		std::stringstream sstream;
+		sstream << "=true";
+		state.dostream(sstream, "streamchunk");
+		TEST_CHECK(last_error_message.find("streamchunk") != std::string::npos);
+	}
+}
+
+
 
 #if LUA_VERSION_NUM >= 502
 KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)

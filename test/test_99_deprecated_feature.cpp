@@ -1000,5 +1000,22 @@ KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
 	TEST_COMPARE_NE(last_error_message, "");
 }
 
+KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	state["Base"].setClass(kaguya::ClassMetatable<Base>()
+		.addConstructor()
+		.addMemberFunction("a", &Base::a)
+	);
+	state["test"] = Base();
+	TEST_CHECK(state("assert(test~=nil)"));
+	TEST_CHECK(state("test.a(test)"));
+
+	last_error_message = "";
+	state("test.a()");
+
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+}
 
 KAGUYA_TEST_GROUP_END(test_99_deprecated_feature)

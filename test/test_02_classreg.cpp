@@ -945,4 +945,31 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::Stat
 	TEST_CHECK(false);
 }
 
+
+
+KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+	
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
+		.addFunction("intdata", &ABC::intmember)
+		.addFunction("stringdata", &ABC::stringmember)
+	);
+
+	state["test"] = ABC();
+	TEST_CHECK(state("assert(test~=nil)"));
+	TEST_CHECK(state("test.setmember(test,'')"));
+
+	last_error_message = "";
+	state("test.setmember()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.intdata()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+}
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)
