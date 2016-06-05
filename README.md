@@ -362,7 +362,7 @@ apple   3
     l.dofile("./scripts/custom.lua"); // eg. accesing a file not existed will invoke HandleError above
   ```
 
-  ## run test
+## run test
   ```
   mkdir build
   cd build
