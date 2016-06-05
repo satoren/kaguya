@@ -20,7 +20,7 @@
 
 namespace kaguya
 {
-	class FunctionResults :public Ref::StackRef, public LuaVariantImpl<FunctionResults>
+	class FunctionResults :public Ref::StackRef, public detail::LuaVariantImpl<FunctionResults>
 	{
 		FunctionResults(lua_State* state, int return_status, int startIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(lua_gettop(state) + 1 - startIndex)
 		{
@@ -28,7 +28,7 @@ namespace kaguya
 		FunctionResults(lua_State* state, int return_status, int startIndex, int endIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(endIndex - startIndex)
 		{
 		}
-		friend class FunctionResultProxy;
+		friend class detail::FunctionResultProxy;
 	public:
 		FunctionResults() :Ref::StackRef(0, 0, true), state_(0), resultStatus_(0), resultCount_(0)
 		{
@@ -52,7 +52,7 @@ namespace kaguya
 		{
 		}
 
-		struct reference :public Ref::StackRef, public LuaVariantImpl<reference>
+		struct reference :public Ref::StackRef, public detail::LuaVariantImpl<reference>
 		{
 			reference(lua_State* s, int index) :Ref::StackRef(s, index, false)
 			{
@@ -175,50 +175,52 @@ namespace kaguya
 
 	};
 
-	template<typename RetType>
-	inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<RetType> tag)
+	namespace detail
 	{
-		return FunctionResults(state, return_status, retindex).get_result<RetType>();
-	}
-	inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<FunctionResults> tag)
-	{
-		return FunctionResults(state, return_status, retindex);
-	}
-	inline void FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<void> tag)
-	{
-		FunctionResults(state, return_status, retindex);
-	}
+		template<typename RetType>
+		inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<RetType> tag)
+		{
+			return FunctionResults(state, return_status, retindex).get_result<RetType>();
+		}
+		inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<FunctionResults> tag)
+		{
+			return FunctionResults(state, return_status, retindex);
+		}
+		inline void FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<void> tag)
+		{
+			FunctionResults(state, return_status, retindex);
+		}
 
 #if KAGUYA_USE_CPP11
-	template<typename Derived>template<class...Args>
-	FunctionResults LuaFunctionImpl<Derived>::operator()(Args&&... args)
-	{
-		return this->template call<FunctionResults>(std::forward<Args>(args)...);
-	}
-
-	template<typename Derived>template<class...Args>
-	FunctionResults LuaThreadImpl<Derived>::operator()(Args&&... args)
-	{
-		return this->template resume<FunctionResults>(std::forward<Args>(args)...);
-	}
-	template<typename Derived>template<class...Args>
-	FunctionResults LuaVariantImpl<Derived>::operator()(Args&&... args)
-	{
-		int t = type();
-		if (t == LUA_TTHREAD)
-		{
-			return this->template resume<FunctionResults>(std::forward<Args>(args)...);
-		}
-		else if (t == LUA_TFUNCTION)
+		template<typename Derived>template<class...Args>
+		FunctionResults LuaFunctionImpl<Derived>::operator()(Args&&... args)
 		{
 			return this->template call<FunctionResults>(std::forward<Args>(args)...);
 		}
-		else
+
+		template<typename Derived>template<class...Args>
+		FunctionResults LuaThreadImpl<Derived>::operator()(Args&&... args)
 		{
-			except::typeMismatchError(state_(), " is not function or thread");
-			return FunctionResults(state_());
+			return this->template resume<FunctionResults>(std::forward<Args>(args)...);
 		}
-	}
+		template<typename Derived>template<class...Args>
+		FunctionResults LuaVariantImpl<Derived>::operator()(Args&&... args)
+		{
+			int t = type();
+			if (t == LUA_TTHREAD)
+			{
+				return this->template resume<FunctionResults>(std::forward<Args>(args)...);
+			}
+			else if (t == LUA_TFUNCTION)
+			{
+				return this->template call<FunctionResults>(std::forward<Args>(args)...);
+			}
+			else
+			{
+				except::typeMismatchError(state_(), " is not function or thread");
+				return FunctionResults(state_());
+			}
+		}
 #else
 #define KAGUYA_TEMPLATE_PARAMETER(N)template<typename Derived>
 #define KAGUYA_FUNCTION_ARGS_DEF(N)
@@ -255,7 +257,7 @@ namespace kaguya
 			}\
 	}
 
-	KAGUYA_OP_FN_DEF(0)
+		KAGUYA_OP_FN_DEF(0)
 
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_FUNCTION_ARGS_DEF
@@ -267,7 +269,7 @@ namespace kaguya
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
 
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
+			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
@@ -279,8 +281,9 @@ namespace kaguya
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
 #endif
+	}
 
-		inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
+	inline std::ostream& operator<<(std::ostream& os, const FunctionResults& res)
 	{
 		for (FunctionResults::const_iterator it = res.begin(); it != res.end(); ++it)
 		{

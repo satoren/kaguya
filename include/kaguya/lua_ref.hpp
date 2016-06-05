@@ -97,7 +97,7 @@ namespace kaguya
 	/**
 	* Reference of Lua any type value.
 	*/
-	class LuaRef :public Ref::RegistoryRef, public LuaVariantImpl<LuaRef>
+	class LuaRef :public Ref::RegistoryRef, public detail::LuaVariantImpl<LuaRef>
 	{
 		friend class LuaUserData;
 		friend class LuaTable;
@@ -251,7 +251,7 @@ namespace kaguya
 
 
 
-	class LuaStackRef :public Ref::StackRef, public LuaVariantImpl<LuaStackRef>
+	class LuaStackRef :public Ref::StackRef, public detail::LuaVariantImpl<LuaStackRef>
 	{
 	public:
 		LuaStackRef() :Ref::StackRef(0,0,false)
@@ -325,8 +325,8 @@ namespace kaguya
 	
 	//! Reference to Lua userdata
 	class  LuaUserData :public Ref::RegistoryRef
-		, public LuaTableOrUserDataImpl<LuaUserData>
-		, public LuaBasicTypeFunctions<LuaUserData>
+		, public detail:: LuaTableOrUserDataImpl<LuaUserData>
+		, public detail::LuaBasicTypeFunctions<LuaUserData>
 	{
 
 		void typecheck()
@@ -388,9 +388,9 @@ namespace kaguya
 
 
 	class LuaTable :public Ref::RegistoryRef
-		, public LuaTableImpl<LuaTable>
-		, public LuaTableOrUserDataImpl<LuaTable>
-		, public LuaBasicTypeFunctions<LuaTable>
+		, public detail::LuaTableImpl<LuaTable>
+		, public detail::LuaTableOrUserDataImpl<LuaTable>
+		, public detail::LuaBasicTypeFunctions<LuaTable>
 	{
 
 		void typecheck()
@@ -453,8 +453,8 @@ namespace kaguya
 	* Reference of Lua function.
 	*/
 	class LuaFunction :public Ref::RegistoryRef
-		, public LuaFunctionImpl<LuaFunction>
-		, public LuaBasicTypeFunctions<LuaFunction>
+		, public detail::LuaFunctionImpl<LuaFunction>
+		, public detail::LuaBasicTypeFunctions<LuaFunction>
 	{
 		void typecheck()
 		{
@@ -645,8 +645,8 @@ namespace kaguya
 	* Reference of Lua thread(==coroutine).
 	*/
 	class LuaThread :public Ref::RegistoryRef
-		, public LuaThreadImpl<LuaThread>
-		, public LuaBasicTypeFunctions<LuaThread>
+		, public detail::LuaThreadImpl<LuaThread>
+		, public detail::LuaBasicTypeFunctions<LuaThread>
 	{
 		void typecheck()
 		{

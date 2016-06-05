@@ -49,7 +49,7 @@ namespace kaguya
 			return result;
 		}
 
-		struct reference :public Ref::StackRef, public LuaVariantImpl<reference>
+		struct reference :public Ref::StackRef, public detail::LuaVariantImpl<reference>
 		{
 			reference(lua_State* s, int index) :Ref::StackRef(s, index, false)
 			{

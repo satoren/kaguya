@@ -21,75 +21,77 @@ namespace kaguya
 {
 	class LuaTable;
 
-    class FunctionResults;
+	class FunctionResults;
 
-	class FunctionResultProxy
+	namespace detail
 	{
-	public:
-		template<typename RetType>
-		static RetType ReturnValue(lua_State* state,int restatus, int retindex, types::typetag<RetType> tag);
-		static FunctionResults ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<FunctionResults> tag);
-		static void ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<void> tag);
-	};
-
-
-
-	template<typename Derived>
-	class LuaFunctionImpl
-	{
-	private:
-		lua_State* state_()const
+		class FunctionResultProxy
 		{
-			return static_cast<const Derived*>(this)->state();
-		}
-		int pushStackIndex_(lua_State* state)const
+		public:
+			template<typename RetType>
+			static RetType ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<RetType> tag);
+			static FunctionResults ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<FunctionResults> tag);
+			static void ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<void> tag);
+		};
+
+
+
+		template<typename Derived>
+		class LuaFunctionImpl
 		{
-			return static_cast<const Derived*>(this)->pushStackIndex(state);
-		}
-		int push_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->push(state);
-		}
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+			int push_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->push(state);
+			}
 
-	public:
-		/**
-		* @name function type
-		*/
-		//@{
+		public:
+			/**
+			* @name function type
+			*/
+			//@{
 
-		/**
-		* set function environment table
-		*/
-		bool setFunctionEnv(const LuaTable& env);
-		/**
-		* set function environment to new table
-		*/
-		bool setFunctionEnv(NewTable env);
-		/**
-		* get function environment table
-		*/
-		LuaTable getFunctionEnv();
+			/**
+			* set function environment table
+			*/
+			bool setFunctionEnv(const LuaTable& env);
+			/**
+			* set function environment to new table
+			*/
+			bool setFunctionEnv(NewTable env);
+			/**
+			* get function environment table
+			*/
+			LuaTable getFunctionEnv();
 
-		//@}
+			//@}
 
 #if KAGUYA_USE_CPP11
-		template<class Result, class...Args> Result call(Args&&... args)
-		{
-			lua_State* state = state_();
-			if (!state)
+			template<class Result, class...Args> Result call(Args&&... args)
 			{
-				except::typeMismatchError(state, "is nil");
-				return Result();
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return Result();
+				}
+				int argstart = lua_gettop(state) + 1;
+				push_(state);
+				int argnum = util::push_args(state, std::forward<Args>(args)...);
+				int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);
+				except::checkErrorAndThrow(result, state);
+				return detail::FunctionResultProxy::ReturnValue(state, result, argstart, types::typetag<Result>());
 			}
-			int argstart = lua_gettop(state) + 1;
-			push_(state);
-			int argnum = util::push_args(state, std::forward<Args>(args)...);
-			int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);
-			except::checkErrorAndThrow(result, state);
-			return FunctionResultProxy::ReturnValue(state, result, argstart, types::typetag<Result>());
-		}
 
-		template<class...Args> FunctionResults operator()(Args&&... args);
+			template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 
 #define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)
@@ -110,12 +112,12 @@ namespace kaguya
 			int argnum = util::push_args(state KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_ARG_DEF));\
 			int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);\
 			except::checkErrorAndThrow(result, state);\
-			return FunctionResultProxy::ReturnValue(state,result, argstart, types::typetag<Result>());\
+			return detail::FunctionResultProxy::ReturnValue(state,result, argstart, types::typetag<Result>());\
 		}
 
 
-		KAGUYA_CALL_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
+			KAGUYA_CALL_DEF(0)
+				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_DEF)
 
 
 #undef KAGUYA_PUSH_DEF
@@ -131,7 +133,7 @@ namespace kaguya
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N));
 
-			KAGUYA_OP_FN_DEF(0)
+				KAGUYA_OP_FN_DEF(0)
 
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_FUNCTION_ARGS_DEF
@@ -143,7 +145,7 @@ namespace kaguya
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
 
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
+				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
@@ -154,58 +156,58 @@ namespace kaguya
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
-			//@}
+				//@}
 #endif
 
 
-	};
+		};
 
 
-	template<typename Derived>
-	class LuaThreadImpl
-	{
-	private:
-		lua_State* state_()const
+		template<typename Derived>
+		class LuaThreadImpl
 		{
-			return static_cast<const Derived*>(this)->state();
-		}
-		int pushStackIndex_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->pushStackIndex(state);
-		}
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
 
-	public:
+		public:
 #if KAGUYA_USE_CPP11
-		template<class Result, class...Args> Result resume(Args&&... args)
-		{
-			lua_State* state = state_();
-			if (!state)
+			template<class Result, class...Args> Result resume(Args&&... args)
 			{
-				except::typeMismatchError(state, "is nil");
-				return Result();
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return Result();
+				}
+				util::ScopedSavedStack save(state);
+				int corStackIndex = pushStackIndex_(state);
+				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
+				int argstart = lua_gettop(thread) + 1;
+				if (argstart > 1 && lua_status(thread) != LUA_YIELD)
+				{
+					argstart -= 1;
+				}
+				util::push_args(thread, std::forward<Args>(args)...);
+				int argnum = lua_gettop(thread) - argstart;
+				int result = compat::lua_resume_compat(thread, argnum);
+				except::checkErrorAndThrow(result, thread);
+				return detail::FunctionResultProxy::ReturnValue(thread, result, argstart, types::typetag<Result>());
 			}
-			util::ScopedSavedStack save(state);
-			int corStackIndex = pushStackIndex_(state);
-			lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
-			int argstart = lua_gettop(thread) + 1;
-			if (argstart > 1 && lua_status(thread) != LUA_YIELD)
-			{
-				argstart -= 1;
-			}
-			util::push_args(thread, std::forward<Args>(args)...);
-			int argnum = lua_gettop(thread) - argstart;
-			int result = compat::lua_resume_compat(thread, argnum);
-			except::checkErrorAndThrow(result, thread);
-			return FunctionResultProxy::ReturnValue(thread, result, argstart, types::typetag<Result>());
-		}
-		template<class...Args> FunctionResults operator()(Args&&... args);
+			template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 
 
 #define KAGUYA_PP_TEMPLATE(N) ,KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
 #define KAGUYA_PUSH_ARG_DEF(N) ,KAGUYA_PP_CAT(a,N)
-		
+
 #define KAGUYA_RESUME_DEF(N) \
 		template<class Result  KAGUYA_PP_REPEAT(N,KAGUYA_PP_TEMPLATE)>\
 		Result resume(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
@@ -228,11 +230,11 @@ namespace kaguya
 			int argnum = lua_gettop(thread) - argstart;\
 			int result = compat::lua_resume_compat(thread, argnum);\
 			except::checkErrorAndThrow(result, thread);\
-			return FunctionResultProxy::ReturnValue(thread,result, argstart, types::typetag<Result>());\
+			return detail::FunctionResultProxy::ReturnValue(thread,result, argstart, types::typetag<Result>());\
 		}
 
-		KAGUYA_RESUME_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
+			KAGUYA_RESUME_DEF(0)
+				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_RESUME_DEF)
 
 #undef KAGUYA_PUSH_DEF
 #undef KAGUYA_PUSH_ARG_DEF
@@ -247,7 +249,7 @@ namespace kaguya
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N));
 
-			KAGUYA_OP_FN_DEF(0)
+				KAGUYA_OP_FN_DEF(0)
 
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_FUNCTION_ARGS_DEF
@@ -259,7 +261,7 @@ namespace kaguya
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
 
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
+				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
@@ -270,7 +272,7 @@ namespace kaguya
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
-			//@}
+				//@}
 #endif
 
 
@@ -278,98 +280,99 @@ namespace kaguya
 		/**
 		* @return state status
 		*/
-		int threadStatus()const
-		{
-			lua_State* state = state_();
-			if (!state)
+				int threadStatus()const
 			{
-				except::typeMismatchError(state, "is nil");
-				return LUA_ERRRUN;
-			}
-			util::ScopedSavedStack save(state);
-			int corStackIndex = pushStackIndex_(state);
-			lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
-
-			if (!thread)
-			{
-				except::typeMismatchError(state, "is not thread");
-				return LUA_ERRRUN;
-			}
-			return lua_status(thread);
-		}
-
-		//! deprecate
-		int thread_status()const
-		{
-			return threadStatus();
-		}
-
-		/**
-		* status of coroutine
-		*/
-		enum coroutine_status
-		{
-			COSTAT_RUNNING,//!< coroutine is running
-			COSTAT_SUSPENDED,//!< coroutine is suspended
-			COSTAT_NORMAL,//!<
-			COSTAT_DEAD//!< coroutine is dead
-		};
-
-		/**
-		* @return coroutine status
-		*/
-		coroutine_status costatus(lua_State *l = 0)const
-		{
-			lua_State* state = state_();
-			if (!state)
-			{
-				return COSTAT_DEAD;
-			}
-			util::ScopedSavedStack save(state);
-			int corStackIndex = pushStackIndex_(state);
-			lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
-
-			if (!thread)
-			{
-				except::typeMismatchError(state, "is not thread");
-				return COSTAT_DEAD;
-			}
-			else if (thread == l)
-			{
-				return COSTAT_RUNNING;
-			}
-			else
-			{
-				switch (lua_status(thread))
+				lua_State* state = state_();
+				if (!state)
 				{
-				case LUA_YIELD:
-					return COSTAT_SUSPENDED;
-				case 0://LUA_OK
+					except::typeMismatchError(state, "is nil");
+					return LUA_ERRRUN;
+				}
+				util::ScopedSavedStack save(state);
+				int corStackIndex = pushStackIndex_(state);
+				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
+
+				if (!thread)
 				{
-					if (lua_gettop(thread) == 0)
+					except::typeMismatchError(state, "is not thread");
+					return LUA_ERRRUN;
+				}
+				return lua_status(thread);
+			}
+
+			//! deprecate
+			int thread_status()const
+			{
+				return threadStatus();
+			}
+
+			/**
+			* status of coroutine
+			*/
+			enum coroutine_status
+			{
+				COSTAT_RUNNING,//!< coroutine is running
+				COSTAT_SUSPENDED,//!< coroutine is suspended
+				COSTAT_NORMAL,//!<
+				COSTAT_DEAD//!< coroutine is dead
+			};
+
+			/**
+			* @return coroutine status
+			*/
+			coroutine_status costatus(lua_State *l = 0)const
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					return COSTAT_DEAD;
+				}
+				util::ScopedSavedStack save(state);
+				int corStackIndex = pushStackIndex_(state);
+				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
+
+				if (!thread)
+				{
+					except::typeMismatchError(state, "is not thread");
+					return COSTAT_DEAD;
+				}
+				else if (thread == l)
+				{
+					return COSTAT_RUNNING;
+				}
+				else
+				{
+					switch (lua_status(thread))
 					{
-						return COSTAT_DEAD;
-					}
-					else
-					{
+					case LUA_YIELD:
 						return COSTAT_SUSPENDED;
+					case 0://LUA_OK
+					{
+						if (lua_gettop(thread) == 0)
+						{
+							return COSTAT_DEAD;
+						}
+						else
+						{
+							return COSTAT_SUSPENDED;
+						}
+					}
+					default:
+						break;
 					}
 				}
-				default:
-					break;
-				}
+				return COSTAT_DEAD;
+
 			}
-			return COSTAT_DEAD;
 
-		}
-
-		/**
-		* @return if coroutine status is dead, return true. Otherwise return false
-		*/
-		bool isThreadDead()const
-		{
-			return costatus() == COSTAT_DEAD;
-		}
-		//@}
-	};
+			/**
+			* @return if coroutine status is dead, return true. Otherwise return false
+			*/
+			bool isThreadDead()const
+			{
+				return costatus() == COSTAT_DEAD;
+			}
+			//@}
+		};
+	}
 }
