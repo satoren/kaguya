@@ -613,16 +613,17 @@ namespace kaguya
 		template<typename T>bool newmetatable(lua_State* l)
 		{
 			if (get_metatable<T>(l)) //already register
+			{
 				return false;  //
+			}
 			lua_pop(l, 1);
 			compat::lua_rawgetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
 			int metaregindex = compat::lua_absindex_compat(l, -1);
 
-
 			lua_createtable(l, 0, 2);
 			lua_pushstring(l, metatableName<T>());
-			lua_setfield(l, -2, "__name");  // metatable.__name = name
-			lua_pushstring(l, metatableName<T>());
+			lua_pushvalue(l,-1);
+			lua_setfield(l, -3, "__name");  // metatable.__name = name
 			compat::lua_rawsetp_compat(l, -2, metatable_name_key());
 			lua_pushvalue(l, -1);
 			compat::lua_rawsetp_compat(l, metaregindex, &metatableType<T>());
