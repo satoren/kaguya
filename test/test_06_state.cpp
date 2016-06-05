@@ -90,6 +90,7 @@ KAGUYA_TEST_FUNCTION_DEF(load_with_other_env)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(no_standard_lib)(kaguya::State&)
 {
 	kaguya::State state(kaguya::NoLoadLib());
+	state.setErrorHandler(ignore_error_fun);
 	TEST_CHECK(!state("assert(true)"));//can not call assert
 }
 KAGUYA_TEST_FUNCTION_DEF(load_lib_constructor)(kaguya::State&)
@@ -191,5 +192,205 @@ KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 	TEST_CHECK(state.dostream(sstream,"streamchunk"));
 	TEST_EQUAL(state["value"], true);
 }
+
+
+
+struct CountLimitAllocator
+{
+	typedef void* pointer;
+	typedef size_t size_type;
+	size_type allocated_count;
+	size_type allocate_limit;
+	size_type allocate_block_max_size;
+	CountLimitAllocator() :allocated_count(0), allocate_limit(0), allocate_block_max_size(0) {}
+	CountLimitAllocator(size_type limit) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(0){}
+	CountLimitAllocator(size_type limit, size_type blockmax) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(blockmax){}
+	pointer allocate(size_type n)
+	{
+		if (allocate_limit != 0 && allocate_limit < allocated_count)
+		{
+			return 0;
+		}
+		if (allocate_block_max_size != 0 && allocate_block_max_size < n)
+		{
+			return 0;
+		}
+		allocated_count++;
+		return std::malloc(n);
+	}
+	pointer reallocate(pointer p, size_type n)
+	{
+		if (allocate_block_max_size != 0 && allocate_block_max_size < n)
+		{
+			return 0;
+		}
+		return std::realloc(p, n);
+	}
+	void deallocate(pointer p, size_type n)
+	{
+		if (p)
+		{
+			allocated_count--;
+		}
+		std::free(p);
+	}
+};
+
+struct alloctest { int data; };
+
+KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
+{
+	kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator);
+	{
+		kaguya::State state(allocator);
+		if (!state.state())
+		{	//can not use allocator e.g. using luajit
+			return;
+		}
+		state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+		state("a='abc'");
+		state["data"] = alloctest();
+		TEST_CHECK(allocator->allocated_count > 0);
+	}
+
+	TEST_CHECK(allocator->allocated_count == 0);
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
+{
+	for (size_t alloclimit = 32; alloclimit < 512; ++alloclimit)
+	{
+
+		kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator(alloclimit));
+		kaguya::State state(allocator);
+		if (!state.state())
+		{	//can not use allocator e.g. using luajit
+			continue;
+		}
+		try
+		{
+			state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+			state["Foo"].setClass(kaguya::UserdataMetatable<Foo>().setConstructors<Foo()>());
+
+			state["data"] = kaguya::NewTable();
+			Foo foodata;
+			for (size_t i = 0; i < alloclimit; ++i)
+			{
+				state("data[" +to_string(i) + "] ='abc'");
+				state["data"][i+ alloclimit*2] = alloctest();
+				state["data"][i+ alloclimit*3] = 1;
+				state["data"][i + alloclimit * 4] = "str";
+				state["data"][i + alloclimit * 5] = foodata;//copy
+				state["data"][i + alloclimit * 6] = &foodata;//ptr
+			}
+		}
+		catch (const kaguya::LuaMemoryError&)
+		{
+			continue;
+		}
+		TEST_CHECK(false);
+	}
+}
+
+
+
+KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state("tes terror");//syntax_error
+	}
+	catch (const kaguya::LuaSyntaxError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("terror") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state("error('error message')");//error
+	}
+	catch (const kaguya::LuaRuntimeError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("error message") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+void throwUnknownError(int status, const char* message)
+{
+	kaguya::ErrorHandler::throwDefaultError(32323232, "unknown error");
+}
+KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(throwUnknownError);
+	try
+	{
+		state("error('')");//error
+	}
+	catch (const kaguya::LuaUnknownError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("unknown error") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+void throwErrorRunningError(int status, const char* message)
+{
+	throw kaguya::LuaErrorRunningError(LUA_ERRERR,"error handler error");
+}
+KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(throwErrorRunningError);
+	try
+	{
+		state("error('')");//error
+	}
+	catch (const kaguya::LuaErrorRunningError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("error handler error") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+#if LUA_VERSION_NUM >= 502
+KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
+{
+	try
+	{
+		kaguya::State state;
+		state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+		state("testtable ={}"
+			"meta ={__gc=function() error('gc error') end}"
+			"setmetatable(testtable,meta)"
+			"testtable={}"
+			);
+		state.gc().collect();
+	}
+	catch (const kaguya::LuaGCError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("gc error") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+#endif
 
 KAGUYA_TEST_GROUP_END(test_06_state)

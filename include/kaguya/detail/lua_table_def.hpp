@@ -24,7 +24,7 @@ namespace kaguya
 	class LuaTable;
 	template<typename KEY>
 	class TableKeyReference;
-	class mem_fun_binder;
+	class MemberFunctionBinder;
 
 	template<typename Derived>
 	class LuaTableOrUserDataImpl
@@ -91,7 +91,7 @@ namespace kaguya
 		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
 		* @param function_name function_name in table
 		*/
-		mem_fun_binder operator->*(const char* function_name);
+		MemberFunctionBinder operator->*(const char* function_name);
 
 		/**
 		* @brief value = table[key];

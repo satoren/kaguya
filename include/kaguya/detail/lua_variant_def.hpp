@@ -15,7 +15,7 @@ namespace kaguya
 	class LuaTable;
 	template<typename KEY>
 	class TableKeyReference;
-	class mem_fun_binder;
+	class MemberFunctionBinder;
 
 	template<typename Derived>
 	class LuaVariantImpl :public LuaTableImpl<Derived>,

@@ -380,10 +380,10 @@ namespace kaguya
 		return LuaTable(state, StackTop());
 	}
 	template<typename T>
-	mem_fun_binder LuaTableOrUserDataImpl<T>::operator->*(const char* function_name)
+	MemberFunctionBinder LuaTableOrUserDataImpl<T>::operator->*(const char* function_name)
 	{
 		push_(state_());
-		return mem_fun_binder(LuaRef(state_(), StackTop()), function_name);
+		return MemberFunctionBinder(LuaRef(state_(), StackTop()), function_name);
 	}
 
 

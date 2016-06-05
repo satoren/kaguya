@@ -23,19 +23,17 @@ namespace kaguya
 		struct typetag {};
 	}
 
-#define KAGUYA_METATABLE_PREFIX "kaguya_object_type_"
 	inline void* metatable_name_key() { static int key; return &key; }
+	inline void* metatable_type_table_key() { static int key; return &key; }
 
 	template<typename T>
-	inline const std::string& metatableName()
+	inline const char* metatableName()
 	{
 		typedef typename traits::remove_cv<T>::type noncv_type;
 		typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
 		typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
 
-		static const std::string v = std::string(KAGUYA_METATABLE_PREFIX) + typeid(noncvpointerref_type*).name();
-
-		return v;
+		return typeid(noncvpointerref_type*).name();
 	}
 	template<typename T>
 	const std::type_info& metatableType()
@@ -45,7 +43,6 @@ namespace kaguya
 		typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
 		return typeid(noncvpointerref_type*);
 	}
-
 
 	struct ObjectWrapperBase
 	{
@@ -57,9 +54,7 @@ namespace kaguya
 		virtual void* get() = 0;
 
 		virtual const std::type_info& type() = 0;
-
-//		virtual void addRef(lua_State* state, int index) {};
-
+		
 		ObjectWrapperBase() {}
 		virtual ~ObjectWrapperBase() {}
 	private:
@@ -223,19 +218,9 @@ namespace kaguya
 
 		~ObjectPointerWrapper()
 		{
-//			for (std::vector<std::pair<lua_State*, int> >::iterator i = retain_ref_.begin(); i != retain_ref_.end(); ++i)
-//			{
-//				luaL_unref(i->first, LUA_REGISTRYINDEX, i->second);
-//			}
 		}
-
-//		virtual void addRef(lua_State* state, int index) {
-//			lua_pushvalue(state, index);
-//			retain_ref_.push_back(std::pair<lua_State*, int>(state, luaL_ref(state, LUA_REGISTRYINDEX)));
-//		};
 	private:
 		T* object_;
-//		std::vector<std::pair<lua_State*, int> > retain_ref_;
 	};
 
 	//for internal use
@@ -364,9 +349,7 @@ namespace kaguya
 			else
 			{
 				void* ptr = lua_newuserdata(state, sizeof(PointerConverter));//dummy data for gc call
-				if (!ptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 				PointerConverter* converter = new(ptr) PointerConverter();
-				if (!converter) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
 
 				lua_createtable(state, 0, 0);
 				lua_pushcclosure(state, &deleter, 0);
@@ -385,15 +368,8 @@ namespace kaguya
 		{
 			std::map<convert_map_key, std::vector<convert_function_type> > add_map;
 			for (std::map<convert_map_key, std::vector<convert_function_type> >::iterator it = function_map_.begin();
-			it != function_map_.end(); ++it)
+				it != function_map_.end(); ++it)
 			{
-//				if (it->first.first == from_type.name())
-//				{
-//					std::vector<convert_function_type> newlist = it->second;
-//					newlist.push_back(f);
-//					add_map[convert_map_key(to_type.name(), it->first.second)] = newlist;
-//				}
-
 				if (it->first.second == to_type.name())
 				{
 					std::vector<convert_function_type> newlist;
@@ -411,15 +387,8 @@ namespace kaguya
 		{
 			std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> > add_map;
 			for (std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> >::iterator it = shared_ptr_function_map_.begin();
-			it != shared_ptr_function_map_.end(); ++it)
+				it != shared_ptr_function_map_.end(); ++it)
 			{
-//				if (it->first.first == from_type.name())
-//				{
-//					std::vector<shared_ptr_convert_function_type> newlist = it->second;
-//					newlist.push_back(f);
-//					add_map[convert_map_key(to_type.name(), it->first.second)] = newlist;
-//				}
-
 				if (it->first.second == to_type.name())
 				{
 					std::vector<shared_ptr_convert_function_type> newlist;
@@ -495,7 +464,7 @@ namespace kaguya
 	}
 
 	template<typename RequireType>
-	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index,bool convert = true)
+	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, bool convert = true)
 	{
 		if (detail::object_wrapper_type_check(l, index))
 		{
@@ -509,7 +478,7 @@ namespace kaguya
 			{
 				return ptr;
 			}
-			else if(convert)
+			else if (convert)
 			{
 				PointerConverter& pcvt = PointerConverter::get(l);
 				return pcvt.get_pointer(ptr, types::typetag<RequireType>()) ? ptr : 0;
@@ -613,7 +582,6 @@ namespace kaguya
 		return standard::shared_ptr<T>();
 	}
 
-
 	namespace class_userdata
 	{
 		template<typename T>inline void destructor(T* pointer)
@@ -625,31 +593,42 @@ namespace kaguya
 		}
 		template<typename T>bool get_metatable(lua_State* l)
 		{
-			luaL_getmetatable(l, metatableName<T>().c_str());
-			return !lua_isnil(l, -1);
+			compat::lua_rawgetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
+			if (lua_isnil(l, -1))
+			{
+				lua_newtable(l);
+				compat::lua_rawsetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());
+				return false;
+			}
+			int type = compat::lua_rawgetp_compat(l, -1, &metatableType<T>());
+			lua_remove(l, -2);//remove metatable registry table
+			return type != LUA_TNIL;
 		}
 		template<typename T>bool available_metatable(lua_State* l)
 		{
 			util::ScopedSavedStack save(l);
 			return get_metatable<T>(l);
 		}
-		inline bool newmetatable(lua_State* l, const char* metatablename)
-		{
-			if (luaL_newmetatable(l, metatablename))
-			{
-#if LUA_VERSION_NUM < 503
-				lua_pushstring(l, metatablename);
-				lua_setfield(l, -2, "__name");
-#endif
-				lua_pushstring(l, metatablename);
-				compat::lua_rawsetp_compat(l, -2, metatable_name_key());
-				return true;
-			}
-			return false;
-		}
+
 		template<typename T>bool newmetatable(lua_State* l)
 		{
-			return newmetatable(l, metatableName<T>().c_str());
+			if (get_metatable<T>(l)) //already register
+				return false;  //
+			lua_pop(l, 1);
+			compat::lua_rawgetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
+			int metaregindex = compat::lua_absindex_compat(l, -1);
+
+
+			lua_createtable(l, 0, 2);
+			lua_pushstring(l, metatableName<T>());
+			lua_setfield(l, -2, "__name");  // metatable.__name = name
+			lua_pushstring(l, metatableName<T>());
+			compat::lua_rawsetp_compat(l, -2, metatable_name_key());
+			lua_pushvalue(l, -1);
+			compat::lua_rawsetp_compat(l, metaregindex, &metatableType<T>());
+			lua_remove(l, metaregindex);//remove metatable registry table
+
+			return true;
 		}
 
 
@@ -679,7 +658,21 @@ namespace kaguya
 
 		template<typename T>T* test_userdata(lua_State* l, int index)
 		{
-			return static_cast<T*>(luaL_testudata(l, index, metatableName<T>().c_str()));
+			void* ptr = lua_touserdata(l, index);
+			if (lua_getmetatable(l, index))
+			{
+				if (!get_metatable<T>(l))
+				{
+					if (!lua_rawequal(l, -1, -2))
+					{
+						ptr = 0;
+					}
+					lua_pop(l, 2);//pop metatables
+					return  static_cast<T*>(ptr);
+				}
+			}
+			lua_pop(l, 1);
+			return 0;
 		}
 
 	}
