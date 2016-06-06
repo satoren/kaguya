@@ -75,13 +75,13 @@ namespace kaguya
 			template<typename U>iterator_base(const iterator_base<U>& other) : state(other.state), stack_index(other.stack_index)
 			{
 			}
-			reference operator*()const
+			T operator*()const
 			{
 				return reference(state, stack_index);
 			}
 			T operator->()const
 			{
-				return T(state, stack_index);
+				return reference(state, stack_index);
 			}
 			const iterator_base& operator++()
 			{
