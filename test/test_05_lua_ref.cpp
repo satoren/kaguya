@@ -34,6 +34,8 @@ KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 
 	abctable.setField("a", 22);
 	TEST_CHECK(abctable["a"] == 22);
+
+	kaguya::LuaStackRef a;
 }
 KAGUYA_TEST_FUNCTION_DEF(newtable)(kaguya::State& state)
 {

@@ -70,6 +70,9 @@ namespace kaguya
 			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(compat::lua_absindex_compat(s, index)), pop_(pop)
 			{
 			}
+			StackRef() :state_(0), stack_index_(0), pop_(false)
+			{
+			}
 			~StackRef()
 			{
 				if (state_ && pop_)

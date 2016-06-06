@@ -254,7 +254,7 @@ namespace kaguya
 	class LuaStackRef :public Ref::StackRef, public detail::LuaVariantImpl<LuaStackRef>
 	{
 	public:
-		LuaStackRef() :Ref::StackRef(0,0,false)
+		LuaStackRef() :Ref::StackRef()
 		{
 		}
 		LuaStackRef(lua_State* s, int index) :Ref::StackRef(s, index, false)
@@ -546,7 +546,7 @@ namespace kaguya
 				const char* bomseq = "\xEF\xBB\xBF";
 				while (stream_.good())
 				{
-					int c = stream_.get();
+					char c = stream_.get();
 					preload.push_back(c);
 					if (c != *bomseq)
 					{

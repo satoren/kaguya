@@ -191,11 +191,21 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 
 KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 {
-	std::stringstream sstream;
-	sstream << "value=true";
+	{
+		std::stringstream sstream;
+		sstream << "value=true";
+		TEST_CHECK(state.dostream(sstream, "streamchunk"));
+		TEST_EQUAL(state["value"], true);
+	}
 
-	TEST_CHECK(state.dostream(sstream,"streamchunk"));
-	TEST_EQUAL(state["value"], true);
+	{
+		std::stringstream sstream;
+		sstream << "\xEF\xBB\xBFvalue=false";
+		TEST_CHECK(state.dostream(sstream, "streamchunk"));
+		TEST_EQUAL(state["value"], false);
+	}
+
+	
 }
 
 
