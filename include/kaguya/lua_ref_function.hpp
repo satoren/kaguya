@@ -30,7 +30,7 @@ namespace kaguya
 		}
 		friend class detail::FunctionResultProxy;
 	public:
-		FunctionResults() :Ref::StackRef(0, 0, true), state_(0), resultStatus_(0), resultCount_(0)
+		FunctionResults() :Ref::StackRef(), state_(0), resultStatus_(0), resultCount_(0)
 		{
 		}
 		FunctionResults(lua_State* state) :Ref::StackRef(state, 0, true), state_(state), resultStatus_(0), resultCount_(0)
@@ -58,53 +58,62 @@ namespace kaguya
 			{
 			}
 
+			reference* operator->()
+			{
+				return this;
+			}
 			const reference* operator->()const
 			{
 				return this;
 			}
 		};
-		struct iterator
+		template<typename T>struct iterator_base
 		{
-			iterator(lua_State* s, int i) : state(s), stack_index(i)
+			iterator_base(lua_State* s, int i) : state(s), stack_index(i)
+			{
+			}
+			template<typename U>iterator_base(const iterator_base<U>& other) : state(other.state), stack_index(other.stack_index)
 			{
 			}
 			reference operator*()const
 			{
 				return reference(state, stack_index);
 			}
-			reference operator->()const
+			T operator->()const
 			{
-				return reference(state, stack_index);
+				return T(state, stack_index);
 			}
-			const iterator& operator++()
+			const iterator_base& operator++()
 			{
 				stack_index++;
 				return *this;
 			}
-			iterator operator++(int)
+			iterator_base operator++(int)
 			{
-				return iterator(state, stack_index++);
+				return iterator_base(state, stack_index++);
 			}
 
-			iterator operator+=(int n)
+			iterator_base operator+=(int n)
 			{
 				stack_index += n;
-				return iterator(state, stack_index);
+				return iterator_base(state, stack_index);
 			}
-			bool operator==(const iterator& other)const
+			bool operator==(const iterator_base& other)const
 			{
 				return state == other.state && stack_index == other.stack_index;
 			}
-			bool operator!=(const iterator& other)const
+			bool operator!=(const iterator_base& other)const
 			{
 				return !(*this == other);
 			}
 			int index() const { return stack_index; }
 		private:
+			template<typename U> friend struct iterator_base;
 			lua_State* state;
 			int stack_index;
 		};
-		typedef iterator const_iterator;
+		typedef iterator_base<reference> iterator;
+		typedef iterator_base<const reference> const_iterator;
 		typedef reference const_reference;
 
 		iterator begin()
