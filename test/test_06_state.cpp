@@ -198,13 +198,21 @@ KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 		TEST_EQUAL(state["value"], true);
 	}
 
-	{
+	{//BOM
 		std::stringstream sstream;
-		sstream << "\xEF\xBB\xBFvalue=false";
+		sstream << "\xEF\xBB\xBFvalue2=true";
 		TEST_CHECK(state.dostream(sstream, "streamchunk"));
-		TEST_EQUAL(state["value"], false);
+		TEST_EQUAL(state["value2"], true);
 	}
 
+
+	{//comment
+		std::stringstream sstream;
+		sstream << "#/bin/lua\n"
+			       "value3=true";
+		TEST_CHECK(state.dostream(sstream, "streamchunk"));
+		TEST_EQUAL(state["value3"], true);
+	}
 	
 }
 
