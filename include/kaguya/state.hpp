@@ -21,6 +21,7 @@ namespace kaguya
 	typedef std::pair<std::string, lua_CFunction> LoadLib;
 	typedef std::vector<LoadLib> LoadLibs;
 	inline LoadLibs NoLoadLib() { return LoadLibs(); }
+	struct AllLoadLibs {};
 
 	template<typename Allocator>
 	void * AllocatorFunction(void *ud,
@@ -95,11 +96,25 @@ namespace kaguya
 		{
 			std::cerr << message << std::endl;
 		}
-		void init()
+
+		template<typename Libs>void init(const Libs& lib)
 		{
-			if (!ErrorHandler::getHandler(state_))
+			if (state_)
 			{
-				setErrorHandler(&stderror_out);
+				lua_atpanic(state_, &initializing_panic);
+				try
+				{
+					if (!ErrorHandler::getHandler(state_))
+					{
+						setErrorHandler(&stderror_out);
+					}
+					openlibs(lib);
+					lua_atpanic(state_, &default_panic);
+				}
+				catch (const LuaException&)
+				{
+					lua_close(state_); state_ = 0;
+				}
 			}
 		}
 
@@ -113,20 +128,7 @@ namespace kaguya
 		*/
 		State() :allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
-			if (state_)
-			{
-				lua_atpanic(state_, &initializing_panic);
-				try
-				{
-					init();
-					openlibs();
-					lua_atpanic(state_, &default_panic);
-				}
-				catch (const LuaException& )
-				{
-					lua_close(state_); state_ = 0;
-				}
-			}
+			init(AllLoadLibs());
 		}
 
 		/**
@@ -137,20 +139,7 @@ namespace kaguya
 		template<typename Allocator>
 		State(standard::shared_ptr<Allocator> allocator) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
-			if (state_)
-			{
-				lua_atpanic(state_, &initializing_panic);
-				try
-				{
-					init();
-					openlibs();
-					lua_atpanic(state_, &default_panic);
-				}
-				catch (const LuaException&)
-				{
-					lua_close(state_); state_ = 0;
-				}
-			}
+			init(AllLoadLibs());
 		}
 
 		/**
@@ -162,20 +151,7 @@ namespace kaguya
 		*/
 		State(const LoadLibs& libs) : allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
-			if (state_)
-			{
-				lua_atpanic(state_, &initializing_panic);
-				try
-				{
-					init();
-					openlibs(libs);
-					lua_atpanic(state_, &default_panic);
-				}
-				catch (const LuaException& )
-				{
-					lua_close(state_); state_ = 0;
-				}
-			}
+			init(libs);
 		}
 		/**
 		* @name constructor
@@ -185,20 +161,7 @@ namespace kaguya
 		template<typename Allocator>
 		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
-			if (state_)
-			{
-				lua_atpanic(state_, &initializing_panic);
-				try
-				{
-					init();
-					openlibs(libs);
-					lua_atpanic(state_, &default_panic);
-				}
-				catch (const LuaException&)
-				{
-					lua_close(state_); state_ = 0;
-				}
-			}
+			init(libs);
 		}
 
 
@@ -211,7 +174,10 @@ namespace kaguya
 		{
 			if (state_)
 			{
-				init();
+				if (!ErrorHandler::getHandler(state_))
+				{
+					setErrorHandler(&stderror_out);
+				}
 			}
 		}
 		~State()
@@ -238,7 +204,7 @@ namespace kaguya
 		* @name openlibs
 		* @brief load all lua standard library
 		*/
-		void openlibs()
+		void openlibs(AllLoadLibs = AllLoadLibs())
 		{
 			if (!state_) { return; }
 			luaL_openlibs(state_);
