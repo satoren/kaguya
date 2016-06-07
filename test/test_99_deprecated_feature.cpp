@@ -362,6 +362,7 @@ struct Base
 {
 	Base() :a(0) {};
 	int a;
+	void f(int,int,int){}
 };
 struct Derived :Base
 {
@@ -1007,6 +1008,7 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	state["Base"].setClass(kaguya::ClassMetatable<Base>()
 		.addConstructor()
 		.addMemberFunction("a", &Base::a)
+		.addMemberFunction("f", &Base::f)
 	);
 	state["test"] = Base();
 	TEST_CHECK(state("assert(test~=nil)"));
@@ -1014,6 +1016,12 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 
 	last_error_message = "";
 	state("test.a()");
+
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+
+	last_error_message = "";
+	state("test.f(1,2,3,4,5,6,7,8,test)");
 
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
 }

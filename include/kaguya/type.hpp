@@ -197,7 +197,7 @@ namespace kaguya
 		}
 		static bool get(lua_State* l, int index)
 		{
-			return lua_toboolean(l, index) != 0;
+			return l && lua_toboolean(l, index) != 0;
 		}
 		static int push(lua_State* l, bool s)
 		{
@@ -255,7 +255,7 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (!lua_type_traits<T>::checkType(l,index)) {
+			if (!lua_type_traits<T>::checkType(l, index)) {
 				return get_type();
 			}
 			get_type opt = lua_type_traits<T>::get(l, index);
@@ -716,6 +716,7 @@ namespace kaguya
 			*/
 			size_t size() const {
 				lua_State* state = state_();
+				if (!state) { return 0; }
 				util::ScopedSavedStack save(state);
 				int index = pushStackIndex_(state);
 #if LUA_VERSION_NUM >= 502
@@ -754,7 +755,7 @@ namespace kaguya
 			{
 				lua_State* state = state_();
 				util::ScopedSavedStack save(state);
-				return lua_type_traits<T>::get(state, pushStackIndex_(state));
+				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
 			}
 
 			//deprecated. use get<kaguya::optional<T> >() instead;
@@ -894,6 +895,9 @@ namespace kaguya
 			optional<typename lua_type_traits<T>::get_type> checkGet_(bool allow_convertible = true)const
 			{
 				lua_State* state = state_();
+				if (!state) {
+					return optional<typename lua_type_traits<T>::get_type>();
+				}
 				util::ScopedSavedStack save(state);
 				int stackindex = pushStackIndex_(state);
 				bool was_valid = false;

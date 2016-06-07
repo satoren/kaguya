@@ -68,8 +68,9 @@ namespace kaguya
 		public:
 			explicit ScopedSavedStack(lua_State * state)
 				: state_(state),
-				saved_top_index_(lua_gettop(state_))
-			{}
+				saved_top_index_(state_ ? lua_gettop(state_):0)
+			{
+			}
 			explicit ScopedSavedStack(lua_State * state, int count)
 				: state_(state),
 				saved_top_index_(count)

@@ -4,6 +4,14 @@
 
 KAGUYA_TEST_GROUP_START(test_05_lua_ref)
 using namespace kaguya_test_util;
+
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
+
+
 KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 {
 	kaguya::LuaRef ref(state.state(), "abc");
@@ -470,7 +478,30 @@ KAGUYA_TEST_FUNCTION_DEF(put_multiple)(kaguya::State& state)
 	TEST_EQUAL(state["value"], 22);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 22)"));
+}
 
+
+KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	kaguya::LuaRef v;
+	kaguya::LuaRef thread = state.newThread();
+	kaguya::LuaRef table = state.newTable();
+
+	TEST_CHECK(!v.setMetatable(state.newTable()));
+	TEST_CHECK(!v.getMetatable());
+
+	TEST_CHECK(!v.setFunctionEnv(state.newTable()));
+	TEST_CHECK(!v.getFunctionEnv());
+	TEST_CHECK(!v.getField("s"));
+
+
+	TEST_CHECK(!table.getFunctionEnv());
+	TEST_CHECK(!thread.getMetatable());
+
+	TEST_CHECK(!table.setFunctionEnv(kaguya::NewTable()));
+	TEST_CHECK(!thread.setMetatable(state.newTable()));
 }
 
 KAGUYA_TEST_GROUP_END(test_05_lua_ref)

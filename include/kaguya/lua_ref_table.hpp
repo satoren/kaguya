@@ -310,13 +310,24 @@ namespace kaguya
 		template<typename T>
 		inline bool LuaFunctionImpl<T>::setFunctionEnv(const LuaTable& env)
 		{
-			util::ScopedSavedStack save(state_());
-			int stackIndex = pushStackIndex_(state_());
-			env.push();
+			lua_State* state = state_();
+			if (!state)
+			{
+				return false;
+			}
+			util::ScopedSavedStack save(state);
+			int stackIndex = pushStackIndex_(state);
+			int t = lua_type(state, stackIndex);
+			if (t != LUA_TFUNCTION)
+			{
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not function"));
+				return false;
+			}
+			env.push(state);
 #if LUA_VERSION_NUM >= 502
-			lua_setupvalue(state_(), stackIndex, 1);
+			lua_setupvalue(state, stackIndex, 1);
 #else
-			lua_setfenv(state_(), stackIndex);
+			lua_setfenv(state, stackIndex);
 #endif
 			return true;
 		}
@@ -329,15 +340,26 @@ namespace kaguya
 		template<typename T>
 		inline LuaTable LuaFunctionImpl<T>::getFunctionEnv()
 		{
-			util::ScopedSavedStack save(state_());
-			int stackIndex = pushStackIndex_(state_());
-
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return LuaTable();
+			}
+			int stackIndex = pushStackIndex_(state);
+			int t = lua_type(state, stackIndex);
+			if (t != LUA_TFUNCTION)
+			{
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not function"));
+				return LuaTable();
+			}
 #if LUA_VERSION_NUM >= 502
-			lua_getupvalue(state_(), stackIndex, 1);
+			lua_getupvalue(state, stackIndex, 1);
 #else
-			lua_getfenv(state_(), stackIndex);
+			lua_getfenv(state, stackIndex);
 #endif
-			return LuaTable(state_(), StackTop());
+			return LuaTable(state, StackTop());
 		}
 
 		template<typename T>
