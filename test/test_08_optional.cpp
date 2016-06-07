@@ -15,6 +15,11 @@ KAGUYA_TEST_FUNCTION_DEF(optional_construct)(kaguya::State&)
 
 	kaguya::optional<std::string> opt2 = std::string("abc");
 	TEST_EQUAL("abc", *opt2);
+
+
+	const kaguya::optional<std::string> opt3 = opt2;
+	TEST_EQUAL("abc", *opt2);
+	TEST_EQUAL("abc", *opt3);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
@@ -22,6 +27,8 @@ KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 	kaguya::optional<const char*> s1 = "abc", s2; // constructor
 	s2 = s1; 
 	s1 = "def";
+	TEST_CHECK(s1);
+	TEST_CHECK(s2);
 	TEST_EQUAL(std::string("abc"), *s2);
 	TEST_EQUAL(std::string("def"), *s1);
 }
@@ -31,6 +38,26 @@ KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
 	std::string str = "abc";
 	kaguya::optional<const std::string&> s1 = str; // constructor
 	TEST_EQUAL(std::string("abc"), *s1);
+
+	const kaguya::optional<const std::string&> s2 = str; // constructor
+	TEST_EQUAL(std::string("abc"), *s2);
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(optional_error)(kaguya::State&)
+{
+	kaguya::optional<const std::string&> s1;
+
+	try
+	{
+		s1.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		return;
+	}
+	TEST_CHECK(false);
+	TEST_CHECK(!s1);
 }
 
 #if KAGUYA_USE_CPP11
