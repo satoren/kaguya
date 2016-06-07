@@ -132,8 +132,7 @@ namespace kaguya
 			int type = lua_type(l, index);
 			if (type == LUA_TLIGHTUSERDATA
 				|| type == LUA_TNIL
-				|| type == LUA_TNONE
-				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
+				|| type == LUA_TNONE)
 			{
 				return true;
 			}
@@ -155,8 +154,7 @@ namespace kaguya
 			}
 
 			if (type == LUA_TNIL
-				|| type == LUA_TNONE
-				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
+				|| type == LUA_TNONE)
 			{
 				return 0;
 			}
@@ -758,6 +756,8 @@ namespace kaguya
 				util::ScopedSavedStack save(state);
 				return lua_type_traits<T>::get(state, pushStackIndex_(state));
 			}
+
+			//deprecated. use get<kaguya::optional<T> >() instead;
 			template<typename T>
 			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
 			{
@@ -859,13 +859,9 @@ namespace kaguya
 			template<typename T>
 			inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator==(const T& rhs)const
 			{
-				try
+				if (optional<typename lua_type_traits<T>::get_type> d = checkGet_<T>())
 				{
-					return get<T>() == rhs;
-				}
-				catch (const LuaTypeMismatch&)
-				{
-					return false;
+					return *d == rhs;
 				}
 				return false;
 			}
@@ -891,6 +887,32 @@ namespace kaguya
 			int pushStackIndex_(lua_State* state)const
 			{
 				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+
+
+			template<typename T>
+			optional<typename lua_type_traits<T>::get_type> checkGet_(bool allow_convertible = true)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int stackindex = pushStackIndex_(state);
+				bool was_valid = false;
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state, stackindex);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+				}
+				if (was_valid)
+				{
+					return optional<typename lua_type_traits<T>::get_type>(lua_type_traits<T>::get(state, stackindex));
+				}
+				else
+				{
+					return optional<typename lua_type_traits<T>::get_type>();
+				}
 			}
 		};
 		template<typename D>

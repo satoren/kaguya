@@ -136,6 +136,13 @@ KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 	TEST_CHECK(nullref == nullptr);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
+{
+	state["value"] = nullptr;
+	TEST_CHECK(state["value"] == nullptr);
+	TEST_CHECK(!state["value"]);
+	TEST_CHECK(state("assert(value == nil)"));
+};
 
 
 KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)

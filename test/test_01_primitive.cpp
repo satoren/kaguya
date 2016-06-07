@@ -139,7 +139,7 @@ KAGUYA_TEST_FUNCTION_DEF(table_set)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
 {
 	state["value"] = (void*)0;
-	TEST_EQUAL(state["value"], 0);
+//	TEST_EQUAL(state["value"], 0); // can not compare nil and number
 	TEST_EQUAL(state["value"], (void*)0);
 	TEST_CHECK(!state["value"]);
 	TEST_CHECK(state("assert(value == nil)"));
