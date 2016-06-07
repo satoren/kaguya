@@ -145,6 +145,31 @@ KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
 	TEST_CHECK(state("assert(value == nil)"));
 };
 
+KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
+{
+	state["value"] = kaguya::optional<double>(5.5);
+	TEST_EQUAL(state["value"], 5.5);
+	TEST_CHECK(state["value"]);
+	TEST_CHECK(state("assert(value == 5.5,value)"));
+	state["value"] = kaguya::optional<double>();
+	TEST_CHECK(state("assert(value == nil)"));
+
+
+	state["value"] = kaguya::optional<const char*>("test");
+	TEST_EQUAL(state["value"], "test");
+	TEST_CHECK(state["value"]);
+	TEST_CHECK(state("assert(value == 'test')"));
+	state["value"] = kaguya::optional<const char*>();
+	TEST_CHECK(state("assert(value == nil)"));
+
+
+	state["value"] = kaguya::optional<std::string>("test");
+	TEST_EQUAL(state["value"], "test");
+	TEST_CHECK(state["value"]);
+	TEST_CHECK(state("assert(value == 'test')"));
+	state["value"] = kaguya::optional<std::string>();
+	TEST_CHECK(state("assert(value == nil)"));
+};
 enum testenum
 {
 	Foo = 0,

@@ -9,6 +9,7 @@
 #include <cstring>
 
 #include "kaguya/config.hpp"
+#include "kaguya/optional.hpp"
 #include "kaguya/traits.hpp"
 #include "kaguya/object.hpp"
 #include "kaguya/exception.hpp"
@@ -237,6 +238,43 @@ namespace kaguya
 		static int push(lua_State* l, push_type v)
 		{
 			return lua_type_traits<T*>::push(l, &v.get());
+		}
+	};
+
+
+	///! traits for optional
+	template<typename T> struct lua_type_traits<optional<T> > {
+		typedef const optional<T>& push_type;
+		typedef optional<T> get_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type_traits<T>::strictCheckType(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (!lua_type_traits<T>::checkType(l,index)) {
+				return get_type();
+			}
+			get_type opt = lua_type_traits<T>::get(l, index);
+			return opt;
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			if (v)
+			{
+				return lua_type_traits<T>::push(l, v.value());
+			}
+			else
+			{
+				lua_pushnil(l);
+			}
+			return 1;
 		}
 	};
 
