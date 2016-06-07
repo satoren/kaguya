@@ -167,7 +167,6 @@ namespace kaguya
 
 		inline int functor_destructor(lua_State *state)
 		{
-
 			FunctorType* f = static_cast<FunctorType*>(lua_touserdata(state, 1));
 			if (f)
 			{

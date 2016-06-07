@@ -49,7 +49,7 @@ add_executable(test_runner
 				${TEST_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(test_runner ${LUA_LIBRARIES})
 
-if(HAVE_FLAG_SANITIZE_ADDRESS)
+if(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
 message(STATUS "test_runner: address sanitizer enabled.")
 SET_TARGET_PROPERTIES(test_runner  PROPERTIES COMPILE_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
 SET_TARGET_PROPERTIES(test_runner  PROPERTIES LINK_FLAGS "-fsanitize=address")
