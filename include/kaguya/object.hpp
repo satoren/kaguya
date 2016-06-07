@@ -656,26 +656,6 @@ namespace kaguya
 			}
 			lua_setmetatable(l, -2);
 		}
-
-		template<typename T>T* test_userdata(lua_State* l, int index)
-		{
-			void* ptr = lua_touserdata(l, index);
-			if (lua_getmetatable(l, index))
-			{
-				if (!get_metatable<T>(l))
-				{
-					if (!lua_rawequal(l, -1, -2))
-					{
-						ptr = 0;
-					}
-					lua_pop(l, 2);//pop metatables
-					return  static_cast<T*>(ptr);
-				}
-			}
-			lua_pop(l, 1);
-			return 0;
-		}
-
 	}
 	template<typename T>
 	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())

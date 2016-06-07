@@ -433,4 +433,26 @@ KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 }
 #endif
 
+
+KAGUYA_TEST_FUNCTION_DEF(gc_test)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	int used = state.gc().count();
+	int first = used;
+	state.gc().disable();
+	for (int i = 0; i < 1000; i++)
+	{
+		state["a"] = kaguya::NewTable(i,i);
+		TEST_COMPARE_LE(used, state.gc().count());
+		used = state.gc().count();
+	}
+	state.gc().enable();
+	state["a"] = kaguya::NilValue();
+	state.gc().collect();
+	int current = state.gc().count();
+	TEST_COMPARE_GT(used, current);
+	TEST_COMPARE_LE(first, current);
+}
+
 KAGUYA_TEST_GROUP_END(test_06_state)
