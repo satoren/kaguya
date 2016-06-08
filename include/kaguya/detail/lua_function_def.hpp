@@ -70,7 +70,7 @@ namespace kaguya
 			/**
 			* get function environment table
 			*/
-			LuaTable getFunctionEnv();
+			LuaTable getFunctionEnv()const;
 
 			//@}
 

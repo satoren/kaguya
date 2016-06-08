@@ -502,6 +502,21 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 
 	TEST_CHECK(!table.setFunctionEnv(kaguya::NewTable()));
 	TEST_CHECK(!thread.setMetatable(state.newTable()));
+
+
+	const kaguya::LuaRef cv;
+	const kaguya::LuaRef cthread = state.newThread();
+	const kaguya::LuaRef ctable = state.newTable();
+
+	TEST_CHECK(!cv.getMetatable());
+
+	TEST_CHECK(!cv.getFunctionEnv());
+	TEST_CHECK(!cv.getField("s"));
+
+
+	TEST_CHECK(!ctable.getFunctionEnv());
+	TEST_CHECK(!cthread.getMetatable());
+
 }
 
 KAGUYA_TEST_GROUP_END(test_05_lua_ref)
