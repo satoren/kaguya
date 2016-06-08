@@ -123,7 +123,7 @@ namespace kaguya
 	* This class is the type returned by members of non-const LuaRef(Table) when directly accessing its elements.
 	*/
 	template<typename KEY>
-	class TableKeyReference : public LuaVariantImpl<TableKeyReference<KEY> >
+	class TableKeyReference : public detail::LuaVariantImpl<TableKeyReference<KEY> >
 	{
 	public:
 
@@ -224,7 +224,7 @@ namespace kaguya
 		{
 			return push(state_);
 		}
-		
+
 		int type()const
 		{
 			util::ScopedSavedStack save(state_);
@@ -306,137 +306,160 @@ namespace kaguya
 		return os;
 	}
 
-	template<typename T>
-	inline bool LuaFunctionImpl<T>::setFunctionEnv(const LuaTable& env)
-	{
-		util::ScopedSavedStack save(state_());
-		int stackIndex = pushStackIndex_(state_());
-		env.push();
+	namespace detail {
+		template<typename T>
+		inline bool LuaFunctionImpl<T>::setFunctionEnv(const LuaTable& env)
+		{
+			lua_State* state = state_();
+			if (!state)
+			{
+				return false;
+			}
+			util::ScopedSavedStack save(state);
+			int stackIndex = pushStackIndex_(state);
+			int t = lua_type(state, stackIndex);
+			if (t != LUA_TFUNCTION)
+			{
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not function"));
+				return false;
+			}
+			env.push(state);
 #if LUA_VERSION_NUM >= 502
-		lua_setupvalue(state_(), stackIndex, 1);
+			lua_setupvalue(state, stackIndex, 1);
 #else
-		lua_setfenv(state_(), stackIndex);
+			lua_setfenv(state, stackIndex);
 #endif
-		return true;
-	}
-	template<typename T>
-	inline bool LuaFunctionImpl<T>::setFunctionEnv(NewTable env)
-	{
-		return setFunctionEnv(LuaTable(state_()));
-	}
+			return true;
+		}
+		template<typename T>
+		inline bool LuaFunctionImpl<T>::setFunctionEnv(NewTable env)
+		{
+			return setFunctionEnv(LuaTable(state_()));
+		}
 
-	template<typename T>
-	inline LuaTable LuaFunctionImpl<T>::getFunctionEnv()
-	{
-		util::ScopedSavedStack save(state_());
-		int stackIndex = pushStackIndex_(state_());
-
+		template<typename T>
+		inline LuaTable LuaFunctionImpl<T>::getFunctionEnv()
+		{
+			lua_State* state = state_();
+			util::ScopedSavedStack save(state);
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return LuaTable();
+			}
+			int stackIndex = pushStackIndex_(state);
+			int t = lua_type(state, stackIndex);
+			if (t != LUA_TFUNCTION)
+			{
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not function"));
+				return LuaTable();
+			}
 #if LUA_VERSION_NUM >= 502
-		lua_getupvalue(state_(), stackIndex, 1);
+			lua_getupvalue(state, stackIndex, 1);
 #else
-		lua_getfenv(state_(), stackIndex);
+			lua_getfenv(state, stackIndex);
 #endif
-		return LuaTable(state_(), StackTop());
-	}
+			return LuaTable(state, StackTop());
+		}
 
-	template<typename T>
-	bool LuaTableOrUserDataImpl<T>::setMetatable(const LuaTable& table)
-	{
-		lua_State* state = state_();
-		if (!state)
+		template<typename T>
+		bool LuaTableOrUserDataImpl<T>::setMetatable(const LuaTable& table)
 		{
-			except::typeMismatchError(state, "is nil");
-			return false;
+			lua_State* state = state_();
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return false;
+			}
+			util::ScopedSavedStack save(state);
+			int stackindex = pushStackIndex_(state);
+			int t = lua_type(state, stackindex);
+			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+			{
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
+				return false;
+			}
+			table.push();
+			return lua_setmetatable(state, stackindex) != 0;
 		}
-		util::ScopedSavedStack save(state);
-		int stackindex = pushStackIndex_(state);
-		int t = lua_type(state, stackindex);
-		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+		template<typename T>
+		LuaTable LuaTableOrUserDataImpl<T>::getMetatable()const
 		{
-			except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
-			return false;
+			lua_State* state = state_();
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return LuaTable();
+			}
+			util::ScopedSavedStack save(state);
+			int stackindex = pushStackIndex_(state);
+			int t = lua_type(state, stackindex);
+			if (t != LUA_TTABLE && t != LUA_TUSERDATA)
+			{
+				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
+				return LuaTable();
+			}
+			lua_getmetatable(state, stackindex);
+			return LuaTable(state, StackTop());
 		}
-		table.push();
-		return lua_setmetatable(state, stackindex) != 0;
-	}
-	template<typename T>
-	LuaTable LuaTableOrUserDataImpl<T>::getMetatable()const
-	{
-		lua_State* state = state_();
-		if (!state)
+		template<typename T>
+		MemberFunctionBinder LuaTableOrUserDataImpl<T>::operator->*(const char* function_name)
 		{
-			except::typeMismatchError(state, "is nil");
-			return LuaTable();
+			push_(state_());
+			return MemberFunctionBinder(LuaRef(state_(), StackTop()), function_name);
 		}
-		util::ScopedSavedStack save(state);
-		int stackindex = pushStackIndex_(state);
-		int t = lua_type(state, stackindex);
-		if (t != LUA_TTABLE && t != LUA_TUSERDATA)
-		{
-			except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
-			return LuaTable();
-		}
-		lua_getmetatable(state, stackindex);
-		return LuaTable(state, StackTop());
-	}
-	template<typename T>
-	mem_fun_binder LuaTableOrUserDataImpl<T>::operator->*(const char* function_name)
-	{
-		push_(state_());
-		return mem_fun_binder(LuaRef(state_(), StackTop()), function_name);
-	}
 
 
-	template<typename T> template <typename KEY>
-	LuaStackRef LuaTableOrUserDataImpl<T>::getField(const KEY& key)const
-	{
-		lua_State* state = state_();
-		if (!state)
+		template<typename T> template <typename KEY>
+		LuaStackRef LuaTableOrUserDataImpl<T>::getField(const KEY& key)const
 		{
-			except::typeMismatchError(state, "is nil");
+			lua_State* state = state_();
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return LuaStackRef();
+			}
+			if (push_(state))//push table
+			{
+				lua_type_traits<KEY>::push(state, key);//push key
+				lua_gettable(state, -2);//get table[key]
+				lua_remove(state, -2);//remove table
+				return LuaStackRef(state, -1, true);
+			}
 			return LuaStackRef();
 		}
-		if (push_(state))//push table
+
+		template<typename T> template<typename KEY>
+		LuaStackRef LuaTableOrUserDataImpl<T>::operator[](KEY key)const
 		{
-			lua_type_traits<KEY>::push(state, key);//push key
-			lua_gettable(state, -2);//get table[key]
-			lua_remove(state, -3);//remove table
-			return LuaStackRef(state, -1, true);
+			return getField(key);
 		}
-		return LuaStackRef();
-	}
 
-	template<typename T> template<typename KEY>
-	LuaStackRef LuaTableOrUserDataImpl<T>::operator[](KEY key)const
-	{
-		return getField(key);
-	}
+		template<typename T>
+		std::vector<LuaRef> LuaTableOrUserDataImpl<T>::values()const
+		{
+			return values<LuaRef>();
+		}
+		template<typename T>
+		std::vector<LuaRef> LuaTableOrUserDataImpl<T>::keys()const
+		{
+			return keys<LuaRef>();
+		}
+		template<typename T>
+		std::map<LuaRef, LuaRef> LuaTableOrUserDataImpl<T>::map()const
+		{
+			return map<LuaRef, LuaRef>();
+		}
 
-	template<typename T>
-	std::vector<LuaRef> LuaTableOrUserDataImpl<T>::values()const
-	{
-		return values<LuaRef>();
+		template<typename T> template <typename K>
+		TableKeyReference<K> LuaTableOrUserDataImpl<T>::operator[](K key)
+		{
+			lua_State* state = state_();
+			int stack_top = lua_gettop(state);
+			int stackindex = pushStackIndex_(state);
+			return TableKeyReference<K>(state, stackindex, key, stack_top);
+		}
 	}
-	template<typename T>
-	std::vector<LuaRef> LuaTableOrUserDataImpl<T>::keys()const
-	{
-		return keys<LuaRef>();
-	}
-	template<typename T>
-	std::map<LuaRef, LuaRef> LuaTableOrUserDataImpl<T>::map()const
-	{
-		return map<LuaRef, LuaRef>();
-	}
-
-	template<typename T> template <typename K>
-	TableKeyReference<K> LuaTableOrUserDataImpl<T>::operator[](K key)
-	{
-		lua_State* state = state_();
-		int stack_top = lua_gettop(state);
-		int stackindex = pushStackIndex_(state);
-		return TableKeyReference<K>(state, stackindex, key, stack_top);
-	}
-
 
 	template<typename KEY>
 	struct lua_type_traits<TableKeyReference<KEY> > {

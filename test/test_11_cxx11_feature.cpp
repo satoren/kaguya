@@ -136,6 +136,13 @@ KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 	TEST_CHECK(nullref == nullptr);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
+{
+	state["value"] = nullptr;
+	TEST_CHECK(state["value"] == nullptr);
+	TEST_CHECK(!state["value"]);
+	TEST_CHECK(state("assert(value == nil)"));
+};
 
 
 KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
@@ -144,6 +151,43 @@ KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
 
 	state["test"] =std::unique_ptr<MoveOnlyClass>();
 	TEST_CHECK(state("assert(test==nil)"));
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(result_range_based_for)(kaguya::State& state)
+{
+	state("fn =function() return 1,2,4,8,16 end");
+	{
+		std::vector<int> res;
+		kaguya::LuaFunction fn = state["fn"];
+		auto result = fn();
+		for (int v : result)
+		{
+			res.push_back(v);
+		}
+		TEST_EQUAL(res.size(), 5);
+		TEST_EQUAL(res[0], 1);
+		TEST_EQUAL(res[1], 2);
+		TEST_EQUAL(res[2], 4);
+		TEST_EQUAL(res[3], 8);
+		TEST_EQUAL(res[4], 16);
+	}
+	{
+		std::vector<int> res;
+		kaguya::LuaFunction fn = state["fn"];
+		const auto result = fn();
+		for (int v : result)
+		{
+			res.push_back(v);
+		}
+		TEST_EQUAL(res.size(), 5);
+		TEST_EQUAL(res[0], 1);
+		TEST_EQUAL(res[1], 2);
+		TEST_EQUAL(res[2], 4);
+		TEST_EQUAL(res[3], 8);
+		TEST_EQUAL(res[4], 16);
+	}
+
 }
 
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)

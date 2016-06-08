@@ -9,6 +9,7 @@
 #include <cstring>
 
 #include "kaguya/config.hpp"
+#include "kaguya/optional.hpp"
 #include "kaguya/traits.hpp"
 #include "kaguya/object.hpp"
 #include "kaguya/exception.hpp"
@@ -131,8 +132,7 @@ namespace kaguya
 			int type = lua_type(l, index);
 			if (type == LUA_TLIGHTUSERDATA
 				|| type == LUA_TNIL
-				|| type == LUA_TNONE
-				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
+				|| type == LUA_TNONE)
 			{
 				return true;
 			}
@@ -154,8 +154,7 @@ namespace kaguya
 			}
 
 			if (type == LUA_TNIL
-				|| type == LUA_TNONE
-				|| (type == LUA_TNUMBER && lua_tonumber(l, index) == 0)) //allow zero for nullptr;
+				|| type == LUA_TNONE)
 			{
 				return 0;
 			}
@@ -198,7 +197,7 @@ namespace kaguya
 		}
 		static bool get(lua_State* l, int index)
 		{
-			return lua_toboolean(l, index) != 0;
+			return l && lua_toboolean(l, index) != 0;
 		}
 		static int push(lua_State* l, bool s)
 		{
@@ -237,6 +236,43 @@ namespace kaguya
 		static int push(lua_State* l, push_type v)
 		{
 			return lua_type_traits<T*>::push(l, &v.get());
+		}
+	};
+
+
+	///! traits for optional
+	template<typename T> struct lua_type_traits<optional<T> > {
+		typedef const optional<T>& push_type;
+		typedef optional<T> get_type;
+
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_type_traits<T>::strictCheckType(l, index);
+		}
+		static bool checkType(lua_State* l, int index)
+		{
+			return true;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (!lua_type_traits<T>::checkType(l, index)) {
+				return get_type();
+			}
+			get_type opt = lua_type_traits<T>::get(l, index);
+			return opt;
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			if (v)
+			{
+				return lua_type_traits<T>::push(l, v.value());
+			}
+			else
+			{
+				lua_pushnil(l);
+			}
+			return 1;
 		}
 	};
 
@@ -644,245 +680,271 @@ namespace kaguya
 	};
 
 
-
-	template<typename Derived>
-	class LuaBasicTypeFunctions
+	namespace detail
 	{
-		template<class Other> friend class LuaBasicTypeFunctions;
-	public:
-		enum value_type
+		template<typename Derived>
+		class LuaBasicTypeFunctions
 		{
-			TYPE_NIL = LUA_TNIL,//!< nil type
-			TYPE_BOOL = LUA_TBOOLEAN,//!< boolean type
-			TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,//!< light userdata type
-			TYPE_NUMBER = LUA_TNUMBER,//!< number type
-			TYPE_STRING = LUA_TSTRING,//!< string type
-			TYPE_TABLE = LUA_TTABLE,//!< table type
-			TYPE_FUNCTION = LUA_TFUNCTION,//!< function type
-			TYPE_USERDATA = LUA_TUSERDATA,//!< userdata type
-			TYPE_THREAD = LUA_TTHREAD//!< thread(coroutine) type
-		};
+			template<class Other> friend class LuaBasicTypeFunctions;
+		public:
+			enum value_type
+			{
+				TYPE_NIL = LUA_TNIL,//!< nil type
+				TYPE_BOOL = LUA_TBOOLEAN,//!< boolean type
+				TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,//!< light userdata type
+				TYPE_NUMBER = LUA_TNUMBER,//!< number type
+				TYPE_STRING = LUA_TSTRING,//!< string type
+				TYPE_TABLE = LUA_TTABLE,//!< table type
+				TYPE_FUNCTION = LUA_TFUNCTION,//!< function type
+				TYPE_USERDATA = LUA_TUSERDATA,//!< userdata type
+				TYPE_THREAD = LUA_TTHREAD//!< thread(coroutine) type
+			};
 
-		bool isNilref_()const {
-			int t = type();
-			return t == LUA_TNIL || t == LUA_TNONE;
-		}
+			bool isNilref_()const {
+				int t = type();
+				return t == LUA_TNIL || t == LUA_TNONE;
+			}
 
-		typedef void (LuaBasicTypeFunctions::*bool_type)() const;
-		void this_type_does_not_support_comparisons() const {}
+			typedef void (LuaBasicTypeFunctions::*bool_type)() const;
+			void this_type_does_not_support_comparisons() const {}
 
-		/**
-		* @brief Equivalent to `#` operator for strings and tables with no metamethods.
-		* Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
-		* than tables, strings or userdatas return 0.
-		* @return Size of table, string length or userdata memory block size.
-		*/
-		size_t size() const {
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			int index = pushStackIndex_(state);
+			/**
+			* @brief Equivalent to `#` operator for strings and tables with no metamethods.
+			* Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
+			* than tables, strings or userdatas return 0.
+			* @return Size of table, string length or userdata memory block size.
+			*/
+			size_t size() const {
+				lua_State* state = state_();
+				if (!state) { return 0; }
+				util::ScopedSavedStack save(state);
+				int index = pushStackIndex_(state);
 #if LUA_VERSION_NUM >= 502
-			return lua_rawlen(state, index);
+				return lua_rawlen(state, index);
 #else
 
-			int type = lua_type(state, index);
-			if (type != TYPE_STRING && type != TYPE_TABLE && type != TYPE_USERDATA && type != TYPE_LIGHTUSERDATA)
-			{
-				return 0;
-			}
-			return lua_objlen(state, index);
+				int type = lua_type(state, index);
+				if (type != TYPE_STRING && type != TYPE_TABLE && type != TYPE_USERDATA && type != TYPE_LIGHTUSERDATA)
+				{
+					return 0;
+				}
+				return lua_objlen(state, index);
 #endif
-		}
-
-		//return type
-		int type() const
-		{
-			lua_State* state = state_();
-			if (!state)
-			{
-				return LUA_TNONE;
 			}
-			util::ScopedSavedStack save(state);
-			return lua_type(state, pushStackIndex_(state));
-		}
 
-		//return type name
-		const char* typeName()const
-		{
-			return lua_typename(state_(), type());
-		}
-
-
-		template<typename T>typename lua_type_traits<T>::get_type get()const
-		{
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			return lua_type_traits<T>::get(state, pushStackIndex_(state));
-		}
-		template<typename T>
-		typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
-		{
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			int stackindex = pushStackIndex_(state);
-			if (allow_convertible)
+			//return type
+			int type() const
 			{
-				was_valid = lua_type_traits<T>::checkType(state, stackindex);
+				lua_State* state = state_();
+				if (!state)
+				{
+					return LUA_TNONE;
+				}
+				util::ScopedSavedStack save(state);
+				return lua_type(state, pushStackIndex_(state));
 			}
-			else
+
+			//return type name
+			const char* typeName()const
 			{
-				was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+				return lua_typename(state_(), type());
 			}
-			if (was_valid)
+
+
+			template<typename T>typename lua_type_traits<T>::get_type get()const
 			{
-				return lua_type_traits<T>::get(state, stackindex);
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
 			}
-			else
+
+			//deprecated. use get<kaguya::optional<T> >() instead;
+			template<typename T>
+			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
 			{
-				return T();
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int stackindex = pushStackIndex_(state);
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state, stackindex);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+				}
+				if (was_valid)
+				{
+					return lua_type_traits<T>::get(state, stackindex);
+				}
+				else
+				{
+					return T();
+				}
 			}
-		}
-		template<typename T>
-		operator T()const
+			template<typename T>
+			operator T()const
+			{
+				return get<T>();
+			}
+
+			operator bool_type() const
+			{
+				return (!isNilref_() && get<bool>() == true) ? &LuaBasicTypeFunctions::this_type_does_not_support_comparisons : 0;
+			}
+
+
+			/**
+			* @name relational operators
+			* @brief
+			*/
+			//@{
+			template<typename OtherDrived>
+			inline bool operator==(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+			{
+				if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int index = pushStackIndex_(state);
+				int rhsindex = rhs.pushStackIndex_(state);
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state, index, rhsindex, LUA_OPEQ) != 0;
+#else
+				return lua_equal(state, index, rhsindex) != 0;
+#endif
+			}
+			template<typename OtherDrived>
+			inline bool operator<(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+			{
+				if (isNilref_() || rhs.isNilref_()) { return !isNilref_() != !rhs.isNilref_(); }
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int index = pushStackIndex_(state);
+				int rhsindex = rhs.pushStackIndex_(state);
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state, index, rhsindex, LUA_OPLT) != 0;
+#else
+				return lua_lessthan(state, index, rhsindex) != 0;
+#endif
+			}
+			template<typename OtherDrived>
+			inline bool operator<=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+			{
+				if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int index = pushStackIndex_(state);
+				int rhsindex = rhs.pushStackIndex_(state);
+#if LUA_VERSION_NUM >= 502
+				return lua_compare(state, index, rhsindex, LUA_OPLE) != 0;
+#else
+				return lua_equal(state, index, rhsindex) != 0 || lua_lessthan(state, index, rhsindex) != 0;
+#endif
+			}
+			template<typename OtherDrived>
+			inline bool operator>=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+			{
+				return rhs <= (*this);
+			}
+			template<typename OtherDrived>
+			inline bool operator>(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+			{
+				return rhs < (*this);
+			}
+			template<typename OtherDrived>
+			inline bool operator!=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
+			{
+				return !this->operator==(rhs);
+			}
+
+			template<typename T>
+			inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator==(const T& rhs)const
+			{
+				if (optional<typename lua_type_traits<T>::get_type> d = checkGet_<T>())
+				{
+					return *d == rhs;
+				}
+				return false;
+			}
+			template<typename T>
+			inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator!=(const T& rhs)const
+			{
+				return !((*this) == rhs);
+			}
+			//@}
+
+			void dump(std::ostream& os)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::stackValueDump(os, state, stackIndex);
+			}
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+
+
+			template<typename T>
+			optional<typename lua_type_traits<T>::get_type> checkGet_(bool allow_convertible = true)const
+			{
+				lua_State* state = state_();
+				if (!state) {
+					return optional<typename lua_type_traits<T>::get_type>();
+				}
+				util::ScopedSavedStack save(state);
+				int stackindex = pushStackIndex_(state);
+				bool was_valid = false;
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state, stackindex);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+				}
+				if (was_valid)
+				{
+					return optional<typename lua_type_traits<T>::get_type>(lua_type_traits<T>::get(state, stackindex));
+				}
+				else
+				{
+					return optional<typename lua_type_traits<T>::get_type>();
+				}
+			}
+		};
+		template<typename D>
+		inline std::ostream& operator<<(std::ostream& os, const LuaBasicTypeFunctions<D>& ref)
 		{
-			return get<T>();
+			ref.dump(os);
+			return os;
 		}
-
-		operator bool_type() const
-		{
-			return (!isNilref_() && get<bool>() == true) ? &LuaBasicTypeFunctions::this_type_does_not_support_comparisons : 0;
-		}
-
-
 		/**
 		* @name relational operators
 		* @brief
 		*/
 		//@{
-		template<typename OtherDrived>
-		inline bool operator==(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
-		{
-			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			int index = pushStackIndex_(state);
-			int rhsindex = rhs.pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
-			return lua_compare(state, index, rhsindex, LUA_OPEQ) != 0;
-#else
-			return lua_equal(state, index, rhsindex) != 0;
-#endif
-		}
-		template<typename OtherDrived>
-		inline bool operator<(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
-		{
-			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() != !rhs.isNilref_(); }
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			int index = pushStackIndex_(state);
-			int rhsindex = rhs.pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
-			return lua_compare(state, index, rhsindex, LUA_OPLT) != 0;
-#else
-			return lua_lessthan(state, index, rhsindex) != 0;
-#endif
-		}
-		template<typename OtherDrived>
-		inline bool operator<=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
-		{
-			if (isNilref_() || rhs.isNilref_()) { return !isNilref_() == !rhs.isNilref_(); }
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			int index = pushStackIndex_(state);
-			int rhsindex = rhs.pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
-			return lua_compare(state, index, rhsindex, LUA_OPLE) != 0;
-#else
-			return lua_equal(state, index, rhsindex) != 0 || lua_lessthan(state, index, rhsindex) != 0;
-#endif
-		}
-		template<typename OtherDrived>
-		inline bool operator>=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
-		{
-			return rhs <= (*this);
-		}
-		template<typename OtherDrived>
-		inline bool operator>(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
-		{
-			return rhs < (*this);
-		}
-		template<typename OtherDrived>
-		inline bool operator!=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
-		{
-			return !this->operator==(rhs);
-		}
-
-		template<typename T>
-		inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator==(const T& rhs)const
-		{
-			try
-			{
-				return get<T>() == rhs;
-			}
-			catch (const LuaTypeMismatch&)
-			{
-				return false;
-			}
-			return false;
-		}
-		template<typename T>
-		inline typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, bool>::type operator!=(const T& rhs)const
-		{
-			return !((*this) == rhs);
-		}
-		//@}
-
-		void dump(std::ostream& os)const
-		{
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			util::stackValueDump(os, state, stackIndex);
-		}
-	private:
-		lua_State* state_()const
-		{
-			return static_cast<const Derived*>(this)->state();
-		}
-		int pushStackIndex_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->pushStackIndex(state);
-		}
-	};
-
-
-
-	template<typename D>
-	inline std::ostream& operator<<(std::ostream& os, const LuaBasicTypeFunctions<D>& ref)
-	{
-		ref.dump(os);
-		return os;
-	}
-
-
-
-	/**
-	* @name relational operators
-	* @brief
-	*/
-	//@{
 
 #define KAGUYA_ENABLE_IF_NOT_LUAREF(RETTYPE) typename traits::enable_if<!traits::is_convertible<T*, LuaBasicTypeFunctions<T>*>::value, RETTYPE>::type
-	template<typename D, typename T>
-	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator == (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
-	{
-		return rhs == lhs;
-	}
-	template<typename D, typename T>
-	inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator != (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
-	{
-		return !(rhs == lhs);
-	}
+		template<typename D, typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator == (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
+		{
+			return rhs == lhs;
+		}
+		template<typename D, typename T>
+		inline KAGUYA_ENABLE_IF_NOT_LUAREF(bool) operator != (const T& lhs, const LuaBasicTypeFunctions<D>& rhs)
+		{
+			return !(rhs == lhs);
+		}
 #undef KAGUYA_ENABLE_IF_NOT_LUAREF
-	//@}
+		//@}
+	}
+
+
 }

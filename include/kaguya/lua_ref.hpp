@@ -30,7 +30,7 @@ namespace kaguya
 	template<typename KEY>
 	class TableKeyReference;
 	class FunctionResults;
-	class mem_fun_binder;
+	class MemberFunctionBinder;
 
 	class LuaRef;
 	class LuaStackRef;
@@ -97,7 +97,7 @@ namespace kaguya
 	/**
 	* Reference of Lua any type value.
 	*/
-	class LuaRef :public Ref::RegistoryRef, public LuaVariantImpl<LuaRef>
+	class LuaRef :public Ref::RegistoryRef, public detail::LuaVariantImpl<LuaRef>
 	{
 		friend class LuaUserData;
 		friend class LuaTable;
@@ -251,10 +251,10 @@ namespace kaguya
 
 
 
-	class LuaStackRef :public Ref::StackRef, public LuaVariantImpl<LuaStackRef>
+	class LuaStackRef :public Ref::StackRef, public detail::LuaVariantImpl<LuaStackRef>
 	{
 	public:
-		LuaStackRef() :Ref::StackRef(0,0,false)
+		LuaStackRef() :Ref::StackRef()
 		{
 		}
 		LuaStackRef(lua_State* s, int index) :Ref::StackRef(s, index, false)
@@ -325,13 +325,14 @@ namespace kaguya
 	
 	//! Reference to Lua userdata
 	class  LuaUserData :public Ref::RegistoryRef
-		, public LuaTableOrUserDataImpl<LuaUserData>
-		, public LuaBasicTypeFunctions<LuaUserData>
+		, public detail:: LuaTableOrUserDataImpl<LuaUserData>
+		, public detail::LuaBasicTypeFunctions<LuaUserData>
 	{
 
 		void typecheck()
 		{
-			if (type() != TYPE_USERDATA)
+			int t = type();
+			if (t != TYPE_USERDATA && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not user data");
 				Ref::RegistoryRef::unref();
@@ -387,14 +388,15 @@ namespace kaguya
 
 
 	class LuaTable :public Ref::RegistoryRef
-		, public LuaTableImpl<LuaTable>
-		, public LuaTableOrUserDataImpl<LuaTable>
-		, public LuaBasicTypeFunctions<LuaTable>
+		, public detail::LuaTableImpl<LuaTable>
+		, public detail::LuaTableOrUserDataImpl<LuaTable>
+		, public detail::LuaBasicTypeFunctions<LuaTable>
 	{
 
 		void typecheck()
 		{
-			if (type() != TYPE_TABLE)
+			int t = type();
+			if (t != TYPE_TABLE && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not table");
 				Ref::RegistoryRef::unref();
@@ -451,12 +453,13 @@ namespace kaguya
 	* Reference of Lua function.
 	*/
 	class LuaFunction :public Ref::RegistoryRef
-		, public LuaFunctionImpl<LuaFunction>
-		, public LuaBasicTypeFunctions<LuaFunction>
+		, public detail::LuaFunctionImpl<LuaFunction>
+		, public detail::LuaBasicTypeFunctions<LuaFunction>
 	{
 		void typecheck()
 		{
-			if (type() != TYPE_FUNCTION)
+			int t = type();
+			if (t != TYPE_FUNCTION && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not function");
 				RegistoryRef::unref();
@@ -543,7 +546,7 @@ namespace kaguya
 				const char* bomseq = "\xEF\xBB\xBF";
 				while (stream_.good())
 				{
-					int c = stream_.get();
+					char c = stream_.get();
 					preload.push_back(c);
 					if (c != *bomseq)
 					{
@@ -642,12 +645,13 @@ namespace kaguya
 	* Reference of Lua thread(==coroutine).
 	*/
 	class LuaThread :public Ref::RegistoryRef
-		, public LuaThreadImpl<LuaThread>
-		, public LuaBasicTypeFunctions<LuaThread>
+		, public detail::LuaThreadImpl<LuaThread>
+		, public detail::LuaBasicTypeFunctions<LuaThread>
 	{
 		void typecheck()
 		{
-			if (type() != TYPE_THREAD)
+			int t = type();
+			if (t != TYPE_THREAD && t != TYPE_NIL)
 			{
 				except::typeMismatchError(state(), "not lua thread");
 				RegistoryRef::unref();
@@ -685,6 +689,22 @@ namespace kaguya
 #else
 namespace std
 {
+	template <> inline void swap(kaguya::LuaUserData& a, kaguya::LuaUserData& b)
+	{
+		a.swap(b);
+	}
+	template <> inline void swap(kaguya::LuaTable& a, kaguya::LuaTable& b)
+	{
+		a.swap(b);
+	}
+	template <> inline void swap(kaguya::LuaFunction& a, kaguya::LuaFunction& b)
+	{
+		a.swap(b);
+	}
+	template <> inline void swap(kaguya::LuaThread& a, kaguya::LuaThread& b)
+	{
+		a.swap(b);
+	}
 	template <> inline void swap(kaguya::LuaRef& a, kaguya::LuaRef& b)
 	{
 		a.swap(b);

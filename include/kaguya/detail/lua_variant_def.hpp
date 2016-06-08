@@ -15,47 +15,49 @@ namespace kaguya
 	class LuaTable;
 	template<typename KEY>
 	class TableKeyReference;
-	class mem_fun_binder;
+	class MemberFunctionBinder;
 
-	template<typename Derived>
-	class LuaVariantImpl :public LuaTableImpl<Derived>,
-		public LuaTableOrUserDataImpl<Derived>,
-		public LuaFunctionImpl<Derived>, 
-		public LuaThreadImpl<Derived>, 
-		public LuaBasicTypeFunctions<Derived>
-	{
-	private:
-		lua_State* state_()const
-		{
-			return static_cast<const Derived*>(this)->state();
-		}
-		int pushStackIndex_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->pushStackIndex(state);
-		}
-	public:
-		using LuaBasicTypeFunctions<Derived>::type;
-		using LuaBasicTypeFunctions<Derived>::typeName;
+	namespace detail {
 
-		template<typename T>
-		bool typeTest()const
+		template<typename Derived>
+		class LuaVariantImpl :public LuaTableImpl<Derived>,
+			public LuaTableOrUserDataImpl<Derived>,
+			public detail::LuaFunctionImpl<Derived>,
+			public detail::LuaThreadImpl<Derived>,
+			public LuaBasicTypeFunctions<Derived>
 		{
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
-		}
-		template<typename T>
-		bool weakTypeTest()const
-		{
-			lua_State* state = state_();
-			util::ScopedSavedStack save(state);
-			return lua_type_traits<T>::checkType(state, pushStackIndex_(state));
-		}
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+		public:
+			using LuaBasicTypeFunctions<Derived>::type;
+			using LuaBasicTypeFunctions<Derived>::typeName;
+
+			template<typename T>
+			bool typeTest()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
+			}
+			template<typename T>
+			bool weakTypeTest()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::checkType(state, pushStackIndex_(state));
+			}
 
 
 
 #if KAGUYA_USE_CPP11
-		template<class...Args> FunctionResults operator()(Args&&... args);
+			template<class...Args> FunctionResults operator()(Args&&... args);
 #else
 #define KAGUYA_TEMPLATE_PARAMETER(N)
 #define KAGUYA_FUNCTION_ARGS_DEF(N)
@@ -75,7 +77,7 @@ namespace kaguya
 #define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
 #define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
 
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
+				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
@@ -86,6 +88,6 @@ namespace kaguya
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
 #endif
-	};
-
+		};
+	}
 }

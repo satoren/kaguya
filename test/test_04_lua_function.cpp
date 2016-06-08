@@ -5,6 +5,12 @@
 KAGUYA_TEST_GROUP_START(test_04_lua_function)
 using namespace kaguya_test_util;
 
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
+
 KAGUYA_TEST_FUNCTION_DEF(function_call)(kaguya::State& state)
 {
 	state("testfun = function(a,b,c,d,e) assert(a == 1,a) assert(b == 2,b) assert(c == 4,c) assert(d == 8,d) assert(e == 16,e) end");
@@ -217,6 +223,98 @@ KAGUYA_TEST_FUNCTION_DEF(bind_to_std_function)(kaguya::State& state)
 {
 	state["luacallback"] = &luacallback;
 	state("luacallback(function(v) assert(32 == v) end)");
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(zero_to_nullpointer)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	{
+		last_error_message = "";
+		kaguya::LuaFunction nilfn = state["a"];
+		nilfn.call<void>();
+		TEST_CHECK(last_error_message.find("attempt to call a nil value") != std::string::npos);
+	}
+
+
+	{
+		last_error_message = "";
+		kaguya::LuaFunction nilfn;
+		nilfn.call<void>();
+	}
+
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(result_range_based_for)(kaguya::State& state)
+{
+	state("fn =function() return 1,2,4,8,16 end");
+	{
+		std::vector<int> res;
+		kaguya::LuaFunction fn = state["fn"];
+		kaguya::FunctionResults result = fn();
+		for (kaguya::FunctionResults::iterator it = result.begin();it != result.end();++it)
+		{
+			res.push_back(*it);
+		}
+		TEST_EQUAL(res.size(), 5);
+		TEST_EQUAL(res[0], 1);
+		TEST_EQUAL(res[1], 2);
+		TEST_EQUAL(res[2], 4);
+		TEST_EQUAL(res[3], 8);
+		TEST_EQUAL(res[4], 16);
+	}
+	{
+		std::vector<int> res;
+		kaguya::LuaFunction fn = state["fn"];
+		const kaguya::FunctionResults& result = fn();
+		for (kaguya::FunctionResults::const_iterator it = result.begin(); it != result.end(); ++it)
+		{
+			res.push_back(*it);
+		}
+		TEST_EQUAL(res.size(), 5);
+		TEST_EQUAL(res[0], 1);
+		TEST_EQUAL(res[1], 2);
+		TEST_EQUAL(res[2], 4);
+		TEST_EQUAL(res[3], 8);
+		TEST_EQUAL(res[4], 16);
+	}
+	{
+		std::vector<int> res;
+		kaguya::LuaFunction fn = state["fn"];
+		kaguya::FunctionResults result = fn();
+		TEST_EQUAL(result.result_size(), 5);
+		TEST_EQUAL(result.resultStatus(), 0);
+		for (kaguya::FunctionResults::const_iterator it = result.begin(); it != result.end(); ++it)
+		{
+			res.push_back(*it);
+		}
+		TEST_EQUAL(res.size(), 5);
+		TEST_EQUAL(res[0], 1);
+		TEST_EQUAL(res[1], 2);
+		TEST_EQUAL(res[2], 4);
+		TEST_EQUAL(res[3], 8);
+		TEST_EQUAL(res[4], 16);
+	}
+
+	state("a={} b={} c={}");
+	state("fn =function() return a,b,c end");
+	{
+		kaguya::LuaFunction fn = state["fn"];
+		kaguya::FunctionResults result = fn();
+		for (kaguya::FunctionResults::iterator it = result.begin(); it != result.end(); ++it)
+		{
+			it->setField("value",5);
+		}
+		TEST_EQUAL(state["a"]["value"], 5);
+		TEST_EQUAL(state["b"]["value"], 5);
+		TEST_EQUAL(state["c"]["value"], 5);
+		for (kaguya::FunctionResults::iterator it = result.begin(); it != result.end(); ++it)
+		{
+			TEST_EQUAL(it->getField("value"), 5);
+		}
+	}
 }
 
 KAGUYA_TEST_GROUP_END(test_04_lua_function)

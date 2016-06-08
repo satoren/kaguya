@@ -286,9 +286,11 @@ KAGUYA_TEST_FUNCTION_DEF(copyable_class_test)(kaguya::State& state)
 {
 	state["CopyableClass"].setClass(kaguya::UserdataMetatable<CopyableClass>()
 		.setConstructors<CopyableClass(int)>()
-		.addStaticField("__eq", &CopyableClass::operator==)
+		.addFunction("__eq", &CopyableClass::operator==)
 		);
 	state["copy"] = CopyableClass(2);
+	state["copy2"] = CopyableClass(2);
+	TEST_CHECK(state("assert(copy2 == copy)"));
 	TEST_CHECK(state["copy"] == CopyableClass(2));
 	TEST_CHECK(CopyableClass(2) == state["copy"]);
 	CopyableClass copy = state["copy"];
@@ -299,6 +301,7 @@ KAGUYA_TEST_FUNCTION_DEF(copyable_class_test)(kaguya::State& state)
 	src.member = 12;
 	CopyableClass copied = state["copied"];
 	TEST_CHECK(copied != src);
+	TEST_CHECK(state("assert(copied ~= copy)"));
 }
 
 
@@ -323,7 +326,7 @@ KAGUYA_TEST_FUNCTION_DEF(noncopyable_class_test)(kaguya::State& state)
 {
 	state["NoncopyableClass"].setClass(kaguya::UserdataMetatable<NoncopyableClass>()
 		.setConstructors<NoncopyableClass(int)>()
-		.addStaticField("__eq", &NoncopyableClass::operator==)
+		.addFunction("__eq", &NoncopyableClass::operator==)
 		);
 
 	NoncopyableClass noncopy(2);
@@ -838,4 +841,135 @@ KAGUYA_TEST_FUNCTION_DEF(null_shared_ptr)(kaguya::State& state)
 	kaguya::standard::shared_ptr<void> sptr = state["test"];
 	TEST_CHECK(!sptr);
 }
+
+int TestClass2_objectcount = 0;
+struct TestClass2
+{
+	TestClass2()
+	{
+		TestClass2_objectcount++;
+	}
+	TestClass2(const TestClass2& src):data(src.data)
+	{
+		TestClass2_objectcount++;
+	}
+	~TestClass2()
+	{
+		TestClass2_objectcount--;
+	}
+	std::vector<int> data;
+};
+
+
+KAGUYA_TEST_FUNCTION_DEF(not_registered_object)(kaguya::State&)
+{
+	TEST_CHECK(TestClass2_objectcount == 0);
+	{
+		kaguya::State state;
+		state["data"] = TestClass2();
+	}
+	TEST_CHECK(TestClass2_objectcount==0);
+}
+
+
+
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
+
+KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
+{
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("a", &Base::a)
+		.addFunction("fa", &Base::a)
+	);
+
+
+	state["test"] = Base();
+	TEST_CHECK(state("assert(test~=nil)"));
+
+	TEST_CHECK(state("test.fa(test)"));
+	TEST_CHECK(state("test:fa()"));
+
+	state.setErrorHandler(ignore_error_fun);
+	last_error_message = "";
+
+	state("test.fa()");//error
+	TEST_COMPARE_NE(last_error_message , "");
+}
+
+
+
+KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.setConstructors<Base()>()
+			.addProperty("a", &Base::a)
+			.addFunction("a", &Base::a)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.setConstructors<Base()>()
+			.addProperty("a", &Base::a)
+		);
+		state["Base3"].setClass(kaguya::UserdataMetatable<Base>()
+			.setConstructors<Base()>()
+			.addProperty("a", &Base::a)
+		);
+	}
+	catch (const kaguya::LuaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("registered") != std::string::npos);
+		return;
+	}
+	TEST_CHECK(false);
+}
+
+
+
+KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+	
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
+		.addFunction("intdata", &ABC::intmember)
+		.addFunction("stringdata", &ABC::stringmember)
+	);
+
+	state["test"] = ABC();
+	TEST_CHECK(state("assert(test~=nil)"));
+	TEST_CHECK(state("test.setmember(test,'')"));
+
+	last_error_message = "";
+	state("test.setmember()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.intdata()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+}
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)

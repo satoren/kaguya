@@ -52,13 +52,11 @@ void ignore_error_fun(int status, const char* message)
 {
 	last_error_message = message ? message : "";
 }
-KAGUYA_TEST_FUNCTION_DEF(zero_to_nullpointer)(kaguya::State& state)
+KAGUYA_TEST_FUNCTION_DEF(nil_to_nullpointer)(kaguya::State& state)
 {
 	state["pointerfun"] = kaguya::function(pointerfun);
-	TEST_CHECK(state("pointerfun(0)"));
 	TEST_CHECK(state("pointerfun(nil)"));
 	state["const_pointerfun"] = kaguya::function(const_pointerfun);
-	TEST_CHECK(state("const_pointerfun(0)"));
 	TEST_CHECK(state("const_pointerfun(nil)"));
 
 	state.setErrorHandler(ignore_error_fun);
@@ -192,8 +190,8 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 	TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}) == 5)"));
 	TEST_CHECK(state("assert(overloaded_function({a='3',b='3'}, 6) == 6)"));
 #endif
-	TEST_CHECK(state("assert(overloaded_function(nil) == 7)"));
 	TEST_EQUAL(f((void*)0), 7);
+	TEST_CHECK(state("assert(overloaded_function(nil) == 7)"));
 
 
 	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>());
@@ -218,5 +216,30 @@ KAGUYA_TEST_FUNCTION_DEF(result_to_table)(kaguya::State& state)
 	state["result"] = state["result_to_table"]();
 	TEST_EQUAL(state["result"], 1);
 }
+
+void nested_function_call(kaguya::LuaStackRef function, kaguya::LuaStackRef value, kaguya::LuaStackRef value2)
+{
+	function(value, value2);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(nested_function_call_test)(kaguya::State& state)
+{
+	state["nested_function_call"] = kaguya::function(nested_function_call);
+
+	state("nested_function_call(function(value,value2) assert(value == 32);assert(value2 == 'text') end,32,'text')");
+}
+
+void nested_function_call2(kaguya::LuaStackRef function,const kaguya::LuaStackRef& table, kaguya::LuaStackRef value2)
+{
+	function(table["key"], value2);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(nested_function_call_test2)(kaguya::State& state)
+{
+	state["nested_function_call"] = kaguya::function(nested_function_call2);
+
+	state("nested_function_call(function(value,value2) assert(value==32);assert(value2 == 'text') end,{key=32},'text')");
+}
+
 
 KAGUYA_TEST_GROUP_END(test_03_function)

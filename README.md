@@ -3,33 +3,25 @@ C++ binding to Lua
 
 Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
-[![Build Status](https://travis-ci.org/satoren/kaguya.svg?branch=master)](https://travis-ci.org/satoren/kaguya)
-[![Build status](https://ci.appveyor.com/api/projects/status/cwlu28s42leacidx/branch/master?svg=true)](https://ci.appveyor.com/project/satoren/kaguya)
-[![codecov.io](https://codecov.io/github/satoren/kaguya/coverage.svg?branch=master)](https://codecov.io/github/satoren/kaguya?branch=master)
 
 ## Requirements
 - Lua 5.1 to 5.3 (recommended: 5.3)
 - C++03 compiler with boost library or C++11 compiler(gcc 4.8+,clang 3.4+,MSVC2015) without boost.
 
+### Tested Environment
+* luajit,lua5.2,clang 3.4,gcc4.8,-std=c++03 with boost library,-std=c++11
+[![Build Status](https://travis-ci.org/satoren/kaguya.svg?branch=master)](https://travis-ci.org/satoren/kaguya)
+* lua5.3,Visual C++2008～2012 with boost library,Visual C++2013,Visual C++2015
+[![Build status](https://ci.appveyor.com/api/projects/status/cwlu28s42leacidx/branch/master?svg=true)](https://ci.appveyor.com/project/satoren/kaguya)
+
+[![codecov.io](https://codecov.io/github/satoren/kaguya/coverage.svg?branch=master)](https://codecov.io/github/satoren/kaguya?branch=master)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/8930/badge.svg)](https://scan.coverity.com/projects/satoren-kaguya)
 
 ## Introduction
 Kaguya is Lua binding library for C++
 - header-file only
 - seamless access to lua elements
 
-
-## run test
-```
-mkdir build
-cd build
-cmake ..
-make
-./test_runner
-```
-If you want to use a non-system default library, add three option to cmake command
-```
-cmake -DLUA_INCLUDE_DIRS=path/to/lua/header/dir -DLUA_LIBRARY_DIRS=/abspath/to/lua/library/dir -DLUA_LIBRARIES=lualibname
-```
 ## Usage
 add "kaguya/include" directory to "header search path" of your project.
 
@@ -368,4 +360,17 @@ apple   3
     kaguya::State l;
     l.setErrorHandler(HandleError);
     l.dofile("./scripts/custom.lua"); // eg. accesing a file not existed will invoke HandleError above
+  ```
+
+## run test
+  ```
+  mkdir build
+  cd build
+  cmake ..
+  make
+  ./test_runner
+  ```
+  If you want to use a non-system default library, add three option to cmake command
+  ```
+  cmake -DLUA_INCLUDE_DIRS=path/to/lua/header/dir -DLUA_LIBRARY_DIRS=/abspath/to/lua/library/dir -DLUA_LIBRARIES=lualibname
   ```

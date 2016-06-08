@@ -24,368 +24,370 @@ namespace kaguya
 	class LuaTable;
 	template<typename KEY>
 	class TableKeyReference;
-	class mem_fun_binder;
+	class MemberFunctionBinder;
 
-	template<typename Derived>
-	class LuaTableOrUserDataImpl
+	namespace detail
 	{
-	private:
-		lua_State* state_()const
+		template<typename Derived>
+		class LuaTableOrUserDataImpl
 		{
-			return static_cast<const Derived*>(this)->state();
-		}
-		int pushStackIndex_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->pushStackIndex(state);
-		}
-		int push_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->push(state);
-		}
-
-		template<typename K, typename A>
-		struct gettablekey
-		{
-			typedef K key_type;
-			typedef void value_type;
-			std::vector<K, A>& v_;
-			gettablekey(std::vector<K, A>&v) :v_(v) {}
-			void operator ()(K key, const void*)
+		private:
+			lua_State* state_()const
 			{
-				v_.push_back(key);
+				return static_cast<const Derived*>(this)->state();
 			}
-		};
-		template<typename V, typename A>
-		struct gettablevalue
-		{
-			typedef void key_type;
-			typedef V value_type;
-			std::vector<V, A>& v_;
-			gettablevalue(std::vector<V, A>&v) :v_(v) {}
-			void operator ()(const void*, V value)
+			int pushStackIndex_(lua_State* state)const
 			{
-				v_.push_back(value);
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
 			}
-		};
-		template<typename K, typename V, typename C, typename A>
-		struct gettablemap
-		{
-			typedef K key_type;
-			typedef V value_type;
-			std::map<K, V, C, A>& m_;
-			gettablemap(std::map<K, V, C, A>& m) :m_(m) {}
-			void operator ()(K key, V value)
+			int push_(lua_State* state)const
 			{
-				m_[key] = value;
+				return static_cast<const Derived*>(this)->push(state);
 			}
-		};
 
-
-	public:
-
-		bool setMetatable(const LuaTable& table);
-		LuaTable getMetatable()const;
-
-
-		/**
-		* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
-		* @param function_name function_name in table
-		*/
-		mem_fun_binder operator->*(const char* function_name);
-
-		/**
-		* @brief value = table[key];
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename T, typename KEY>
-		typename lua_type_traits<T>::get_type getField(const KEY& key)const
-		{
-			lua_State* state = state_();
-			typedef typename lua_type_traits<T>::get_type get_type;
-			if (!state)
+			template<typename K, typename A>
+			struct gettablekey
 			{
-				except::typeMismatchError(state, "is nil");
-				return get_type();
-			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			lua_type_traits<KEY>::push(state, key);
-			lua_gettable(state, stackIndex);
-			return lua_type_traits<T>::get(state, -1);
-		}
-		/**
-		* @brief value = table[key];
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename T>
-		typename lua_type_traits<T>::get_type getField(const char* str)const
-		{
-			lua_State* state = state_();
-			if (!state)
-			{
-				except::typeMismatchError(state, "is nil");
-				return typename lua_type_traits<T>::get_type();
-			}
-			util::ScopedSavedStack save(state);
-			lua_getfield(state, pushStackIndex_(state), str);
-			return lua_type_traits<T>::get(state, -1);
-		}
-
-		/**
-		* @brief value = table[key];
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename T>
-		typename lua_type_traits<T>::get_type getField(const std::string& str)const
-		{
-			return getField(str.c_str());
-		}
-		template<typename KEY>
-		LuaStackRef getField(const KEY& key)const;
-
-		/**
-		* @brief foreach table fields
-		*/
-		template < class K, class V, class Fun> void foreach_table(Fun f)const
-		{
-			lua_State* state = state_();
-			if (!state)
-			{
-				except::typeMismatchError(state, "is nil");
-				return;
-			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			lua_pushnil(state);
-			while (lua_next(state, stackIndex) != 0)
-			{
-				lua_pushvalue(state, -2);//backup key
-				lua_insert(state, -3);
-
-				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
-				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
-				f(key, value);
-				lua_pop(state, 2);//pop key and value
-			}
-		}
-
-
-		/**
-		* @brief foreach table fields
-		*/
-		template < class K, class V, class Fun> void foreach_table_breakable(Fun f)const
-		{
-			lua_State* state = state_();
-			if (!state)
-			{
-				except::typeMismatchError(state, "is nil");
-				return;
-			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			lua_pushnil(state);
-			while (lua_next(state, stackIndex) != 0)
-			{
-				lua_pushvalue(state, -2);//backup key
-				lua_insert(state, -3);
-
-				typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
-				typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
-				bool cont = f(key, value);
-				lua_pop(state, 2);//pop key and value
-				if (!cont)
+				typedef K key_type;
+				typedef void value_type;
+				std::vector<K, A>& v_;
+				gettablekey(std::vector<K, A>&v) :v_(v) {}
+				void operator ()(K key, const void*)
 				{
-					break;
+					v_.push_back(key);
+				}
+			};
+			template<typename V, typename A>
+			struct gettablevalue
+			{
+				typedef void key_type;
+				typedef V value_type;
+				std::vector<V, A>& v_;
+				gettablevalue(std::vector<V, A>&v) :v_(v) {}
+				void operator ()(const void*, V value)
+				{
+					v_.push_back(value);
+				}
+			};
+			template<typename K, typename V, typename C, typename A>
+			struct gettablemap
+			{
+				typedef K key_type;
+				typedef V value_type;
+				std::map<K, V, C, A>& m_;
+				gettablemap(std::map<K, V, C, A>& m) :m_(m) {}
+				void operator ()(K key, V value)
+				{
+					m_[key] = value;
+				}
+			};
+
+
+		public:
+
+			bool setMetatable(const LuaTable& table);
+			LuaTable getMetatable()const;
+
+
+			/**
+			* @brief table->*"function_name"() in c++ and table:function_name(); in lua is same
+			* @param function_name function_name in table
+			*/
+			MemberFunctionBinder operator->*(const char* function_name);
+
+			/**
+			* @brief value = table[key];
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename T, typename KEY>
+			typename lua_type_traits<T>::get_type getField(const KEY& key)const
+			{
+				lua_State* state = state_();
+				typedef typename lua_type_traits<T>::get_type get_type;
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return get_type();
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				lua_type_traits<KEY>::push(state, key);
+				lua_gettable(state, stackIndex);
+				return lua_type_traits<T>::get(state, -1);
+			}
+			/**
+			* @brief value = table[key];
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename T>
+			typename lua_type_traits<T>::get_type getField(const char* str)const
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return typename lua_type_traits<T>::get_type();
+				}
+				util::ScopedSavedStack save(state);
+				lua_getfield(state, pushStackIndex_(state), str);
+				return lua_type_traits<T>::get(state, -1);
+			}
+
+			/**
+			* @brief value = table[key];
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename T>
+			typename lua_type_traits<T>::get_type getField(const std::string& str)const
+			{
+				return getField(str.c_str());
+			}
+			template<typename KEY>
+			LuaStackRef getField(const KEY& key)const;
+
+			/**
+			* @brief foreach table fields
+			*/
+			template < class K, class V, class Fun> void foreach_table(Fun f)const
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				lua_pushnil(state);
+				while (lua_next(state, stackIndex) != 0)
+				{
+					lua_pushvalue(state, -2);//backup key
+					lua_insert(state, -3);
+
+					typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
+					typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
+					f(key, value);
+					lua_pop(state, 2);//pop key and value
 				}
 			}
-		}
-
-		/**
-		* @brief If type is table or userdata, return keys.
-		* @return field keys
-		*/
-		template<typename K, typename A>
-		std::vector<K, A> keys()const
-		{
-			std::vector<K, A> res;
-			util::ScopedSavedStack save(state_());
-			int stackIndex = pushStackIndex_(state_());
-#if LUA_VERSION_NUM >= 502
-			int size = lua_rawlen(state_(), stackIndex);
-#else
-			int size = lua_objlen(state_(), stackIndex);
-#endif
-			res.reserve(size);
-			foreach_table<K, void>(gettablekey<K, A>(res));
-			return res;
-		}
-		template<typename K >
-		std::vector<K> keys()const
-		{
-			return keys<K, std::allocator<K> >();
-		}
-		std::vector<LuaRef> keys()const;
-		/**
-		* @brief If type is table or userdata, return values.
-		* @return field value
-		*/
-		template<typename V, typename A>
-		std::vector<V, A> values()const
-		{
-			std::vector<V, A> res;
-			util::ScopedSavedStack save(state_());
-			int stackIndex = pushStackIndex_(state_());
-#if LUA_VERSION_NUM >= 502
-			size_t size = lua_rawlen(state_(), stackIndex);
-#else
-			size_t size = lua_objlen(state_(), stackIndex);
-#endif
-			res.reserve(size);
-			foreach_table<void, V>(gettablevalue<V, A>(res));
-			return res;
-		}
-		template<typename V >
-		std::vector<V> values()const
-		{
-			return values<V, std::allocator<V> >();
-		}
-		std::vector<LuaRef> values()const;
-		/**
-		* @brief If type is table or userdata, return key value pair.
-		* @return key value pair
-		*/
-		template<typename K, typename V, typename C, typename A >
-		std::map<K, V, C, A> map()const
-		{
-			std::map<K, V, C, A> res;
-			foreach_table<K, V>(gettablemap<K, V, C, A>(res));
-			return res;
-		}
-		template<typename K, typename V, typename C >
-		std::map<K, V, C> map()const
-		{
-			return map < K, V, C, std::allocator<std::pair<const K, V> > >();
-		}
-		template<typename K, typename V>
-		std::map<K, V> map()const
-		{
-			return map<K, V, std::less<K> >();
-		}
-		std::map<LuaRef, LuaRef> map()const;
-		/**
-		* @brief value = table[key];
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename K>
-		LuaStackRef operator[](K key)const;
 
 
-
-		/**
-		* @brief value = table[key];or table[key] = value;
-		* @param key key of table
-		* @return reference of field value
-		*/
-		template<typename K>
-		TableKeyReference<K> operator[](K key);
-		//@}
-	};
-
-	template<typename Derived>
-	class LuaTableImpl
-	{
-	private:
-		lua_State* state_()const
-		{
-			return static_cast<const Derived*>(this)->state();
-		}
-		int pushStackIndex_(lua_State* state)const
-		{
-			return static_cast<const Derived*>(this)->pushStackIndex(state);
-		}
-	public:
-
-		/**
-		* @brief table[key] = value;
-		*/
-		template<typename K, typename V>
-		void setField(const K& key, const V& value)
-		{
-			lua_State* state = state_();
-			if (!state)
+			/**
+			* @brief foreach table fields
+			*/
+			template < class K, class V, class Fun> void foreach_table_breakable(Fun f)const
 			{
-				except::typeMismatchError(state, "is nil");
-				return;
-			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			util::one_push(state, key);//push table key
-			util::one_push(state, value);//push value
-			lua_settable(state, stackIndex);//thistable[key] = value
-		}
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				lua_pushnil(state);
+				while (lua_next(state, stackIndex) != 0)
+				{
+					lua_pushvalue(state, -2);//backup key
+					lua_insert(state, -3);
 
-		template<typename V>
-		void setField(const char* key, const V& value)
-		{
-			lua_State* state = state_();
-			if (!state)
-			{
-				except::typeMismatchError(state, "is nil");
-				return;
+					typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
+					typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
+					bool cont = f(key, value);
+					lua_pop(state, 2);//pop key and value
+					if (!cont)
+					{
+						break;
+					}
+				}
 			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			util::one_push(state, value);//push value
-			lua_setfield(state, stackIndex, key);//thistable[key] = value
-		}
-		template<typename V>
-		void setField(const std::string& key, const V& value)
+
+			/**
+			* @brief If type is table or userdata, return keys.
+			* @return field keys
+			*/
+			template<typename K, typename A>
+			std::vector<K, A> keys()const
+			{
+				std::vector<K, A> res;
+				util::ScopedSavedStack save(state_());
+				int stackIndex = pushStackIndex_(state_());
+#if LUA_VERSION_NUM >= 502
+				int size = lua_rawlen(state_(), stackIndex);
+#else
+				int size = lua_objlen(state_(), stackIndex);
+#endif
+				res.reserve(size);
+				foreach_table<K, void>(gettablekey<K, A>(res));
+				return res;
+			}
+			template<typename K >
+			std::vector<K> keys()const
+			{
+				return keys<K, std::allocator<K> >();
+			}
+			std::vector<LuaRef> keys()const;
+			/**
+			* @brief If type is table or userdata, return values.
+			* @return field value
+			*/
+			template<typename V, typename A>
+			std::vector<V, A> values()const
+			{
+				std::vector<V, A> res;
+				util::ScopedSavedStack save(state_());
+				int stackIndex = pushStackIndex_(state_());
+#if LUA_VERSION_NUM >= 502
+				size_t size = lua_rawlen(state_(), stackIndex);
+#else
+				size_t size = lua_objlen(state_(), stackIndex);
+#endif
+				res.reserve(size);
+				foreach_table<void, V>(gettablevalue<V, A>(res));
+				return res;
+			}
+			template<typename V >
+			std::vector<V> values()const
+			{
+				return values<V, std::allocator<V> >();
+			}
+			std::vector<LuaRef> values()const;
+			/**
+			* @brief If type is table or userdata, return key value pair.
+			* @return key value pair
+			*/
+			template<typename K, typename V, typename C, typename A >
+			std::map<K, V, C, A> map()const
+			{
+				std::map<K, V, C, A> res;
+				foreach_table<K, V>(gettablemap<K, V, C, A>(res));
+				return res;
+			}
+			template<typename K, typename V, typename C >
+			std::map<K, V, C> map()const
+			{
+				return map < K, V, C, std::allocator<std::pair<const K, V> > >();
+			}
+			template<typename K, typename V>
+			std::map<K, V> map()const
+			{
+				return map<K, V, std::less<K> >();
+			}
+			std::map<LuaRef, LuaRef> map()const;
+			/**
+			* @brief value = table[key];
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename K>
+			LuaStackRef operator[](K key)const;
+
+
+
+			/**
+			* @brief value = table[key];or table[key] = value;
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename K>
+			TableKeyReference<K> operator[](K key);
+			//@}
+		};
+
+		template<typename Derived>
+		class LuaTableImpl
 		{
-			setField(key.c_str(), value);
-		}
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+		public:
+
+			/**
+			* @brief table[key] = value;
+			*/
+			template<typename K, typename V>
+			void setField(const K& key, const V& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, key);//push table key
+				util::one_push(state, value);//push value
+				lua_settable(state, stackIndex);//thistable[key] = value
+			}
+
+			template<typename V>
+			void setField(const char* key, const V& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, value);//push value
+				lua_setfield(state, stackIndex, key);//thistable[key] = value
+			}
+			template<typename V>
+			void setField(const std::string& key, const V& value)
+			{
+				setField(key.c_str(), value);
+			}
 #if KAGUYA_USE_CPP11
-		/**
-		* @brief table[key] = value;
-		*/
-		template<typename K, typename V>
-		void setField(K&& key, V&& value)
-		{
-			lua_State* state = state_();
-			if (!state)
+			/**
+			* @brief table[key] = value;
+			*/
+			template<typename K, typename V>
+			void setField(K&& key, V&& value)
 			{
-				except::typeMismatchError(state, "is nil");
-				return;
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, std::forward<K>(key));//push table key
+				util::one_push(state, std::forward<V>(value));//push value
+				lua_settable(state, stackIndex);//thistable[key] = value
 			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			util::one_push(state, std::forward<K>(key));//push table key
-			util::one_push(state, std::forward<V>(value));//push value
-			lua_settable(state, stackIndex);//thistable[key] = value
-		}
-		template<typename V>
-		void setField(const char* key, V&& value)
-		{
-			lua_State* state = state_();
-			if (!state)
+			template<typename V>
+			void setField(const char* key, V&& value)
 			{
-				except::typeMismatchError(state, "is nil");
-				return;
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, std::forward<V>(value));//push value
+				lua_setfield(state, stackIndex, key);//thistable[key] = value
 			}
-			util::ScopedSavedStack save(state);
-			int stackIndex = pushStackIndex_(state);
-			util::one_push(state, std::forward<V>(value));//push value
-			lua_setfield(state, stackIndex, key);//thistable[key] = value
-		}
-		template<typename V>
-		void setField(const std::string& key, V&& value)
-		{
-			setField(key.c_str(), std::forward<V>(value));
-		}
+			template<typename V>
+			void setField(const std::string& key, V&& value)
+			{
+				setField(key.c_str(), std::forward<V>(value));
+			}
 #endif
-	};
-
+		};
+	}
 }

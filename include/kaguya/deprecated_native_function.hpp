@@ -38,8 +38,6 @@ namespace kaguya
 
 		struct BaseInvoker
 		{
-			virtual int argsCount()const = 0;
-			virtual bool checktype(lua_State *state, bool strictcheck) = 0;
 			virtual int invoke(lua_State *state) = 0;
 			virtual std::string argumentTypeNames() = 0;
 			virtual uint8_t argsMatchingScore(lua_State* state) = 0;
@@ -62,19 +60,6 @@ namespace kaguya
 				typedef F func_type;
 				func_type func_;
 				FunInvoker(func_type fun) :func_(fun) {}
-				virtual int argsCount()const {
-					return argCount(func_);
-				}
-				virtual bool checktype(lua_State *state, bool strictcheck) {
-					if (strictcheck)
-					{
-						return strictCheckArgTypes(state, func_);
-					}
-					else
-					{
-						return checkArgTypes(state, func_);
-					}
-				}
 				virtual int invoke(lua_State *state)
 				{
 					int count = call(state, func_);
@@ -182,7 +167,7 @@ namespace kaguya
 
 		inline int functor_destructor(lua_State *state)
 		{
-			FunctorType* f = class_userdata::test_userdata<FunctorType>(state, 1);
+			FunctorType* f = static_cast<FunctorType*>(lua_touserdata(state, 1));
 			if (f)
 			{
 				f->~FunctorType();
@@ -204,30 +189,10 @@ namespace kaguya
 	typedef std::vector<FunctorType> FunctorOverloadType;
 
 
-
-
 	//!deperecated
 	template<> struct lua_type_traits<FunctorType> {
 		typedef FunctorType get_type;
 		typedef FunctorType push_type;
-
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return 0 != class_userdata::test_userdata<FunctorType>(l, index);
-		}
-		static bool checkType(lua_State* l, int index)
-		{
-			return 0 != class_userdata::test_userdata<FunctorType>(l, index);
-		}
-		static FunctorType get(lua_State* l, int index)
-		{
-			FunctorType* ptr = class_userdata::test_userdata<FunctorType>(l, index);
-			if (ptr)
-			{
-				return *ptr;
-			}
-			return FunctorType();
-		}
 		static int push(lua_State* l, const FunctorType& f)
 		{
 			lua_pushnumber(l, 1);//no overload

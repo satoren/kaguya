@@ -21,6 +21,7 @@ namespace kaguya
 	typedef std::pair<std::string, lua_CFunction> LoadLib;
 	typedef std::vector<LoadLib> LoadLibs;
 	inline LoadLibs NoLoadLib() { return LoadLibs(); }
+	struct AllLoadLibs {};
 
 	template<typename Allocator>
 	void * AllocatorFunction(void *ud,
@@ -77,7 +78,16 @@ namespace kaguya
 		State& operator =(const State&);
 
 
+
+		static int initializing_panic(lua_State *L) {
+			ErrorHandler::throwDefaultError(lua_status(L), lua_tostring(L, -1));
+			return 0;  /* return to Lua to abort */
+		}
 		static int default_panic(lua_State *L) {
+			if (ErrorHandler::handle(lua_status(L), L))
+			{
+				return 0;
+			}
 			fprintf(stderr, "PANIC: unprotected error in call to Lua API (%s)\n", lua_tostring(L, -1));
 			fflush(stderr);
 			return 0;  /* return to Lua to abort */
@@ -86,11 +96,25 @@ namespace kaguya
 		{
 			std::cerr << message << std::endl;
 		}
-		void init()
+
+		template<typename Libs>void init(const Libs& lib)
 		{
-			if (!ErrorHandler::getHandler(state_))
+			if (state_)
 			{
-				setErrorHandler(&stderror_out);
+				lua_atpanic(state_, &initializing_panic);
+				try
+				{
+					if (!ErrorHandler::getHandler(state_))
+					{
+						setErrorHandler(&stderror_out);
+					}
+					openlibs(lib);
+					lua_atpanic(state_, &default_panic);
+				}
+				catch (const LuaException&)
+				{
+					lua_close(state_); state_ = 0;
+				}
 			}
 		}
 
@@ -104,9 +128,7 @@ namespace kaguya
 		*/
 		State() :allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
-//			lua_atpanic(state_, &default_panic);
-			init();
-			openlibs();
+			init(AllLoadLibs());
 		}
 
 		/**
@@ -117,9 +139,7 @@ namespace kaguya
 		template<typename Allocator>
 		State(standard::shared_ptr<Allocator> allocator) :allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
-			lua_atpanic(state_, &default_panic);
-			init();
-			openlibs();
+			init(AllLoadLibs());
 		}
 
 		/**
@@ -131,9 +151,7 @@ namespace kaguya
 		*/
 		State(const LoadLibs& libs) : allocator_holder_(), state_(luaL_newstate()), created_(true)
 		{
-//			lua_atpanic(state_, &default_panic);
-			init();
-			openlibs(libs);
+			init(libs);
 		}
 		/**
 		* @name constructor
@@ -143,9 +161,7 @@ namespace kaguya
 		template<typename Allocator>
 		State(const LoadLibs& libs, standard::shared_ptr<Allocator> allocator) : allocator_holder_(allocator), state_(lua_newstate(&AllocatorFunction<Allocator>, allocator_holder_.get())), created_(true)
 		{
-			lua_atpanic(state_, &default_panic);
-			init();
-			openlibs(libs);
+			init(libs);
 		}
 
 
@@ -156,11 +172,17 @@ namespace kaguya
 		*/
 		State(lua_State* lua) :state_(lua), created_(false)
 		{
-			init();
+			if (state_)
+			{
+				if (!ErrorHandler::getHandler(state_))
+				{
+					setErrorHandler(&stderror_out);
+				}
+			}
 		}
 		~State()
 		{
-			if (created_)
+			if (created_ && state_)
 			{
 				lua_close(state_);
 			}
@@ -172,6 +194,7 @@ namespace kaguya
 		*/
 		void setErrorHandler(standard::function<void(int statuscode, const char*message)> errorfunction)
 		{
+			if (!state_) { return; }
 			util::ScopedSavedStack save(state_);
 			ErrorHandler::registerHandler(state_, errorfunction);
 		}
@@ -181,8 +204,9 @@ namespace kaguya
 		* @name openlibs
 		* @brief load all lua standard library
 		*/
-		void openlibs()
+		void openlibs(AllLoadLibs = AllLoadLibs())
 		{
+			if (!state_) { return; }
 			luaL_openlibs(state_);
 		}
 
@@ -192,6 +216,7 @@ namespace kaguya
 		*/
 		LuaStackRef openlib(const LoadLib& lib)
 		{
+			if (!state_) { return LuaStackRef(); }
 			luaL_requiref(state_, lib.first.c_str(), lib.second, 1);
 			return LuaStackRef(state_, -1, true);
 		}
@@ -258,7 +283,12 @@ namespace kaguya
 		}
 		bool dostream(std::istream& stream, const char* chunkname = "", const LuaTable& env = LuaTable())
 		{
+			util::ScopedSavedStack save(state_);
 			LuaFunction f = loadstream(stream,chunkname);
+			if (!f)
+			{//load failed
+				return false;
+			}
 			if (!env.isNilref())
 			{
 				f.setFunctionEnv(env);
@@ -573,5 +603,10 @@ namespace kaguya
 		* @return lua_State*
 		*/
 		lua_State *state() { return state_; };
+
+		/**
+		* @brief check valid lua_State.
+		*/
+		bool isInvalid() const { return !state_; }
 	};
 }

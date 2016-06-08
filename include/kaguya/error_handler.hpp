@@ -10,20 +10,22 @@
 #include "kaguya/config.hpp"
 #include "kaguya/type.hpp"
 
-
-#define KAGUYA_ERROR_HANDLER_METATABLE "error_handler_kaguya_metatype"
-
 namespace kaguya
 {
 
 	inline const char* get_error_message(lua_State *state)
 	{
-		const char* message = lua_tostring(state, -1);
-		return message ? message : "unknown error";
+		if (lua_type(state, -1) == LUA_TSTRING)
+		{
+			const char* message = lua_tostring(state, -1);
+			return message ? message : "unknown error";
+		}
+		else
+		{
+			return "unknown error";
+		}
 	}
-
-
-
+	
 #if KAGUYA_NO_SET_AT_PANIC
 	inline void set_at_panic_handler(lua_State* state)
 	{
@@ -64,29 +66,35 @@ namespace kaguya
 		typedef standard::function<void(int, const char*)> function_type;
 
 
-		static void handle(const char* message, lua_State *state)
+		static bool handle(const char* message, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
 			{
 				handler(0, message);
+				return true;
 			}
+			return false;
 		}
-		static void handle(int status_code, const char* message, lua_State *state)
+		static bool handle(int status_code, const char* message, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
 			{
 				handler(status_code, message);
+				return true;
 			}
+			return false;
 		}
-		static void handle(int status_code, lua_State *state)
+		static bool handle(int status_code, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
 			{
 				handler(status_code, get_error_message(state));
+				return true;
 			}
+			return false;
 		}
 
 		static function_type getHandler(lua_State* state)
@@ -117,32 +125,48 @@ namespace kaguya
 			set_at_panic_handler(state);
 			if (state)
 			{
-				util::ScopedSavedStack save(state);
-				lua_pushlightuserdata(state, handlerRegistryKey());
-				if (class_userdata::newmetatable<function_type>(state))//register error handler destructor to Lua state
+				function_type* funptr = getFunctionPointer(state);
+				if (!funptr)
 				{
+					util::ScopedSavedStack save(state);
+					lua_pushlightuserdata(state, handlerRegistryKey());
+					void* ptr = lua_newuserdata(state, sizeof(function_type));//dummy data for gc call
+					funptr = new(ptr) function_type();
+
+					//create function_type metatable
+					lua_newtable(state);
 					lua_pushcclosure(state, &error_handler_cleanner, 0);
 					lua_setfield(state, -2, "__gc");
+					lua_pushvalue(state, -1);
 					lua_setfield(state, -1, "__index");
-					void* ptr = lua_newuserdata(state, sizeof(function_type));//dummy data for gc call
-					if (!ptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
-					function_type* funptr = new(ptr) function_type();
-					if (!funptr) { throw std::runtime_error("critical error. maybe failed memory allocation"); }//critical error
-					class_userdata::setmetatable<function_type>(state);
+					lua_setmetatable(state, -2);
+
 					lua_settable(state, LUA_REGISTRYINDEX);
-					*funptr = f;
 				}
-				else
-				{
-					function_type* funptr = getFunctionPointer(state);
-					if (funptr)
-					{
-						*funptr = f;
-					}
-				}
+				*funptr = f;
 			}
 		}
 		
+		static void throwDefaultError(int status, const char* message=0)
+		{
+			switch (status)
+			{
+			case LUA_ERRSYNTAX:
+				throw LuaSyntaxError(status, message ? std::string(message) : "unknown syntax error");
+			case LUA_ERRRUN:
+				throw LuaRuntimeError(status, message ? std::string(message) : "unknown runtime error");
+			case LUA_ERRMEM:
+				throw LuaMemoryError(status, message ? std::string(message) : "lua memory allocation error");
+			case LUA_ERRERR:
+				throw LuaErrorRunningError(status, message ? std::string(message) : "unknown error running error");
+#if LUA_VERSION_NUM >= 502
+			case LUA_ERRGCMM:
+				throw LuaGCError(status, message ? std::string(message) : "unknown gc error");
+#endif
+			default:
+				throw LuaUnknownError(status, message ? std::string(message) : "lua unknown error");
+			}
+		}
 	private:
 
 		static void* handlerRegistryKey()
@@ -180,44 +204,44 @@ namespace kaguya
 	{
 		inline void OtherError(lua_State *state, const std::string& message)
 		{
-			ErrorHandler::handle(message.c_str(), state);
+			if (ErrorHandler::handle(message.c_str(), state))
+			{
+				return;
+			}
 #if !KAGUYA_ERROR_NO_THROW
-			throw LuaKaguyaError(message);
+			throw KaguyaException(message);
 #endif
 		}
 		inline void typeMismatchError(lua_State *state, const std::string& message)
 		{
-			ErrorHandler::handle(message.c_str(), state);
+			if(ErrorHandler::handle(message.c_str(), state))
+			{
+				return;
+			}
 #if !KAGUYA_ERROR_NO_THROW
 			throw LuaTypeMismatch(message);
+#endif
+		}
+		inline void memoryError(lua_State *state, const char* message)
+		{
+			if (ErrorHandler::handle(message, state))
+			{
+				return;
+			}
+#if !KAGUYA_ERROR_NO_THROW
+			throw LuaMemoryError(lua_status(state), message ? std::string(message) : "lua memory allocation error");
 #endif
 		}
 		inline bool checkErrorAndThrow(int status, lua_State *state)
 		{
 			if (status != 0 && status != LUA_YIELD)
 			{
-				ErrorHandler::handle(status, state);
-#if !KAGUYA_ERROR_NO_THROW
-				const char* message = 0;
-				switch (status)
+				if (ErrorHandler::handle(status, state))
 				{
-				case LUA_ERRSYNTAX:
-					message = lua_tostring(state, -1);
-					throw LuaSyntaxError(status, message ? std::string(message) : "unknown syntax error");
-				case LUA_ERRRUN:
-					message = lua_tostring(state, -1);
-					throw LuaRuntimeError(status, message ? std::string(message) : "unknown runtime error");
-				case LUA_ERRMEM:
-					throw LuaMemoryError(status, "lua memory allocation error");
-				case LUA_ERRERR:
-					message = lua_tostring(state, -1);
-					throw LuaRunningError(status, message ? std::string(message) : "unknown error");
-				case LUA_ERRGCMM:
-					message = lua_tostring(state, -1);
-					throw LuaGCError(status, message ? std::string(message) : "unknown gc error");
-				default:
-					throw LuaUnknownError(status, "lua unknown error");
+					return false;
 				}
+#if !KAGUYA_ERROR_NO_THROW
+				throwDefaultError(status, lua_tostring(state, -1));
 #endif
 				return false;
 			}

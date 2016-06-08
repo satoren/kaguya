@@ -33,7 +33,7 @@ build_script:
 
     cd build
 
-    cmake ../ -G $env:CMAKE_GEN_TYPE -DADDITIONAL_INCLUDE_PATH="$env:ADDITIONAL_INCLUDE_PATH"
+    cmake ../ -G $env:CMAKE_GEN_TYPE -DADDITIONAL_INCLUDE_PATH="$env:ADDITIONAL_INCLUDE_PATH" -DLOCAL_LUA_DIRECTORY=lua-5.3.2
 
     cmake --build . --config $env:CONFIGURATION
 test_script:

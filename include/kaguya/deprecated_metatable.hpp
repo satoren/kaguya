@@ -199,7 +199,7 @@ namespace kaguya
 		{
 			if (has_key(name, true))
 			{
-				//already registerd
+				//already registered
 				return *this;
 			}
 			addFunction(name, f);
@@ -217,7 +217,7 @@ namespace kaguya
 		{
 			if (has_key(name, true))
 			{
-				//already registerd
+				//already registered
 				return *this;
 			}
 			addFunction(name, f);
@@ -245,7 +245,7 @@ namespace kaguya
 		{
 			if (has_key(name, true))
 			{
-				//already registerd
+				//already registered
 				return *this;
 			}
 			addFunction(name, f);
@@ -265,7 +265,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				//already registerd
+				//already registered
 				return *this;
 			}
 			member_map_[name] = DataHolderType(new DataHolder<Data>(f));
@@ -279,7 +279,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				//already registerd
+				//already registered
 				return *this;
 			}
 			member_map_[name] = DataHolderType(new MoveDataHolder<Data>(std::move(f)));

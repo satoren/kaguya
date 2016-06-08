@@ -146,8 +146,7 @@ namespace kaguya
 			util::ScopedSavedStack save(state);
 			if (class_userdata::newmetatable<class_type>(state))
 			{
-				LuaTable metatable(state, StackTop());
-				metatable.push();
+				LuaStackRef metatable(state, -1);
 				registerMember(state);
 
 				if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
@@ -221,7 +220,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			property_map_[name] = metatable_detail::makeDataHolder(function(mem));
@@ -233,7 +232,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
@@ -246,7 +245,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			
@@ -261,7 +260,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(d);
@@ -273,7 +272,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd."); 
+				throw KaguyaException("already registered."); 
 				return *this;
 			}
 
@@ -286,7 +285,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd.");
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(std::forward<Data>(d));
@@ -302,7 +301,7 @@ namespace kaguya
 		{\
 			if (has_key(name))\
 			{\
-				throw KaguyaException("already registerd.");\
+				throw KaguyaException("already registered.");\
 				return *this;\
 			}\
 			member_map_[name] = metatable_detail::makeDataHolder(overload(KAGUYA_PP_ARG_REPEAT(N)));\
@@ -322,7 +321,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
@@ -334,7 +333,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registerd. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = metatable_detail::makeDataHolder(function(f));
@@ -371,11 +370,11 @@ namespace kaguya
 
 	private:
 
-		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<void>)const
+		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<void>)const
 		{
 		}
 		template<class Base>
-		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<Base>)const
+		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<Base>)const
 		{
 			class_userdata::get_metatable<Base>(state);
 			metatable.setMetatable(LuaTable(state, StackTop()));
@@ -384,7 +383,7 @@ namespace kaguya
 			pconverter.add_type_conversion<Base, class_type>();
 		}
 
-		void set_multiple_base(lua_State* state, LuaTable& metatable, const LuaTable& metabases)const
+		void set_multiple_base(lua_State* state, LuaStackRef& metatable, const LuaTable& metabases)const
 		{
 			LuaTable newmeta(state, NewTable());
 
@@ -406,14 +405,14 @@ namespace kaguya
 #if KAGUYA_USE_CPP11
 
 		template<typename Base>
-		void metatables(lua_State* state, LuaTable& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
+		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
 			metabases.setField(metabases.size() + 1, LuaTable(state, StackTop()));
 			pvtreg.add_type_conversion<Base, class_type>();
 		}
 		template<typename Base, typename... Remain>
-		void metatables(lua_State* state, LuaTable& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
+		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
 			metabases.setField(metabases.size() + 1, LuaTable(state, StackTop()));
@@ -422,10 +421,12 @@ namespace kaguya
 		}
 
 		template<typename... Bases>
-		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<MultipleBase<Bases...> > metatypes)const
+		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<MultipleBase<Bases...> > metatypes)const
 		{
 			PointerConverter& pconverter = PointerConverter::get(state);
-			LuaTable metabases(state, NewTable(sizeof...(Bases), 0));
+
+			util::one_push(state, NewTable(sizeof...(Bases),0));
+			LuaStackRef metabases(state,-1, true);
 			metatables(state, metabases, pconverter, metatypes);
 			set_multiple_base(state, metatable, metabases);
 		}
@@ -437,10 +438,11 @@ namespace kaguya
 		pconverter.add_type_conversion<KAGUYA_PP_CAT(A,N),class_type>();
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
-		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
+		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
 		{\
 			PointerConverter& pconverter = PointerConverter::get(state);\
-			LuaTable metabases(state, NewTable(N, 0));\
+			util::one_push(state, NewTable(N,0));\
+			LuaStackRef metabases(state,-1, true);\
 			KAGUYA_PP_REPEAT(N, KAGUYA_GET_BASE_METATABLE); \
 			set_multiple_base(state, metatable, metabases);\
 		}\
