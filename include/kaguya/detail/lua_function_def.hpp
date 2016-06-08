@@ -6,7 +6,6 @@
 #pragma once
 
 #include <vector>
-#include <set>
 #include <map>
 #include <cassert>
 #include <algorithm>
@@ -196,7 +195,8 @@ namespace kaguya
 				}
 				util::push_args(thread, std::forward<Args>(args)...);
 				int argnum = lua_gettop(thread) - argstart;
-				int result = compat::lua_resume_compat(thread, argnum);
+				if (argnum < 0) { argnum = 0; }
+				int result = lua_resume(thread, 0, argnum);
 				except::checkErrorAndThrow(result, thread);
 				return detail::FunctionResultProxy::ReturnValue(thread, result, argstart, types::typetag<Result>());
 			}
@@ -228,7 +228,8 @@ namespace kaguya
 			}\
 			util::push_args(thread KAGUYA_PP_REPEAT(N, KAGUYA_PUSH_ARG_DEF));\
 			int argnum = lua_gettop(thread) - argstart;\
-			int result = compat::lua_resume_compat(thread, argnum);\
+			if (argnum < 0) { argnum = 0; }\
+			int result = lua_resume(thread,0, argnum);\
 			except::checkErrorAndThrow(result, thread);\
 			return detail::FunctionResultProxy::ReturnValue(thread,result, argstart, types::typetag<Result>());\
 		}

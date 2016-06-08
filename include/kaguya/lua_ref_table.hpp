@@ -7,7 +7,6 @@
 
 #include <vector>
 #include <map>
-#include <cassert>
 #include "kaguya/config.hpp"
 #include "kaguya/lua_ref.hpp"
 
@@ -43,19 +42,12 @@ namespace kaguya
 			lua_setfield(state, table_index, key.c_str());
 		}
 
-#if LUA_VERSION_NUM > 502
 		template<typename V>
-		static void set(lua_State* state, int table_index, luaInt key, V&& value)
+		static void set(lua_State* state, int table_index, const luaInt& key, V&& value)
 		{
 			util::one_push(state, std::forward<V>(value));
 			lua_seti(state, table_index, key);
 		}
-		template<typename V>
-		static void set(lua_State* state, int table_index, const int& key, V&& value)
-		{
-			set(state, table_index, luaInt(key), std::forward<V>(value));
-		}
-#endif
 #endif
 		template<typename V, typename KEY>
 		static void set(lua_State* state, int table_index, const KEY& key, const V& value)
@@ -76,19 +68,13 @@ namespace kaguya
 			util::one_push(state, value);
 			lua_setfield(state, table_index, key.c_str());
 		}
-#if LUA_VERSION_NUM > 502
+
 		template<typename V>
-		static void set(lua_State* state, int table_index, luaInt key, const V& value)
+		static void set(lua_State* state, int table_index, const luaInt& key, const V& value)
 		{
 			util::one_push(state, value);
 			lua_seti(state, table_index, key);
 		}
-		template<typename V>
-		static void set(lua_State* state, int table_index, const int& key, const V& value)
-		{
-			set(state, table_index, luaInt(key), value);
-		}
-#endif
 
 		template<typename KEY>
 		static void get(lua_State* state, int table_index, const KEY& key)
@@ -104,18 +90,10 @@ namespace kaguya
 		{
 			lua_getfield(state, table_index, key.c_str());
 		}
-
-
-#if LUA_VERSION_NUM > 502
 		static void get(lua_State* state, int table_index, luaInt key)
 		{
 			lua_geti(state, table_index, key);
 		}
-		static void get(lua_State* state, int table_index, const int& key)
-		{
-			lua_geti(state, table_index, key);
-		}
-#endif
 	};
 
 

@@ -6,7 +6,6 @@
 #pragma once
 
 #include <vector>
-#include <set>
 #include <map>
 #include <cassert>
 #include <algorithm>

@@ -6,11 +6,8 @@
 #pragma once
 
 #include <vector>
-#include <set>
 #include <map>
-#include <cassert>
 #include <algorithm>
-#include <ostream>
 #include "kaguya/config.hpp"
 #include "kaguya/error_handler.hpp"
 #include "kaguya/type.hpp"
@@ -215,11 +212,7 @@ namespace kaguya
 				std::vector<K, A> res;
 				util::ScopedSavedStack save(state_());
 				int stackIndex = pushStackIndex_(state_());
-#if LUA_VERSION_NUM >= 502
 				int size = lua_rawlen(state_(), stackIndex);
-#else
-				int size = lua_objlen(state_(), stackIndex);
-#endif
 				res.reserve(size);
 				foreach_table<K, void>(gettablekey<K, A>(res));
 				return res;
@@ -240,11 +233,7 @@ namespace kaguya
 				std::vector<V, A> res;
 				util::ScopedSavedStack save(state_());
 				int stackIndex = pushStackIndex_(state_());
-#if LUA_VERSION_NUM >= 502
-				size_t size = lua_rawlen(state_(), stackIndex);
-#else
-				size_t size = lua_objlen(state_(), stackIndex);
-#endif
+				int size = lua_rawlen(state_(), stackIndex);
 				res.reserve(size);
 				foreach_table<void, V>(gettablevalue<V, A>(res));
 				return res;

@@ -5,60 +5,10 @@
 #pragma once
 
 #include "kaguya/config.hpp"
+#include "kaguya/compatibility.hpp"
 
 namespace kaguya
 {
-
-	//for lua version compatibility
-	namespace compat
-	{
-		inline int lua_resume_compat(lua_State *L, int nargs)
-		{
-			if (nargs < 0) { nargs = 0; }
-#if LUA_VERSION_NUM >= 502
-			return lua_resume(L, 0, nargs);
-#else
-			return lua_resume(L, nargs);
-#endif
-		}
-
-		inline int lua_absindex_compat(lua_State *L, int idx)
-		{
-#if LUA_VERSION_NUM >= 502
-			return lua_absindex(L, idx);
-#else
-			return (idx > 0 || (idx <= LUA_REGISTRYINDEX)) ? idx : lua_gettop(L) + 1 + idx;
-#endif
-		}
-
-		inline void lua_rawsetp_compat(lua_State *L, int idx, const void* ptr)
-		{
-#if LUA_VERSION_NUM >= 502
-			lua_rawsetp(L, idx, ptr);
-#else
-			int absidx = lua_absindex_compat(L, idx);
-			lua_pushvalue(L, -1);
-			lua_pushlightuserdata(L, (void*)ptr);
-			lua_replace(L, -3);
-			lua_rawset(L, absidx);
-#endif
-		}
-		inline int lua_rawgetp_compat(lua_State *L, int idx, const void* ptr)
-		{
-#if LUA_VERSION_NUM >= 503
-			return lua_rawgetp(L, idx, ptr);
-#elif LUA_VERSION_NUM >= 502
-			lua_rawgetp(L, idx, ptr);
-			return lua_type(L, -1);
-#else
-			int absidx = lua_absindex_compat(L, idx);
-			lua_pushlightuserdata(L, (void*)ptr);
-			lua_rawget(L, absidx);
-			return lua_type(L, -1);
-#endif
-		}
-	}
-
 	namespace util
 	{
 		class ScopedSavedStack {
@@ -132,7 +82,7 @@ namespace kaguya
 
 		inline void stackValueDump(std::ostream& os, lua_State* state, int stackIndex, int max_recursive = 2)
 		{
-			stackIndex = compat::lua_absindex_compat(state, stackIndex);
+			stackIndex = lua_absindex(state, stackIndex);
 			util::ScopedSavedStack save(state);
 			int type = lua_type(state, stackIndex);
 			switch (type)

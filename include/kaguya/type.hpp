@@ -670,11 +670,7 @@ namespace kaguya
 	template<>	struct lua_type_traits<GlobalTable> {
 		static int push(lua_State* l, const GlobalTable&)
 		{
-#if LUA_VERSION_NUM >= 502
 			lua_pushglobaltable(l);
-#else
-			lua_pushvalue(l, LUA_GLOBALSINDEX);
-#endif
 			return 1;
 		}
 	};
@@ -719,17 +715,8 @@ namespace kaguya
 				if (!state) { return 0; }
 				util::ScopedSavedStack save(state);
 				int index = pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
-				return lua_rawlen(state, index);
-#else
 
-				int type = lua_type(state, index);
-				if (type != TYPE_STRING && type != TYPE_TABLE && type != TYPE_USERDATA && type != TYPE_LIGHTUSERDATA)
-				{
-					return 0;
-				}
-				return lua_objlen(state, index);
-#endif
+				return lua_rawlen(state, index);
 			}
 
 			//return type
@@ -807,11 +794,7 @@ namespace kaguya
 				util::ScopedSavedStack save(state);
 				int index = pushStackIndex_(state);
 				int rhsindex = rhs.pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
 				return lua_compare(state, index, rhsindex, LUA_OPEQ) != 0;
-#else
-				return lua_equal(state, index, rhsindex) != 0;
-#endif
 			}
 			template<typename OtherDrived>
 			inline bool operator<(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
@@ -821,11 +804,7 @@ namespace kaguya
 				util::ScopedSavedStack save(state);
 				int index = pushStackIndex_(state);
 				int rhsindex = rhs.pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
 				return lua_compare(state, index, rhsindex, LUA_OPLT) != 0;
-#else
-				return lua_lessthan(state, index, rhsindex) != 0;
-#endif
 			}
 			template<typename OtherDrived>
 			inline bool operator<=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
@@ -835,11 +814,7 @@ namespace kaguya
 				util::ScopedSavedStack save(state);
 				int index = pushStackIndex_(state);
 				int rhsindex = rhs.pushStackIndex_(state);
-#if LUA_VERSION_NUM >= 502
 				return lua_compare(state, index, rhsindex, LUA_OPLE) != 0;
-#else
-				return lua_equal(state, index, rhsindex) != 0 || lua_lessthan(state, index, rhsindex) != 0;
-#endif
 			}
 			template<typename OtherDrived>
 			inline bool operator>=(const LuaBasicTypeFunctions<OtherDrived>& rhs)const
