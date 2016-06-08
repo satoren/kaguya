@@ -17,7 +17,7 @@ namespace kaguya
 	public:
 		optional() : value_(0) {};
 		optional(nullopt_t) : value_(0) {};
-		optional(const optional& other)
+		optional(const optional& other) : value_(0)
 		{
 			if (other)
 			{
