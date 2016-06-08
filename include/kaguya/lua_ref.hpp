@@ -534,81 +534,75 @@ namespace kaguya
 
 		struct LuaLoadStreamWrapper
 		{
-			LuaLoadStreamWrapper(std::istream& stream) :preload_(false), stream_(stream)
+			LuaLoadStreamWrapper(std::istream& stream) :preloaded_(false), stream_(stream)
 			{
 				buffer_.reserve(512);
 				skipComment();
+				preloaded_ = !buffer_.empty();
 			}
-			std::vector<char> skipBom()
+			void skipBom()
 			{
-				std::vector<char> preload;
-				preload.reserve(512);
-				const char* bomseq = "\xEF\xBB\xBF";
-				while (stream_.good())
+				const char* bom = "\xEF\xBB\xBF";
+				const char* bomseq = bom;
+				char c;
+				while (stream_.get(c))
 				{
-					char c = stream_.get();
-					preload.push_back(c);
-					if (c != *bomseq)
+					if (c != *bomseq)// not bom sequence
 					{
+						buffer_.assign(bom, bomseq);
+						buffer_.push_back(c);
 						break;
 					}
 					bomseq++;
 					if ('\0' == *bomseq)
 					{
-						preload.clear();
+						return;
 					}
 				}
-				return preload;
 			}
 			void skipComment()
 			{
-				std::vector<char> preload = skipBom();
-				if (!preload.empty() && preload.front() == '#')
+				skipBom();
+				
+				if (!buffer_.empty() && buffer_.front() == '#')
 				{
-					std::vector<char>::iterator lf = std::find(preload.begin(), preload.end(), '\n');
-					if (lf != preload.end())
+					std::vector<char>::iterator lf = std::find(buffer_.begin(), buffer_.end(), '\n');
+					if (lf != buffer_.end())
 					{
-						buffer_.assign(lf, preload.end());
+						buffer_.erase(buffer_.begin(), buffer_.end());
 					}
 					else
 					{
+						buffer_.clear();
 						std::string comment;
 						std::getline(stream_, comment);
 					}
 				}
-				else
-				{
-					buffer_.assign(preload.begin(), preload.end());
-				}
-				preload_ = !buffer_.empty();
 			}
 			
 
 			static const char *getdata(lua_State *, void *ud, size_t *size) {
 				LuaLoadStreamWrapper *loader = static_cast<LuaLoadStreamWrapper *>(ud);
 
-				if (loader->preload_)
+				if (loader->preloaded_)
 				{
-					loader->preload_ = false;
+					loader->preloaded_ = false;
 				}
 				else
 				{
 					loader->buffer_.clear();
 				}
 
-				while (loader->stream_.good() && loader->buffer_.size() < loader->buffer_.capacity())
+				char c = 0;
+				while (loader->buffer_.size() < loader->buffer_.capacity() && loader->stream_.get(c))
 				{
-					int c = loader->stream_.get();
-					if (!loader->stream_.eof())
-					{
-						loader->buffer_.push_back(c);
-					}
+					loader->buffer_.push_back(c);
 				}
 				*size = loader->buffer_.size();
 				return loader->buffer_.empty()?0:&loader->buffer_[0];
 			}
 		private:
-			bool preload_;
+			bool preloaded_;
 			std::vector<char> buffer_;
 			std::istream& stream_;
 		};
@@ -620,11 +614,23 @@ namespace kaguya
 		* @param file  file path of lua script
 		* @return reference of lua function
 		*/
-		static LuaFunction loadstream(lua_State* state, std::istream& stream, const std::string& chunkname = "")
+		static LuaStackRef loadstreamtostack(lua_State* state, std::istream& stream, const char* chunkname = 0)
 		{
-			return loadstream(state, stream, chunkname.c_str());
+			LuaLoadStreamWrapper wrapper(stream);
+#if LUA_VERSION_NUM >= 502
+			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname, 0);
+#else
+			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname);
+#endif
+			if (status)
+			{
+				ErrorHandler::handle(status, state);
+				lua_pushnil(state);
+			}
+			return LuaStackRef(state,-1,true);
 		}
-		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = "")
+
+		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = 0)
 		{
 			LuaLoadStreamWrapper wrapper(stream);
 #if LUA_VERSION_NUM >= 502
