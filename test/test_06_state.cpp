@@ -191,6 +191,7 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 
 KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 {
+	state("value=nil");
 	{
 		std::stringstream sstream;
 		sstream << "value=true";
@@ -198,22 +199,62 @@ KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 		TEST_EQUAL(state["value"], true);
 	}
 
+	state("value=nil");
 	{//BOM
 		std::stringstream sstream;
-		sstream << "\xEF\xBB\xBFvalue2=true";
+		sstream << "\xEF\xBB\xBFvalue=true";
 		TEST_CHECK(state.dostream(sstream, "streamchunk"));
-		TEST_EQUAL(state["value2"], true);
+		TEST_EQUAL(state["value"], true);
 	}
 
 
+	state("value=nil");
 	{//comment
 		std::stringstream sstream;
 		sstream << "#/bin/lua\n"
-			       "value3=true";
+			       "value=true";
 		TEST_CHECK(state.dostream(sstream, "streamchunk"));
-		TEST_EQUAL(state["value3"], true);
+		TEST_EQUAL(state["value"], true);
 	}
-	
+
+	state("value=nil");
+	{//short comment
+		std::stringstream sstream;
+		sstream << "#\n"
+			"value=true";
+		TEST_CHECK(state.dostream(sstream, "streamchunk"));
+		TEST_EQUAL(state["value"], true);
+	}
+	state("value=nil");
+	{
+		std::stringstream sstream;
+		sstream << "value=true";
+		TEST_CHECK(state.dostream(sstream));
+		TEST_EQUAL(state["value"], true);
+	}
+	state("value=nil");
+	{
+		std::stringstream sstream;
+		sstream << "value=true";
+		state.loadstream(sstream)();//loadstream and execute
+		TEST_EQUAL(state["value"], true);
+	}
+	state("value=nil");
+	{
+		std::stringstream sstream;
+		sstream << "value=true";
+		state.loadstream(sstream, "streamchunk")();//loadstream and execute with chunkname
+		TEST_EQUAL(state["value"], true);
+	}
+	state("value=nil");
+	{
+		kaguya::LuaTable env = state.newTable();
+		std::stringstream sstream;
+		sstream << "value=true";
+		state.dostream(sstream, "streamchunk", env);//dostream with chunkname and function env
+		TEST_CHECK(!state["value"]);
+		TEST_EQUAL(env["value"], true);
+	}
 }
 
 
