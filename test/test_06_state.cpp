@@ -251,7 +251,7 @@ KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 		kaguya::LuaTable env = state.newTable();
 		std::stringstream sstream;
 		sstream << "value=true";
-		state.dostream(sstream, "streamchunk", env);//dostream with chunkname and function env
+		TEST_CHECK(state.dostream(sstream, "streamchunk", env));//dostream with chunkname and function env
 		TEST_CHECK(!state["value"]);
 		TEST_EQUAL(env["value"], true);
 	}
@@ -442,7 +442,7 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 		last_error_message = "";
 		std::stringstream sstream;
 		sstream << "=true";
-		state.dostream(sstream, "streamchunk");
+		TEST_CHECK(!state.dostream(sstream, "streamchunk"));
 		TEST_CHECK(last_error_message.find("streamchunk") != std::string::npos);
 	}
 }

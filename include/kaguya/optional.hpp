@@ -14,6 +14,8 @@ namespace kaguya
 	struct nullopt_t {};
 	template<class T>class optional
 	{
+		typedef void (optional::*bool_type)() const;
+		void this_type_does_not_support_comparisons() const {}
 	public:
 		optional() : value_(0) {};
 		optional(nullopt_t) : value_(0) {};
@@ -93,10 +95,6 @@ namespace kaguya
 		}
 #endif
 
-		typedef void (optional::*bool_type)() const;
-
-		void this_type_does_not_support_comparisons() const {}
-
 		operator bool_type() const
 		{
 			return value_ != 0 ? &optional::this_type_does_not_support_comparisons : 0;
@@ -141,6 +139,8 @@ namespace kaguya
 
 	template<class T>class optional<T&>
 	{
+		typedef void (optional::*bool_type)() const;
+		void this_type_does_not_support_comparisons() const {}
 	public:
 		optional() : value_(0) {};
 		optional(nullopt_t) : value_(0) {};
@@ -159,10 +159,6 @@ namespace kaguya
 		{
 			value_ = &value;
 		}
-		typedef void (optional::*bool_type)() const;
-
-		void this_type_does_not_support_comparisons() const {}
-
 		operator bool_type() const
 		{
 			return value_ != 0 ? &optional::this_type_does_not_support_comparisons : 0;
