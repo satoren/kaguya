@@ -6,12 +6,10 @@ file(GLOB LUA_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   src/*.c)
 
 add_library(liblua STATIC ${LUA_SRCS})
-
 SET_TARGET_PROPERTIES(liblua PROPERTIES OUTPUT_NAME lua)
 
-add_executable(lua src/lua.c)
-target_link_libraries(lua liblua)
+#add_executable(lua src/lua.c)
+#target_link_libraries(lua liblua)
 
-
-add_executable(luac src/luac.c)
-target_link_libraries(luac liblua)
+#add_executable(luac src/luac.c)
+#target_link_libraries(luac liblua)
