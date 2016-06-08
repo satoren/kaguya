@@ -101,6 +101,11 @@ namespace kaguya_test_util
 					result = false;
 					std::cout << e.what() << std::endl;
 				}
+				catch (...)
+				{
+					result = false;
+					std::cout << "unknown exception" << std::endl;
+				}
 
 				if (result)
 				{

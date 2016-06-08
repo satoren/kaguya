@@ -338,7 +338,7 @@ namespace kaguya
 		}
 
 		template<typename T>
-		inline LuaTable LuaFunctionImpl<T>::getFunctionEnv()
+		inline LuaTable LuaFunctionImpl<T>::getFunctionEnv()const
 		{
 			lua_State* state = state_();
 			util::ScopedSavedStack save(state);

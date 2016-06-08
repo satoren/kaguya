@@ -257,14 +257,11 @@ namespace kaguya
 		* @brief If there are no errors,compiled stream as a Lua function and return.
 		*  Otherwise send error message to error handler and return nil reference
 		* @param stream stream of lua script
+		* @param chunkname chunkname of lua script
 		* @return reference of lua function
 		*/
 		//@{
-		LuaFunction loadstream(std::istream& stream,const std::string& chunkname="")
-		{
-			return loadstream(stream, chunkname.c_str());
-		}
-		LuaFunction loadstream(std::istream& stream, const char* chunkname="")
+		LuaFunction loadstream(std::istream& stream, const char* chunkname=0)
 		{
 			return LuaFunction::loadstream(state_, stream, chunkname);
 		}
@@ -273,18 +270,15 @@ namespace kaguya
 		* @name dostream
 		* @brief Loads and runs the given stream.
 		* @param stream stream of lua script
+		* @param chunkname chunkname of lua script
 		* @param env execute env table
 		* @return If there are no errors, returns true.Otherwise return false
 		*/
 		//@{
-		bool dostream(std::istream& stream, const std::string& chunkname = "", const LuaTable& env = LuaTable())
-		{
-			return dostream(stream, chunkname.c_str(), env);
-		}
-		bool dostream(std::istream& stream, const char* chunkname = "", const LuaTable& env = LuaTable())
+		bool dostream(std::istream& stream, const char* chunkname = 0, const LuaTable& env = LuaTable())
 		{
 			util::ScopedSavedStack save(state_);
-			LuaFunction f = loadstream(stream,chunkname);
+			LuaStackRef f = LuaFunction::loadstreamtostack(state_,stream,chunkname);
 			if (!f)
 			{//load failed
 				return false;

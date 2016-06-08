@@ -686,6 +686,9 @@ namespace kaguya
 		class LuaBasicTypeFunctions
 		{
 			template<class Other> friend class LuaBasicTypeFunctions;
+			typedef void (LuaBasicTypeFunctions::*bool_type)() const;
+			void this_type_does_not_support_comparisons() const {}
+
 		public:
 			enum value_type
 			{
@@ -704,9 +707,6 @@ namespace kaguya
 				int t = type();
 				return t == LUA_TNIL || t == LUA_TNONE;
 			}
-
-			typedef void (LuaBasicTypeFunctions::*bool_type)() const;
-			void this_type_does_not_support_comparisons() const {}
 
 			/**
 			* @brief Equivalent to `#` operator for strings and tables with no metamethods.
