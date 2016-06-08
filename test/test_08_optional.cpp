@@ -45,7 +45,22 @@ KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
 }
 
 
-KAGUYA_TEST_FUNCTION_DEF(optional_error)(kaguya::State&)
+KAGUYA_TEST_FUNCTION_DEF(optional_value_error)(kaguya::State&)
+{
+	kaguya::optional<std::string> s1;
+
+	TEST_CHECK(!s1);
+	try
+	{
+		s1.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		return;
+	}
+	TEST_CHECK(false);
+}
+KAGUYA_TEST_FUNCTION_DEF(optional_value_error2)(kaguya::State&)
 {
 	kaguya::optional<const std::string&> s1;
 
@@ -60,9 +75,24 @@ KAGUYA_TEST_FUNCTION_DEF(optional_error)(kaguya::State&)
 	}
 	TEST_CHECK(false);
 }
-KAGUYA_TEST_FUNCTION_DEF(optional_error2)(kaguya::State&)
+KAGUYA_TEST_FUNCTION_DEF(optional_value_error3)(kaguya::State&)
 {
-	kaguya::optional<std::string> s1;
+	const kaguya::optional<std::string> s1;
+
+	TEST_CHECK(!s1);
+	try
+	{
+		s1.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		return;
+	}
+	TEST_CHECK(false);
+}
+KAGUYA_TEST_FUNCTION_DEF(optional_value_error4)(kaguya::State&)
+{
+	const kaguya::optional<const std::string&> s1;
 
 	TEST_CHECK(!s1);
 	try

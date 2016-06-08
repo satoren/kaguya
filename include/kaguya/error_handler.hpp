@@ -10,9 +10,6 @@
 #include "kaguya/config.hpp"
 #include "kaguya/type.hpp"
 
-
-#define KAGUYA_ERROR_HANDLER_METATABLE "error_handler_kaguya_metatype"
-
 namespace kaguya
 {
 
@@ -28,9 +25,7 @@ namespace kaguya
 			return "unknown error";
 		}
 	}
-
-
-
+	
 #if KAGUYA_NO_SET_AT_PANIC
 	inline void set_at_panic_handler(lua_State* state)
 	{
