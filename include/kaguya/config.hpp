@@ -68,7 +68,7 @@ extern "C" {
 
 
 #ifndef KAGUYA_DEPRECATED_FEATURE
-#if KAGUYA_USE_CPP11 && defined(__has_cpp_attribute)
+#if __cplusplus >= 201402L && defined(__has_cpp_attribute)
 #if  __has_cpp_attribute(deprecated)
 //C++ standard depecated
 #define KAGUYA_DEPRECATED_FEATURE(MSG) [[deprecated(MSG)]]

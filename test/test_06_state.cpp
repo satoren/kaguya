@@ -212,7 +212,7 @@ KAGUYA_TEST_FUNCTION_DEF(load_from_stream)(kaguya::State& state)
 	{//comment
 		std::stringstream sstream;
 		sstream << "#/bin/lua\n"
-			       "value=true";
+			"value=true";
 		TEST_CHECK(state.dostream(sstream, "streamchunk"));
 		TEST_EQUAL(state["value"], true);
 	}
@@ -267,8 +267,8 @@ struct CountLimitAllocator
 	size_type allocate_limit;
 	size_type allocate_block_max_size;
 	CountLimitAllocator() :allocated_count(0), allocate_limit(0), allocate_block_max_size(0) {}
-	CountLimitAllocator(size_type limit) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(0){}
-	CountLimitAllocator(size_type limit, size_type blockmax) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(blockmax){}
+	CountLimitAllocator(size_type limit) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(0) {}
+	CountLimitAllocator(size_type limit, size_type blockmax) :allocated_count(0), allocate_limit(limit), allocate_block_max_size(blockmax) {}
 	pointer allocate(size_type n)
 	{
 		if (allocate_limit != 0 && allocate_limit < allocated_count)
@@ -302,7 +302,7 @@ struct CountLimitAllocator
 
 struct alloctest { int data; };
 
-KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
+KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State&)
 {
 	kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator);
 	{
@@ -321,11 +321,10 @@ KAGUYA_TEST_FUNCTION_DEF(allocator_test)(kaguya::State& )
 }
 
 
-KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
+KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State&)
 {
 	for (size_t alloclimit = 32; alloclimit < 512; ++alloclimit)
 	{
-
 		kaguya::standard::shared_ptr<CountLimitAllocator> allocator(new CountLimitAllocator(alloclimit));
 		kaguya::State state(allocator);
 		if (!state.state())
@@ -342,9 +341,9 @@ KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State& )
 			Foo foodata;
 			for (size_t i = 0; i < alloclimit; ++i)
 			{
-				state("data[" +to_string(i) + "] ='abc'");
-				state["data"][i+ alloclimit*2] = alloctest();
-				state["data"][i+ alloclimit*3] = 1;
+				state("data[" + to_string(i) + "] ='abc'");
+				state["data"][i + alloclimit * 2] = alloctest();
+				state["data"][i + alloclimit * 3] = 1;
 				state["data"][i + alloclimit * 4] = "str";
 				state["data"][i + alloclimit * 5] = foodata;//copy
 				state["data"][i + alloclimit * 6] = &foodata;//ptr
@@ -414,7 +413,7 @@ KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
 
 void throwErrorRunningError(int status, const char* message)
 {
-	throw kaguya::LuaErrorRunningError(LUA_ERRERR,"error handler error");
+	throw kaguya::LuaErrorRunningError(LUA_ERRERR, "error handler error");
 }
 KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
 {
@@ -461,7 +460,7 @@ KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 			"meta ={__gc=function() error('gc error') end}"
 			"setmetatable(testtable,meta)"
 			"testtable={}"
-			);
+		);
 		state.gc().collect();
 	}
 	catch (const kaguya::LuaGCError& e)
@@ -475,7 +474,7 @@ KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 #endif
 
 
-KAGUYA_TEST_FUNCTION_DEF(gc_test)(kaguya::State& state)
+KAGUYA_TEST_FUNCTION_DEF(full_gc_test)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
 
@@ -484,7 +483,7 @@ KAGUYA_TEST_FUNCTION_DEF(gc_test)(kaguya::State& state)
 	state.gc().disable();
 	for (int i = 0; i < 1000; i++)
 	{
-		state["a"] = kaguya::NewTable(i,i);
+		state["a"] = kaguya::NewTable(i, i);
 		TEST_COMPARE_LE(used, state.gc().count());
 		used = state.gc().count();
 	}
@@ -494,6 +493,20 @@ KAGUYA_TEST_FUNCTION_DEF(gc_test)(kaguya::State& state)
 	int current = state.gc().count();
 	TEST_COMPARE_GT(used, current);
 	TEST_COMPARE_LE(first, current);
+}
+KAGUYA_TEST_FUNCTION_DEF(inc_gc_test)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	int used = state.gc().count();
+	int peak = 0;
+	for (int i = 0; i < 1000; i++)
+	{
+		state["a"] = kaguya::NewTable(i, i);
+		used = state.gc().count();
+		peak = std::max(peak, used);
+	}
+	TEST_COMPARE_LT(peak, 1000);
 }
 
 KAGUYA_TEST_GROUP_END(test_06_state)
