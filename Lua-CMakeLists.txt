@@ -1,11 +1,17 @@
 cmake_minimum_required (VERSION 2.6)
 project (lua)
 
-file(GLOB LUA_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+file(GLOB LIB_LUA_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   src/*.h
-  src/*.c)
+  src/*.c
+  include/*.h)
 
-add_library(liblua STATIC ${LUA_SRCS})
+include_directories("src/")
+include_directories("include/")
+
+list(REMOVE_ITEM LIB_LUA_SRCS src/lua.c src/luac.c)
+
+add_library(liblua STATIC ${LIB_LUA_SRCS})
 SET_TARGET_PROPERTIES(liblua PROPERTIES OUTPUT_NAME lua)
 
 #add_executable(lua src/lua.c)
