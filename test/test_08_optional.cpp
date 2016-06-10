@@ -16,6 +16,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_construct)(kaguya::State&)
 	kaguya::optional<std::string> opt2 = std::string("abc");
 	TEST_EQUAL("abc", *opt2);
 
+	TEST_EQUAL(std::string("abc"), opt2.value_or("def"));
 
 	const kaguya::optional<std::string> opt3 = opt2;
 	TEST_EQUAL("abc", *opt2);
@@ -25,8 +26,13 @@ KAGUYA_TEST_FUNCTION_DEF(optional_construct)(kaguya::State&)
 KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 {
 	kaguya::optional<const char*> s1 = "abc", s2; // constructor
+
+	TEST_EQUAL(std::string("def"), s2.value_or("def"));
 	s2 = s1; 
 	s1 = "def";
+
+	TEST_EQUAL(std::string("def"), s1.value_or("abc"));
+	TEST_EQUAL(std::string("abc"), s2.value_or("def"));
 	TEST_CHECK(s1);
 	TEST_CHECK(s2);
 	TEST_EQUAL(std::string("abc"), *s2);
@@ -39,9 +45,12 @@ KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
 	kaguya::optional<const std::string&> s1 = str; // constructor
 	TEST_EQUAL(std::string("abc"), *s1);
 
+	TEST_EQUAL(std::string("abc"), s1.value_or("def"));
+
 	const kaguya::optional<const std::string&> s2 = str; // constructor
 	TEST_CHECK(s2);
 	TEST_EQUAL(std::string("abc"), *s2);
+	TEST_EQUAL(std::string("abc"), s1.value_or("def"));
 }
 
 
@@ -50,6 +59,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_value_error)(kaguya::State&)
 	kaguya::optional<std::string> s1;
 
 	TEST_CHECK(!s1);
+	TEST_EQUAL(std::string("def"), s1.value_or("def"));
 	try
 	{
 		s1.value();
@@ -65,6 +75,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_value_error2)(kaguya::State&)
 	kaguya::optional<const std::string&> s1;
 
 	TEST_CHECK(!s1);
+	TEST_EQUAL(std::string("def"), s1.value_or("def"));
 	try
 	{
 		s1.value();
@@ -80,6 +91,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_value_error3)(kaguya::State&)
 	const kaguya::optional<std::string> s1;
 
 	TEST_CHECK(!s1);
+	TEST_EQUAL(std::string("def"), s1.value_or("def"));
 	try
 	{
 		s1.value();
@@ -95,6 +107,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_value_error4)(kaguya::State&)
 	const kaguya::optional<const std::string&> s1;
 
 	TEST_CHECK(!s1);
+	TEST_EQUAL(std::string("def"), s1.value_or("def"));
 	try
 	{
 		s1.value();
