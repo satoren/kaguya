@@ -506,6 +506,12 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 	TEST_CHECK(!v.setFunctionEnv(state.newTable()));
 	TEST_CHECK(!v.getFunctionEnv());
 	TEST_CHECK(!v.getField("s"));
+	TEST_CHECK(!v.setField("s", 2));
+	TEST_CHECK(!v.setField("s", "a"));
+	TEST_CHECK(!v.setField("s", std::string("a")));
+	TEST_CHECK(!v.setField("s", table));
+	TEST_CHECK(!v.setField("s", kaguya::NilValue()));
+	TEST_CHECK(!v.setField(kaguya::NilValue(), kaguya::NilValue()));
 
 
 	TEST_CHECK(!table.getFunctionEnv());
@@ -523,6 +529,7 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 
 	TEST_CHECK(!cv.getFunctionEnv());
 	TEST_CHECK(!cv.getField("s"));
+	TEST_CHECK(!cv.getField<int>("s"));
 
 
 	TEST_CHECK(!ctable.getFunctionEnv());

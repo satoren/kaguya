@@ -175,6 +175,38 @@ void corresult_to_main2(kaguya::VariadicArgType args)
 }
 
 
+int coroutine_exec(kaguya::LuaThread cor)
+{
+	return cor.resume<int>() * 2;
+}
+
+KAGUYA_TEST_FUNCTION_DEF(coroutine_on_the_coroutine)(kaguya::State& state)
+{
+	TEST_CHECK(state("cor1 = coroutine.create( function()"
+		"coroutine.yield(32) "
+		"coroutine.yield(53) "
+		"return 2 "
+		" end)"));
+
+	state["coroutine_exec"] = coroutine_exec;
+
+	TEST_CHECK(state("cor2 = coroutine.wrap( function()"
+		"coroutine.yield(coroutine_exec(cor1)) "
+		"coroutine.yield(coroutine_exec(cor1)) "
+		"return 4 "
+		" end)"));
+
+	kaguya::LuaRef cor = state["cor2"];
+	int r1 = cor();
+	int r2 = cor();
+	int r3 = cor();
+
+	TEST_EQUAL(r1, 32*2);
+	TEST_EQUAL(r2, 53*2);
+	TEST_EQUAL(r3, 4);
+}
+
+
 KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 {
 	state["corresult_to_main"] = &corresult_to_main;
@@ -226,7 +258,7 @@ KAGUYA_TEST_FUNCTION_DEF(bind_to_std_function)(kaguya::State& state)
 }
 
 
-KAGUYA_TEST_FUNCTION_DEF(zero_to_nullpointer)(kaguya::State& state)
+KAGUYA_TEST_FUNCTION_DEF(call_error)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
 
@@ -243,12 +275,28 @@ KAGUYA_TEST_FUNCTION_DEF(zero_to_nullpointer)(kaguya::State& state)
 		kaguya::LuaFunction nilfn;
 		nilfn.call<void>();
 	}
-
+	{
+		last_error_message = "";
+		kaguya::LuaFunction notfn = state.newTable();
+		TEST_COMPARE_NE(last_error_message, "");
+		notfn.call<void>();
+	}
 }
 
 
-KAGUYA_TEST_FUNCTION_DEF(result_range_based_for)(kaguya::State& state)
+KAGUYA_TEST_FUNCTION_DEF(function_result_for)(kaguya::State& state)
 {
+	{
+		const kaguya::FunctionResults empty;
+		TEST_EQUAL(empty.result_size(), 0);
+		std::vector<int> res;
+		for (kaguya::FunctionResults::iterator it = empty.begin(); it != empty.end(); ++it)
+		{
+			res.push_back(*it);
+		}
+		TEST_EQUAL(res.size(), 0);
+	}
+
 	state("fn =function() return 1,2,4,8,16 end");
 	{
 		std::vector<int> res;
