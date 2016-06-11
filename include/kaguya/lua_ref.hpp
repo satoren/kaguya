@@ -6,7 +6,6 @@
 #pragma once
 
 #include <vector>
-#include <set>
 #include <map>
 #include <cassert>
 #include <algorithm>
@@ -332,7 +331,7 @@ namespace kaguya
 		void typecheck()
 		{
 			int t = type();
-			if (t != TYPE_USERDATA && t != TYPE_NIL)
+			if (t != TYPE_USERDATA && t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not user data");
 				Ref::RegistoryRef::unref();
@@ -396,7 +395,7 @@ namespace kaguya
 		void typecheck()
 		{
 			int t = type();
-			if (t != TYPE_TABLE && t != TYPE_NIL)
+			if (t != TYPE_TABLE && t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not table");
 				Ref::RegistoryRef::unref();
@@ -459,7 +458,7 @@ namespace kaguya
 		void typecheck()
 		{
 			int t = type();
-			if (t != TYPE_FUNCTION && t != TYPE_NIL)
+			if (t != TYPE_FUNCTION && t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not function");
 				RegistoryRef::unref();
@@ -657,7 +656,7 @@ namespace kaguya
 		void typecheck()
 		{
 			int t = type();
-			if (t != TYPE_THREAD && t != TYPE_NIL)
+			if (t != TYPE_THREAD && t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not lua thread");
 				RegistoryRef::unref();

@@ -9,7 +9,6 @@
 #include <vector>
 #include <map>
 #include <typeinfo>
-#include <iostream>
 
 #include "kaguya/config.hpp"
 #include "kaguya/native_function.hpp"

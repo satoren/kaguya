@@ -11,7 +11,6 @@ extern "C" {
 #include <lualib.h>
 }
 
-
 #ifndef KAGUYA_USE_CPP11
 #if defined(__cpp_decltype) || __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 #define KAGUYA_USE_CPP11 1
@@ -69,7 +68,7 @@ extern "C" {
 
 
 #ifndef KAGUYA_DEPRECATED_FEATURE
-#if KAGUYA_USE_CPP11 && defined(__has_cpp_attribute)
+#if __cplusplus >= 201402L && defined(__has_cpp_attribute)
 #if  __has_cpp_attribute(deprecated)
 //C++ standard depecated
 #define KAGUYA_DEPRECATED_FEATURE(MSG) [[deprecated(MSG)]]
@@ -108,24 +107,10 @@ namespace kaguya
 #endif
 	}
 
-	//compatibility for Lua5.1
-#if LUA_VERSION_NUM < 502
-	inline void luaL_requiref(lua_State *L, const char *modname,
-		lua_CFunction openf, int glb) {
-
-		lua_pushcfunction(L, openf);
-		lua_pushstring(L, modname);
-		lua_call(L, 1, 1);
-
-		if (glb) {
-			lua_pushvalue(L, -1);
-			lua_setglobal(L, modname);
-		}
-	}
-#endif
 #if LUA_VERSION_NUM > 502
 	typedef lua_Integer luaInt;
 #else
 	typedef int32_t luaInt;
 #endif
 }
+

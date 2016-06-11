@@ -6,7 +6,6 @@
 #pragma once
 
 #include <vector>
-#include <set>
 #include <map>
 #include <cassert>
 #include <algorithm>
@@ -64,10 +63,10 @@ namespace kaguya
 				return *this;
 			}
 #endif
-			StackRef(lua_State* s, int index) :state_(s), stack_index_(compat::lua_absindex_compat(s, index)), pop_(true)
+			StackRef(lua_State* s, int index) :state_(s), stack_index_(lua_absindex(s, index)), pop_(true)
 			{
 			}
-			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(compat::lua_absindex_compat(s, index)), pop_(pop)
+			StackRef(lua_State* s, int index, bool pop) :state_(s), stack_index_(lua_absindex(s, index)), pop_(pop)
 			{
 			}
 			StackRef() :state_(0), stack_index_(0), pop_(false)
@@ -273,7 +272,6 @@ namespace kaguya
 				if (!isNilref())
 				{
 					luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
-					state_ = 0;
 					ref_ = LUA_REFNIL;
 				}
 			}

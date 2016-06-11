@@ -443,7 +443,7 @@ namespace kaguya
 		{
 			if (lua_getmetatable(l, index))
 			{
-				compat::lua_rawgetp_compat(l, -1, metatable_name_key());
+				lua_rawgetp(l, -1, metatable_name_key());
 				const char* metatable_name = lua_tostring(l, -1);
 
 				lua_pop(l, 2);
@@ -593,14 +593,15 @@ namespace kaguya
 		}
 		template<typename T>bool get_metatable(lua_State* l)
 		{
-			compat::lua_rawgetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
+			lua_rawgetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
 			if (lua_isnil(l, -1))
 			{
 				lua_newtable(l);
-				compat::lua_rawsetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());
+				lua_rawsetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());
 				return false;
 			}
-			int type = compat::lua_rawgetp_compat(l, -1, &metatableType<T>());
+			lua_rawgetp(l, -1, &metatableType<T>());
+			int type = lua_type(l, -1);
 			lua_remove(l, -2);//remove metatable registry table
 			return type != LUA_TNIL;
 		}
@@ -617,16 +618,16 @@ namespace kaguya
 				return false;  //
 			}
 			lua_pop(l, 1);
-			compat::lua_rawgetp_compat(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
-			int metaregindex = compat::lua_absindex_compat(l, -1);
+			lua_rawgetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
+			int metaregindex = lua_absindex(l, -1);
 
 			lua_createtable(l, 0, 2);
 			lua_pushstring(l, metatableName<T>());
 			lua_pushvalue(l,-1);
 			lua_setfield(l, -3, "__name");  // metatable.__name = name
-			compat::lua_rawsetp_compat(l, -2, metatable_name_key());
+			lua_rawsetp(l, -2, metatable_name_key());
 			lua_pushvalue(l, -1);
-			compat::lua_rawsetp_compat(l, metaregindex, &metatableType<T>());
+			lua_rawsetp(l, metaregindex, &metatableType<T>());
 			lua_remove(l, metaregindex);//remove metatable registry table
 
 			return true;

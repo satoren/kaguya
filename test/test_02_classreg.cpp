@@ -357,10 +357,16 @@ KAGUYA_TEST_FUNCTION_DEF(registering_object_instance)(kaguya::State& state)
 	state("assert(43 == shared_abc:get_value())");
 }
 
+struct Member
+{
+	Member() :a(0) {};
+	int a;
+};
 struct Base
 {
 	Base() :a(0) {};
 	int a;
+	Member member;
 };
 struct Derived :Base
 {
@@ -577,7 +583,13 @@ KAGUYA_TEST_FUNCTION_DEF(add_property)(kaguya::State& state)
 	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
 		.setConstructors<Base()>()
 		.addProperty("a", &Base::a)
+		.addProperty("member", &Base::member)
+		.addFunction("memberf", &Base::member)
 		);
+
+	state["Member"].setClass(kaguya::UserdataMetatable<Member>()
+		.addProperty("a", &Member::a)
+	);
 
 	state["Derived"].setClass(kaguya::UserdataMetatable<Derived, Base>()
 		.setConstructors<Derived()>()
@@ -592,20 +604,26 @@ KAGUYA_TEST_FUNCTION_DEF(add_property)(kaguya::State& state)
 	TEST_CHECK(state("base.a=1"));
 	TEST_CHECK(state("derived.a = 2"));
 	TEST_CHECK(state("derived.b=3"));
+	TEST_CHECK(state("derived.member.a=5"));
 	TEST_CHECK(state("assert(1 == base.a)"));
 	TEST_CHECK(state("assert(2 == derived.a)"));
 	TEST_CHECK(state("assert(3 == derived.b)"));
+	TEST_CHECK(state("assert(5 == derived.member.a)"));
 	TEST_EQUAL(base.a, 1);
 	TEST_EQUAL(derived.a, 2);
 	TEST_EQUAL(derived.b, 3);
+	TEST_EQUAL(derived.member.a, 5);
 
 	TEST_CHECK(state("base2 = Base.new()"));
 	TEST_CHECK(state("base2.a=5"));
 	TEST_CHECK(state("assert(5 == base2.a)"));
 
 	base.a = 3;
+	base.member.a = 6;
 	state["constbase"] = constbase;
 	TEST_CHECK(state("assert(3 == constbase.a)"));
+	TEST_CHECK(state("assert(6 == constbase.member.a)"));
+	TEST_CHECK(state("assert(6 == constbase.memberf(constbase).a)"));
 }
 KAGUYA_TEST_FUNCTION_DEF(add_property_case2)(kaguya::State& state)
 {
@@ -885,6 +903,8 @@ KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
 		.setConstructors<Base()>()
 		.addProperty("a", &Base::a)
 		.addFunction("fa", &Base::a)
+		.addProperty("member", &Base::member)
+		.addFunction("memberf", &Base::member)
 	);
 
 
@@ -899,6 +919,11 @@ KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
 
 	state("test.fa()");//error
 	TEST_COMPARE_NE(last_error_message , "");
+
+	last_error_message = "";
+	state("assert(6 == test.memberf(nil).a)");
+	TEST_COMPARE_NE(last_error_message, "");
+
 }
 
 
@@ -906,6 +931,7 @@ KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	bool catch_except = false;
 	try
 	{
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -918,13 +944,30 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addProperty("a", &Base::a)
+			.addStaticFunction("a", &Base::a)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test2)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+	bool catch_except = false;
 	try
 	{
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -937,13 +980,15 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test2)(kaguya::St
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test3)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+	bool catch_except = false;
 	try
 	{
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -956,13 +1001,15 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test3)(kaguya::St
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+	bool catch_except = false;
 	try
 	{
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -978,9 +1025,9 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::Stat
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("registered") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 
 

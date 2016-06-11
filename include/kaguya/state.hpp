@@ -6,6 +6,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "kaguya/config.hpp"
 
@@ -585,7 +586,7 @@ namespace kaguya
 		* using for Lua module
 		* @return return Lua Table Reference
 		*/
-		LuaRef newLib()
+		LuaTable newLib()
 		{
 			LuaTable newtable = newTable();
 			newtable.push(state_);

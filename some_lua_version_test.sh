@@ -1,4 +1,4 @@
-build_test_versions=("lua-5.3.2" "lua-5.2.4" "lua-5.1.5")
+build_test_versions=("lua-5.3.3" "lua-5.2.4" "lua-5.1.5")
 
 for version in "${build_test_versions[@]}"
 do

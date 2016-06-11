@@ -110,6 +110,21 @@ namespace kaguya
 			throw bad_optional_access();
 		}
 
+#if KAGUYA_USE_CPP11
+		template< class U >
+		T value_or(U&& default_value)  const&
+		{
+			if (value_) { return *value_; }
+			return default_value;
+		}
+#else
+		template< class U >
+		T value_or(U default_value)const
+		{
+			if (value_) { return *value_; }
+			return default_value;
+		}
+#endif
 		const T* operator->() const { if (value_) { return value_; } throw bad_optional_access(); }
 		T* operator->() { if (value_) { return value_; }throw bad_optional_access(); }
 		const T& operator*() const { return value(); }
@@ -173,6 +188,22 @@ namespace kaguya
 			if (value_) { return *value_; }
 			throw bad_optional_access();
 		}
+
+#if KAGUYA_USE_CPP11
+		template< class U >
+		T value_or(U&& default_value)  const&
+		{
+			if (value_) { return *value_; }
+			return default_value;
+		}
+#else
+		template< class U >
+		T value_or(U default_value)const
+		{
+			if (value_) { return *value_; }
+			return default_value;
+		}
+#endif
 
 		const T* operator->() const { return value_; }
 		T* operator->() { return value_; }

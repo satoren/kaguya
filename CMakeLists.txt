@@ -53,7 +53,7 @@ if(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
 message(STATUS "test_runner: address sanitizer enabled.")
 SET_TARGET_PROPERTIES(test_runner  PROPERTIES COMPILE_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
 SET_TARGET_PROPERTIES(test_runner  PROPERTIES LINK_FLAGS "-fsanitize=address")
-endif(HAVE_FLAG_SANITIZE_ADDRESS)
+endif(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
 
 set(BENCHMARK_SRCS benchmark/benchmark.cpp benchmark/benchmark_function.cpp benchmark/benchmark_function.hpp)
 

@@ -1,0 +1,9 @@
+comment:
+  layout: header, changes, diff
+coverage:
+  ignore:
+  - test/.*
+  status:
+    patch: false
+codecov:
+  token: 257ff6ee-863c-4b7e-ae36-832f365350e2
