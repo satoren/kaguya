@@ -197,7 +197,7 @@ namespace kaguya
 		}
 		inline void FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<void> tag)
 		{
-			FunctionResults(state, return_status, retindex);
+			lua_settop(state, retindex - 1);
 		}
 
 #if KAGUYA_USE_CPP11
