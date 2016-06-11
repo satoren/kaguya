@@ -1,9 +1,6 @@
 #include "kaguya/optional.hpp"
 #include "test_util.hpp"
 
-#if KAGUYA_USE_CPP11
-
-
 KAGUYA_TEST_GROUP_START(test_08_optional)
 
 using namespace kaguya_test_util;
@@ -150,5 +147,3 @@ KAGUYA_TEST_FUNCTION_DEF(optional_move)(kaguya::State&)
 
 
 KAGUYA_TEST_GROUP_END(test_08_optional)
-
-#endif
