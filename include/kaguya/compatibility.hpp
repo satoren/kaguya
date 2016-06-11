@@ -49,10 +49,6 @@ namespace kaguya
 
 		inline int lua_resume(lua_State *L, lua_State* from, int nargs)
 		{
-			if (from && L != from)
-			{
-				lua_xmove(from, L, nargs);
-			}
 			return ::lua_resume(L, nargs);
 		}
 		inline int lua_absindex(lua_State *L, int idx)
