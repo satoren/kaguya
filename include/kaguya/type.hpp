@@ -688,6 +688,7 @@ namespace kaguya
 		public:
 			enum value_type
 			{
+				TYPE_NONE = LUA_TNONE,//!< none type
 				TYPE_NIL = LUA_TNIL,//!< nil type
 				TYPE_BOOL = LUA_TBOOLEAN,//!< boolean type
 				TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,//!< light userdata type

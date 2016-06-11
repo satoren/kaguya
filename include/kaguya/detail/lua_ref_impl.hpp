@@ -272,7 +272,6 @@ namespace kaguya
 				if (!isNilref())
 				{
 					luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
-					state_ = 0;
 					ref_ = LUA_REFNIL;
 				}
 			}
