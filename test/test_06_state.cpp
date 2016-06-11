@@ -409,6 +409,7 @@ KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	bool catch_except = false;
 	try
 	{
 		state("error('error message')");//error
@@ -417,9 +418,9 @@ KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("error message") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 
 void throwUnknownError(int status, const char* message)
@@ -429,6 +430,7 @@ void throwUnknownError(int status, const char* message)
 KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(throwUnknownError);
+	bool catch_except = false;
 	try
 	{
 		state("error('')");//error
@@ -437,9 +439,9 @@ KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("unknown error") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 
 void throwErrorRunningError(int status, const char* message)
@@ -449,6 +451,7 @@ void throwErrorRunningError(int status, const char* message)
 KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(throwErrorRunningError);
+	bool catch_except = false;
 	try
 	{
 		state("error('')");//error
@@ -457,9 +460,9 @@ KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("error handler error") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 
 

@@ -89,15 +89,17 @@ KAGUYA_TEST_FUNCTION_DEF(optional_value_error3)(kaguya::State&)
 
 	TEST_CHECK(!s1);
 	TEST_EQUAL(std::string("def"), s1.value_or("def"));
+
+	bool catch_except = false;
 	try
 	{
 		s1.value();
 	}
 	catch (const kaguya::bad_optional_access&)
 	{
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(optional_value_error4)(kaguya::State&)
 {
@@ -105,15 +107,16 @@ KAGUYA_TEST_FUNCTION_DEF(optional_value_error4)(kaguya::State&)
 
 	TEST_CHECK(!s1);
 	TEST_EQUAL(std::string("def"), s1.value_or("def"));
+	bool catch_except = false;
 	try
 	{
 		s1.value();
 	}
 	catch (const kaguya::bad_optional_access&)
 	{
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 
 #if KAGUYA_USE_CPP11
