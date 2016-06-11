@@ -304,77 +304,76 @@ namespace kaguya
 			* @brief table[key] = value;
 			*/
 			template<typename K, typename V>
-			void setField(const K& key, const V& value)
+			bool setField(const K& key, const V& value)
 			{
 				lua_State* state = state_();
 				if (!state)
 				{
 					except::typeMismatchError(state, "is nil");
-					return;
+					return false;
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
 				util::one_push(state, key);//push table key
 				util::one_push(state, value);//push value
 				lua_settable(state, stackIndex);//thistable[key] = value
+				return true;
 			}
 
 			template<typename V>
-			void setField(const char* key, const V& value)
+			bool setField(const char* key, const V& value)
 			{
 				lua_State* state = state_();
 				if (!state)
 				{
 					except::typeMismatchError(state, "is nil");
-					return;
+					return false;
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
 				util::one_push(state, value);//push value
 				lua_setfield(state, stackIndex, key);//thistable[key] = value
+				return true;
 			}
 			template<typename V>
-			void setField(const std::string& key, const V& value)
+			bool setField(const std::string& key, const V& value)
 			{
-				setField(key.c_str(), value);
+				return setField(key.c_str(), value);
 			}
 #if KAGUYA_USE_CPP11
 			/**
 			* @brief table[key] = value;
 			*/
 			template<typename K, typename V>
-			void setField(K&& key, V&& value)
+			bool setField(K&& key, V&& value)
 			{
 				lua_State* state = state_();
 				if (!state)
 				{
 					except::typeMismatchError(state, "is nil");
-					return;
+					return false;
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
 				util::one_push(state, std::forward<K>(key));//push table key
 				util::one_push(state, std::forward<V>(value));//push value
 				lua_settable(state, stackIndex);//thistable[key] = value
+				return true;
 			}
 			template<typename V>
-			void setField(const char* key, V&& value)
+			bool setField(const char* key, V&& value)
 			{
 				lua_State* state = state_();
 				if (!state)
 				{
 					except::typeMismatchError(state, "is nil");
-					return;
+					return false;
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
 				util::one_push(state, std::forward<V>(value));//push value
 				lua_setfield(state, stackIndex, key);//thistable[key] = value
-			}
-			template<typename V>
-			void setField(const std::string& key, V&& value)
-			{
-				setField(key.c_str(), std::forward<V>(value));
+				return true;
 			}
 #endif
 		};
