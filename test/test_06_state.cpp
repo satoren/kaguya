@@ -98,6 +98,37 @@ KAGUYA_TEST_FUNCTION_DEF(no_standard_lib)(kaguya::State&)
 	state.setErrorHandler(ignore_error_fun);
 	TEST_CHECK(!state("assert(true)"));//can not call assert
 }
+KAGUYA_TEST_FUNCTION_DEF(load_all_library)(kaguya::State&)
+{
+	kaguya::State state(kaguya::NoLoadLib());
+	state.openlibs();
+
+	TEST_CHECK(state("assert(true)"));//
+	TEST_CHECK(state("assert(load)"));//
+	TEST_CHECK(state("assert(coroutine)"));
+	TEST_CHECK(state("assert(debug)"));//
+	TEST_CHECK(state("assert(io)"));//
+	TEST_CHECK(state("assert(math)"));//
+	TEST_CHECK(state("assert(os)"));//
+	TEST_CHECK(state("assert(package)"));//
+	TEST_CHECK(state("assert(string)"));//
+	TEST_CHECK(state("assert(table)"));//
+}
+
+int lua_mylibf(lua_State* L)
+{
+	kaguya::State state(L);
+	kaguya::LuaTable t = state.newTable();
+	t["value"] = 111;
+	return t.push();
+}
+
+KAGUYA_TEST_FUNCTION_DEF(load_my_library)(kaguya::State& state)
+{
+	state.openlib(kaguya::LoadLib("mylib",lua_mylibf));
+	TEST_CHECK(state("assert(mylib.value == 111)"));
+}
+
 KAGUYA_TEST_FUNCTION_DEF(load_lib_constructor)(kaguya::State&)
 {
 	{
@@ -506,7 +537,7 @@ KAGUYA_TEST_FUNCTION_DEF(inc_gc_test)(kaguya::State& state)
 		used = state.gc().count();
 		peak = std::max(peak, used);
 	}
-	TEST_COMPARE_LT(peak, 1000);
+	TEST_COMPARE_LT(peak, 1500);
 }
 
 KAGUYA_TEST_GROUP_END(test_06_state)
