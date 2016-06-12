@@ -437,6 +437,10 @@ int receive_base_shared_ptr_function(kaguya::standard::shared_ptr<Base> d) {
 	d->a = 2;
 	return d->a;
 }
+int receive_base_shared_ptr_function_null(kaguya::standard::shared_ptr<Base> d) {
+	TEST_CHECK(!d);
+	return 4;
+}
 KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 {
 	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -449,13 +453,21 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 
 	kaguya::standard::shared_ptr<Derived> derived(new Derived());
 	kaguya::standard::shared_ptr<Base> base(new Base());
+	kaguya::standard::shared_ptr<const Derived> const_derived(new Derived());
+	kaguya::standard::shared_ptr<const Base> const_base(new Base());
 	state["base"] = base;
 	state["derived"] = derived;
+	state["const_base"] = const_base;
+	state["const_derived"] = const_derived;
+	state["non_shared_base"] = Base();
 	state["base_function"] = &base_function;
 	state["derived_function"] = &derived_function;
 	state["receive_shared_ptr_function"] = &receive_shared_ptr_function;
 	state["receive_base_shared_ptr_function"] = &receive_base_shared_ptr_function;
 
+
+	state["receive_shared_ptr_function_null"] = &receive_base_shared_ptr_function_null;
+	
 
 
 	TEST_CHECK(state("assert(1 == base_function(base))"));
@@ -471,6 +483,58 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 	TEST_EQUAL(derived->b, 5);
 	TEST_CHECK(state("assert(2 == receive_base_shared_ptr_function(derived))"));
 	TEST_EQUAL(derived->a, 2);
+	TEST_CHECK(state("assert(4 == receive_shared_ptr_function_null(non_shared_base))"));
+
+	TEST_EQUAL(derived->a, 2);
+	
+	{
+		kaguya::standard::shared_ptr<Derived> d;
+		kaguya::standard::shared_ptr<Base> b;
+		kaguya::standard::shared_ptr<void> v;
+		TEST_CHECK(!(d = state["base"]));
+		TEST_CHECK(b = state["base"]);
+		TEST_CHECK(v = state["base"]);
+		TEST_CHECK(d = state["derived"]);
+		TEST_CHECK(b = state["derived"]);
+		TEST_CHECK(v = state["derived"]);
+
+		TEST_CHECK(!(d = state["non_shared_base"]));
+		TEST_CHECK(!(b = state["non_shared_base"]));
+		TEST_CHECK(!(v = state["non_shared_base"]));
+
+		TEST_CHECK(!(d = state["const_base"]));
+		TEST_CHECK(!(b = state["const_base"]));
+		TEST_CHECK(!(v = state["const_base"]));
+		TEST_CHECK(!(d = state["const_derived"]));
+		TEST_CHECK(!(b = state["const_derived"]));
+		TEST_CHECK(!(v = state["const_derived"]));
+	}
+	{
+		kaguya::standard::shared_ptr<Derived> d;
+		kaguya::standard::shared_ptr<Base> b;
+		kaguya::standard::shared_ptr<void> v;
+		kaguya::standard::shared_ptr<const Derived> cd;
+		kaguya::standard::shared_ptr<const Base> cb;
+		kaguya::standard::shared_ptr<const void> cv;
+		TEST_CHECK(!(cd = state["base"]));
+		TEST_CHECK(cb = state["base"]);
+		TEST_CHECK(cv = state["base"]);
+		TEST_CHECK(cd = state["derived"]);
+		TEST_CHECK(cb = state["derived"]);
+		TEST_CHECK(cv = state["derived"]);
+
+		TEST_CHECK(!(d = state["non_shared_base"]));
+		TEST_CHECK(!(b = state["non_shared_base"]));
+		TEST_CHECK(!(v = state["non_shared_base"]));
+
+		TEST_CHECK(!(cd = state["const_base"]));
+		TEST_CHECK((cb = state["const_base"]));
+		TEST_CHECK((cv = state["const_base"]));
+		TEST_CHECK((cd = state["const_derived"]));
+		TEST_CHECK((cb = state["const_derived"]));
+		TEST_CHECK((cv = state["const_derived"]));
+	}
+
 
 	state["shared_ptr_function"] = kaguya::overload(&receive_shared_ptr_function, &receive_base_shared_ptr_function);
 	TEST_CHECK(state("assert(5 == shared_ptr_function(derived))"));

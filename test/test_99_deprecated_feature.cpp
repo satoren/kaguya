@@ -932,6 +932,9 @@ KAGUYA_TEST_FUNCTION_DEF(variadic_function_test)(kaguya::State& state)
 	TEST_CHECK(typevalid);
 	ptr->args[2].get<std::string>(typevalid, false);
 	TEST_CHECK(!typevalid);
+	
+	state("var:variadicfun()");
+	TEST_EQUAL(ptr->args.size(), 0);
 
 
 	state("var = Vari.new('abc')");

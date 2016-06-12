@@ -411,7 +411,7 @@ namespace kaguya
 	template<typename T>
 	inline FunctionInvokerType<standard::tuple<T> > function(T f)
 	{
-		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename standard::decay<T>::type>::value, "argument need callable");
+		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::decay<T>::type>::value, "argument need callable");
 		return FunctionInvokerType<standard::tuple<T> >(standard::tuple<T>(f));
 	}
 

@@ -283,20 +283,20 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper<get_type>(l, index, false) != 0;
+			ObjectSharedPointerWrapper* wrapper = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
+			const std::type_info& type = metatableType<standard::shared_ptr<typename traits::decay<T>::type > >();
+			return wrapper && (wrapper->shared_ptr_type() == type);
 		}
 		static bool checkType(lua_State* l, int index)
 		{
-			return object_wrapper<get_type>(l, index) != 0 ||
-				lua_isnil(l, index);
+			return get_shared_pointer(l, index, types::typetag<T>()) ||	lua_isnil(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
 			if (lua_isnil(l, index)) {
 				return get_type();
 			}
-			get_type pointer = get_shared_pointer<T>(l, index, types::typetag<T>());
-			return pointer;
+			return get_shared_pointer(l, index, types::typetag<T>());
 		}
 
 		static int push(lua_State* l, push_type v)
@@ -315,44 +315,6 @@ namespace kaguya
 			return 1;
 		}
 	};
-	template<>
-	struct lua_type_traits<standard::shared_ptr<void> > {
-		typedef const standard::shared_ptr<void>& push_type;
-		typedef standard::shared_ptr<void> get_type;
-
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return object_wrapper<get_type>(l, index, false) != 0;
-		}
-		static bool checkType(lua_State* l, int index)
-		{
-			return object_wrapper<get_type>(l, index) != 0 ||
-				lua_isnil(l, index);
-		}
-		static get_type get(lua_State* l, int index)
-		{
-			if (lua_isnil(l, index)) {
-				return get_type();
-			}
-			return get_shared_pointer(l, index, types::typetag<void>());
-		}
-
-		static int push(lua_State* l, push_type v)
-		{
-			if (v)
-			{
-				typedef ObjectSharedPointerWrapper wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(v);
-			}
-			else
-			{
-				lua_pushnil(l);
-			}
-			return 1;
-		}
-	};
-
 #if KAGUYA_USE_CPP11
 	///! traits for unique_ptr
 	template<typename T, typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
