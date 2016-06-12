@@ -31,10 +31,6 @@ namespace kaguya
 		size_t nsize)
 	{
 		Allocator* allocator = static_cast<Allocator*>(ud);
-		if (!allocator)
-		{
-			return std::realloc(ptr, nsize);
-		}
 		if (nsize == 0)
 		{
 			allocator->deallocate(ptr, osize);

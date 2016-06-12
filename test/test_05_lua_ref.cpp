@@ -534,7 +534,74 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 
 	TEST_CHECK(!ctable.getFunctionEnv());
 	TEST_CHECK(!cthread.getMetatable());
+}
 
+struct UserDataTest
+{
+	UserDataTest(int v) :m(v) {}
+	int m;
+};
+struct UserDataTest2
+{
+	UserDataTest2(int v) :m(v) {}
+	double m;
+};
+
+KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+	{
+		last_error_message = "";
+		kaguya::LuaTable nottable = state.newThread();
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData notud = state.newThread();
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaThread notud = state.newTable();
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+
+	{
+		last_error_message = "";
+		kaguya::LuaRef udataref = state.newRef(UserDataTest(2));
+		TEST_CHECK(udataref.weakTypeTest<kaguya::LuaUserData>());
+		TEST_CHECK(udataref.typeTest<kaguya::LuaUserData>());
+		TEST_CHECK(!udataref.weakTypeTest<kaguya::LuaTable>());
+		TEST_CHECK(!udataref.typeTest<kaguya::LuaTable>());
+		TEST_CHECK(udataref.typeTest<UserDataTest>());
+		TEST_CHECK(!udataref.typeTest<UserDataTest2>());
+		kaguya::LuaUserData udata = udataref;
+		TEST_EQUAL(last_error_message, "");
+		UserDataTest d = udata;
+		TEST_EQUAL(d.m, 2);		
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData udata;
+		TEST_CHECK(!udata);
+		TEST_EQUAL(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData udata(state.state());
+		TEST_CHECK(!udata);
+		TEST_EQUAL(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData udata(state.state(), UserDataTest(2));
+		TEST_CHECK(udata);
+		TEST_CHECK(udata.typeTest<UserDataTest>());
+		TEST_CHECK(!udata.typeTest<UserDataTest2>());
+		UserDataTest d = udata;
+		TEST_EQUAL(d.m, 2);
+		TEST_EQUAL(last_error_message, "");
+	}
 }
 
 KAGUYA_TEST_GROUP_END(test_05_lua_ref)

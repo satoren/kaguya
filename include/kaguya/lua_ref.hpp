@@ -346,17 +346,30 @@ namespace kaguya
 		{
 			typecheck();
 		}
-		LuaUserData(lua_State* state, const NewTable& table) :Ref::RegistoryRef(state, table)
+		template<typename TYPE>
+		LuaUserData(lua_State* state, const TYPE& table) :Ref::RegistoryRef(state, table)
 		{
 			typecheck();
 		}
-		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NewTable())
+		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NilValue())
 		{
 			typecheck();
 		}
 		LuaUserData()
 		{
 			typecheck();
+		}
+		template<typename T>
+		bool typeTest()const
+		{
+			util::ScopedSavedStack save(state());
+			return lua_type_traits<T>::strictCheckType(state(), pushStackIndex(state()));
+		}
+		template<typename T>
+		bool weakTypeTest()const
+		{
+			util::ScopedSavedStack save(state());
+			return lua_type_traits<T>::checkType(state(), pushStackIndex(state()));
 		}
 	};
 
