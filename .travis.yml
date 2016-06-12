@@ -16,6 +16,7 @@ addons:
     - libluajit-5.1-dev
     - libboost-all-dev
     - g++-4.8
+    - llvm-gcov
     - cmake
 env:
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 LUALIB=lua5.2
@@ -28,5 +29,5 @@ after_success:
   - cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug && make test_coverage && ./test_coverage
   - if [ "$CXX" = "g++-4.8" ]; then export GCOV="gcov-4.8"; fi
   - if [ "$CXX" = "g++" ]; then export GCOV="gcov-4.6"; fi
-  - if [ "$CXX" = "clang++" ]; then export GCOV="llvm-cov-3.4"; fi
+  - if [ "$CXX" = "clang++" ]; then export GCOV="llvm-gcov"; fi
   - bash <(curl -s https://codecov.io/bash) -p CMakeFiles/test_coverage.dir/test/ -x "$GCOV" -a "-o CMakeFiles/test_coverage.dir/test/"
