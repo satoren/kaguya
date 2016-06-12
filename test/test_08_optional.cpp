@@ -25,8 +25,8 @@ KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 	kaguya::optional<const char*> s1 = "abc", s2; // constructor
 
 	TEST_EQUAL(std::string("def"), s2.value_or("def"));
-	s2 = s1; 
-	s1 = "def";
+	TEST_CHECK((s2 = s1));
+	TEST_CHECK((s1 = "def"));
 
 	TEST_EQUAL(std::string("def"), s1.value_or("abc"));
 	TEST_EQUAL(std::string("abc"), s2.value_or("def"));
@@ -34,6 +34,24 @@ KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 	TEST_CHECK(s2);
 	TEST_EQUAL(std::string("abc"), *s2);
 	TEST_EQUAL(std::string("def"), *s1);
+
+	TEST_CHECK(!(s2 = kaguya::optional<const char*>()));
+	TEST_CHECK(!s2);
+
+	TEST_CHECK(s2 = s1);
+	TEST_EQUAL(std::string("def"), *s2);
+	TEST_CHECK(s2 = "data");
+	TEST_EQUAL(std::string("data"), *s2);
+
+
+	kaguya::optional<const char*> csnullopt;
+	TEST_CHECK(!(s2 = csnullopt));
+	TEST_CHECK(!s2);
+
+
+	kaguya::nullopt_t nullopt;
+	TEST_CHECK(!(s2 = nullopt));
+	TEST_CHECK(!s2);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
@@ -48,6 +66,18 @@ KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
 	TEST_CHECK(s2);
 	TEST_EQUAL(std::string("abc"), *s2);
 	TEST_EQUAL(std::string("abc"), s1.value_or("def"));
+
+
+	kaguya::optional<const std::string&> csnullopt;
+	TEST_CHECK(!(s1 = csnullopt));
+	TEST_CHECK(!s1);
+
+	TEST_CHECK(s1 = str);
+	TEST_CHECK(s1);
+
+	kaguya::nullopt_t nullopt;
+	TEST_CHECK(!(s1 = nullopt));
+	TEST_CHECK(!s1);
 }
 
 

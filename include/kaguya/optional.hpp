@@ -34,7 +34,7 @@ namespace kaguya
 		~optional() {
 			destruct();
 		}
-		optional& operator=(nullopt_t) { destruct(); }
+		optional& operator=(nullopt_t) { destruct(); return *this; }
 		optional& operator=(const optional& other)
 		{
 			if (other)
@@ -165,14 +165,19 @@ namespace kaguya
 
 		~optional() {
 		}
-		optional& operator=(nullopt_t) { value_ = 0; }
+		optional& operator=(nullopt_t) {
+			value_ = 0;
+			return *this;
+		}
 		optional& operator=(optional& other)
 		{
 			value_ = other.value_;
+			return *this;
 		}
 		optional& operator=(T& value)
 		{
 			value_ = &value;
+			return *this;
 		}
 		operator bool_type() const
 		{
