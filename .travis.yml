@@ -29,8 +29,8 @@ after_success:
   - if [ "$CXX" = "g++-4.8" ]; then export GCOV="gcov-4.8"; fi
   - if [ "$CXX" = "g++" ]; then export GCOV="gcov-4.6"; fi
   - if [ -n "$GCOV" ]; then
-     cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug
-     make test_coverage
+     cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug;
+     make test_coverage;
      ./test_coverage;
     fi
   - bash <(curl -s https://codecov.io/bash) -p CMakeFiles/test_coverage.dir/test/ -x "$GCOV" -a "-o CMakeFiles/test_coverage.dir/test/"
