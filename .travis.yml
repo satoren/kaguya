@@ -26,11 +26,15 @@ env:
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success:
-  - if [ "$CXX" = "g++-4.8" ]; then export GCOV="gcov-4.8"; fi
-  - if [ "$CXX" = "g++" ]; then export GCOV="gcov-4.6"; fi
-  - if [ -n "$GCOV" ]; then
-     cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug;
-     make test_coverage;
-     ./test_coverage;
+  - if [ "$CXX_FLAGS" = "-std=c++11" ]; then
+     export GCOV="gcov-4.8";
+     export CXX="g++-4.8"
+    else
+     export GCOV="gcov-4.6";
+     export CXX="g++-4.6";
     fi
+  - rm -Rf ./*
+  - cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug
+  - make test_coverage
+  - ./test_coverage
   - bash <(curl -s https://codecov.io/bash) -p CMakeFiles/test_coverage.dir/test/ -x "$GCOV" -a "-o CMakeFiles/test_coverage.dir/test/"
