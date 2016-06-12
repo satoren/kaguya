@@ -133,8 +133,8 @@ KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 {
 	kaguya::LuaRef nullref = state.newRef(nullptr);
-	TEST_CHECK(nullref.typeTest<nullptr_t>());
-	TEST_CHECK(nullref.weakTypeTest<nullptr_t>());
+	TEST_CHECK(nullref.typeTest<std::nullptr_t>());
+	TEST_CHECK(nullref.weakTypeTest<std::nullptr_t>());
 	TEST_CHECK(nullref == nullptr);
 }
 
