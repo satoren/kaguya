@@ -16,7 +16,7 @@ addons:
     - libluajit-5.1-dev
     - libboost-all-dev
     - g++-4.8
-    - llvm-gcov
+    - llvm-gcc-4.6
     - cmake
 env:
   - BUILD_TYPE=Release CXX_FLAGS=-std=c++03 LUALIB=lua5.2
