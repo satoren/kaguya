@@ -331,7 +331,7 @@ namespace kaguya
 		void typecheck()
 		{
 			int t = type();
-			if (t != TYPE_USERDATA && t != TYPE_NIL && t != TYPE_NONE)
+			if (t != TYPE_USERDATA && t != TYPE_LIGHTUSERDATA &&t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not user data");
 				Ref::RegistoryRef::unref();
@@ -480,10 +480,33 @@ namespace kaguya
 
 	public:
 
+		/**
+		* @name constructor
+		* @brief construct with state and function .
+		* @param state pointer to lua_State
+		* @param function e.g. kaguya::function(function_ptr),kaguya::overload(function_ptr)
+		*/
+		template<typename F>
+		LuaFunction(lua_State* state, F f) :Ref::RegistoryRef(state, f)
+		{
+			typecheck();
+		}
+
+		/**
+		* @name constructor
+		* @brief construct with stack top value.
+		* @param state pointer to lua_State
+		* @param StackTop tag
+		*/
 		LuaFunction(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
 		{
 			typecheck();
 		}
+
+		/**
+		* @name constructor
+		* @brief construct nil reference.
+		*/
 		LuaFunction()
 		{
 		}

@@ -547,6 +547,16 @@ struct UserDataTest2
 	double m;
 };
 
+UserDataTest& UserDataTestFunction(UserDataTest& r)
+{
+	r.m = 5;
+	return r;
+}
+void UserDataTestFunction2(int r)
+{
+}
+
+
 KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
@@ -575,6 +585,7 @@ KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
 		TEST_CHECK(!udataref.typeTest<kaguya::LuaTable>());
 		TEST_CHECK(udataref.typeTest<UserDataTest>());
 		TEST_CHECK(!udataref.typeTest<UserDataTest2>());
+		TEST_CHECK(!udataref.typeTest<bool>());
 		kaguya::LuaUserData udata = udataref;
 		TEST_EQUAL(last_error_message, "");
 		UserDataTest d = udata;
@@ -601,6 +612,38 @@ KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
 		UserDataTest d = udata;
 		TEST_EQUAL(d.m, 2);
 		TEST_EQUAL(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		UserDataTest udatan(2);
+		kaguya::LuaUserData udata(state.state(), &udatan);
+		TEST_CHECK(udata);
+		UserDataTest* d = udata;//unsafe
+		TEST_EQUAL(d->m, 2);
+
+		const UserDataTest& dr = udata;//unsafe
+		TEST_EQUAL(dr.m, 2);
+		TEST_EQUAL(last_error_message, "");
+
+		kaguya::LuaFunction f(state.state(), kaguya::overload(UserDataTestFunction, UserDataTestFunction2));
+		f(udata);
+		TEST_EQUAL(udatan.m, 5);
+	}
+	{
+		last_error_message = "";
+		UserDataTest udatan(2);
+		kaguya::LuaUserData udata(state.state(), kaguya::standard::ref(udatan));
+		TEST_CHECK(udata);
+		UserDataTest* d = udata;//unsafe
+		TEST_EQUAL(d->m, 2);
+
+		const UserDataTest& dr = udata;//unsafe
+		TEST_EQUAL(dr.m, 2);
+		TEST_EQUAL(last_error_message, "");
+
+		kaguya::LuaFunction f(state.state(), kaguya::overload(UserDataTestFunction, UserDataTestFunction2));
+		f(udata);
+		TEST_EQUAL(udatan.m, 5);
 	}
 }
 

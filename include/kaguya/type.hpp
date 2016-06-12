@@ -827,10 +827,8 @@ namespace kaguya
 			{
 				return static_cast<const Derived*>(this)->pushStackIndex(state);
 			}
-
-
 			template<typename T>
-			optional<typename lua_type_traits<T>::get_type> checkGet_(bool allow_convertible = true)const
+			optional<typename lua_type_traits<T>::get_type> checkGet_()const
 			{
 				lua_State* state = state_();
 				if (!state) {
@@ -838,15 +836,7 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackindex = pushStackIndex_(state);
-				bool was_valid = false;
-				if (allow_convertible)
-				{
-					was_valid = lua_type_traits<T>::checkType(state, stackindex);
-				}
-				else
-				{
-					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
-				}
+				bool was_valid = lua_type_traits<T>::checkType(state, stackindex);
 				if (was_valid)
 				{
 					return optional<typename lua_type_traits<T>::get_type>(lua_type_traits<T>::get(state, stackindex));
