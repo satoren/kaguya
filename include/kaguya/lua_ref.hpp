@@ -575,8 +575,10 @@ namespace kaguya
 				skipComment();
 				preloaded_ = !buffer_.empty();
 			}
-			void skipBom()
+
+			void skipComment()
 			{
+				//skip bom
 				const char* bom = "\xEF\xBB\xBF";
 				const char* bomseq = bom;
 				char c;
@@ -594,24 +596,15 @@ namespace kaguya
 						return;
 					}
 				}
-			}
-			void skipComment()
-			{
-				skipBom();
 				
+				//skip comment
 				if (!buffer_.empty() && buffer_.front() == '#')
 				{
 					std::vector<char>::iterator lf = std::find(buffer_.begin(), buffer_.end(), '\n');
-					if (lf != buffer_.end())
-					{
-						buffer_.erase(buffer_.begin(), buffer_.end());
-					}
-					else
-					{
-						buffer_.clear();
-						std::string comment;
-						std::getline(stream_, comment);
-					}
+
+					buffer_.clear();
+					std::string comment;
+					std::getline(stream_, comment);
 				}
 			}
 			
@@ -667,6 +660,7 @@ namespace kaguya
 
 		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = 0)
 		{
+			util::ScopedSavedStack save(state);
 			LuaLoadStreamWrapper wrapper(stream);
 #if LUA_VERSION_NUM >= 502
 			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname, 0);

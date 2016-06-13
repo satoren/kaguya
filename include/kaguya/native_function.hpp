@@ -270,14 +270,7 @@ namespace kaguya
 		}
 		template<typename Fn> int invoke_index(lua_State* state, int index, int current_index, const Fn& fn)
 		{
-			if (index == current_index)
-			{
-				return nativefunction::call(state, fn);
-			}
-			else
-			{
-				return -1;
-			}
+			return nativefunction::call(state, fn);
 		}
 		template<typename Fn, typename... Functions> int invoke_index(lua_State* state, int index, int current_index, const Fn& fn, const Functions&... fns)
 		{
@@ -301,6 +294,7 @@ namespace kaguya
 			int index = best_function_index(state, fn, fns...);
 			if (index >= 0)
 			{
+				assert(index <= sizeof...(fns));
 				return invoke_index(state, index, 0, fn, fns...);
 			}
 			else
@@ -542,7 +536,7 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (lua_type(l, index) != LUA_TFUNCTION) {
+			if (!l || lua_type(l, index) != LUA_TFUNCTION) {
 				return get_type();
 			}
 			lua_pushvalue(l, index);
