@@ -333,9 +333,6 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (lua_isnoneornil(l, index)) {
-				throw LuaTypeMismatch("type mismatch!!");
-			}
 			type* pointer = get_pointer(l, index, types::typetag<type>());
 			if (!pointer)
 			{
@@ -389,7 +386,8 @@ namespace kaguya
 	};
 #endif
 
-	///! traits for 
+	///! traits for ObjectWrapperBase*
+	/// implement for __gc desrcutor
 	template<>	struct lua_type_traits<ObjectWrapperBase*> {
 		typedef ObjectWrapperBase* get_type;
 		typedef ObjectWrapperBase* push_type;

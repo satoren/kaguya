@@ -76,7 +76,10 @@ namespace kaguya
 			{
 				if (state_ && pop_)
 				{
-					lua_settop(state_, stack_index_ - 1);
+					if (lua_gettop(state_) >= stack_index_ )
+					{
+						lua_settop(state_, stack_index_ - 1);
+					}
 				}
 			}
 		public:

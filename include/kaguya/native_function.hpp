@@ -294,7 +294,7 @@ namespace kaguya
 			int index = best_function_index(state, fn, fns...);
 			if (index >= 0)
 			{
-				assert(index <= sizeof...(fns));
+				assert(size_t(index) <= sizeof...(fns));
 				return invoke_index(state, index, 0, fn, fns...);
 			}
 			else

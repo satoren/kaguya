@@ -153,20 +153,30 @@ KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 	TEST_CHECK(state("assert(shared_object:getInt() == 53)"));
 	TEST_CHECK(state("assert(shared_object:getString() =='shared_object')"));
 
-
+	TEST_CHECK(state["value5"].weakTypeTest<kaguya::ObjectWrapperBase*>());
+	TEST_CHECK(state["value5"].typeTest<kaguya::ObjectWrapperBase*>());
+	
 };
 
 KAGUYA_TEST_FUNCTION_DEF(data_member_bind)(kaguya::State& state)
 {
+
+	kaguya::LuaFunction f = state.loadstring("return 3,4");
+	kaguya::LuaFunction f2 = state.loadstring("return 7,8,9");
+
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 		.setConstructors<ABC(int), ABC(std::string)>()
 		.addFunction("intmember", &ABC::intmember)
 		.addFunction("stringmember", &ABC::stringmember)
+		.addStaticField("static_data", f())
+		.addStaticField("static_data2", f2())
 		);
 
 	TEST_CHECK(state("value = assert(ABC.new(64))"));
 	TEST_CHECK(state("assert(value:intmember() == 64)"));
 
+	TEST_CHECK(state("assert(value.static_data == 3)"));
+	TEST_CHECK(state("assert(value.static_data2 == 7)"));
 
 	TEST_CHECK(state("value:intmember(4)"));
 	TEST_CHECK(state("assert(value:intmember() == 4)"));

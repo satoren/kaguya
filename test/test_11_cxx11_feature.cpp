@@ -139,6 +139,19 @@ KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
 	state("func =function(arg) return assert(arg.member == 5) end");
 	TEST_CHECK(state["func"](std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(5))) == true);
 
+
+	bool catch_except = false;
+	try
+	{
+		std::unique_ptr<MoveOnlyClass>& uptr = state["nil"].get<std::unique_ptr<MoveOnlyClass>&>();
+		TEST_CHECK(uptr);
+		TEST_EQUAL(uptr->member, 2);
+	}
+	catch (const kaguya::LuaTypeMismatch&)
+	{
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 {
