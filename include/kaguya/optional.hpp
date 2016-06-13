@@ -97,6 +97,7 @@ namespace kaguya
 
 		operator bool_type() const
 		{
+			this_type_does_not_support_comparisons();
 			return value_ != 0 ? &optional::this_type_does_not_support_comparisons : 0;
 		}
 		T& value()
@@ -181,6 +182,7 @@ namespace kaguya
 		}
 		operator bool_type() const
 		{
+			this_type_does_not_support_comparisons();
 			return value_ != 0 ? &optional::this_type_does_not_support_comparisons : 0;
 		}
 		T& value()
