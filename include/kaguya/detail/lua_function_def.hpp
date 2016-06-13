@@ -22,6 +22,17 @@ namespace kaguya
 
 	class FunctionResults;
 
+	/**
+	* status of coroutine
+	*/
+	enum coroutine_status
+	{
+		COSTAT_RUNNING,//!< coroutine is running
+		COSTAT_SUSPENDED,//!< coroutine is suspended
+		COSTAT_NORMAL,//!<
+		COSTAT_DEAD//!< coroutine is dead
+	};
+
 	namespace detail
 	{
 		class FunctionResultProxy
@@ -307,16 +318,6 @@ namespace kaguya
 				return threadStatus();
 			}
 
-			/**
-			* status of coroutine
-			*/
-			enum coroutine_status
-			{
-				COSTAT_RUNNING,//!< coroutine is running
-				COSTAT_SUSPENDED,//!< coroutine is suspended
-				COSTAT_NORMAL,//!<
-				COSTAT_DEAD//!< coroutine is dead
-			};
 
 			/**
 			* @return coroutine status
