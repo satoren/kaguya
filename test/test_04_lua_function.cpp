@@ -241,6 +241,9 @@ KAGUYA_TEST_FUNCTION_DEF(function_on_the_coroutine)(kaguya::State& state)
 
 	kaguya::VariadicArgType vargtest(state.state(), 5);
 	TEST_EQUAL(vargtest.size(), 0);
+
+	TEST_CHECK(cor.typeTest<kaguya::VariadicArgType>());
+	TEST_CHECK(cor.weakTypeTest<kaguya::VariadicArgType>());
 }
 
 KAGUYA_TEST_FUNCTION_DEF(move_stack)(kaguya::State& state)
@@ -436,7 +439,12 @@ KAGUYA_TEST_FUNCTION_DEF(to_standard_function)(kaguya::State& state)
 	TEST_CHECK(testfunref);
 	TEST_CHECK(testfunref.typeTest<kaguya::standard::function<int()> >());
 	TEST_CHECK(testfunref.weakTypeTest<kaguya::standard::function<int()> >());
-	kaguya::standard::function<int()> testfun(testfunref);
+	kaguya::standard::function<int()> testfun;
+
+	testfun = kaguya::LuaRef().get<kaguya::standard::function<int()> >();
+	TEST_CHECK(!testfun);
+
+	testfun = testfunref.get<kaguya::standard::function<int()> >();
 	TEST_EQUAL(testfun(), 3232);
 	state("testfun3 = function() return 'text' end");
 	TEST_EQUAL(state["testfun3"](), "text");

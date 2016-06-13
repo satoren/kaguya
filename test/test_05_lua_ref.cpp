@@ -571,6 +571,8 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 
 	ctable.foreach_table<int,int>(table_functor());
 	ctable.foreach_table_breakable<int, int>(breakable_table_functor());
+	cv.foreach_table<int, int>(table_functor());
+	cv.foreach_table_breakable<int, int>(breakable_table_functor());
 
 	last_error_message = "";
 	kaguya::LuaRef ref = state.newTable();

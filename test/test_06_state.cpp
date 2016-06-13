@@ -401,6 +401,7 @@ KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State&)
 KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	bool catch_except = false;
 	try
 	{
 		state("tes terror");//syntax_error
@@ -409,9 +410,24 @@ KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("terror") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
+
+	catch_except = false;
+	try
+	{
+		std::stringstream sstream;
+		sstream << "tes terror";
+		state.loadstream(sstream)();//syntax_error
+	}
+	catch (const kaguya::LuaSyntaxError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("terror") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
@@ -510,6 +526,7 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 #if LUA_VERSION_NUM >= 502
 KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 {
+	bool catch_except = false;
 	try
 	{
 		kaguya::State state;
@@ -526,9 +543,9 @@ KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("gc error") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 #endif
 

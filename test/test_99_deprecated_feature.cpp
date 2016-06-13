@@ -1029,4 +1029,27 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+	bool catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addProperty("a", &Base::a)
+		);
+		state["Base3"].setClass(kaguya::ClassMetatable<Base>()
+			.addProperty("a", &Base::a)
+		);
+	}
+	catch (const kaguya::LuaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+}
+
 KAGUYA_TEST_GROUP_END(test_99_deprecated_feature)
