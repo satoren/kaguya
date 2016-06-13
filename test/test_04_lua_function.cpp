@@ -88,6 +88,7 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine)(kaguya::State& state)
 			results.push_back(cor3(3));
 		}
 
+		TEST_EQUAL(cor3.costatus(cor3), kaguya::COSTAT_RUNNING);
 		TEST_EQUAL(results.size(), 4);
 		TEST_EQUAL(results[0], 3);
 		TEST_EQUAL(results[1], 6);
@@ -213,6 +214,58 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_on_the_coroutine)(kaguya::State& state)
 	TEST_EQUAL(vargtest.size(), 0);
 }
 
+int function_exec(kaguya::LuaFunction f, kaguya::LuaStackRef v)
+{
+	return f.call<int>(v) *2;
+}
+KAGUYA_TEST_FUNCTION_DEF(function_on_the_coroutine)(kaguya::State& state)
+{
+	TEST_CHECK(state("fn = function(a) return a end"));
+
+	state["function_exec"] = function_exec;
+
+	TEST_CHECK(state("cor2 = coroutine.wrap( function()"
+		"coroutine.yield(function_exec(fn,3)) "
+		"coroutine.yield(function_exec(fn,4)) "
+		"return 4 "
+		" end)"));
+
+	kaguya::LuaRef cor = state["cor2"];
+	int r1 = cor();
+	int r2 = cor();
+	int r3 = cor();
+
+	TEST_EQUAL(r1, 3 *2);
+	TEST_EQUAL(r2, 4 *2);
+	TEST_EQUAL(r3, 4);
+
+	kaguya::VariadicArgType vargtest(state.state(), 5);
+	TEST_EQUAL(vargtest.size(), 0);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(move_stack)(kaguya::State& state)
+{
+	state.pushToStack(1);
+	kaguya::LuaStackRef ref1(state.state(),-1);
+	TEST_EQUAL(ref1, 1);
+	state.pushToStack(2);
+	kaguya::LuaStackRef ref2(state.state(), -1);
+	TEST_EQUAL(ref2, 2);
+	TEST_EQUAL(ref1, 1);
+
+	kaguya::LuaThread cor = state.newThread();
+
+	TEST_EQUAL(ref1, 1);
+	ref1.pushStackIndex(cor);
+	kaguya::LuaStackRef coref1(cor, -1);
+	TEST_EQUAL(coref1, 1);
+	ref2.pushStackIndex(cor);
+	kaguya::LuaStackRef coref2(cor, -1);
+	TEST_EQUAL(coref2, 2);
+
+	state.popFromStack();
+	state.popFromStack();
+}
 
 KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 {

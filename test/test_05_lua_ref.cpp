@@ -37,6 +37,14 @@ KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 	TEST_EQUAL(strmap["g"], "sss");
 	TEST_EQUAL(strmap.size(), 4);
 
+	std::vector<std::string>keys= abctable.keys<std::string>();
+
+	TEST_EQUAL(keys.size(), 4);
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "d") != keys.end());
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "e") != keys.end());
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "f") != keys.end());
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "g") != keys.end());
+
 	abctable.setField("a", "test");
 	TEST_CHECK(abctable["a"] == std::string("test"));
 
@@ -44,6 +52,20 @@ KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 	TEST_CHECK(abctable["a"] == 22);
 
 	kaguya::LuaStackRef a;
+}
+KAGUYA_TEST_FUNCTION_DEF(refcopy)(kaguya::State& state)
+{
+	kaguya::LuaRef ref = state.newRef(2);
+	kaguya::LuaRef ref2;
+	kaguya::LuaRef ref3;
+	TEST_CHECK(ref);
+	TEST_CHECK(!ref2);
+
+	ref2 = ref;
+	TEST_CHECK(ref2);
+	ref2 = ref3;
+	TEST_CHECK(!ref2);
+
 }
 KAGUYA_TEST_FUNCTION_DEF(newtable)(kaguya::State& state)
 {
@@ -440,6 +462,7 @@ KAGUYA_TEST_FUNCTION_DEF(get_field)(kaguya::State& state)
 	TEST_EQUAL(const_table.getField("3"), 4);
 	TEST_EQUAL(const_table[1], 32);
 	TEST_EQUAL(const_table.getField(1), 32);
+	TEST_EQUAL(const_table.getField<int>(state.newRef(1)),32);
 }
 
 
@@ -491,6 +514,16 @@ KAGUYA_TEST_FUNCTION_DEF(put_multiple)(kaguya::State& state)
 	TEST_CHECK(state("assert(value == 22)"));
 }
 
+struct table_functor
+{
+	void operator()(int, int) {}
+};
+struct breakable_table_functor
+{
+	bool operator()(int, int) {
+		return true;
+	}
+};
 
 KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 {
@@ -535,6 +568,15 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 
 	TEST_CHECK(!ctable.getFunctionEnv());
 	TEST_CHECK(!cthread.getMetatable());
+
+	ctable.foreach_table<int,int>(table_functor());
+	ctable.foreach_table_breakable<int, int>(breakable_table_functor());
+
+	last_error_message = "";
+	kaguya::LuaRef ref = state.newTable();
+	ref.costatus();
+	TEST_CHECK(!last_error_message.empty());
+
 }
 
 struct UserDataTest
