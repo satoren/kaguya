@@ -28,7 +28,7 @@ namespace kaguya
 	template<typename T>
 	const std::type_info& metatableType()
 	{
-		return typeid(typename standard::decay<T>::type);
+		return typeid(typename traits::decay<T>::type);
 	}
 	template<typename T>
 	inline const char* metatableName()
@@ -104,11 +104,11 @@ namespace kaguya
 	{
 		template<typename T>
 		ObjectSharedPointerWrapper(const standard::shared_ptr<T>& sptr) :object_(standard::const_pointer_cast<typename standard::remove_const<T>::type>(sptr)), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<typename standard::decay<T>::type> >()), const_value_(traits::is_const<T>::value) {}
+			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<typename T>
 		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object_(std::move(standard::const_pointer_cast<typename standard::remove_const<T>::type>(sptr))), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<typename standard::decay<T>::type> >()), const_value_(traits::is_const<T>::value){}
+			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value){}
 #endif
 		virtual const std::type_info& type()
 		{
@@ -249,7 +249,7 @@ namespace kaguya
 		template<typename TO>
 		standard::shared_ptr<TO> get_shared_pointer(ObjectSharedPointerWrapper* from)const
 		{
-			const std::type_info& to_type = metatableType<standard::shared_ptr<typename standard::decay<TO>::type> >();
+			const std::type_info& to_type = metatableType<standard::shared_ptr<typename traits::decay<TO>::type> >();
 			//unreachable
 //			if (to_type == from->type())
 //			{
@@ -518,7 +518,7 @@ namespace kaguya
 		if (ptr)
 		{
 			const std::type_info& from_type = ptr->shared_ptr_type();
-			const std::type_info& to_type = metatableType<standard::shared_ptr<typename standard::decay<T>::type> >();
+			const std::type_info& to_type = metatableType<standard::shared_ptr<typename traits::decay<T>::type> >();
 			if (from_type == to_type)
 			{
 				if (standard::is_const<T>::value)
