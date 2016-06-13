@@ -397,14 +397,11 @@ namespace kaguya
 				except::typeMismatchError(state, "is nil");
 				return LuaStackRef();
 			}
-			if (push_(state))//push table
-			{
-				lua_type_traits<KEY>::push(state, key);//push key
-				lua_gettable(state, -2);//get table[key]
-				lua_remove(state, -2);//remove table
-				return LuaStackRef(state, -1, true);
-			}
-			return LuaStackRef();
+			push_(state);
+			lua_type_traits<KEY>::push(state, key);//push key
+			lua_gettable(state, -2);//get table[key]
+			lua_remove(state, -2);//remove table
+			return LuaStackRef(state, -1, true);
 		}
 
 		template<typename T> template<typename KEY>

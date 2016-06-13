@@ -72,4 +72,12 @@ KAGUYA_TEST_FUNCTION_DEF(luaL_requiref_test)(kaguya::State& s)
 	TEST_EQUAL(ref["value"],111);
 	TEST_CHECK(s("assert(mylib == nil)"));
 }
+
+KAGUYA_TEST_FUNCTION_DEF(stackValueDump)(kaguya::State& s)
+{
+	using namespace kaguya;
+	util::stackValueDump(std::cout, s.state(), 4, 2);
+}
+
+
 KAGUYA_TEST_GROUP_END(test_09_utility)

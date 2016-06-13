@@ -1026,6 +1026,54 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 		catch_except = true;
 	}
 	TEST_CHECK(catch_except);
+	catch_except = false;
+	try
+	{
+		std::string data_value("value");
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addProperty("a", &Base::a)
+			.addStaticField("a", data_value)
+		);
+		TEST_EQUAL(data_value, "value");
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addProperty("a", &Base::a)
+			.addOverloadedFunctions("a", &Base::a)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+
+
+	catch_except = false;
+	try
+	{
+		CopyableClass copy = state["a"];
+		TEST_CHECK(false);//unreachable
+		TEST_CHECK(copy.member);
+	}
+	catch (const kaguya::LuaTypeMismatch& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("mismatch") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test2)(kaguya::State& state)
 {
@@ -1105,6 +1153,11 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
 		.addFunction("intdata", &ABC::intmember)
 		.addFunction("stringdata", &ABC::stringmember)
+		.addFunction("getInt", &ABC::getInt)
+		.addFunction("setInt", &ABC::setInt)
+		.addFunction("shared_copy", &ABC::shared_copy)
+		
+		
 	);
 
 	state["test"] = ABC();
@@ -1117,6 +1170,18 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 
 	last_error_message = "";
 	state("test.intdata()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.getInt()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.setInt()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.shared_copy()");
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
 
 }

@@ -319,23 +319,24 @@ namespace kaguya
 	///! traits for unique_ptr
 	template<typename T, typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
 		typedef std::unique_ptr<T, Deleter>&& push_type;
-		typedef std::unique_ptr<T, Deleter> get_type;
+		typedef std::unique_ptr<T, Deleter>& get_type;
+		typedef std::unique_ptr<T, Deleter> type;
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>(), false) != 0;
+			return object_wrapper<type>(l, index,  false) != 0;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
+			return object_wrapper<type>(l, index) != 0 ||
 				lua_isnil(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
 			if (lua_isnoneornil(l, index)) {
-				return 0;
+				throw LuaTypeMismatch("type mismatch!!");
 			}
-			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
+			type* pointer = get_pointer(l, index, types::typetag<type>());
 			if (!pointer)
 			{
 				throw LuaTypeMismatch("type mismatch!!");
@@ -356,7 +357,6 @@ namespace kaguya
 			{
 				lua_pushnil(l);
 			}
-			return 1;
 			return 1;
 		}
 	};

@@ -38,7 +38,7 @@ namespace kaguya
 		{
 		};
 
-		//boost.decay
+		//can not use boost.decay
 		template< class T >
 		struct decay {
 		private:

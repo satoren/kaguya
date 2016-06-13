@@ -18,6 +18,8 @@ KAGUYA_TEST_FUNCTION_DEF(optional_construct)(kaguya::State&)
 	const kaguya::optional<std::string> opt3 = opt2;
 	TEST_EQUAL("abc", *opt2);
 	TEST_EQUAL("abc", *opt3);
+	std::string value("data");
+	TEST_CHECK(opt2 = value);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)

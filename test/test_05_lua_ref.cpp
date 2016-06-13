@@ -530,6 +530,7 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 	TEST_CHECK(!cv.getFunctionEnv());
 	TEST_CHECK(!cv.getField("s"));
 	TEST_CHECK(!cv.getField<int>("s"));
+	TEST_CHECK(!cv.getField<int>(kaguya::NewTable()));
 
 
 	TEST_CHECK(!ctable.getFunctionEnv());

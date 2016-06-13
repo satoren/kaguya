@@ -42,7 +42,10 @@ namespace kaguya
 		virtual void* get() = 0;
 
 		virtual const std::type_info& type() = 0;
-		
+
+		virtual const std::type_info& native_type() { return type(); }
+		virtual void* native_get() { return get(); }
+
 		ObjectWrapperBase() {}
 		virtual ~ObjectWrapperBase() {}
 	private:
@@ -125,6 +128,13 @@ namespace kaguya
 		standard::shared_ptr<void> object()const { return const_value_? standard::shared_ptr<void>():object_; }
 		standard::shared_ptr<const void> const_object()const { return object_; }
 		const std::type_info& shared_ptr_type()const { return shared_ptr_type_; }
+
+
+		virtual const std::type_info& native_type()
+		{
+			return metatableType<standard::shared_ptr<void>>();
+		}
+		virtual void* native_get() { return &object_; }
 	private:
 		standard::shared_ptr<void> object_;
 		const std::type_info& type_;
@@ -152,6 +162,11 @@ namespace kaguya
 		{
 			return object_.get();
 		}
+		virtual const std::type_info& native_type() 
+		{
+			return metatableType<T>();
+		}
+		virtual void* native_get() { return &object_; }
 	private:
 		T object_;
 	};
@@ -466,9 +481,14 @@ namespace kaguya
 			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
 			if (objwrapper)
 			{
-				if (objwrapper->type() == metatableType<T>())
+				const std::type_info& to_type = metatableType<T>();
+				if (objwrapper->type() == to_type)
 				{
 					return static_cast<T*>(objwrapper->get());
+				}
+				if (objwrapper->native_type() == to_type)
+				{
+					return static_cast<T*>(objwrapper->native_get());
 				}
 				else
 				{
