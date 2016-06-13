@@ -132,7 +132,7 @@ namespace kaguya
 
 		virtual const std::type_info& native_type()
 		{
-			return metatableType<standard::shared_ptr<void>>();
+			return metatableType<standard::shared_ptr<void> >();
 		}
 		virtual void* native_get() { return &object_; }
 	private:

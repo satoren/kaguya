@@ -144,6 +144,7 @@ namespace kaguya
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
 				KAGUYA_MEM_ATTRBUTE ThisType* this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::get(state, 1); \
+				if (!this_){throw LuaTypeMismatch("type mismatch!!");}\
 				(this_->*f)(KAGUYA_GET_REPEAT(N));\
 				return 0;\
 			}\
@@ -170,6 +171,7 @@ namespace kaguya
 			inline int call(lua_State* state,KAGUYA_FUNC_DEF(N))\
 			{\
 				KAGUYA_MEM_ATTRBUTE ThisType* this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::get(state, 1); \
+				if (!this_){throw LuaTypeMismatch("type mismatch!!");}\
 				return lua_type_traits<Ret>::push(state, (this_->*f)(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
