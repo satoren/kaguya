@@ -24,7 +24,6 @@ install:
     }
 cache:
 - lua-5.3.2
-- build
 build_script:
 - ps: >-
     if(!(Test-Path -Path build )){
