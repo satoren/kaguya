@@ -1,3 +1,4 @@
+set -e
 build_test_versions=("lua-5.3.3" "lua-5.2.4" "lua-5.1.5")
 build_test_cxx_flags=("-std=c++03" "-std=c++11")
 
