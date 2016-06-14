@@ -212,7 +212,7 @@ namespace kaguya
 				std::vector<K, A> res;
 				util::ScopedSavedStack save(state_());
 				int stackIndex = pushStackIndex_(state_());
-				int size = lua_rawlen(state_(), stackIndex);
+				size_t size = lua_rawlen(state_(), stackIndex);
 				res.reserve(size);
 				foreach_table<K, void>(gettablekey<K, A>(res));
 				return res;
@@ -233,7 +233,7 @@ namespace kaguya
 				std::vector<V, A> res;
 				util::ScopedSavedStack save(state_());
 				int stackIndex = pushStackIndex_(state_());
-				int size = lua_rawlen(state_(), stackIndex);
+				size_t size = lua_rawlen(state_(), stackIndex);
 				res.reserve(size);
 				foreach_table<void, V>(gettablevalue<V, A>(res));
 				return res;
