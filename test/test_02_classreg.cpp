@@ -1010,8 +1010,8 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 	{
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
 			.setConstructors<Base()>()
-			.addProperty("a", &Base::a)
 			.addFunction("a", &Base::a)
+			.addProperty("a", &Base::a)
 		);
 	}
 	catch (const kaguya::KaguyaException& e)
