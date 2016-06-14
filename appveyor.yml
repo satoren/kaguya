@@ -16,14 +16,14 @@ environment:
   - CMAKE_GEN_TYPE: '"Visual Studio 14 2015 Win64"'
 install:
 - ps: >-
-    if(!(Test-Path -Path lua-5.3.2 )){
+    if(!(Test-Path -Path lua-5.3.3 )){
       choco install 7zip.commandline
-      Invoke-WebRequest  http://www.lua.org/ftp/lua-5.3.2.tar.gz -OutFile lua-5.3.2.tar.gz
-      7z x lua-5.3.2.tar.gz
-      7z x lua-5.3.2.tar
+      Invoke-WebRequest  http://www.lua.org/ftp/lua-5.3.3.tar.gz -OutFile lua-5.3.3.tar.gz
+      7z x lua-5.3.3.tar.gz
+      7z x lua-5.3.3.tar
     }
 cache:
-- lua-5.3.2
+- lua-5.3.3
 build_script:
 - ps: >-
     if(!(Test-Path -Path build )){
@@ -32,7 +32,7 @@ build_script:
 
     cd build
 
-    cmake ../ -G $env:CMAKE_GEN_TYPE -DADDITIONAL_INCLUDE_PATH="$env:ADDITIONAL_INCLUDE_PATH" -DLOCAL_LUA_DIRECTORY=lua-5.3.2
+    cmake ../ -G $env:CMAKE_GEN_TYPE -DADDITIONAL_INCLUDE_PATH="$env:ADDITIONAL_INCLUDE_PATH" -DLOCAL_LUA_DIRECTORY="lua-5.3.3"
 
     cmake --build . --config $env:CONFIGURATION
 test_script:
