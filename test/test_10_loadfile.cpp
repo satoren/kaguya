@@ -13,9 +13,19 @@ void ignore_error_fun(int status, const char* message)
 
 KAGUYA_TEST_FUNCTION_DEF(load_return_number)(kaguya::State& state)
 {
-	state.loadfile("lua/return_number.lua");
+	TEST_CHECK(state.dofile("lua/return_number.lua"));
 }
 
+
+KAGUYA_TEST_FUNCTION_DEF(load_assign_value)(kaguya::State& state)
+{
+	TEST_CHECK(state.dofile("lua/assign_value.lua"));
+	TEST_EQUAL(state["value"],1);
+	state["value"] = 5;
+	kaguya::LuaTable env = state.newTable();
+	TEST_CHECK(state.dofile("lua/assign_value.lua", env));
+	TEST_EQUAL(env["value"], 1);
+}
 
 KAGUYA_TEST_FUNCTION_DEF(load_syntax_error_script)(kaguya::State& state)
 {
