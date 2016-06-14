@@ -37,4 +37,4 @@ after_success:
   - cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}
   - make
   - ctest
-  - bash <(curl -s https://codecov.io/bash) -p CMakeFiles/test_coverage.dir/test/ -x "$GCOV" -a "-o CMakeFiles/test_coverage.dir/test/"
+  - bash <(curl -s https://codecov.io/bash) -p . -x "$GCOV"
