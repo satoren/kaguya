@@ -600,8 +600,6 @@ namespace kaguya
 				//skip comment
 				if (!buffer_.empty() && buffer_.front() == '#')
 				{
-					std::vector<char>::iterator lf = std::find(buffer_.begin(), buffer_.end(), '\n');
-
 					buffer_.clear();
 					std::string comment;
 					std::getline(stream_, comment);
