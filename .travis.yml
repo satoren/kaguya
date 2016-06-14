@@ -35,6 +35,6 @@ after_success:
     fi
   - rm -Rf ./*
   - cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}
-  - make test_coverage
-  - ./test_coverage
+  - make
+  - ctest
   - bash <(curl -s https://codecov.io/bash) -p CMakeFiles/test_coverage.dir/test/ -x "$GCOV" -a "-o CMakeFiles/test_coverage.dir/test/"
