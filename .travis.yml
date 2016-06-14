@@ -26,13 +26,8 @@ env:
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success:
-  - if [ "$CXX_FLAGS" = "-std=c++11" ]; then
-     export GCOV="gcov-4.8";
-     export CXX="g++-4.8";
-    else
-     export GCOV="gcov-4.6";
-     export CXX="g++-4.6";
-    fi
+  - export GCOV="gcov-4.8";
+  - export CXX="g++-4.8";
   - rm -Rf ./*
   - cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}
   - make
