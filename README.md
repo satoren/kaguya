@@ -368,7 +368,7 @@ apple   3
   cd build
   cmake ..
   make
-  ./test_runner
+  ctest
   ```
   If you want to use a non-system default library, add three option to cmake command
   ```

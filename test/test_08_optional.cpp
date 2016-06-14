@@ -1,4 +1,3 @@
-#include "kaguya/optional.hpp"
 #include "test_util.hpp"
 
 KAGUYA_TEST_GROUP_START(test_08_optional)
