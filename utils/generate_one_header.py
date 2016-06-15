@@ -24,7 +24,7 @@ def parseheader(out,filepath,basedir,onceincludedfiles):
 
 if __name__ == "__main__":
     onceincludedfiles=[]
-    sys.stdout.write('#ifdef KAGUYA_LUABINDING_HPP_INCLUDED\n')
+    sys.stdout.write('#ifndef KAGUYA_LUABINDING_HPP_INCLUDED\n')
     sys.stdout.write('#define KAGUYA_LUABINDING_HPP_INCLUDED\n')
     parseheader(sys.stdout,'kaguya/kaguya.hpp','../include/',onceincludedfiles)
     sys.stdout.write('#endif// KAGUYA_LUABINDING_HPP_INCLUDED\n')
