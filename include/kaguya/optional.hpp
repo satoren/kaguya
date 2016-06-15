@@ -138,24 +138,10 @@ namespace kaguya
 				value_->~T(); value_ = 0;
 			}
 		}
-#define KAGUYA_USE_CPP11_ALIGNMENT 0
-#if KAGUYA_USE_CPP11_ALIGNMENT
-		alignas(alignof(T)) char storage_[sizeof(T)];
-#else
-#if defined(_MSC_VER)
-#if _MSC_VER == 1500
-//		__declspec(__alignof(T))
-		__declspec(align(64)) char storage_[sizeof(T)];
-#else
-		__declspec(align(__alignof(T))) char storage_[sizeof(T)];
-#endif
 
-#elif defined(__GNUC__) || defined(__clang__)
-		char storage_[sizeof(T)] __attribute__((aligned(__alignof__(T))));
-#else
-		char storage_[sizeof(T)] __attribute__((aligned(__alignof__(T))));
-#endif
-#endif
+		typename standard::aligned_storage<sizeof(T),
+			standard::alignment_of<T>::value>::type storage_[1];
+
 		T* value_;
 	};
 
