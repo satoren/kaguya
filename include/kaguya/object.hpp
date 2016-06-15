@@ -292,11 +292,6 @@ namespace kaguya
 			return get_pointer<T>(from);
 		}
 		template<class T>
-		const T* get_pointer(ObjectWrapperBase* from, types::typetag<const T> tag)
-		{
-			return get_const_pointer<T>(from);
-		}
-		template<class T>
 		standard::shared_ptr<T> get_pointer(ObjectWrapperBase* from, types::typetag<standard::shared_ptr<T> > tag)
 		{
 			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
@@ -529,6 +524,11 @@ namespace kaguya
 			}
 		}
 		return 0;
+	}
+	template<class T>
+	const T* get_pointer(lua_State* l, int index, types::typetag<const T> tag)
+	{
+		return get_const_pointer<T>(l,index, types::typetag<T>());
 	}
 	
 	template<class T>

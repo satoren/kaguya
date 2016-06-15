@@ -143,14 +143,7 @@ namespace kaguya
 			int type = lua_type(l, index);
 			if (type == LUA_TUSERDATA || type == LUA_TLIGHTUSERDATA)
 			{
-				if (traits::is_const<T>::value)
-				{
-					return const_cast<get_type>(get_const_pointer(l, index, types::typetag<T>()));
-				}
-				else
-				{
-					return get_pointer(l, index, types::typetag<T>());
-				}
+				return get_pointer(l, index, types::typetag<T>());
 			}
 
 			if (type == LUA_TNIL
