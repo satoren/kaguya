@@ -143,7 +143,13 @@ namespace kaguya
 		alignas(alignof(T)) char storage_[sizeof(T)];
 #else
 #if defined(_MSC_VER)
+#if _MSC_VER == 1500
+//		__declspec(__alignof(T))
+		__declspec(align(64)) char storage_[sizeof(T)];
+#else
 		__declspec(align(__alignof(T))) char storage_[sizeof(T)];
+#endif
+
 #elif defined(__GNUC__) || defined(__clang__)
 		char storage_[sizeof(T)] __attribute__((aligned(__alignof__(T))));
 #else
