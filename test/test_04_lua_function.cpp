@@ -193,7 +193,7 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_on_the_coroutine)(kaguya::State& state)
 		"return 2 "
 		" end)"));
 
-	state["coroutine_exec"] = coroutine_exec;
+	state["coroutine_exec"] = &coroutine_exec;
 
 	TEST_CHECK(state("cor2 = coroutine.wrap( function()"
 		"coroutine.yield(coroutine_exec(cor1)) "
@@ -222,7 +222,7 @@ KAGUYA_TEST_FUNCTION_DEF(function_on_the_coroutine)(kaguya::State& state)
 {
 	TEST_CHECK(state("fn = function(a) return a end"));
 
-	state["function_exec"] = function_exec;
+	state["function_exec"] = &function_exec;
 
 	TEST_CHECK(state("cor2 = coroutine.wrap( function()"
 		"coroutine.yield(function_exec(fn,3)) "

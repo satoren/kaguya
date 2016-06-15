@@ -255,28 +255,30 @@ namespace functioncall_testfunction
 		called = 2;
 	}
 }
+
 KAGUYA_TEST_FUNCTION_DEF(functioncall)(kaguya::State& state)
 {
-	kaguya::standard::function<void()> f = functioncall_testfunction::testcall;
-	kaguya::standard::function<void(int)> f2 = functioncall_testfunction::testcall2;
-	state["testcall"] = functioncall_testfunction::testcall;
+	using namespace functioncall_testfunction;
+	kaguya::standard::function<void()> f = testcall;
+	kaguya::standard::function<void(int)> f2 = testcall2;
+	state["testcall"] = &testcall;
 	state["testcall"]();
-	TEST_EQUAL(functioncall_testfunction::called , 1);
-	functioncall_testfunction::called = 0;
+	TEST_EQUAL(called , 1);
+	called = 0;
 
 	state["testcall"] = kaguya::function(f);
 	state["testcall"]();
-	TEST_EQUAL(functioncall_testfunction::called ,1);
+	TEST_EQUAL(called ,1);
 
-	state["overloaded"] = kaguya::overload(functioncall_testfunction::testcall2, functioncall_testfunction::testcall,f,f2);
+	state["overloaded"] = kaguya::overload(testcall2, testcall,f,f2);
 	state["overloaded"]();
-	TEST_EQUAL(functioncall_testfunction::called, 1);
+	TEST_EQUAL(called, 1);
 	state["overloaded"](1);
-	TEST_EQUAL(functioncall_testfunction::called, 2);
+	TEST_EQUAL(called, 2);
 	state["overloaded"](1, 2);
-	TEST_EQUAL(functioncall_testfunction::called, 2);
+	TEST_EQUAL(called, 2);
 	state["overloaded"]("test");
-	TEST_EQUAL(functioncall_testfunction::called, 1);
+	TEST_EQUAL(called, 1);
 }
 
 
