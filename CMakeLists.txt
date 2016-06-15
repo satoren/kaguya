@@ -47,7 +47,6 @@ add_executable(benchmark ${BENCHMARK_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(benchmark ${LUA_LIBRARIES})
 
 
-link_directories(${LUA_LIBRARY_DIRS})
 enable_testing()
 if(COVERAGE)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage -coverage")
@@ -55,27 +54,15 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -W -fprofile-arcs -ftest-covera
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage -coverage")
 endif(COVERAGE)
 
-
-function(add_kaguya_test filepath)
-  get_filename_component(TEST_NAME ${filepath} NAME_WE)
-
-  add_executable(${TEST_NAME} ${filepath}  ${KAGUYA_HEADER})
-  target_link_libraries(${TEST_NAME} ${LUA_LIBRARIES})
-
-  if(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
-  SET_TARGET_PROPERTIES(${TEST_NAME}  PROPERTIES COMPILE_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
-  SET_TARGET_PROPERTIES(${TEST_NAME}  PROPERTIES LINK_FLAGS "-fsanitize=address")
-  endif(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
-  add_test(
-    NAME ${TEST_NAME}
-    COMMAND $<TARGET_FILE:${TEST_NAME}>
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
-endfunction()
-
-#link test for duplicate symbol
-add_executable(check_duplicate_symbok test/link.cpp test/link2.cpp)
-
 file(GLOB TEST_SRCS files RELATIVE ${CMAKE_SOURCE_DIR} test/test_*.cpp)
-foreach(TEST_SRC IN LISTS TEST_SRCS)
-  add_kaguya_test(${TEST_SRC})
-endforeach()
+
+add_executable(test_runner ${TEST_SRCS}  ${KAGUYA_HEADER})
+target_link_libraries(test_runner ${LUA_LIBRARIES})
+if(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
+SET_TARGET_PROPERTIES(test_runner PROPERTIES COMPILE_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
+SET_TARGET_PROPERTIES(test_runner PROPERTIES LINK_FLAGS "-fsanitize=address")
+endif(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
+add_test(
+  NAME test_runner
+  COMMAND $<TARGET_FILE:test_runner>
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
