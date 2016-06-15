@@ -331,7 +331,7 @@ namespace kaguya
 		void typecheck()
 		{
 			int t = type();
-			if (t != TYPE_USERDATA && t != TYPE_NIL && t != TYPE_NONE)
+			if (t != TYPE_USERDATA && t != TYPE_LIGHTUSERDATA &&t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not user data");
 				Ref::RegistoryRef::unref();
@@ -346,17 +346,30 @@ namespace kaguya
 		{
 			typecheck();
 		}
-		LuaUserData(lua_State* state, const NewTable& table) :Ref::RegistoryRef(state, table)
+		template<typename TYPE>
+		LuaUserData(lua_State* state, const TYPE& table) :Ref::RegistoryRef(state, table)
 		{
 			typecheck();
 		}
-		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NewTable())
+		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NilValue())
 		{
 			typecheck();
 		}
 		LuaUserData()
 		{
 			typecheck();
+		}
+		template<typename T>
+		bool typeTest()const
+		{
+			util::ScopedSavedStack save(state());
+			return lua_type_traits<T>::strictCheckType(state(), pushStackIndex(state()));
+		}
+		template<typename T>
+		bool weakTypeTest()const
+		{
+			util::ScopedSavedStack save(state());
+			return lua_type_traits<T>::checkType(state(), pushStackIndex(state()));
 		}
 	};
 
@@ -467,10 +480,33 @@ namespace kaguya
 
 	public:
 
+		/**
+		* @name constructor
+		* @brief construct with state and function .
+		* @param state pointer to lua_State
+		* @param function e.g. kaguya::function(function_ptr),kaguya::overload(function_ptr)
+		*/
+		template<typename F>
+		LuaFunction(lua_State* state, F f) :Ref::RegistoryRef(state, f)
+		{
+			typecheck();
+		}
+
+		/**
+		* @name constructor
+		* @brief construct with stack top value.
+		* @param state pointer to lua_State
+		* @param StackTop tag
+		*/
 		LuaFunction(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
 		{
 			typecheck();
 		}
+
+		/**
+		* @name constructor
+		* @brief construct nil reference.
+		*/
 		LuaFunction()
 		{
 		}
@@ -539,8 +575,10 @@ namespace kaguya
 				skipComment();
 				preloaded_ = !buffer_.empty();
 			}
-			void skipBom()
+
+			void skipComment()
 			{
+				//skip bom
 				const char* bom = "\xEF\xBB\xBF";
 				const char* bomseq = bom;
 				char c;
@@ -558,24 +596,13 @@ namespace kaguya
 						return;
 					}
 				}
-			}
-			void skipComment()
-			{
-				skipBom();
 				
+				//skip comment
 				if (!buffer_.empty() && buffer_.front() == '#')
 				{
-					std::vector<char>::iterator lf = std::find(buffer_.begin(), buffer_.end(), '\n');
-					if (lf != buffer_.end())
-					{
-						buffer_.erase(buffer_.begin(), buffer_.end());
-					}
-					else
-					{
-						buffer_.clear();
-						std::string comment;
-						std::getline(stream_, comment);
-					}
+					buffer_.clear();
+					std::string comment;
+					std::getline(stream_, comment);
 				}
 			}
 			
@@ -631,6 +658,7 @@ namespace kaguya
 
 		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = 0)
 		{
+			util::ScopedSavedStack save(state);
 			LuaLoadStreamWrapper wrapper(stream);
 #if LUA_VERSION_NUM >= 502
 			int status = lua_load(state, &LuaLoadStreamWrapper::getdata, &wrapper, chunkname, 0);

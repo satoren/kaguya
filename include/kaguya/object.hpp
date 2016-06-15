@@ -4,7 +4,6 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
-
 #include <string>
 #include <cstring>
 #include <typeinfo>
@@ -27,34 +26,26 @@ namespace kaguya
 	inline void* metatable_type_table_key() { static int key; return &key; }
 
 	template<typename T>
-	inline const char* metatableName()
-	{
-		typedef typename traits::remove_cv<T>::type noncv_type;
-		typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-		typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
-
-		return typeid(noncvpointerref_type*).name();
-	}
-	template<typename T>
 	const std::type_info& metatableType()
 	{
-		typedef typename traits::remove_cv<T>::type noncv_type;
-		typedef typename traits::remove_pointer<noncv_type>::type noncvpointer_type;
-		typedef typename traits::remove_const_and_reference<noncvpointer_type>::type noncvpointerref_type;
-		return typeid(noncvpointerref_type*);
+		return typeid(typename traits::decay<T>::type);
+	}
+	template<typename T>
+	inline const char* metatableName()
+	{
+		return metatableType<T>().name();
 	}
 
 	struct ObjectWrapperBase
 	{
-		virtual bool is_native_type(const std::type_info& type) = 0;
-
-		virtual const void* native_cget() = 0;
-		virtual void* native_get() = 0;
 		virtual const void* cget() = 0;
 		virtual void* get() = 0;
 
 		virtual const std::type_info& type() = 0;
-		
+
+		virtual const std::type_info& native_type() { return type(); }
+		virtual void* native_get() { return get(); }
+
 		ObjectWrapperBase() {}
 		virtual ~ObjectWrapperBase() {}
 	private:
@@ -94,10 +85,6 @@ namespace kaguya
 
 #endif
 
-		virtual bool is_native_type(const std::type_info& type)
-		{
-			return metatableType<T>() == type;
-		}
 		virtual const std::type_info& type()
 		{
 			return metatableType<T>();
@@ -111,9 +98,6 @@ namespace kaguya
 		{
 			return &object_;
 		}
-		virtual const void* native_cget() { return cget(); };
-		virtual void* native_get() { return get(); };
-
 	private:
 		T object_;
 	};
@@ -121,41 +105,42 @@ namespace kaguya
 
 	struct ObjectSharedPointerWrapper : ObjectWrapperBase
 	{
-
 		template<typename T>
-		ObjectSharedPointerWrapper(const standard::shared_ptr<T>& sptr) :object_(sptr), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()) {}
+		ObjectSharedPointerWrapper(const standard::shared_ptr<T>& sptr) :object_(standard::const_pointer_cast<typename standard::remove_const<T>::type>(sptr)), type_(metatableType<T>()),
+			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value) {}
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<typename T>
-		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object_(std::move(sptr)), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<T> >()) {}
+		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object_(std::move(standard::const_pointer_cast<typename standard::remove_const<T>::type>(sptr))), type_(metatableType<T>()),
+			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value){}
 #endif
-		virtual bool is_native_type(const std::type_info& type)
-		{
-			return shared_ptr_type_ == type;
-		}
 		virtual const std::type_info& type()
 		{
 			return type_;
 		}
 		virtual void* get()
 		{
-			return object_.get();
+			return  const_value_ ? 0 : object_.get();
 		}
 		virtual const void* cget()
 		{
 			return object_.get();
 		}
-		virtual const void* native_cget() { return &object_; };
-		virtual void* native_get() { return &object_; };
-
-		const standard::shared_ptr<void> object()const { return object_; }
+		standard::shared_ptr<void> object()const { return const_value_? standard::shared_ptr<void>():object_; }
+		standard::shared_ptr<const void> const_object()const { return object_; }
 		const std::type_info& shared_ptr_type()const { return shared_ptr_type_; }
+
+
+		virtual const std::type_info& native_type()
+		{
+			return metatableType<standard::shared_ptr<void> >();
+		}
+		virtual void* native_get() { return &object_; }
 	private:
 		standard::shared_ptr<void> object_;
 		const std::type_info& type_;
 
 		const std::type_info& shared_ptr_type_;
+		bool const_value_;
 	};
 
 	template<class T>
@@ -165,10 +150,6 @@ namespace kaguya
 #if KAGUYA_USE_RVALUE_REFERENCE
 		ObjectSmartPointerWrapper(T&& sptr) : object_(std::move(sptr)) {}
 #endif
-		virtual bool is_native_type(const std::type_info& type)
-		{
-			return metatableType<T>() == type;
-		}
 		virtual const std::type_info& type()
 		{
 			return metatableType<typename T::element_type>();
@@ -181,9 +162,11 @@ namespace kaguya
 		{
 			return object_.get();
 		}
-		virtual const void* native_cget() { return &object_; };
-		virtual void* native_get() { return &object_; };
-
+		virtual const std::type_info& native_type() 
+		{
+			return metatableType<T>();
+		}
+		virtual void* native_get() { return &object_; }
 	private:
 		T object_;
 	};
@@ -193,10 +176,6 @@ namespace kaguya
 	{
 		ObjectPointerWrapper(T* ptr) :object_(ptr) {}
 
-		virtual bool is_native_type(const std::type_info& type)
-		{
-			return metatableType<T>() == type;
-		}
 		virtual const std::type_info& type()
 		{
 			return metatableType<T>();
@@ -213,9 +192,6 @@ namespace kaguya
 		{
 			return object_;
 		}
-		virtual const void* native_cget() { return cget(); };
-		virtual void* native_get() { return get(); };
-
 		~ObjectPointerWrapper()
 		{
 		}
@@ -255,10 +231,11 @@ namespace kaguya
 		TO* get_pointer(ObjectWrapperBase* from)const
 		{
 			const std::type_info& to_type = metatableType<TO>();
-			if (to_type == from->type())
-			{
-				return static_cast<TO*>(from->get());
-			}
+			//unreachable
+			//if (to_type == from->type())
+			//{
+			//	return static_cast<TO*>(from->get());
+			//}
 			std::map<convert_map_key, std::vector<convert_function_type> >::const_iterator match = function_map_.find(convert_map_key(to_type.name(), from->type().name()));
 			if (match != function_map_.end())
 			{
@@ -271,10 +248,11 @@ namespace kaguya
 		const TO* get_const_pointer(ObjectWrapperBase* from)const
 		{
 			const std::type_info& to_type = metatableType<TO>();
-			if (to_type == from->type())
-			{
-				return static_cast<const TO*>(from->cget());
-			}
+			//unreachable
+			//if (to_type == from->type())
+			//{
+			//	return static_cast<const TO*>(from->cget());
+			//}
 			std::map<convert_map_key, std::vector<convert_function_type> >::const_iterator match = function_map_.find(convert_map_key(to_type.name(), from->type().name()));
 			if (match != function_map_.end())
 			{
@@ -284,33 +262,29 @@ namespace kaguya
 		}
 
 		template<typename TO>
-		standard::shared_ptr<TO> get_shared_pointer(ObjectWrapperBase* from)const
+		standard::shared_ptr<TO> get_shared_pointer(ObjectSharedPointerWrapper* from)const
 		{
-			const std::type_info& to_type = metatableType<standard::shared_ptr<TO> >();
-			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
-			if (!ptr) {
-				return standard::shared_ptr<TO>();
-			}
-			if (to_type == from->type())
-			{
-				return standard::static_pointer_cast<TO>(ptr->object());
-			}
-			std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> >::const_iterator match = shared_ptr_function_map_.find(convert_map_key(to_type.name(), ptr->shared_ptr_type().name()));
+			const std::type_info& to_type = metatableType<standard::shared_ptr<typename traits::decay<TO>::type> >();
+			//unreachable
+//			if (to_type == from->type())
+//			{
+//				return standard::static_pointer_cast<TO>(from->object());
+//			}
+			const std::type_info& from_type = from->shared_ptr_type();
+			std::map<convert_map_key, std::vector<shared_ptr_convert_function_type> >::const_iterator match = shared_ptr_function_map_.find(convert_map_key(to_type.name(), from_type.name()));
 			if (match != shared_ptr_function_map_.end())
 			{
-				return standard::static_pointer_cast<TO>(pcvt_list_apply(ptr->object(), match->second));
+				standard::shared_ptr<void> sptr = from->object();
+
+				if (!sptr && standard::is_const<TO>::value)
+				{
+					sptr = standard::const_pointer_cast<void>(from->const_object());
+				}
+
+				return standard::static_pointer_cast<TO>(pcvt_list_apply(sptr, match->second));
 			}
 			return standard::shared_ptr<TO>();
 		}
-		standard::shared_ptr<void> get_shared_pointer(ObjectWrapperBase* from)const
-		{
-			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
-			if (ptr) {
-				return ptr->object();
-			}
-			return standard::shared_ptr<void>();
-		}
-
 
 		template<class T>
 		T* get_pointer(ObjectWrapperBase* from, types::typetag<T> tag)
@@ -318,14 +292,14 @@ namespace kaguya
 			return get_pointer<T>(from);
 		}
 		template<class T>
-		const T* get_pointer(ObjectWrapperBase* from, types::typetag<const T> tag)
-		{
-			return get_const_pointer<T>(from);
-		}
-		template<class T>
 		standard::shared_ptr<T> get_pointer(ObjectWrapperBase* from, types::typetag<standard::shared_ptr<T> > tag)
 		{
-			return get_shared_pointer<T>(from);
+			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
+			if (ptr)
+			{
+				return get_shared_pointer<T>(ptr);
+			}
+			return standard::shared_ptr<T>();
 		}
 
 
@@ -464,17 +438,13 @@ namespace kaguya
 	}
 
 	template<typename RequireType>
-	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, bool convert = true)
+	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, bool convert = true, types::typetag<RequireType> type = types::typetag<RequireType>())
 	{
 		if (detail::object_wrapper_type_check(l, index))
 		{
 			ObjectWrapperBase* ptr = static_cast<ObjectWrapperBase*>(lua_touserdata(l, index));
 
-			if (ptr->is_native_type(metatableType<RequireType>()))
-			{
-				return ptr;
-			}
-			else if (ptr->type() == metatableType<RequireType>())
+			if (ptr->type() == metatableType<RequireType>())
 			{
 				return ptr;
 			}
@@ -506,13 +476,14 @@ namespace kaguya
 			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
 			if (objwrapper)
 			{
-				if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableType<T>()))
-				{
-					return static_cast<T*>(objwrapper->native_get());
-				}
-				else if (objwrapper->type() == metatableType<T>())
+				const std::type_info& to_type = metatableType<T>();
+				if (objwrapper->type() == to_type)
 				{
 					return static_cast<T*>(objwrapper->get());
+				}
+				if (objwrapper->native_type() == to_type)
+				{
+					return static_cast<T*>(objwrapper->native_get());
 				}
 				else
 				{
@@ -541,11 +512,7 @@ namespace kaguya
 			ObjectWrapperBase* objwrapper = object_wrapper(l, index);
 			if (objwrapper)
 			{
-				if (objwrapper->is_native_type(metatableType<T>()))
-				{
-					return static_cast<const T*>(objwrapper->native_cget());
-				}
-				else if (objwrapper->type() == metatableType<T>())
+				if (objwrapper->type() == metatableType<T>())
 				{
 					return static_cast<const T*>(objwrapper->cget());
 				}
@@ -558,28 +525,53 @@ namespace kaguya
 		}
 		return 0;
 	}
-
-
-
+	template<class T>
+	const T* get_pointer(lua_State* l, int index, types::typetag<const T> tag)
+	{
+		return get_const_pointer<T>(l,index, types::typetag<T>());
+	}
+	
 	template<class T>
 	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> tag)
 	{
-
-		ObjectWrapperBase* objwrapper = object_wrapper(l, index);
-		if (objwrapper)
+		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
+		if (ptr)
 		{
-			if (static_cast<ObjectWrapperBase*>(objwrapper)->is_native_type(metatableType<standard::shared_ptr<T> >()))
+			const std::type_info& from_type = ptr->shared_ptr_type();
+			const std::type_info& to_type = metatableType<standard::shared_ptr<typename traits::decay<T>::type> >();
+			if (from_type == to_type)
 			{
-				standard::shared_ptr<T>* ptr = static_cast<standard::shared_ptr<T>*>(objwrapper->native_get());
-				if (ptr) { return *ptr; }
+				if (standard::is_const<T>::value)
+				{
+					return standard::static_pointer_cast<T>(standard::const_pointer_cast<void>(ptr->const_object()));
+				}
+				else
+				{
+					return standard::static_pointer_cast<T>(ptr->object());
+				}
 			}
-			else
-			{
-				PointerConverter& pcvt = PointerConverter::get(l);
-				return pcvt.get_shared_pointer<T>(objwrapper);
-			}
+			PointerConverter& pcvt = PointerConverter::get(l);
+			return pcvt.get_shared_pointer<T>(ptr);
 		}
 		return standard::shared_ptr<T>();
+	}
+	inline standard::shared_ptr<void> get_shared_pointer(lua_State* l, int index, types::typetag<void> tag)
+	{
+		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
+		if (ptr) 
+		{
+			return ptr->object();
+		}
+		return standard::shared_ptr<void>();
+	}
+	inline standard::shared_ptr<const void> get_shared_pointer(lua_State* l, int index, types::typetag<const void> tag)
+	{
+		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
+		if (ptr)
+		{
+			return ptr->const_object();
+		}
+		return standard::shared_ptr<const void>();
 	}
 
 	namespace class_userdata

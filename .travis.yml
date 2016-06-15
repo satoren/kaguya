@@ -4,8 +4,6 @@ language: cpp
 compiler:
   - clang
   - g++
-before_install:
-  - pip install --user codecov
 install:
   - if [ "$CXX" = "g++" ] && [ "$CXX_FLAGS" = "-std=c++11" ]; then export CXX="g++-4.8"; fi
 addons:
@@ -18,6 +16,7 @@ addons:
     - libluajit-5.1-dev
     - libboost-all-dev
     - g++-4.8
+    - llvm-gcc-4.6
     - cmake
   coverity_scan:
     project:
@@ -41,5 +40,10 @@ env:
 script:
   - mkdir build && cd build && cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success:
-  - cmake ../ -DCOVERAGE=1 && make test_coverage && ./test_coverage
-  - codecov --gcov-root CMakeFiles/test_coverage.dir/test/ --gcov-args "-o CMakeFiles/test_coverage.dir/test/"
+  - export GCOV="gcov-4.8";
+  - export CXX="g++-4.8";
+  - rm -Rf ./*
+  - cmake ../ -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB}
+  - make
+  - ctest
+  - bash <(curl -s https://codecov.io/bash) -p . -x "$GCOV"

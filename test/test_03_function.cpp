@@ -134,7 +134,7 @@ int overload4(const std::vector<int>& a)
 	return 4;
 }
 #endif
-#ifndef KAGUYA_NO_STD_MAP_TO_TABLE	
+#ifndef KAGUYA_NO_STD_MAP_TO_TABLE
 int overload5(const std::map<std::string, std::string>& a)
 {
 	return 5;
@@ -234,11 +234,51 @@ void nested_function_call2(kaguya::LuaStackRef function,const kaguya::LuaStackRe
 	function(table["key"], value2);
 }
 
+
 KAGUYA_TEST_FUNCTION_DEF(nested_function_call_test2)(kaguya::State& state)
 {
 	state["nested_function_call"] = kaguya::function(nested_function_call2);
 
 	state("nested_function_call(function(value,value2) assert(value==32);assert(value2 == 'text') end,{key=32},'text')");
+
+}
+
+namespace functioncall_testfunction
+{
+	int called = 0;
+	void testcall()
+	{
+		called = 1;
+	}
+	void testcall2(int)
+	{
+		called = 2;
+	}
+}
+
+KAGUYA_TEST_FUNCTION_DEF(functioncall)(kaguya::State& state)
+{
+	using namespace functioncall_testfunction;
+	kaguya::standard::function<void()> f = testcall;
+	kaguya::standard::function<void(int)> f2 = testcall2;
+	state["testcall"] = &testcall;
+	state["testcall"]();
+	TEST_EQUAL(called , 1);
+	called = 0;
+
+	state["testcall"] = kaguya::function(f);
+	state["testcall"]();
+	TEST_EQUAL(called ,1);
+
+	state["overloaded"] = kaguya::overload(testcall2, testcall,f,f2);
+	state["overloaded"]();
+	TEST_EQUAL(called, 1);
+	state["overloaded"](1);
+	TEST_EQUAL(called, 2);
+	state["overloaded"](1, 2);
+	TEST_EQUAL(called, 2);
+	state["overloaded"]("test");
+	TEST_EQUAL(called, 1);
 }
 
 

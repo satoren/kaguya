@@ -153,20 +153,30 @@ KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 	TEST_CHECK(state("assert(shared_object:getInt() == 53)"));
 	TEST_CHECK(state("assert(shared_object:getString() =='shared_object')"));
 
-
+	TEST_CHECK(state["value5"].weakTypeTest<kaguya::ObjectWrapperBase*>());
+	TEST_CHECK(state["value5"].typeTest<kaguya::ObjectWrapperBase*>());
+	
 };
 
 KAGUYA_TEST_FUNCTION_DEF(data_member_bind)(kaguya::State& state)
 {
+
+	kaguya::LuaFunction f = state.loadstring("return 3,4");
+	kaguya::LuaFunction f2 = state.loadstring("return 7,8,9");
+
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 		.setConstructors<ABC(int), ABC(std::string)>()
 		.addFunction("intmember", &ABC::intmember)
 		.addFunction("stringmember", &ABC::stringmember)
+		.addStaticField("static_data", f())
+		.addStaticField("static_data2", f2())
 		);
 
 	TEST_CHECK(state("value = assert(ABC.new(64))"));
 	TEST_CHECK(state("assert(value:intmember() == 64)"));
 
+	TEST_CHECK(state("assert(value.static_data == 3)"));
+	TEST_CHECK(state("assert(value.static_data2 == 7)"));
 
 	TEST_CHECK(state("value:intmember(4)"));
 	TEST_CHECK(state("assert(value:intmember() == 4)"));
@@ -437,6 +447,10 @@ int receive_base_shared_ptr_function(kaguya::standard::shared_ptr<Base> d) {
 	d->a = 2;
 	return d->a;
 }
+int receive_base_shared_ptr_function_null(kaguya::standard::shared_ptr<Base> d) {
+	TEST_CHECK(!d);
+	return 4;
+}
 KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 {
 	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -449,13 +463,21 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 
 	kaguya::standard::shared_ptr<Derived> derived(new Derived());
 	kaguya::standard::shared_ptr<Base> base(new Base());
+	kaguya::standard::shared_ptr<const Derived> const_derived(new Derived());
+	kaguya::standard::shared_ptr<const Base> const_base(new Base());
 	state["base"] = base;
 	state["derived"] = derived;
+	state["const_base"] = const_base;
+	state["const_derived"] = const_derived;
+	state["non_shared_base"] = Base();
 	state["base_function"] = &base_function;
 	state["derived_function"] = &derived_function;
 	state["receive_shared_ptr_function"] = &receive_shared_ptr_function;
 	state["receive_base_shared_ptr_function"] = &receive_base_shared_ptr_function;
 
+
+	state["receive_shared_ptr_function_null"] = &receive_base_shared_ptr_function_null;
+	
 
 
 	TEST_CHECK(state("assert(1 == base_function(base))"));
@@ -471,6 +493,58 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 	TEST_EQUAL(derived->b, 5);
 	TEST_CHECK(state("assert(2 == receive_base_shared_ptr_function(derived))"));
 	TEST_EQUAL(derived->a, 2);
+	TEST_CHECK(state("assert(4 == receive_shared_ptr_function_null(non_shared_base))"));
+
+	TEST_EQUAL(derived->a, 2);
+	
+	{
+		kaguya::standard::shared_ptr<Derived> d;
+		kaguya::standard::shared_ptr<Base> b;
+		kaguya::standard::shared_ptr<void> v;
+		TEST_CHECK(!(d = state["base"]));
+		TEST_CHECK(b = state["base"]);
+		TEST_CHECK(v = state["base"]);
+		TEST_CHECK(d = state["derived"]);
+		TEST_CHECK(b = state["derived"]);
+		TEST_CHECK(v = state["derived"]);
+
+		TEST_CHECK(!(d = state["non_shared_base"]));
+		TEST_CHECK(!(b = state["non_shared_base"]));
+		TEST_CHECK(!(v = state["non_shared_base"]));
+
+		TEST_CHECK(!(d = state["const_base"]));
+		TEST_CHECK(!(b = state["const_base"]));
+		TEST_CHECK(!(v = state["const_base"]));
+		TEST_CHECK(!(d = state["const_derived"]));
+		TEST_CHECK(!(b = state["const_derived"]));
+		TEST_CHECK(!(v = state["const_derived"]));
+	}
+	{
+		kaguya::standard::shared_ptr<Derived> d;
+		kaguya::standard::shared_ptr<Base> b;
+		kaguya::standard::shared_ptr<void> v;
+		kaguya::standard::shared_ptr<const Derived> cd;
+		kaguya::standard::shared_ptr<const Base> cb;
+		kaguya::standard::shared_ptr<const void> cv;
+		TEST_CHECK(!(cd = state["base"]));
+		TEST_CHECK(cb = state["base"]);
+		TEST_CHECK(cv = state["base"]);
+		TEST_CHECK(cd = state["derived"]);
+		TEST_CHECK(cb = state["derived"]);
+		TEST_CHECK(cv = state["derived"]);
+
+		TEST_CHECK(!(d = state["non_shared_base"]));
+		TEST_CHECK(!(b = state["non_shared_base"]));
+		TEST_CHECK(!(v = state["non_shared_base"]));
+
+		TEST_CHECK(!(cd = state["const_base"]));
+		TEST_CHECK((cb = state["const_base"]));
+		TEST_CHECK((cv = state["const_base"]));
+		TEST_CHECK((cd = state["const_derived"]));
+		TEST_CHECK((cb = state["const_derived"]));
+		TEST_CHECK((cv = state["const_derived"]));
+	}
+
 
 	state["shared_ptr_function"] = kaguya::overload(&receive_shared_ptr_function, &receive_base_shared_ptr_function);
 	TEST_CHECK(state("assert(5 == shared_ptr_function(derived))"));
@@ -936,8 +1010,8 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 	{
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
 			.setConstructors<Base()>()
-			.addProperty("a", &Base::a)
 			.addFunction("a", &Base::a)
+			.addProperty("a", &Base::a)
 		);
 	}
 	catch (const kaguya::KaguyaException& e)
@@ -959,6 +1033,54 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+	catch_except = false;
+	try
+	{
+		std::string data_value("value");
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addProperty("a", &Base::a)
+			.addStaticField("a", data_value)
+		);
+		TEST_EQUAL(data_value, "value");
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addProperty("a", &Base::a)
+			.addOverloadedFunctions("a", &Base::a)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+
+
+	catch_except = false;
+	try
+	{
+		CopyableClass copy = state["a"];
+		TEST_CHECK(false);//unreachable
+		TEST_CHECK(copy.member);
+	}
+	catch (const kaguya::LuaTypeMismatch& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("mismatch") != std::string::npos);
 		catch_except = true;
 	}
 	TEST_CHECK(catch_except);
@@ -1041,6 +1163,11 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
 		.addFunction("intdata", &ABC::intmember)
 		.addFunction("stringdata", &ABC::stringmember)
+		.addFunction("getInt", &ABC::getInt)
+		.addFunction("setInt", &ABC::setInt)
+		.addFunction("shared_copy", &ABC::shared_copy)
+		
+		
 	);
 
 	state["test"] = ABC();
@@ -1053,6 +1180,18 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 
 	last_error_message = "";
 	state("test.intdata()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.getInt()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.setInt()");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+
+	last_error_message = "";
+	state("test.shared_copy()");
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
 
 }

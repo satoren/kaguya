@@ -37,6 +37,14 @@ KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 	TEST_EQUAL(strmap["g"], "sss");
 	TEST_EQUAL(strmap.size(), 4);
 
+	std::vector<std::string>keys= abctable.keys<std::string>();
+
+	TEST_EQUAL(keys.size(), 4);
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "d") != keys.end());
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "e") != keys.end());
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "f") != keys.end());
+	TEST_CHECK(std::find(keys.begin(), keys.end(), "g") != keys.end());
+
 	abctable.setField("a", "test");
 	TEST_CHECK(abctable["a"] == std::string("test"));
 
@@ -44,6 +52,20 @@ KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 	TEST_CHECK(abctable["a"] == 22);
 
 	kaguya::LuaStackRef a;
+}
+KAGUYA_TEST_FUNCTION_DEF(refcopy)(kaguya::State& state)
+{
+	kaguya::LuaRef ref = state.newRef(2);
+	kaguya::LuaRef ref2;
+	kaguya::LuaRef ref3;
+	TEST_CHECK(ref);
+	TEST_CHECK(!ref2);
+
+	ref2 = ref;
+	TEST_CHECK(ref2);
+	ref2 = ref3;
+	TEST_CHECK(!ref2);
+
 }
 KAGUYA_TEST_FUNCTION_DEF(newtable)(kaguya::State& state)
 {
@@ -440,6 +462,7 @@ KAGUYA_TEST_FUNCTION_DEF(get_field)(kaguya::State& state)
 	TEST_EQUAL(const_table.getField("3"), 4);
 	TEST_EQUAL(const_table[1], 32);
 	TEST_EQUAL(const_table.getField(1), 32);
+	TEST_EQUAL(const_table.getField<int>(state.newRef(1)),32);
 }
 
 
@@ -491,6 +514,16 @@ KAGUYA_TEST_FUNCTION_DEF(put_multiple)(kaguya::State& state)
 	TEST_CHECK(state("assert(value == 22)"));
 }
 
+struct table_functor
+{
+	void operator()(int, int) {}
+};
+struct breakable_table_functor
+{
+	bool operator()(int, int) {
+		return true;
+	}
+};
 
 KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 {
@@ -530,11 +563,133 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 	TEST_CHECK(!cv.getFunctionEnv());
 	TEST_CHECK(!cv.getField("s"));
 	TEST_CHECK(!cv.getField<int>("s"));
+	TEST_CHECK(!cv.getField<int>(kaguya::NewTable()));
 
 
 	TEST_CHECK(!ctable.getFunctionEnv());
 	TEST_CHECK(!cthread.getMetatable());
 
+	ctable.foreach_table<int,int>(table_functor());
+	ctable.foreach_table_breakable<int, int>(breakable_table_functor());
+	cv.foreach_table<int, int>(table_functor());
+	cv.foreach_table_breakable<int, int>(breakable_table_functor());
+
+	last_error_message = "";
+	kaguya::LuaRef ref = state.newTable();
+	ref.costatus();
+	TEST_CHECK(!last_error_message.empty());
+
+}
+
+struct UserDataTest
+{
+	UserDataTest(int v) :m(v) {}
+	int m;
+};
+struct UserDataTest2
+{
+	UserDataTest2(int v) :m(v) {}
+	double m;
+};
+
+UserDataTest& UserDataTestFunction(UserDataTest& r)
+{
+	r.m = 5;
+	return r;
+}
+void UserDataTestFunction2(int r)
+{
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+	{
+		last_error_message = "";
+		kaguya::LuaTable nottable = state.newThread();
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData notud = state.newThread();
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaThread notud = state.newTable();
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+
+	{
+		last_error_message = "";
+		kaguya::LuaRef udataref = state.newRef(UserDataTest(2));
+		TEST_CHECK(udataref.weakTypeTest<kaguya::LuaUserData>());
+		TEST_CHECK(udataref.typeTest<kaguya::LuaUserData>());
+		TEST_CHECK(!udataref.weakTypeTest<kaguya::LuaTable>());
+		TEST_CHECK(!udataref.typeTest<kaguya::LuaTable>());
+		TEST_CHECK(udataref.typeTest<UserDataTest>());
+		TEST_CHECK(!udataref.typeTest<UserDataTest2>());
+		TEST_CHECK(!udataref.typeTest<bool>());
+		kaguya::LuaUserData udata = udataref;
+		TEST_EQUAL(last_error_message, "");
+		UserDataTest d = udata;
+		TEST_EQUAL(d.m, 2);		
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData udata;
+		TEST_CHECK(!udata);
+		TEST_EQUAL(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData udata(state.state());
+		TEST_CHECK(!udata);
+		TEST_EQUAL(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData udata(state.state(), UserDataTest(2));
+		TEST_CHECK(udata);
+		TEST_CHECK(udata.typeTest<UserDataTest>());
+		TEST_CHECK(!udata.typeTest<UserDataTest2>());
+		UserDataTest d = udata;
+		TEST_EQUAL(d.m, 2);
+		TEST_EQUAL(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		UserDataTest udatan(2);
+		kaguya::LuaUserData udata(state.state(), &udatan);
+		TEST_CHECK(udata);
+		UserDataTest* d = udata;//unsafe
+		TEST_EQUAL(d->m, 2);
+
+		const UserDataTest& dr = udata;//unsafe
+		TEST_EQUAL(dr.m, 2);
+		TEST_EQUAL(last_error_message, "");
+
+		kaguya::LuaFunction f(state.state(), kaguya::overload(UserDataTestFunction, UserDataTestFunction2));
+		f(udata);
+		TEST_EQUAL(udatan.m, 5);
+	}
+	{
+		last_error_message = "";
+		UserDataTest udatan(2);
+		kaguya::LuaUserData udata(state.state(), kaguya::standard::ref(udatan));
+		TEST_CHECK(udata);
+		UserDataTest* d = udata;//unsafe
+		TEST_EQUAL(d->m, 2);
+
+		const UserDataTest& dr = udata;//unsafe
+		TEST_EQUAL(dr.m, 2);
+		TEST_EQUAL(last_error_message, "");
+
+		kaguya::LuaFunction f(state.state(), kaguya::overload(UserDataTestFunction, UserDataTestFunction2));
+		f(udata);
+		TEST_EQUAL(udatan.m, 5);
+	}
 }
 
 KAGUYA_TEST_GROUP_END(test_05_lua_ref)

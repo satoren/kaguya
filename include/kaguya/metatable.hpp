@@ -287,7 +287,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(std::forward<Data>(d));
+			member_map_[name] = metatable_detail::makeDataHolder(std::move(d));
 			return *this;
 		}
 #else

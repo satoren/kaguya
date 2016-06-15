@@ -34,7 +34,7 @@ namespace kaguya
 		~optional() {
 			destruct();
 		}
-		optional& operator=(nullopt_t) { destruct(); }
+		optional& operator=(nullopt_t) { destruct(); return *this; }
 		optional& operator=(const optional& other)
 		{
 			if (other)
@@ -97,6 +97,7 @@ namespace kaguya
 
 		operator bool_type() const
 		{
+			this_type_does_not_support_comparisons();
 			return value_ != 0 ? &optional::this_type_does_not_support_comparisons : 0;
 		}
 		T& value()
@@ -112,7 +113,7 @@ namespace kaguya
 
 #if KAGUYA_USE_CPP11
 		template< class U >
-		T value_or(U&& default_value)  const&
+		T value_or(U&& default_value)  const
 		{
 			if (value_) { return *value_; }
 			return default_value;
@@ -137,18 +138,10 @@ namespace kaguya
 				value_->~T(); value_ = 0;
 			}
 		}
-#define KAGUYA_USE_CPP11_ALIGNMENT 0
-#if KAGUYA_USE_CPP11_ALIGNMENT
-		alignas(alignof(T)) char storage_[sizeof(T)];
-#else
-#if defined(_MSC_VER)
-		__declspec(align(__alignof(T))) char storage_[sizeof(T)];
-#elif defined(__GNUC__) || defined(__clang__)
-		char storage_[sizeof(T)] __attribute__((aligned(__alignof__(T))));
-#else
-		char storage_[sizeof(T)] __attribute__((aligned(__alignof__(T))));
-#endif
-#endif
+
+		typename standard::aligned_storage<sizeof(T),
+			standard::alignment_of<T>::value>::type storage_[1];
+
 		T* value_;
 	};
 
@@ -165,17 +158,23 @@ namespace kaguya
 
 		~optional() {
 		}
-		optional& operator=(nullopt_t) { value_ = 0; }
+		optional& operator=(nullopt_t) {
+			value_ = 0;
+			return *this;
+		}
 		optional& operator=(optional& other)
 		{
 			value_ = other.value_;
+			return *this;
 		}
 		optional& operator=(T& value)
 		{
 			value_ = &value;
+			return *this;
 		}
 		operator bool_type() const
 		{
+			this_type_does_not_support_comparisons();
 			return value_ != 0 ? &optional::this_type_does_not_support_comparisons : 0;
 		}
 		T& value()
@@ -191,7 +190,7 @@ namespace kaguya
 
 #if KAGUYA_USE_CPP11
 		template< class U >
-		T value_or(U&& default_value)  const&
+		T value_or(U&& default_value)  const
 		{
 			if (value_) { return *value_; }
 			return default_value;

@@ -101,13 +101,7 @@ namespace kaguya
 				{
 					for (PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
 					{
-						int count = lua_type_traits<FunctorType>::push(state, it->second);
-						if (count > 1)
-						{
-							lua_pop(state, count - 1);
-							count = 1;
-						}
-						if (count == 1)
+						if (util::one_push(state, it->second))
 						{
 							lua_setfield(state, -2, ("_prop_" + it->first).c_str());
 						}
@@ -384,13 +378,7 @@ namespace kaguya
 		}
 		void registerFunction(lua_State* state, const char* name, const FunctorOverloadType& func_array)const
 		{
-			int count = lua_type_traits<FunctorOverloadType>::push(state, func_array);
-			if (count > 1)
-			{
-				lua_pop(state, count - 1);
-				count = 1;
-			}
-			if (count == 1)
+			if (util::one_push(state, func_array))
 			{
 				lua_setfield(state, -2, name);
 			}

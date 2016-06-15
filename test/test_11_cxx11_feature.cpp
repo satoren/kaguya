@@ -126,14 +126,59 @@ KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
 	TEST_CHECK(ref);
 	TEST_EQUAL(ref->member, 2);
 
+	state["uniqueptr"].typeTest<const std::unique_ptr<MoveOnlyClass>&>();
+	const std::unique_ptr<MoveOnlyClass>& cuptr = state["uniqueptr"].get<const std::unique_ptr<MoveOnlyClass>&>();
+	TEST_CHECK(cuptr);
+	TEST_EQUAL(cuptr->member, 2);
+
+	std::unique_ptr<MoveOnlyClass>& uptr = state["uniqueptr"].get<std::unique_ptr<MoveOnlyClass>&>();
+	TEST_CHECK(uptr);
+	TEST_EQUAL(uptr->member, 2);
+	uptr.reset();
+
 	state("func =function(arg) return assert(arg.member == 5) end");
 	TEST_CHECK(state["func"](std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(5))) == true);
 
+
+	bool catch_except = false;
+	try
+	{
+		std::unique_ptr<MoveOnlyClass>& uptr = state["nil"].get<std::unique_ptr<MoveOnlyClass>&>();
+		TEST_CHECK(uptr);
+		TEST_EQUAL(uptr->member, 2);
+	}
+	catch (const kaguya::LuaTypeMismatch&)
+	{
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 KAGUYA_TEST_FUNCTION_DEF(compare_null_ptr)(kaguya::State& state)
 {
-	kaguya::LuaRef nullref = state.newRef(nullptr);
-	TEST_CHECK(nullref == nullptr);
+	{
+		kaguya::LuaRef nullref = state.newRef(nullptr);
+		TEST_CHECK(nullref.typeTest<std::nullptr_t>());
+		TEST_CHECK(nullref.weakTypeTest<std::nullptr_t>());
+		TEST_CHECK(nullref == nullptr);
+		void* ptr = nullref.get<std::nullptr_t>();
+		TEST_CHECK(!ptr);
+	}
+	{
+		kaguya::LuaRef ref = state.newRef(1);
+		TEST_CHECK(!(ref.typeTest<std::nullptr_t>()));
+		TEST_CHECK(!(ref.weakTypeTest<std::nullptr_t>()));
+		TEST_CHECK(ref != nullptr);
+		bool catch_except = false;
+		try
+		{
+			ref.get<std::nullptr_t>();
+		}
+		catch (const kaguya::LuaTypeMismatch&)
+		{
+			catch_except = true;
+		}
+		TEST_CHECK(catch_except);
+	}
 }
 
 KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)

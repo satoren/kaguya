@@ -143,14 +143,7 @@ namespace kaguya
 			int type = lua_type(l, index);
 			if (type == LUA_TUSERDATA || type == LUA_TLIGHTUSERDATA)
 			{
-				if (traits::is_const<T>::value)
-				{
-					return const_cast<get_type>(get_const_pointer(l, index, types::typetag<T>()));
-				}
-				else
-				{
-					return get_pointer(l, index, types::typetag<T>());
-				}
+				return get_pointer(l, index, types::typetag<T>());
 			}
 
 			if (type == LUA_TNIL
@@ -283,20 +276,20 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper<get_type>(l, index, false) != 0;
+			ObjectSharedPointerWrapper* wrapper = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
+			const std::type_info& type = metatableType<standard::shared_ptr<typename traits::decay<T>::type > >();
+			return wrapper && (wrapper->shared_ptr_type() == type);
 		}
 		static bool checkType(lua_State* l, int index)
 		{
-			return object_wrapper<get_type>(l, index) != 0 ||
-				lua_isnil(l, index);
+			return get_shared_pointer(l, index, types::typetag<T>()) ||	lua_isnil(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
 			if (lua_isnil(l, index)) {
 				return get_type();
 			}
-			get_type pointer = get_shared_pointer<T>(l, index, types::typetag<T>());
-			return pointer;
+			return get_shared_pointer(l, index, types::typetag<T>());
 		}
 
 		static int push(lua_State* l, push_type v)
@@ -315,65 +308,25 @@ namespace kaguya
 			return 1;
 		}
 	};
-	template<>
-	struct lua_type_traits<standard::shared_ptr<void> > {
-		typedef const standard::shared_ptr<void>& push_type;
-		typedef standard::shared_ptr<void> get_type;
-
-		static bool strictCheckType(lua_State* l, int index)
-		{
-			return object_wrapper<get_type>(l, index, false) != 0;
-		}
-		static bool checkType(lua_State* l, int index)
-		{
-			return object_wrapper<get_type>(l, index) != 0 ||
-				lua_isnil(l, index);
-		}
-		static get_type get(lua_State* l, int index)
-		{
-			if (lua_isnil(l, index)) {
-				return get_type();
-			}
-			return get_shared_pointer(l, index, types::typetag<void>());
-		}
-
-		static int push(lua_State* l, push_type v)
-		{
-			if (v)
-			{
-				typedef ObjectSharedPointerWrapper wrapper_type;
-				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-				new(storage) wrapper_type(v);
-			}
-			else
-			{
-				lua_pushnil(l);
-			}
-			return 1;
-		}
-	};
-
 #if KAGUYA_USE_CPP11
 	///! traits for unique_ptr
 	template<typename T, typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
 		typedef std::unique_ptr<T, Deleter>&& push_type;
-		typedef std::unique_ptr<T, Deleter> get_type;
+		typedef std::unique_ptr<T, Deleter>& get_type;
+		typedef std::unique_ptr<T, Deleter> type;
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>(), false) != 0;
+			return object_wrapper<type>(l, index,  false) != 0;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
-			return object_wrapper(l, index, metatableName<get_type>()) != 0 ||
+			return object_wrapper<type>(l, index) != 0 ||
 				lua_isnil(l, index);
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (lua_isnoneornil(l, index)) {
-				return 0;
-			}
-			const get_type* pointer = get_const_pointer(l, index, types::typetag<get_type>());
+			type* pointer = get_pointer(l, index, types::typetag<type>());
 			if (!pointer)
 			{
 				throw LuaTypeMismatch("type mismatch!!");
@@ -394,7 +347,6 @@ namespace kaguya
 			{
 				lua_pushnil(l);
 			}
-			return 1;
 			return 1;
 		}
 	};
@@ -427,7 +379,8 @@ namespace kaguya
 	};
 #endif
 
-	///! traits for 
+	///! traits for ObjectWrapperBase*
+	/// implement for __gc desrcutor
 	template<>	struct lua_type_traits<ObjectWrapperBase*> {
 		typedef ObjectWrapperBase* get_type;
 		typedef ObjectWrapperBase* push_type;
@@ -865,10 +818,8 @@ namespace kaguya
 			{
 				return static_cast<const Derived*>(this)->pushStackIndex(state);
 			}
-
-
 			template<typename T>
-			optional<typename lua_type_traits<T>::get_type> checkGet_(bool allow_convertible = true)const
+			optional<typename lua_type_traits<T>::get_type> checkGet_()const
 			{
 				lua_State* state = state_();
 				if (!state) {
@@ -876,15 +827,7 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackindex = pushStackIndex_(state);
-				bool was_valid = false;
-				if (allow_convertible)
-				{
-					was_valid = lua_type_traits<T>::checkType(state, stackindex);
-				}
-				else
-				{
-					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
-				}
+				bool was_valid = lua_type_traits<T>::checkType(state, stackindex);
 				if (was_valid)
 				{
 					return optional<typename lua_type_traits<T>::get_type>(lua_type_traits<T>::get(state, stackindex));

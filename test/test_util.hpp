@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+#include <set>
 #include <iostream>
 #include <cassert>
 #include <sstream>
@@ -56,7 +58,13 @@ namespace kaguya_test_util
 		typedef std::map<std::string, TestFunctionType> TestFunctionMapType;
 
 		TestFunctionMapType test_functions_;
+
+		std::vector<std::string> test_set_;
 	public:
+		void set_test_set(std::vector<std::string> container)
+		{
+			test_set_ = container;
+		}
 		static TestRunner& instance()
 		{
 			static TestRunner ins;
@@ -66,6 +74,29 @@ namespace kaguya_test_util
 		{
 			throw std::runtime_error(std::string(message));
 		}
+		bool is_name_execute(const std::string& name)const
+		{
+			if (test_set_.empty()) { return true; }
+			for (std::vector<std::string>::const_iterator it = test_set_.begin(); it != test_set_.end(); ++it)
+			{
+				if (name.find(*it) != std::string::npos)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+		TestFunctionMapType tests()
+		{
+			TestFunctionMapType tests;
+			for (TestFunctionMapType::const_iterator it = test_functions_.begin(); it != test_functions_.end(); ++it)
+			{
+				if (!is_name_execute(it->first)) { continue; }
+				tests.insert(*it);
+			}
+			return tests;
+		}
 
 		void addTest(const std::string& name, TestFunctionType function)
 		{
@@ -74,19 +105,21 @@ namespace kaguya_test_util
 
 		bool execute()
 		{
+			TestFunctionMapType test_function = tests();
 			bool fail = false;
-			size_t testcount = test_functions_.size();
+			size_t testcount = test_function.size();
 			size_t testindex = 1;
 
 			std::vector<std::string> pass_tests;
 			std::vector<std::string> fail_tests;
-			for (TestFunctionMapType::const_iterator it = test_functions_.begin(); it != test_functions_.end(); ++it, ++testindex)
+			for (TestFunctionMapType::const_iterator it = test_function.begin(); it != test_function.end(); ++it, ++testindex)
 			{
+				const std::string& test_name = it->first;
+
 				kaguya::State state;
 
 				state.setErrorHandler(test_error_handler);
 
-				const std::string& test_name = it->first;
 
 				std::cout << test_name << "  (" << testindex << "/" << testcount << ") ...";
 

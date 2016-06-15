@@ -167,10 +167,11 @@ struct Foo {};
 void foobar1(int) { throw std::runtime_error("MyRuntimeError"); }
 void foobar2(int, int) {}
 void foobar3(int, Foo, int) {}
+void foobar4(std::string) { throw 3; }
 
 KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 {
-	state["foobar"] = kaguya::overload(foobar1, foobar2, foobar3);
+	state["foobar"] = kaguya::overload(foobar1, foobar2, foobar3, foobar4);
 	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>().setConstructors<Foo()>());
 	state.setErrorHandler(registerError);
 	TEST_CHECK(!state("foobar()"));
@@ -179,11 +180,12 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 	lastMsg = lastMsg.substr(lastMsg.find("candidate is:\n"));
 	lastMsg = lastMsg.substr(0, lastMsg.find("stack "));
 	std::vector<std::string> parts = remove_empty(split(lastMsg, '\n'));
-	TEST_EQUAL(parts.size(), 4);
+	TEST_EQUAL(parts.size(), 5);
 	std::string intName = typeid(int).name();
 	TEST_CHECK(parts[1].find(intName) != std::string::npos);
 	TEST_CHECK(parts[2].find(intName + "," + intName) != std::string::npos);
 	TEST_CHECK(parts[3].find(intName + "," + typeid(Foo).name() + "," + intName) != std::string::npos);
+	TEST_CHECK(parts[4].find(typeid(std::string).name()) != std::string::npos);
 
 	errorOccurred = false;
 	TEST_CHECK(!state("foobar(Foo.new(), 1, 1)"));
@@ -194,6 +196,12 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 	TEST_CHECK(!state("foobar(1)"));
 	TEST_EQUAL(errorOccurred, true);
 	TEST_CHECK(lastMsg.find("MyRuntimeError") != std::string::npos);
+
+
+	errorOccurred = false;
+	TEST_CHECK(!state("foobar('test')"));
+	TEST_EQUAL(errorOccurred, true);
+	TEST_CHECK(lastMsg.find("Unknown") != std::string::npos);
 
 	{
 		std::stringstream sstream;
@@ -393,6 +401,7 @@ KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State&)
 KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+	bool catch_except = false;
 	try
 	{
 		state("tes terror");//syntax_error
@@ -401,9 +410,24 @@ KAGUYA_TEST_FUNCTION_DEF(syntax_error_throw_test)(kaguya::State& state)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("terror") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
+
+	catch_except = false;
+	try
+	{
+		std::stringstream sstream;
+		sstream << "tes terror";
+		state.loadstream(sstream)();//syntax_error
+	}
+	catch (const kaguya::LuaSyntaxError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("terror") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
@@ -448,6 +472,10 @@ void throwErrorRunningError(int status, const char* message)
 {
 	throw kaguya::LuaErrorRunningError(LUA_ERRERR, "error handler error");
 }
+void throwErrorRunningError2(int status, const char* message)
+{
+	throw kaguya::LuaErrorRunningError(LUA_ERRERR, std::string("error handler error"));
+}
 KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
 {
 	state.setErrorHandler(throwErrorRunningError);
@@ -463,6 +491,19 @@ KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)
 		catch_except = true;
 	}
 	TEST_CHECK(catch_except);
+
+	state.setErrorHandler(throwErrorRunningError2);
+	catch_except = false;
+	try
+	{
+		state("error('')");//error
+	}
+	catch (const kaguya::LuaErrorRunningError& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("error handler error") != std::string::npos);
+		catch_except = true;
+	}
 }
 
 
@@ -485,6 +526,7 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 #if LUA_VERSION_NUM >= 502
 KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 {
+	bool catch_except = false;
 	try
 	{
 		kaguya::State state;
@@ -501,9 +543,9 @@ KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State&)
 	{
 		std::string errormessage(e.what());
 		TEST_CHECK(errormessage.find("gc error") != std::string::npos);
-		return;
+		catch_except = true;
 	}
-	TEST_CHECK(false);
+	TEST_CHECK(catch_except);
 }
 #endif
 
@@ -543,4 +585,9 @@ KAGUYA_TEST_FUNCTION_DEF(inc_gc_test)(kaguya::State& state)
 	TEST_COMPARE_LT(peak, 1500);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(defailt_error_handler)(kaguya::State&)
+{
+	kaguya::State state;
+	state("a");
+}
 KAGUYA_TEST_GROUP_END(test_06_state)

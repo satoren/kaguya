@@ -1,11 +1,6 @@
-
-if(LUA_SEARCH_LIB_NAME)
-  find_package(PkgConfig)
-  foreach(modulename ${LUA_SEARCH_LIB_NAME})
-    pkg_search_module(LUA ${modulename})
-  endforeach(modulename)
-endif(LUA_SEARCH_LIB_NAME)
-
+if(NOT LOCAL_LUA_DIRECTORY)
+   set(LOCAL_LUA_DIRECTORY ${LUA_SEARCH_LIB_NAME})
+endif()
 
 if(LOCAL_LUA_DIRECTORY)
   #search local directory
@@ -27,7 +22,7 @@ endif()
 
 if(NOT LUA_INCLUDE_DIRS)
   find_package(PkgConfig)
-  set(LUA_SEARCHVERS lua5.3 lua5.2 luajit lua5.1 lua)
+  set(LUA_SEARCHVERS ${LUA_SEARCH_LIB_NAME} lua5.3 lua5.2 luajit lua5.1 lua)
   foreach(modulename ${LUA_SEARCHVERS})
     pkg_search_module(LUA ${modulename})
   endforeach(modulename)

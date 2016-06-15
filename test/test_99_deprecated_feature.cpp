@@ -9,6 +9,12 @@ KAGUYA_TEST_GROUP_START(test_99_deprecated_feature)
 
 using namespace kaguya_test_util;
 
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
+
 struct ABC
 {
 	int intmember;
@@ -61,6 +67,7 @@ struct ABC
 	const ABC* const_pointer()const { return this; }
 	kaguya::standard::shared_ptr<ABC> shared_copy() { return kaguya::standard::shared_ptr<ABC>(new ABC(*this)); }
 };
+
 
 KAGUYA_TEST_FUNCTION_DEF(default_constructor)(kaguya::State& state)
 {
@@ -256,18 +263,26 @@ KAGUYA_TEST_FUNCTION_DEF(operator_bind)(kaguya::State& state)
 }
 KAGUYA_TEST_FUNCTION_DEF(add_field)(kaguya::State& state)
 {
+	kaguya::LuaFunction f = state.loadstring("return 3,4");
+	kaguya::LuaFunction f2 = state.loadstring("return 7,8,9");
 	state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
 		.addConstructor<int>()
 		.addStaticField("TEST", 1)
 		.addStaticField("TEST2", "343")
 		.addStaticField("TEST3", 133.23)
 		.addStaticField("TEST4", std::string("test"))
+		.addStaticField("static_data", f())
+		.addStaticField("static_data2", f2())
 		);
 
 	TEST_CHECK(state("assert(ABC.TEST == 1)"));
 	TEST_CHECK(state("assert(ABC.TEST2 == '343')"));
 	TEST_CHECK(state("assert(ABC.TEST3 == 133.23)"));
 	TEST_CHECK(state("assert(ABC.TEST4 == 'test')"));
+
+
+	TEST_CHECK(state("assert(ABC.static_data == 3)"));
+	TEST_CHECK(state("assert(ABC.static_data2 == 7)"));
 }
 
 
@@ -858,11 +873,22 @@ struct Bar
 	Bar() {}
 	Bar(const std::string& data):member(data){}
 };
+void static_function()
+{
+	throw std::runtime_error("my error");
+}
+void static_function2()
+{
+	throw 3232;
+}
+
 KAGUYA_TEST_FUNCTION_DEF(member_function_test)(kaguya::State& state)
 {
 	state["Foo"].setClass(kaguya::ClassMetatable<Foo>()
 		.addMember("setBar", &Foo::setBar)
 		.addCodeChunkResult("luafunc", "return function(a,b) return a*b end")
+		.addStaticFunction("static_function", &static_function)
+		.addStaticFunction("static_function2", &static_function2)
 		);
 	Foo foo;
 	kaguya::LuaRef lfoo = state["Foo"];
@@ -889,6 +915,19 @@ KAGUYA_TEST_FUNCTION_DEF(member_function_test)(kaguya::State& state)
 	TEST_EQUAL(foo.bar, "test4");
 #else
 #endif
+
+
+	last_error_message = "";
+	state.setErrorHandler(ignore_error_fun);
+	state["foo"] = &foo;
+	state("foo.static_function()");
+	TEST_CHECK(!last_error_message.empty());
+
+	last_error_message = "";
+	state.setErrorHandler(ignore_error_fun);
+	state["foo"] = &foo;
+	state("foo.static_function2()");
+	TEST_CHECK(!last_error_message.empty());
 }
 
 struct VariFoo
@@ -932,6 +971,9 @@ KAGUYA_TEST_FUNCTION_DEF(variadic_function_test)(kaguya::State& state)
 	TEST_CHECK(typevalid);
 	ptr->args[2].get<std::string>(typevalid, false);
 	TEST_CHECK(!typevalid);
+	
+	state("var:variadicfun()");
+	TEST_EQUAL(ptr->args.size(), 0);
 
 
 	state("var = Vari.new('abc')");
@@ -972,12 +1014,6 @@ KAGUYA_TEST_FUNCTION_DEF(arg_class_ref)(kaguya::State& state)
 	state["reffun"](kaguya::standard::ref(foo));
 	TEST_EQUAL(foo.bar, "BarBar");
 }
-}
-
-std::string last_error_message;
-void ignore_error_fun(int status, const char* message)
-{
-	last_error_message = message ? message : "";
 }
 KAGUYA_TEST_FUNCTION_DEF(error_check)(kaguya::State& state)
 {
@@ -1024,6 +1060,36 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	state("test.f(1,2,3,4,5,6,7,8,test)");
 
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(duplicate_register_class_error_throw_test)(kaguya::State& state)
+{
+	state.setErrorHandler(kaguya::ErrorHandler::throwDefaultError);
+
+	bool catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::ClassMetatable<Base>()
+			.addProperty("a", &Base::a)
+			.addStaticField("a", 1)
+			.addStaticField("a", 1)
+			.addMemberFunction("a", &Base::a)
+			.addStaticFunction("a", &Base::a)
+			.addStaticField("a", "343")
+			
+		);
+		state["Base3"].setClass(kaguya::ClassMetatable<Base>()
+			.addMemberFunction("a", &Base::a)
+			.addStaticField("a", "343")
+		);
+	}
+	catch (const kaguya::LuaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 }
 
 KAGUYA_TEST_GROUP_END(test_99_deprecated_feature)

@@ -13,7 +13,18 @@ namespace kaguya
 {
 	namespace traits
 	{
-		using namespace kaguya::standard;
+		using standard::integral_constant;
+		using standard::is_lvalue_reference;
+		using standard::remove_reference;
+		using standard::remove_pointer;
+		using standard::remove_const;
+		using standard::is_pointer;
+		using standard::is_function;
+		using standard::is_floating_point;
+		using standard::is_integral;
+		using standard::is_enum;
+		using standard::is_convertible;
+		using standard::is_same;
 
 		template<bool B, class T = void>struct enable_if {};
 		template<class T>struct enable_if<true, T> { typedef T type; };
@@ -27,6 +38,22 @@ namespace kaguya
 		{
 		};
 
+		//can not use boost.decay
+		template< class T >
+		struct decay {
+		private:
+			typedef typename standard::remove_reference<T>::type U;
+		public:
+			typedef typename standard::conditional<
+				standard::is_array<U>::value,
+				typename standard::remove_extent<U>::type*,
+				typename standard::conditional<
+				is_function<U>::value,
+				typename standard::add_pointer<U>::type,
+				typename standard::remove_cv<U>::type
+				>::type
+			>::type type;
+		};
 
 		template<class T> struct is_const : integral_constant<bool, false> {};
 		template<class T> struct is_const<const T> : integral_constant<bool, true> {};

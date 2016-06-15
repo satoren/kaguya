@@ -1,33 +1,37 @@
+set -e
 build_test_versions=("lua-5.3.3" "lua-5.2.4" "lua-5.1.5")
+build_test_cxx_flags=("-std=c++03" "-std=c++11")
 
-for version in "${build_test_versions[@]}"
-do
-  if [ ! -e $version ]; then
-    if [ ! -e ${version}.tar.gzn ]; then
-      wget https://www.lua.org/ftp/${version}.tar.gz
-    fi
-    tar zxf ${version}.tar.gz
+build_and_exec_test(){
+  if [ ! -e "build$2_$1" ]; then
+    mkdir "build$2_$1"
   fi
-
-  if [ ! -e "build$version" ]; then
-    mkdir "build$version"
-  fi
-  cd "build$version"
-  cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLOCAL_LUA_DIRECTORY=$version -DCOVERAGE=${TEST_COVERAGE}
+  cd "build$2_$1"
+  cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=$2 -DLUA_SEARCH_LIB_NAME=$1 -DCOVERAGE=${TEST_COVERAGE}
   make -j4
   CTEST_OUTPUT_ON_FAILURE=1 make test
   cd ../
+}
+
+for luaversion in "${build_test_versions[@]}"
+do
+  if [ ! -e $luaversion ]; then
+    if [ ! -e ${luaversion}.tar.gz ]; then
+      wget https://www.lua.org/ftp/${luaversion}.tar.gz
+    fi
+    tar zxf ${luaversion}.tar.gz
+  fi
+  for cxxflag in "${build_test_cxx_flags[@]}"
+  do
+    build_and_exec_test $luaversion $cxxflag
+  done
 done
 
 test_versions=("luajit")
-for version in "${test_versions[@]}"
+for luaversion in "${test_versions[@]}"
 do
-  if [ ! -e "build$version" ]; then
-    mkdir "build$version"
-  fi
-  cd "build$version"
-  cmake ../ -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=$version -DCOVERAGE=${TEST_COVERAGE}
-  make -j4
-  CTEST_OUTPUT_ON_FAILURE=1 make test
-  cd ../
+  for cxxflag in "${build_test_cxx_flags[@]}"
+  do
+    build_and_exec_test $luaversion $cxxflag
+  done
 done
