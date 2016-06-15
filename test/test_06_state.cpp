@@ -585,4 +585,9 @@ KAGUYA_TEST_FUNCTION_DEF(inc_gc_test)(kaguya::State& state)
 	TEST_COMPARE_LT(peak, 1500);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(defailt_error_handler)(kaguya::State&)
+{
+	kaguya::State state;
+	state("a");
+}
 KAGUYA_TEST_GROUP_END(test_06_state)

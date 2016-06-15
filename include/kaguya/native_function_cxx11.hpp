@@ -296,7 +296,8 @@ namespace kaguya
 			template<class F>
 			int call(lua_State* state, const F& f)
 			{
-				typedef typename f_signature<F>::type fsigtype;
+				typedef typename traits::decay<F>::type ftype;
+				typedef typename f_signature<ftype>::type fsigtype;
 				typedef typename arg_index_range<fsigtype>::type index;
 
 				return _call_apply(state, f, index(), fsigtype());
@@ -304,14 +305,16 @@ namespace kaguya
 			template<class F>
 			bool checkArgTypes(lua_State* state, const F& f)
 			{
-				typedef typename f_signature<F>::type fsigtype;
+				typedef typename traits::decay<F>::type ftype;
+				typedef typename f_signature<ftype>::type fsigtype;
 				typedef typename arg_index_range<fsigtype>::type index;
 				return _ctype_apply(state, index(), fsigtype());
 			}
 			template<class F>
 			bool strictCheckArgTypes(lua_State* state, const F& f)
 			{
-				typedef typename f_signature<F>::type fsigtype;
+				typedef typename traits::decay<F>::type ftype;
+				typedef typename f_signature<ftype>::type fsigtype;
 				typedef typename arg_index_range<fsigtype>::type index;
 				return _sctype_apply(state, index(), fsigtype());
 			}
@@ -319,13 +322,15 @@ namespace kaguya
 			template<class F>
 			std::string argTypesName(const F& f)
 			{
-				typedef typename f_signature<F>::type fsigtype;
+				typedef typename traits::decay<F>::type ftype;
+				typedef typename f_signature<ftype>::type fsigtype;
 				return _type_name_apply(fsigtype());
 			}
 			template<class F>
 			int argCount(const F& f)
 			{
-				typedef typename f_signature<F>::type fsigtype;
+				typedef typename traits::decay<F>::type ftype;
+				typedef typename f_signature<ftype>::type fsigtype;
 				return arg_count<fsigtype>::value;
 			}
 

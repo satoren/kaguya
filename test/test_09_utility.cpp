@@ -80,4 +80,30 @@ KAGUYA_TEST_FUNCTION_DEF(stackValueDump)(kaguya::State& s)
 }
 
 
+void checkf()
+{
+}
+
+KAGUYA_TEST_FUNCTION_DEF(check_function_signature)(kaguya::State& s)
+{
+	using namespace kaguya;
+
+	standard::function<void()> stdfn(checkf);
+
+	TEST_CHECK(nativefunction::checkArgTypes(s.state(), checkf));
+	TEST_CHECK(nativefunction::strictCheckArgTypes(s.state(), checkf));
+	TEST_EQUAL(nativefunction::argTypesName(checkf),std::string(""));
+	TEST_EQUAL(nativefunction::argCount(checkf), 0);
+
+	TEST_CHECK(nativefunction::checkArgTypes(s.state(), &checkf));
+	TEST_CHECK(nativefunction::strictCheckArgTypes(s.state(), &checkf));
+	TEST_EQUAL(nativefunction::argTypesName(&checkf), std::string(""));
+	TEST_EQUAL(nativefunction::argCount(&checkf), 0);
+
+	TEST_CHECK(nativefunction::checkArgTypes(s.state(), stdfn));
+	TEST_CHECK(nativefunction::strictCheckArgTypes(s.state(), stdfn));
+	TEST_EQUAL(nativefunction::argTypesName(stdfn), std::string(""));
+	TEST_EQUAL(nativefunction::argCount(stdfn), 0);
+}
+
 KAGUYA_TEST_GROUP_END(test_09_utility)
