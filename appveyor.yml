@@ -36,4 +36,4 @@ build_script:
 
     cmake --build . --config $env:CONFIGURATION
 test_script:
-- ps: ctest -V
+- ps: ctest -C $env:CONFIGURATION
