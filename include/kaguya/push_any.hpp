@@ -34,8 +34,11 @@ namespace kaguya
 			: holder_(new DataHolder<DataType>(v)) { }
 
 #if KAGUYA_USE_CPP11
-		AnyDataPusher(AnyDataPusher&& rhs) = default;
-		AnyDataPusher & operator = (AnyDataPusher&& rhs) = default;
+		AnyDataPusher(AnyDataPusher&& other) : holder_(std::move(other.holder_)) { }
+		AnyDataPusher & operator = (AnyDataPusher&& rhs)
+		{
+			holder_ = std::move(rhs.holder_);
+		}
 		template < typename DataType >
 		AnyDataPusher(DataType&& v)
 			: holder_(new DataHolder<DataType>(std::move(v))) { }
