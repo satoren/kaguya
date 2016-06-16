@@ -79,6 +79,22 @@ KAGUYA_TEST_FUNCTION_DEF(stackValueDump)(kaguya::State& s)
 	util::stackValueDump(std::cout, s.state(), 4, 2);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(lua_rawlen_test)(kaguya::State& s)
+{
+	using namespace kaguya;
+
+	s.pushToStack("string");
+	TEST_EQUAL(lua_rawlen(s.state(), -1), 6);
+
+	LuaTable tbl = s.newTable();
+	tbl["2"] = 3;tbl["1"] = 3;
+	s.pushToStack(tbl);
+	TEST_EQUAL(lua_rawlen(s.state(), -1), 0);
+
+
+	lua_settop(s.state(),0);
+}
+
 
 void checkf()
 {
