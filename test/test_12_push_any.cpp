@@ -18,6 +18,15 @@ KAGUYA_TEST_FUNCTION_DEF(push_any_type)(kaguya::State& state)
 	TEST_COMPARE_EQ(state.newRef(AnyLuaData(3)), 3);
 	TEST_COMPARE_EQ(state.newRef(AnyLuaData("data")), "data");
 	TEST_COMPARE_EQ(state.newRef(AnyLuaData(std::string("abc"))), std::string("abc"));
+
+	char strdata[]= "test";
+	data.push_back(strdata);
+
+	AnyLuaData a("d");
+	AnyLuaData b(4);
+	a = b;
+	a = a;
+	TEST_COMPARE_EQ(state.newRef(a), 4);
 }
 
 KAGUYA_TEST_GROUP_END(test_12_push_any)

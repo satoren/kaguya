@@ -15,7 +15,15 @@ namespace kaguya
 	public:
 		int pushToLua(lua_State* state)const
 		{
-			return empty() ? 0 : holder_->pushToLua(state);
+			if (empty())
+			{
+				lua_pushnil(state);
+				return 1;
+			}
+			else
+			{
+				return holder_->pushToLua(state);
+			}
 		}
 
 		AnyLuaData() : holder_() { }
