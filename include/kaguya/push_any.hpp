@@ -38,6 +38,7 @@ namespace kaguya
 		AnyDataPusher & operator = (AnyDataPusher&& rhs)
 		{
 			holder_ = std::move(rhs.holder_);
+			return *this;
 		}
 		template < typename DataType >
 		AnyDataPusher(DataType&& v)
