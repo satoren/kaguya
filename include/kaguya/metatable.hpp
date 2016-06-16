@@ -11,6 +11,7 @@
 #include <typeinfo>
 
 #include "kaguya/config.hpp"
+#include "kaguya/push_any.hpp"
 #include "kaguya/native_function.hpp"
 
 
@@ -59,70 +60,11 @@ namespace kaguya
 		}
 	};
 
-	namespace metatable_detail
-	{
-		struct DataHolderBase
-		{
-			virtual int push_to_lua(lua_State* data)const = 0;
-			virtual ~DataHolderBase() {}
-		};
-		template<typename T>
-		struct DataHolder :DataHolderBase
-		{
-			DataHolder(const T& d) :data(d) {}
-			T data;
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return util::push_args(state, data);
-			}
-		};
-		template<int N>
-		struct DataHolder<char[N]> :DataHolderBase {
-			char data[N];
-			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return util::push_args(state, data);
-			}
-		};
-		template<int N>
-		struct DataHolder<const char[N]> :DataHolderBase {
-			char data[N];
-			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return util::push_args(state, data);
-			}
-		};
-#if KAGUYA_USE_CPP11
-		template<typename T>
-		struct MoveDataHolder :DataHolderBase
-		{
-			MoveDataHolder(T&& d) :data(std::move(d)) {}
-			T data;
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return util::push_args(state, std::move(data));
-			}
-		};
-		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
-		template<typename T>DataHolderType makeDataHolder(T&& d)
-		{
-			return DataHolderType(new MoveDataHolder<T>(std::move(d)));
-		}
-#endif
-		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
-		template<typename T>DataHolderType makeDataHolder(const T& d)
-		{
-			return DataHolderType(new DataHolder<T>(d));
-		}
-	}
-
 	template<typename class_type, typename base_class_type = void>
 	class UserdataMetatable
 	{
-		typedef std::map<std::string, metatable_detail::DataHolderType> PropMapType;
-		typedef std::map<std::string, metatable_detail::DataHolderType> MemberMapType;
+		typedef std::map<std::string, AnyDataPusher> PropMapType;
+		typedef std::map<std::string, AnyDataPusher> MemberMapType;
 	public:
 
 		UserdataMetatable()
@@ -222,7 +164,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			property_map_[name] = metatable_detail::makeDataHolder(function(mem));
+			property_map_[name] = AnyDataPusher(function(mem));
 			return *this;
 		}
 
@@ -234,7 +176,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
+			member_map_[name] = AnyDataPusher(function(f));
 			return *this;
 		}
 
@@ -248,7 +190,7 @@ namespace kaguya
 				return *this;
 			}
 			
-			member_map_[name] = metatable_detail::makeDataHolder(LuaCodeChunkResult(lua_code_chunk));
+			member_map_[name] = AnyDataPusher(LuaCodeChunkResult(lua_code_chunk));
 			return *this;
 		}
 
@@ -262,7 +204,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(d);
+			member_map_[name] = AnyDataPusher(d);
 			return *this;
 		}
 #if KAGUYA_USE_CPP11
@@ -275,7 +217,7 @@ namespace kaguya
 				return *this;
 			}
 
-			member_map_[name] = metatable_detail::makeDataHolder(overload(f...));
+			member_map_[name] = AnyDataPusher(overload(f...));
 
 			return *this;
 		}
@@ -287,7 +229,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(std::move(d));
+			member_map_[name] = AnyDataPusher(std::move(d));
 			return *this;
 		}
 #else
@@ -303,7 +245,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");\
 				return *this;\
 			}\
-			member_map_[name] = metatable_detail::makeDataHolder(overload(KAGUYA_PP_ARG_REPEAT(N)));\
+			member_map_[name] = AnyDataPusher(overload(KAGUYA_PP_ARG_REPEAT(N)));\
 			return *this;\
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF)
@@ -323,7 +265,7 @@ namespace kaguya
 				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
+			member_map_[name] = AnyDataPusher(function(f));
 			return *this;
 		}
 #else
@@ -335,7 +277,7 @@ namespace kaguya
 				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
-			member_map_[name] = metatable_detail::makeDataHolder(function(f));
+			member_map_[name] = AnyDataPusher(function(f));
 			return *this;
 		}
 #endif
@@ -465,9 +407,9 @@ namespace kaguya
 			}
 			return false;
 		}
-		void registerField(lua_State* state, const char* name, const metatable_detail::DataHolderType& value)const
+		void registerField(lua_State* state, const char* name, const AnyDataPusher& value)const
 		{
-			int count = value->push_to_lua(state);
+			int count = value.pushToLua(state);
 			if (count > 1)
 			{
 				lua_pop(state, count - 1);

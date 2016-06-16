@@ -127,6 +127,13 @@ KAGUYA_TEST_FUNCTION_DEF(string_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], std::string("test"));
 	TEST_CHECK(state("assert(value == 'test')"));
 
+	std::string org = std::string("t\0est", 5);
+	state["value"] = org;
+	TEST_EQUAL(state["value"], org);
+
+	state["value"] = "t\0est";
+	TEST_EQUAL(state["value"].size(), 5);
+	TEST_EQUAL(state["value"], std::string("t\0est",5));
 };
 KAGUYA_TEST_FUNCTION_DEF(table_set)(kaguya::State& state)
 {

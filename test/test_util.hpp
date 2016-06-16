@@ -166,8 +166,7 @@ namespace kaguya_test_util
 					//test failure
 					std::cout << "Failed" << std::endl;
 					fail = true;
-					fail_tests.push_back(test_name);
-					fail_tests.push_back(test_name + " msg: " + error_message);
+					fail_tests.push_back(test_name + "\n\t error msg: " + error_message);
 				}
 			}
 			std::cout << std::endl;

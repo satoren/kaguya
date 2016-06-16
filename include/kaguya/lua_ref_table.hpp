@@ -586,25 +586,25 @@ namespace kaguya
 
 #if KAGUYA_USE_CPP11
 	struct TableDataElement {
-		typedef std::pair<AnyLuaData, AnyLuaData> keyvalue_type;
+		typedef std::pair<AnyDataPusher, AnyDataPusher> keyvalue_type;
 
 		template<typename Value>
-		TableDataElement(Value value) :keyvalue(keyvalue_type(AnyLuaData(), value)) {}
+		TableDataElement(Value value) :keyvalue(keyvalue_type(AnyDataPusher(), value)) {}
 
 		template<typename Key, typename Value>
 		TableDataElement(Key key, Value value) : keyvalue(keyvalue_type(key, value)) {}
-		std::pair<AnyLuaData, AnyLuaData> keyvalue;
+		std::pair<AnyDataPusher, AnyDataPusher> keyvalue;
 	};
 
 	struct TableData {
-		typedef std::pair<AnyLuaData, AnyLuaData> data_type;
+		typedef std::pair<AnyDataPusher, AnyDataPusher> data_type;
 
 		TableData(std::initializer_list<TableDataElement> list) :elements(list.begin(), list.end()) {}
 		std::vector<TableDataElement> elements;
 	};
 	template<>
 	struct lua_type_traits<TableData> {
-		static int push(lua_State* l, const TableData& list)
+		static int push(lua_State* l,const TableData& list)
 		{
 			lua_createtable(l, int(list.elements.size()), 0);
 			LuaStackRef table(l, -1);

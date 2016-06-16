@@ -8,25 +8,25 @@ KAGUYA_TEST_FUNCTION_DEF(push_any_type)(kaguya::State& state)
 {
 	using namespace kaguya;
 	
-	std::vector<AnyLuaData> data;
+	std::vector<AnyDataPusher> data;
 	data.push_back(3);
 	data.push_back("data");
 	data.push_back("abc");
 	data.push_back(std::string("abc"));
 
 
-	TEST_COMPARE_EQ(state.newRef(AnyLuaData(3)), 3);
-	TEST_COMPARE_EQ(state.newRef(AnyLuaData("data")), "data");
-	TEST_COMPARE_EQ(state.newRef(AnyLuaData(std::string("abc"))), std::string("abc"));
-
-	char strdata[]= "test";
-	data.push_back(strdata);
-
-	AnyLuaData a("d");
-	AnyLuaData b(4);
+	TEST_COMPARE_EQ(state.newRef(AnyDataPusher(3)), 3);
+	TEST_COMPARE_EQ(state.newRef(AnyDataPusher("data")), "data");
+	TEST_COMPARE_EQ(state.newRef(AnyDataPusher(std::string("abc"))), std::string("abc"));
+	
+	AnyDataPusher a("d");
+	AnyDataPusher b(4);	
 	a = b;
 	a = a;
+	AnyDataPusher c;
 	TEST_COMPARE_EQ(state.newRef(a), 4);
+	TEST_COMPARE_EQ(state.newRef(b), 4);
+	TEST_CHECK(!state.newRef(c));
 }
 
 KAGUYA_TEST_GROUP_END(test_12_push_any)

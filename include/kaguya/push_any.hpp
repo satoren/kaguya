@@ -11,7 +11,7 @@
 
 namespace kaguya
 {
-	class AnyLuaData
+	class AnyDataPusher
 	{
 	public:
 		int pushToLua(lua_State* state)const
@@ -27,72 +27,71 @@ namespace kaguya
 			}
 		}
 
-		AnyLuaData() : holder_() { }
+		AnyDataPusher() : holder_() { }
 
 		template < typename DataType >
-		AnyLuaData(const DataType& v)
+		AnyDataPusher(const DataType& v)
 			: holder_(new DataHolder<DataType>(v)) { }
 
-		AnyLuaData(const AnyLuaData& other)
-			: holder_(other.holder_.get() ? other.holder_->clone() : 0) { }
-
-		AnyLuaData & operator = (AnyLuaData const & rhs)
+#if KAGUYA_USE_CPP11
+		AnyDataPusher(AnyDataPusher&& rhs) = default;
+		AnyDataPusher & operator = (AnyDataPusher&& rhs) = default;
+		template < typename DataType >
+		AnyDataPusher(DataType&& v)
+			: holder_(new DataHolder<DataType>(std::move(v))) { }
+#endif
+		AnyDataPusher(const AnyDataPusher& other)
+			: holder_(other.holder_) { }
+		AnyDataPusher& operator = (const AnyDataPusher& other)
 		{
-			if (this != &rhs)
-			{
-				holder_.reset(rhs.holder_->clone());
-			}
+			holder_ = other.holder_;
 			return *this;
 		}
-#if KAGUYA_USE_CPP11
-		AnyLuaData(AnyLuaData&& rhs) = default;
-		AnyLuaData & operator = (AnyLuaData&& rhs) = default;
-#endif
+
 		bool empty()const { return !holder_.get(); }
 	private:
 		struct DataHolderBase
 		{
 			virtual int pushToLua(lua_State* data)const = 0;
-			virtual DataHolderBase * clone(void) = 0;
+			//			virtual DataHolderBase * clone(void) = 0;
 			virtual ~DataHolderBase() {}
 		};
 		template < typename Type >
 		class DataHolder : public DataHolderBase
 		{
+			typedef typename traits::decay<Type>::type DataType;
 		public:
-			explicit DataHolder(const Type& v) : data_(v) { }
 #if KAGUYA_USE_CPP11
-			explicit DataHolder(Type&& v) : data_(std::forward<Type>(v)) { }
+			explicit DataHolder(DataType&& v) : data_(std::forward<DataType>(v)) { }
+#else
+			explicit DataHolder(const DataType& v) : data_(v){ }
 #endif
-
-			virtual DataHolderBase * clone(void)
-			{
-				return new DataHolder(data_);
-			}
 			virtual int pushToLua(lua_State* state)const
 			{
+#if KAGUYA_USE_CPP11
+				if (!standard::is_copy_constructible<DataType>::value)
+				{
+					return util::push_args(state, std::move(data_));
+				}
+#endif
 				return util::push_args(state, data_);
 			}
 		private:
-			Type data_;
+			DataType data_;
 		};
 		//specialize for string literal
 		template<int N>	struct DataHolder<const char[N]> :DataHolder<std::string> {
 			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
 		};
 		template<int N>	struct DataHolder<char[N]> :DataHolder<std::string> {
-			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N :v + N - 1)) {}
+			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
 		};
-#if KAGUYA_USE_CPP11
-		standard::unique_ptr<DataHolderBase> holder_;
-#else
-		std::auto_ptr<DataHolderBase> holder_;
-#endif
+		standard::shared_ptr<DataHolderBase> holder_;
 	};
 
 
-	template<>	struct lua_type_traits<AnyLuaData> {
-		static int push(lua_State* l, const AnyLuaData& data)
+	template<>	struct lua_type_traits<AnyDataPusher> {
+		static int push(lua_State* l, const AnyDataPusher& data)
 		{
 			return data.pushToLua(l);
 		}
