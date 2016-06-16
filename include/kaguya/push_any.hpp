@@ -3,6 +3,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 #pragma once
+#include <memory>
 
 #include "kaguya/config.hpp"
 #include "kaguya/traits.hpp"
@@ -14,7 +15,7 @@ namespace kaguya
 	public:
 		int pushToLua(lua_State* state)const
 		{
-			return holder_?holder_->pushToLua(state):0;
+			return empty() ? 0 : holder_->pushToLua(state);
 		}
 
 		AnyLuaData() : holder_() { }
@@ -38,7 +39,7 @@ namespace kaguya
 		AnyLuaData(AnyLuaData&& rhs) = default;
 		AnyLuaData & operator = (AnyLuaData&& rhs) = default;
 #endif
-		bool empty()const { return holder_ ? false : true; }
+		bool empty()const { return !holder_.get(); }
 	private:
 		struct DataHolderBase
 		{
@@ -73,7 +74,7 @@ namespace kaguya
 #if KAGUYA_USE_CPP11
 		standard::unique_ptr<DataHolderBase> holder_;
 #else
-		standard::auto_ptr<DataHolderBase> holder_;
+		std::auto_ptr<DataHolderBase> holder_;
 #endif
 	};
 
