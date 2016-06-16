@@ -123,6 +123,8 @@ namespace kaguya_test_util
 
 				std::cout << test_name << "  (" << testindex << "/" << testcount << ") ...";
 
+				std::string error_message = "";
+
 				bool result = false;
 				try
 				{
@@ -133,11 +135,13 @@ namespace kaguya_test_util
 				{
 					result = false;
 					std::cout << e.what() << std::endl;
+					error_message = e.what();
 				}
 				catch (...)
 				{
 					result = false;
 					std::cout << "unknown exception" << std::endl;
+					error_message = "unknown exception";
 				}
 
 				if (result)
@@ -146,43 +150,41 @@ namespace kaguya_test_util
 					int stack_leak = lua_gettop(state.state());
 					if (stack_leak == 0)
 					{
-						std::cout << "done" << std::endl;
+						std::cout << "pass" << std::endl;
 						pass_tests.push_back(test_name);
 					}
 					else
 					{
-						std::cout << "stack leaked count=" << stack_leak << std::endl;
+						std::cout << "pass. but stack leaked, count=" << stack_leak << std::endl;
 						fail = true;
-						fail_tests.push_back(test_name);
+						error_message = "stack leaked, count =" + to_string(stack_leak);
+						fail_tests.push_back(test_name + " msg: " + error_message);
 					}
 				}
 				else
 				{
 					//test failure
-					std::cout << "failure" << std::endl;
+					std::cout << "Failed" << std::endl;
 					fail = true;
 					fail_tests.push_back(test_name);
+					fail_tests.push_back(test_name + " msg: " + error_message);
 				}
 			}
-			if (fail)
+			std::cout << std::endl;
+			int percent = int(pass_tests.size() * 100 / test_function.size());
+			std::cout << percent << "% tests passed." << std::endl;
+			if (!fail_tests.empty())
 			{
-				std::cout << "test failed!!" << std::endl;
-				std::cout << "error in ";
+				std::cout << "The following tests FAILED:" << std::endl;
 
 				for (size_t i = 0; i < fail_tests.size(); ++i)
 				{
-
-					std::cout << fail_tests[i] << ",";
+					std::cout << fail_tests[i]  << std::endl;
 				}
 
 				std::cout << std::endl;
 
 			}
-			else
-			{
-				std::cout << "all pass." << std::endl;
-			}
-
 			return !fail;
 		}
 
