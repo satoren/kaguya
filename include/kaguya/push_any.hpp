@@ -60,6 +60,9 @@ namespace kaguya
 		{
 		public:
 			explicit DataHolder(const Type& v) : data_(v) { }
+#if KAGUYA_USE_CPP11
+			explicit DataHolder(Type&& v) : data_(std::forward<Type>(v)) { }
+#endif
 
 			virtual DataHolderBase * clone(void)
 			{
@@ -74,10 +77,10 @@ namespace kaguya
 		};
 		//specialize for string literal
 		template<int N>	struct DataHolder<const char[N]> :DataHolder<std::string> {
-			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v + N)) {}
+			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
 		};
 		template<int N>	struct DataHolder<char[N]> :DataHolder<std::string> {
-			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v + N)) {}
+			explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N :v + N - 1)) {}
 		};
 #if KAGUYA_USE_CPP11
 		standard::unique_ptr<DataHolderBase> holder_;
