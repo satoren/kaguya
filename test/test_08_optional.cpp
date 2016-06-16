@@ -57,7 +57,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 
 KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
 {
-	std::string str = "abc";
+	const std::string& str = "abc";
 	kaguya::optional<const std::string&> s1 = str; // constructor
 	TEST_EQUAL(std::string("abc"), *s1);
 
@@ -180,13 +180,15 @@ KAGUYA_TEST_FUNCTION_DEF(optional_move)(kaguya::State&)
 
 
 
-template<typename T>void optional_type_test(const T& init_value, const T& other_value)
+template<typename T>
+void optional_type_test(const typename kaguya::traits::decay<T>::type& init_value, const typename kaguya::traits::decay<T>::type& other_value)
 {
-	kaguya::optional<T> opt1 = init_value;
+	typedef kaguya::optional<T> test_type;
+	test_type opt1 = init_value;
 	TEST_EQUAL(init_value, *opt1);
 
 	TEST_EQUAL(init_value, opt1.value_or(other_value));
-	opt1 = kaguya::optional<T>();
+	TEST_CHECK(!(opt1 = test_type()));
 	TEST_EQUAL(other_value, opt1.value_or(other_value));
 
 	bool except_catch = false;
@@ -200,18 +202,18 @@ template<typename T>void optional_type_test(const T& init_value, const T& other_
 	}
 	TEST_CHECK(except_catch);
 
-	opt1 = kaguya::optional<T>(init_value);
+	TEST_CHECK(opt1 = test_type(init_value));
 	TEST_EQUAL(init_value, *opt1);
-	opt1 = kaguya::optional<T>(other_value);
+	TEST_CHECK(opt1 = test_type(other_value));
 	TEST_EQUAL(other_value, *opt1);
 
 
-	const kaguya::optional<T> copt1 = init_value;
+	const test_type copt1 = init_value;
 	TEST_EQUAL(init_value, *copt1);
 
 	TEST_EQUAL(init_value, copt1.value_or(other_value));
 
-	const kaguya::optional<T> copt2;
+	const test_type copt2;
 	except_catch = false;
 	try
 	{

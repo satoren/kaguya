@@ -162,7 +162,7 @@ namespace kaguya
 			value_ = 0;
 			return *this;
 		}
-		optional& operator=(optional& other)
+		optional& operator=(const optional& other)
 		{
 			value_ = other.value_;
 			return *this;
