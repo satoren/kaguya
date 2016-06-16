@@ -25,41 +25,11 @@ namespace kaguya
 			return "unknown error";
 		}
 	}
-	
-#if KAGUYA_NO_SET_AT_PANIC
-	inline void set_at_panic_handler(lua_State* state)
-	{
-	}
 	inline int lua_pcall_wrap(lua_State* state, int argnum, int retnum)
 	{
 		int result = lua_pcall(state, argnum, retnum, 0);
 		return result;
 	}
-#else
-	inline int panic_handler(lua_State *state)
-	{
-		const char* errormessage = get_error_message(state);
-		throw LuaException(lua_status(state), errormessage);
-		return 0;
-	}
-	inline void set_at_panic_handler(lua_State* state)
-	{
-		lua_atpanic(state, panic_handler);
-	}
-	inline int lua_pcall_wrap(lua_State* state, int argnum, int retnum)
-	{
-		try
-		{
-			lua_call(state, argnum, LUA_MULTRET);
-		}
-		catch (const LuaException& e)
-		{
-			return LUA_ERRRUN;
-//			return e.status();//status not changed at luajit 2.0.4
-		}
-		return lua_status(state);
-	}
-#endif
 
 	struct ErrorHandler
 	{
@@ -121,8 +91,6 @@ namespace kaguya
 		}
 		static void registerHandler(lua_State* state, function_type f)
 		{
-			
-			set_at_panic_handler(state);
 			if (state)
 			{
 				function_type* funptr = getFunctionPointer(state);

@@ -19,11 +19,6 @@ extern "C" {
 #endif
 #endif
 
-#ifndef KAGUYA_NO_SET_AT_PANIC
-//msvc 2013 and 2015(no update) strange error.
-//and lua_State status not update
-#define KAGUYA_NO_SET_AT_PANIC 1
-#endif
 
 #if KAGUYA_USE_CPP11
 #include <functional>
