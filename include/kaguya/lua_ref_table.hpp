@@ -253,14 +253,14 @@ namespace kaguya
 
 		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
-			lua_type_traits<LuaTable>::push(state_, table);
-			lua_type_traits<KEY>::push(state_, key);
+			util::one_push(state_, table);
+			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 		}
 		TableKeyReference(const LuaRef& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
-			lua_type_traits<LuaRef>::push(state_, table);
-			lua_type_traits<KEY>::push(state_, key);
+			util::one_push(state_, table);
+			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 			int t = lua_type(state_, table_index_);
 			if (t != LUA_TTABLE)
@@ -399,7 +399,7 @@ namespace kaguya
 				return LuaStackRef();
 			}
 			push_(state);
-			lua_type_traits<KEY>::push(state, key);//push key
+			util::one_push(state, key);//push key
 			lua_gettable(state, -2);//get table[key]
 			lua_remove(state, -2);//remove table
 			return LuaStackRef(state, -1, true);

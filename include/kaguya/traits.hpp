@@ -99,7 +99,7 @@ namespace kaguya
 	{
 		typedef void Registerable;
 
-		typedef typename traits::remove_const_and_reference<T>::type NCRT;
+		typedef typename traits::decay<T>::type NCRT;
 		typedef const NCRT& get_type;
 		typedef const NCRT& push_type;
 

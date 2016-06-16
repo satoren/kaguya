@@ -7,6 +7,7 @@
 
 #include "kaguya/config.hpp"
 #include "kaguya/traits.hpp"
+#include "kaguya/utility.hpp"
 
 namespace kaguya
 {
@@ -70,7 +71,7 @@ namespace kaguya
 			}
 			virtual int pushToLua(lua_State* state)const
 			{
-				return lua_type_traits<Type>::push(state, data_);
+				return util::push_args(state, data_);
 			}
 		private:
 			Type data_;

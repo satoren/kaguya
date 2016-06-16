@@ -109,7 +109,7 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
-				lua_type_traits<KEY>::push(state, key);
+				util::one_push(state, key);
 				lua_gettable(state, stackIndex);
 				return lua_type_traits<T>::get(state, -1);
 			}

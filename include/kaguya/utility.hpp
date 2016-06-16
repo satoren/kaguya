@@ -3,6 +3,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 #pragma once
+#include <iostream>
 
 #include "kaguya/config.hpp"
 #include "kaguya/compatibility.hpp"
@@ -174,7 +175,7 @@ namespace kaguya
 		template<class Arg, class...Args>
 		inline int push_args(lua_State *l, Arg&& arg, Args&&... args)
 		{
-			int c = lua_type_traits<typename traits::remove_reference<Arg>::type>::push(l, std::forward<Arg>(arg));
+			int c = lua_type_traits<typename traits::decay<Arg>::type>::push(l, std::forward<Arg>(arg));
 			return c + push_args(l, std::forward<Args>(args)...);
 		}
 		template<class Arg, class...Args>

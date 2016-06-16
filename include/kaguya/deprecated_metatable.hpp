@@ -26,7 +26,7 @@ namespace kaguya
 			T data;
 			virtual int push_to_lua(lua_State* state)const
 			{
-				return lua_type_traits<T>::push(state, data);
+				return util::push_args(state, data);
 			}
 		};
 		template<int N>
@@ -35,7 +35,7 @@ namespace kaguya
 			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
 			virtual int push_to_lua(lua_State* state)const
 			{
-				return lua_type_traits<char[N]>::push(state, data);
+				return util::push_args(state, data);
 			}
 		};
 		template<int N>
@@ -44,7 +44,7 @@ namespace kaguya
 			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
 			virtual int push_to_lua(lua_State* state)const
 			{
-				return lua_type_traits<char[N]>::push(state, data);
+				return util::push_args(state, data);
 			}
 		};
 #if KAGUYA_USE_CPP11
@@ -55,7 +55,7 @@ namespace kaguya
 			T data;
 			virtual int push_to_lua(lua_State* state)const
 			{
-				return lua_type_traits<T>::push(state, std::move(data));
+				return util::push_args(state, std::move(data));
 			}
 		};
 #endif
