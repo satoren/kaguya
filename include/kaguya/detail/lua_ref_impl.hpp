@@ -55,7 +55,7 @@ namespace kaguya
 			}
 			StackRef& operator=(const StackRef& src)
 			{
-				if (this != src)
+				if (this != &src)
 				{
 					state_ = src.state_;
 					stack_index_ = src.stack_index_;
