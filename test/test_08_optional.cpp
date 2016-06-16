@@ -180,4 +180,58 @@ KAGUYA_TEST_FUNCTION_DEF(optional_move)(kaguya::State&)
 
 
 
+template<typename T>void optional_type_test(const T& init_value, const T& other_value)
+{
+	kaguya::optional<T> opt1 = init_value;
+	TEST_EQUAL(init_value, *opt1);
+
+	TEST_EQUAL(init_value, opt1.value_or(other_value));
+	opt1 = kaguya::optional<T>();
+	TEST_EQUAL(other_value, opt1.value_or(other_value));
+
+	bool except_catch = false;
+	try
+	{
+		opt1.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		except_catch = true;
+	}
+	TEST_CHECK(except_catch);
+
+	opt1 = kaguya::optional<T>(init_value);
+	TEST_EQUAL(init_value, *opt1);
+	opt1 = kaguya::optional<T>(other_value);
+	TEST_EQUAL(other_value, *opt1);
+
+
+	const kaguya::optional<T> copt1 = init_value;
+	TEST_EQUAL(init_value, *copt1);
+
+	TEST_EQUAL(init_value, copt1.value_or(other_value));
+
+	const kaguya::optional<T> copt2;
+	except_catch = false;
+	try
+	{
+		copt2.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		except_catch = true;
+	}
+	TEST_CHECK(except_catch);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(optional_type)(kaguya::State&)
+{
+	optional_type_test<int>(1, 4);
+	optional_type_test<double>(1, 4);
+	optional_type_test<std::string>("abc", "def");
+	optional_type_test<const std::string&>("abc", "def");
+}
+
+
+
 KAGUYA_TEST_GROUP_END(test_08_optional)
