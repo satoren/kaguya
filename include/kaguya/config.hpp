@@ -26,6 +26,7 @@ extern "C" {
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <initializer_list>
 #else
 #include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>

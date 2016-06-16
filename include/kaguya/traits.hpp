@@ -6,6 +6,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <map>
 
 #include "kaguya/config.hpp"
 

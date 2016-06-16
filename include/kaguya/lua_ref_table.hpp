@@ -9,6 +9,7 @@
 #include <map>
 #include "kaguya/config.hpp"
 #include "kaguya/lua_ref.hpp"
+#include "kaguya/push_any.hpp"
 
 #include "kaguya/detail/lua_ref_impl.hpp"
 #include "kaguya/detail/lua_table_def.hpp"
@@ -577,6 +578,47 @@ namespace kaguya
 			for (typename std::map<K, V, C, A>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
 				table.setField(it->first, it->second);
+			}
+			return 1;
+		}
+	};
+#endif
+
+#if KAGUYA_USE_CPP11
+	struct TableDataElement {
+		typedef std::pair<AnyLuaData, AnyLuaData> keyvalue_type;
+
+		template<typename Value>
+		TableDataElement(Value value) :keyvalue(keyvalue_type(AnyLuaData(), value)) {}
+
+		template<typename Key, typename Value>
+		TableDataElement(Key key, Value value) : keyvalue(keyvalue_type(key, value)) {}
+		std::pair<AnyLuaData, AnyLuaData> keyvalue;
+	};
+
+	struct TableData {
+		typedef std::pair<AnyLuaData, AnyLuaData> data_type;
+
+		TableData(std::initializer_list<TableDataElement> list) :elements(list.begin(), list.end()) {}
+		std::vector<TableDataElement> elements;
+	};
+	template<>
+	struct lua_type_traits<TableData> {
+		static int push(lua_State* l, const TableData& list)
+		{
+			lua_createtable(l, int(list.elements.size()), 0);
+			LuaStackRef table(l, -1);
+			int count = 1;//array is 1 origin in Lua
+			for (auto&& v : list.elements)
+			{
+				if (v.keyvalue.first.empty())
+				{
+					table.setField(count++, v.keyvalue.second);
+				}
+				else
+				{
+					table.setField(v.keyvalue.first, v.keyvalue.second);
+				}
 			}
 			return 1;
 		}

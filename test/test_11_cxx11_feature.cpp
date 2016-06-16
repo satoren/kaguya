@@ -235,6 +235,19 @@ KAGUYA_TEST_FUNCTION_DEF(result_range_based_for)(kaguya::State& state)
 
 }
 
+KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
+{
+	state["table"] = kaguya::TableData{ 23,"test",{"key","value"},
+	{ "childtable",kaguya::TableData{3} }};
+	kaguya::LuaTable tbl = state["table"];
+
+	TEST_EQUAL(tbl[1], 23);
+	TEST_EQUAL(tbl[2], "test");
+	TEST_EQUAL(tbl["key"], "value");
+	TEST_EQUAL(tbl["childtable"][1], 3);
+}
+
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
+
 
 #endif
