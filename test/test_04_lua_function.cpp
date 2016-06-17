@@ -141,6 +141,30 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine)(kaguya::State& state)
 	}
 }
 
+KAGUYA_TEST_FUNCTION_DEF(coroutine_yield_return)(kaguya::State& state)
+{
+	{
+		kaguya::LuaThread cor2 = state.newRef(kaguya::NewThread());
+		TEST_CHECK(state("corfun = function(arg)"
+			"local r = coroutine.yield(arg) "
+			"r = coroutine.yield(r) "
+			"r = coroutine.yield(r) "
+			"return r "
+			" end"));
+
+		kaguya::LuaFunction corfun = state["corfun"];
+		int r1 = cor2(corfun, 3);
+		int r2 = cor2.resume<int>(4);
+		int r3 = cor2.resume<int>(5);
+		int r4 = cor2.resume<int>(6);
+
+		TEST_EQUAL(r1, 3);
+		TEST_EQUAL(r2, 4);
+		TEST_EQUAL(r3, 5);
+		TEST_EQUAL(r4, 6);
+	}
+}
+
 KAGUYA_TEST_FUNCTION_DEF(coroutine_dead)(kaguya::State& state)
 {
 	kaguya::LuaThread emptycoroutine;
