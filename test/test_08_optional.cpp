@@ -229,6 +229,11 @@ void optional_type_test(const typename kaguya::traits::decay<T>::type& init_valu
 	TEST_CHECK(opt1 = test_type(other_value));
 	TEST_EQUAL(other_value, *opt1);
 
+	TEST_CHECK(opt1 = test_type(T(init_value)));
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = T(init_value));
+	TEST_EQUAL(init_value, *opt1);
+
 	TEST_CHECK(opt1 = init_v_opt);
 	TEST_EQUAL(init_value, *opt1);
 	TEST_CHECK(opt1 = other_v_opt);
@@ -241,11 +246,13 @@ void optional_type_test(const typename kaguya::traits::decay<T>::type& init_valu
 	TEST_EQUAL(other_value, *opt1);
 
 	const test_type copt1 = init_value;
+	TEST_CHECK(copt1);
 	TEST_EQUAL(init_value, *copt1);
 
 	TEST_EQUAL(init_value, copt1.value_or(other_value));
 
 	const test_type copt2;
+	TEST_CHECK(!copt2);
 	except_catch = false;
 	try
 	{
@@ -258,10 +265,14 @@ void optional_type_test(const typename kaguya::traits::decay<T>::type& init_valu
 	TEST_CHECK(except_catch);
 }
 
+
 KAGUYA_TEST_FUNCTION_DEF(optional_type)(kaguya::State&)
 {
 	optional_type_test<int>(1, 4);
+	optional_type_test<const int&>(1, 4);
 	optional_type_test<double>(1, 4);
+	optional_type_test<const double&>(1, 4);
+	optional_type_test<const char*>("abc", "def");
 	optional_type_test<std::string>("abc", "def");
 	optional_type_test<const std::string&>("abc", "def");
 }
