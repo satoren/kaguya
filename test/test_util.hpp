@@ -192,14 +192,14 @@ namespace kaguya_test_util
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya_test_util::to_string(__LINE__) + "\nCHECKCODE:" #B );
 
-#define TEST_COMPARE(A,B,OP)  if(!(A OP B))\
+#define TEST_COMPARE(A,B,OP)  if(!((A) OP (B)))\
 {\
 std::stringstream ss;\
 ss << "failed.\nfunction:" << __FUNCTION__ << std::endl \
 << " line:" << __LINE__<< std::endl \
 << " CHECKCODE:"#A #OP #B << std::endl \
-<< " left:" << A << std::endl \
-<< " right:" << B << std::endl; \
+<< " left:" << (A) << std::endl \
+<< " right:" << (B) << std::endl; \
 	throw std::runtime_error(ss.str());\
 }
 #define TEST_EQUAL(A,B)  TEST_COMPARE(A,B,==)

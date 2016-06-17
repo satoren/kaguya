@@ -184,6 +184,26 @@ template<typename T>
 void optional_type_test(const typename kaguya::traits::decay<T>::type& init_value, const typename kaguya::traits::decay<T>::type& other_value)
 {
 	typedef kaguya::optional<T> test_type;
+
+	test_type init_v_opt(init_value);
+	test_type other_v_opt(other_value);
+	test_type nullopt_v_opt;
+
+
+	TEST_EQUAL(init_v_opt == other_v_opt, init_value == other_value);
+	TEST_EQUAL(init_v_opt != other_v_opt, init_value != other_value);
+	TEST_EQUAL(init_v_opt < other_v_opt, init_value < other_value);
+	TEST_EQUAL(init_v_opt > other_v_opt, init_value > other_value);
+	TEST_EQUAL(init_v_opt <= other_v_opt, init_value <= other_value);
+	TEST_EQUAL(init_v_opt >= other_v_opt, init_value >= other_value);
+
+	TEST_EQUAL(init_v_opt == nullopt_v_opt, false);
+	TEST_EQUAL(init_v_opt != nullopt_v_opt, true);
+	TEST_EQUAL(init_v_opt < nullopt_v_opt, false);
+	TEST_EQUAL(init_v_opt > nullopt_v_opt, true);
+	TEST_EQUAL(init_v_opt <= nullopt_v_opt, false);
+	TEST_EQUAL(init_v_opt >= nullopt_v_opt, true);
+
 	test_type opt1 = init_value;
 	TEST_EQUAL(init_value, *opt1);
 
@@ -207,6 +227,16 @@ void optional_type_test(const typename kaguya::traits::decay<T>::type& init_valu
 	TEST_CHECK(opt1 = test_type(other_value));
 	TEST_EQUAL(other_value, *opt1);
 
+	TEST_CHECK(opt1 = init_v_opt);
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = other_v_opt);
+	TEST_EQUAL(other_value, *opt1);
+
+	
+	TEST_CHECK(opt1 = init_value);
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = other_value);
+	TEST_EQUAL(other_value, *opt1);
 
 	const test_type copt1 = init_value;
 	TEST_EQUAL(init_value, *copt1);

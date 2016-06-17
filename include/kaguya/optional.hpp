@@ -212,4 +212,38 @@ namespace kaguya
 		T* value_;
 	};
 
+	template< class T >
+	bool operator==(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		if (bool(lhs) != bool(rhs)) { return false; }
+		if (bool(lhs) == false) { return true; }
+		return lhs.value() == rhs.value();
+	}
+	template< class T >
+	bool operator!=(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	template< class T >
+	bool operator<(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		if (!bool(rhs)) { return false; }
+		if (!bool(lhs)) { return true; }
+		return lhs.value() < rhs.value();
+	}
+	template< class T >
+	bool operator<=(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return !(rhs < lhs);
+	}
+	template< class T >
+	bool operator>(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return rhs < lhs;
+	}
+	template< class T >
+	bool operator>=(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return !(lhs < rhs);
+	}
 }
