@@ -74,7 +74,10 @@ extern "C" int luaopen_modulename(lua_State *L)
   state["tbl"] = kaguya::NewTable();//tbl ={};
   state["tbl"]["value"] = 1;//tbl.value = 1 in lua
 
-  state("assert(tbl.value == 1)");
+  state["tbl"] = kaguya::TableData{ 23,"test",{"key","value"}}; //using initializer list(C++11)
+  state("assert(tbl[1] == 23)");
+  state("assert(tbl[2] == 'test')");
+  state("assert(tbl['key'] == 'value')");
 
 ```
 

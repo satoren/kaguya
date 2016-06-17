@@ -241,6 +241,11 @@ KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 	{ "childtable",kaguya::TableData{3} }};
 	kaguya::LuaTable tbl = state["table"];
 
+
+	state("assert(table[1] == 23)");
+	state("assert(table[2] == 'test')");
+	state("assert(table['key'] == 'value')");
+
 	TEST_EQUAL(tbl[1], 23);
 	TEST_EQUAL(tbl[2], "test");
 	TEST_EQUAL(tbl["key"], "value");
