@@ -405,7 +405,7 @@ namespace kaguya
 		TableKeyReference<std::string> operator[](const std::string& str)
 		{
 			int stack_top = lua_gettop(state_);
-			lua_type_traits<GlobalTable>::push(state_, GlobalTable());
+			util::push_args(state_, GlobalTable());
 			int table_index = stack_top + 1;
 			return TableKeyReference<std::string>(state_, table_index, str, stack_top, NoTypeCheck());
 		}
@@ -414,7 +414,7 @@ namespace kaguya
 		TableKeyReference<const char*> operator[](const char* str)
 		{
 			int stack_top = lua_gettop(state_);
-			lua_type_traits<GlobalTable>::push(state_, GlobalTable());
+			util::push_args(state_, GlobalTable());
 			int table_index = stack_top + 1;
 			return TableKeyReference<const char*>(state_, table_index, str, stack_top, NoTypeCheck());
 		}
@@ -468,7 +468,7 @@ namespace kaguya
 		template<typename T>
 		void pushToStack(T value)
 		{
-			lua_type_traits<T>::push(state_, value);
+			util::push_args(state_, value);
 		}
 		LuaRef popFromStack()
 		{
