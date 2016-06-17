@@ -79,6 +79,10 @@ KAGUYA_TEST_FUNCTION_DEF(stackValueDump)(kaguya::State& s)
 	util::stackValueDump(std::cout, s.state(), 4, 2);
 }
 
+struct A
+{
+	int a[4];
+};
 KAGUYA_TEST_FUNCTION_DEF(lua_rawlen_test)(kaguya::State& s)
 {
 	using namespace kaguya;
@@ -91,6 +95,17 @@ KAGUYA_TEST_FUNCTION_DEF(lua_rawlen_test)(kaguya::State& s)
 	s.pushToStack(tbl);
 	TEST_EQUAL(lua_rawlen(s.state(), -1), 0);
 
+	s.pushToStack(A());
+	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), sizeof(A));
+
+
+	s.pushToStack(A());
+	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), sizeof(A));
+
+	A a;
+	s.pushToStack(&a);
+	TEST_EQUAL(lua_type(s.state(), -1) , LUA_TLIGHTUSERDATA);
+	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), 0);
 
 	lua_settop(s.state(),0);
 }
