@@ -205,12 +205,27 @@ void optional_type_test(const typename kaguya::traits::decay<T>::type& init_valu
 	TEST_EQUAL(init_v_opt <= nullopt_v_opt, false);
 	TEST_EQUAL(init_v_opt >= nullopt_v_opt, true);
 
+	TEST_EQUAL(nullopt_v_opt == nullopt_v_opt, true);
+	TEST_EQUAL(nullopt_v_opt != nullopt_v_opt, false);
+	TEST_EQUAL(nullopt_v_opt < nullopt_v_opt, false);
+	TEST_EQUAL(nullopt_v_opt > nullopt_v_opt, false);
+	TEST_EQUAL(nullopt_v_opt <= nullopt_v_opt, true);
+	TEST_EQUAL(nullopt_v_opt >= nullopt_v_opt, true);
+
 	test_type opt1 = init_value;
 	TEST_EQUAL(init_value, opt1.value());
 	TEST_EQUAL(init_value, *opt1);
 	TEST_EQUAL(init_value, opt1.value_or(other_value));
 	TEST_CHECK(!(opt1 = nullopt_v_opt));
 	TEST_EQUAL(other_value, opt1.value_or(other_value));
+	TEST_CHECK(!(opt1 = nullopt_v_opt));
+
+	opt1 = init_value;
+	TEST_EQUAL(init_value, opt1.value());
+	TEST_EQUAL(init_value, *opt1);
+	TEST_EQUAL(init_value, opt1.value_or(T(other_value)));
+	TEST_CHECK(!(opt1 = nullopt_v_opt));
+	TEST_EQUAL(other_value, opt1.value_or(T(other_value)));
 	TEST_CHECK(!(opt1 = nullopt_v_opt));
 
 	bool except_catch = false;
