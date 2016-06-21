@@ -22,6 +22,10 @@ add_definitions("-Wall")
 #add_definitions("-std=c++11")
 endif(NOT MSVC)
 
+if(KAGUYA_NO_USERDATA_TYPE_CHECK)
+  add_definitions("-DKAGUYA_NO_USERDATA_TYPE_CHECK=1")
+endif()
+
 #check for address sanitizer support
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER 4.8)
