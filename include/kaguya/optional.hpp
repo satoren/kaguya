@@ -65,7 +65,7 @@ namespace kaguya
 		{
 			if (other)
 			{
-				*this = new(storage_) T(std::move(other.value()));
+				value_ = new(storage_) T(std::move(other.value()));
 			}
 		}
 		optional(T&& value)
