@@ -23,12 +23,12 @@ namespace kaguya
 		{
 			if (other)
 			{
-				value_ = new(storage_) T(other.value());
+				value_ = new(&storage_) T(other.value());
 			}
 		}
 		optional(const T& value)
 		{
-			value_ = new(storage_) T(value);
+			value_ = new(&storage_) T(value);
 		}
 
 		~optional() {
@@ -55,7 +55,7 @@ namespace kaguya
 			}
 			else
 			{
-				value_ = new(storage_) T(value);
+				value_ = new(&storage_) T(value);
 			}
 			return *this;
 		}
@@ -65,12 +65,12 @@ namespace kaguya
 		{
 			if (other)
 			{
-				value_ = new(storage_) T(std::move(other.value()));
+				value_ = new(&storage_) T(std::move(other.value()));
 			}
 		}
 		optional(T&& value)
 		{
-			value_ = new(storage_) T(std::move(value));
+			value_ = new(&storage_) T(std::move(value));
 		}
 		optional& operator=(optional&& other)
 		{
@@ -92,7 +92,7 @@ namespace kaguya
 			}
 			else
 			{
-				value_ = new(storage_) T(std::move(value));
+				value_ = new(&storage_) T(std::move(value));
 			}
 			return *this;
 		}
@@ -143,7 +143,7 @@ namespace kaguya
 		}
 
 		typename standard::aligned_storage<sizeof(T),
-			standard::alignment_of<T>::value>::type storage_[1];
+			standard::alignment_of<T>::value>::type storage_;
 
 		T* value_;
 	};
