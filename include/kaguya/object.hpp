@@ -415,13 +415,16 @@ namespace kaguya
 	{
 		inline bool object_wrapper_type_check(lua_State* l, int index)
 		{
+#if KAGUYA_NO_USERDATA_TYPE_CHECK
+			return lua_isuserdata(l, index) && !lua_islightuserdata(l, index);
+#endif
 			if (lua_getmetatable(l, index))
 			{
 				lua_rawgetp(l, -1, metatable_name_key());
-				const char* metatable_name = lua_tostring(l, -1);
+				bool res = lua_isstring(l, -1) != 0;
 
 				lua_pop(l, 2);
-				return metatable_name != 0;
+				return res;
 			}
 			return false;
 		}

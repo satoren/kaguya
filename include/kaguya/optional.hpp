@@ -4,7 +4,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
-
+#include <cassert>
 #include "kaguya/config.hpp"
 
 namespace kaguya
@@ -61,9 +61,12 @@ namespace kaguya
 		}
 
 #if KAGUYA_USE_CPP11
-		optional(optional&& other)
+		optional(optional&& other) :value_(0)
 		{
-			value_ = new(storage_) T(std::move(other.value()));
+			if (other)
+			{
+				value_ = new(storage_) T(std::move(other.value()));
+			}
 		}
 		optional(T&& value)
 		{
@@ -126,10 +129,10 @@ namespace kaguya
 			return default_value;
 		}
 #endif
-		const T* operator->() const { if (value_) { return value_; } throw bad_optional_access(); }
-		T* operator->() { if (value_) { return value_; }throw bad_optional_access(); }
-		const T& operator*() const { return value(); }
-		T& operator*() { return value(); }
+		const T* operator->() const { assert(value_); return value_; }
+		T* operator->() { assert(value_); return value_; }
+		const T& operator*() const { assert(value_); return *value_; }
+		T& operator*() { assert(value_); return  *value_; }
 	private:
 		void destruct()
 		{
@@ -162,7 +165,7 @@ namespace kaguya
 			value_ = 0;
 			return *this;
 		}
-		optional& operator=(optional& other)
+		optional& operator=(const optional& other)
 		{
 			value_ = other.value_;
 			return *this;
@@ -204,12 +207,46 @@ namespace kaguya
 		}
 #endif
 
-		const T* operator->() const { return value_; }
-		T* operator->() { return value_; }
-		const T& operator*() const { return value(); }
-		T& operator*() { return value(); }
+		const T* operator->() const { assert(value_); return value_; }
+		T* operator->() { assert(value_); return value_; }
+		const T& operator*() const { assert(value_); return *value_; }
+		T& operator*() { assert(value_); return *value_; }
 	private:
 		T* value_;
 	};
 
+	template< class T >
+	bool operator==(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		if (bool(lhs) != bool(rhs)) { return false; }
+		if (bool(lhs) == false) { return true; }
+		return lhs.value() == rhs.value();
+	}
+	template< class T >
+	bool operator!=(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+	template< class T >
+	bool operator<(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		if (!bool(rhs)) { return false; }
+		if (!bool(lhs)) { return true; }
+		return lhs.value() < rhs.value();
+	}
+	template< class T >
+	bool operator<=(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return !(rhs < lhs);
+	}
+	template< class T >
+	bool operator>(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return rhs < lhs;
+	}
+	template< class T >
+	bool operator>=(const optional<T>& lhs, const optional<T>& rhs)
+	{
+		return !(lhs < rhs);
+	}
 }

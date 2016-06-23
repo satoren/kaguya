@@ -133,7 +133,7 @@ namespace kaguya
 			template<class F, class Ret, class... Args, size_t... Indexes>
 			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
 			{
-				return lua_type_traits<Ret>::push(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
+				return util::push_args(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
 			}
 			template<class F, class... Args, size_t... Indexes>
 			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
@@ -207,22 +207,22 @@ namespace kaguya
 						}
 						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 						{
-							return lua_type_traits<standard::reference_wrapper<const MemType> >::push(state, standard::reference_wrapper<const MemType>(this_->*m));
+							return util::push_args(state, standard::reference_wrapper<const MemType>(this_->*m));
 						}
 						else
 						{
-							return lua_type_traits<MemType>::push(state, this_->*m);
+							return util::push_args(state, this_->*m);
 						}
 					}
 					else
 					{
 						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 						{
-							return lua_type_traits<standard::reference_wrapper<MemType> >::push(state, standard::reference_wrapper<MemType>(this_->*m));
+							return util::push_args(state, standard::reference_wrapper<MemType>(this_->*m));
 						}
 						else
 						{
-							return lua_type_traits<MemType>::push(state, this_->*m);
+							return util::push_args(state, this_->*m);
 						}
 					}
 				}

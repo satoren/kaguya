@@ -13,63 +13,11 @@ namespace kaguya
 	template<typename class_type, typename base_class_type = void>
 	struct ClassMetatable
 	{
-
-		struct DataHolderBase
-		{
-			virtual int push_to_lua(lua_State* data)const = 0;
-			virtual ~DataHolderBase() {}
-		};
-		template<typename T>
-		struct DataHolder :DataHolderBase
-		{
-			DataHolder(const T& d) :data(d) {}
-			T data;
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return lua_type_traits<T>::push(state, data);
-			}
-		};
-		template<int N>
-		struct DataHolder<char[N]> :DataHolderBase {
-			char data[N];
-			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return lua_type_traits<char[N]>::push(state, data);
-			}
-		};
-		template<int N>
-		struct DataHolder<const char[N]> :DataHolderBase {
-			char data[N];
-			DataHolder(const char(&array)[N]) { memcpy(data, array, sizeof(data)); }
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return lua_type_traits<char[N]>::push(state, data);
-			}
-		};
-#if KAGUYA_USE_CPP11
-		template<typename T>
-		struct MoveDataHolder :DataHolderBase
-		{
-			MoveDataHolder(T&& d) :data(std::move(d)) {}
-			T data;
-			virtual int push_to_lua(lua_State* state)const
-			{
-				return lua_type_traits<T>::push(state, std::move(data));
-			}
-		};
-#endif
-		typedef standard::shared_ptr<DataHolderBase> DataHolderType;
-		template<typename T>DataHolderType makeDataHolder(const T& d)
-		{
-			return DataHolderType(new DataHolder<T>(d));
-		}
-
 		typedef std::vector<FunctorType> FunctorOverloadType;
 		typedef std::map<std::string, FunctorOverloadType> FuncMapType;
 		typedef std::map<std::string, FunctorType> PropMapType;
 
-		typedef std::map<std::string, DataHolderType> MemberMapType;
+		typedef std::map<std::string, AnyDataPusher> MemberMapType;
 		typedef std::map<std::string, std::string> CodeChunkMapType;
 
 
@@ -262,7 +210,7 @@ namespace kaguya
 				//already registered
 				return *this;
 			}
-			member_map_[name] = DataHolderType(new DataHolder<Data>(f));
+			member_map_[name] = AnyDataPusher(f);
 			return *this;
 		}
 
@@ -276,7 +224,7 @@ namespace kaguya
 				//already registered
 				return *this;
 			}
-			member_map_[name] = DataHolderType(new MoveDataHolder<Data>(std::move(f)));
+			member_map_[name] = AnyDataPusher(std::move(f));
 			return *this;
 		}
 #endif
@@ -383,9 +331,9 @@ namespace kaguya
 				lua_setfield(state, -2, name);
 			}
 		}
-		void registerField(lua_State* state, const char* name, const DataHolderType& value)const
+		void registerField(lua_State* state, const char* name, const AnyDataPusher& value)const
 		{
-			int count = value->push_to_lua(state);
+			int count = value.pushToLua(state);
 			if (count > 1)
 			{
 				lua_pop(state, count - 1);

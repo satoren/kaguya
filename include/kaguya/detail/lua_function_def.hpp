@@ -199,17 +199,17 @@ namespace kaguya
 				util::ScopedSavedStack save(state);
 				int corStackIndex = pushStackIndex_(state);
 				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
-				int argstart = lua_gettop(thread) + 1;
-				if (argstart > 1 && lua_status(thread) != LUA_YIELD)
+				int argstart = 1;//exist function in stack at first resume.
+				if (lua_status(thread) == LUA_YIELD)
 				{
-					argstart -= 1;
+					argstart = 0;
 				}
 				util::push_args(thread, std::forward<Args>(args)...);
 				int argnum = lua_gettop(thread) - argstart;
 				if (argnum < 0) { argnum = 0; }
 				int result = lua_resume(thread, state, argnum);
 				except::checkErrorAndThrow(result, thread);
-				return detail::FunctionResultProxy::ReturnValue(thread, result, argstart, types::typetag<Result>());
+				return detail::FunctionResultProxy::ReturnValue(thread, result, 1, types::typetag<Result>());
 			}
 			template<class...Args> FunctionResults operator()(Args&&... args);
 #else
@@ -232,17 +232,17 @@ namespace kaguya
 			util::ScopedSavedStack save(state);\
 			int corStackIndex = pushStackIndex_(state);\
 			lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);\
-			int argstart = lua_gettop(thread) + 1;\
-			if (argstart > 1 && lua_status(thread) != LUA_YIELD)\
+			int argstart = 1;\
+			if (lua_status(thread) == LUA_YIELD)\
 			{\
-				argstart -= 1;\
+				argstart = 0;\
 			}\
 			util::push_args(thread KAGUYA_PP_REPEAT(N, KAGUYA_PUSH_ARG_DEF));\
 			int argnum = lua_gettop(thread) - argstart;\
 			if (argnum < 0) { argnum = 0; }\
 			int result = lua_resume(thread, state, argnum);\
 			except::checkErrorAndThrow(result, thread);\
-			return detail::FunctionResultProxy::ReturnValue(thread,result, argstart, types::typetag<Result>());\
+			return detail::FunctionResultProxy::ReturnValue(thread,result, 1, types::typetag<Result>());\
 		}
 
 			KAGUYA_RESUME_DEF(0)

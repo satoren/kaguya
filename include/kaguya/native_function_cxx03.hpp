@@ -104,7 +104,7 @@ namespace kaguya
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return lua_type_traits<Ret>::push(state, f(KAGUYA_GET_REPEAT(N)));\
+				return util::push_args(state, f(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
@@ -172,7 +172,7 @@ namespace kaguya
 			{\
 				KAGUYA_MEM_ATTRBUTE ThisType* this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::get(state, 1); \
 				if (!this_){throw LuaTypeMismatch("type mismatch!!");}\
-				return lua_type_traits<Ret>::push(state, (this_->*f)(KAGUYA_GET_REPEAT(N)));\
+				return util::push_args(state, (this_->*f)(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
@@ -232,7 +232,7 @@ namespace kaguya
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return lua_type_traits<Ret>::push(state,f(KAGUYA_GET_REPEAT(N)));\
+				return util::push_args(state,f(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
@@ -275,22 +275,22 @@ namespace kaguya
 						}
 						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 						{
-							return lua_type_traits<standard::reference_wrapper<const MemType> >::push(state, standard::reference_wrapper<const MemType>(this_->*m));
+							return util::push_args(state, standard::reference_wrapper<const MemType>(this_->*m));
 						}
 						else
 						{
-							return lua_type_traits<MemType>::push(state, this_->*m);
+							return util::push_args(state, this_->*m);
 						}
 					}
 					else
 					{
 						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 						{
-							return lua_type_traits<standard::reference_wrapper<MemType> >::push(state, standard::reference_wrapper<MemType>(this_->*m));
+							return util::push_args(state, standard::reference_wrapper<MemType>(this_->*m));
 						}
 						else
 						{
-							return lua_type_traits<MemType>::push(state, this_->*m);
+							return util::push_args(state, this_->*m);
 						}
 					}
 				}

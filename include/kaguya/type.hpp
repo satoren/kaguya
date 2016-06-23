@@ -228,7 +228,7 @@ namespace kaguya
 
 		static int push(lua_State* l, push_type v)
 		{
-			return lua_type_traits<T*>::push(l, &v.get());
+			return util::push_args(l, &v.get());
 		}
 	};
 
@@ -259,7 +259,7 @@ namespace kaguya
 		{
 			if (v)
 			{
-				return lua_type_traits<T>::push(l, v.value());
+				return util::push_args(l, v.value());
 			}
 			else
 			{
@@ -484,7 +484,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, push_type s)
 		{
-			return lua_type_traits<lua_Number>::push(l, s);
+			return util::push_args(l, s);
 		}
 #endif
 	};
@@ -509,7 +509,7 @@ namespace kaguya
 		}
 		static int push(lua_State* l, push_type s)
 		{
-			return lua_type_traits<luaInt>::push(l, static_cast<typename lua_type_traits<int64_t>::push_type>(s));
+			return util::push_args(l, static_cast<typename lua_type_traits<int64_t>::push_type>(s));
 		}
 	};
 

@@ -55,11 +55,14 @@ namespace kaguya
 			}
 			StackRef& operator=(const StackRef& src)
 			{
-				state_ = src.state_;
-				stack_index_ = src.stack_index_;
-				pop_ = src.pop_;
+				if (this != &src)
+				{
+					state_ = src.state_;
+					stack_index_ = src.stack_index_;
+					pop_ = src.pop_;
 
-				src.pop_ = false;
+					src.pop_ = false;
+				}
 				return *this;
 			}
 #endif
@@ -141,16 +144,19 @@ namespace kaguya
 			}
 			RegistoryRef& operator =(const RegistoryRef& src)
 			{
-				unref();
-				state_ = src.state_;
-				if (!src.isNilref())
+				if (this != &src)
 				{
-					src.push(state_);
-					ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
-				}
-				else
-				{
-					ref_ = LUA_REFNIL;
+					unref();
+					state_ = src.state_;
+					if (!src.isNilref())
+					{
+						src.push(state_);
+						ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+					}
+					else
+					{
+						ref_ = LUA_REFNIL;
+					}
 				}
 				return *this;
 			}

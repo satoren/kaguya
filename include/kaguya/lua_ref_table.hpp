@@ -9,6 +9,7 @@
 #include <map>
 #include "kaguya/config.hpp"
 #include "kaguya/lua_ref.hpp"
+#include "kaguya/push_any.hpp"
 
 #include "kaguya/detail/lua_ref_impl.hpp"
 #include "kaguya/detail/lua_table_def.hpp"
@@ -252,14 +253,14 @@ namespace kaguya
 
 		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
-			lua_type_traits<LuaTable>::push(state_, table);
-			lua_type_traits<KEY>::push(state_, key);
+			util::one_push(state_, table);
+			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 		}
 		TableKeyReference(const LuaRef& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
-			lua_type_traits<LuaRef>::push(state_, table);
-			lua_type_traits<KEY>::push(state_, key);
+			util::one_push(state_, table);
+			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 			int t = lua_type(state_, table_index_);
 			if (t != LUA_TTABLE)
@@ -398,7 +399,7 @@ namespace kaguya
 				return LuaStackRef();
 			}
 			push_(state);
-			lua_type_traits<KEY>::push(state, key);//push key
+			util::one_push(state, key);//push key
 			lua_gettable(state, -2);//get table[key]
 			lua_remove(state, -2);//remove table
 			return LuaStackRef(state, -1, true);
@@ -577,6 +578,47 @@ namespace kaguya
 			for (typename std::map<K, V, C, A>::const_iterator it = v.begin(); it != v.end(); ++it)
 			{
 				table.setField(it->first, it->second);
+			}
+			return 1;
+		}
+	};
+#endif
+
+#if KAGUYA_USE_CPP11
+	struct TableDataElement {
+		typedef std::pair<AnyDataPusher, AnyDataPusher> keyvalue_type;
+
+		template<typename Value>
+		TableDataElement(Value value) :keyvalue(keyvalue_type(AnyDataPusher(), value)) {}
+
+		template<typename Key, typename Value>
+		TableDataElement(Key key, Value value) : keyvalue(keyvalue_type(key, value)) {}
+		std::pair<AnyDataPusher, AnyDataPusher> keyvalue;
+	};
+
+	struct TableData {
+		typedef std::pair<AnyDataPusher, AnyDataPusher> data_type;
+
+		TableData(std::initializer_list<TableDataElement> list) :elements(list.begin(), list.end()) {}
+		std::vector<TableDataElement> elements;
+	};
+	template<>
+	struct lua_type_traits<TableData> {
+		static int push(lua_State* l,const TableData& list)
+		{
+			lua_createtable(l, int(list.elements.size()), 0);
+			LuaStackRef table(l, -1);
+			int count = 1;//array is 1 origin in Lua
+			for (auto&& v : list.elements)
+			{
+				if (v.keyvalue.first.empty())
+				{
+					table.setField(count++, v.keyvalue.second);
+				}
+				else
+				{
+					table.setField(v.keyvalue.first, v.keyvalue.second);
+				}
 			}
 			return 1;
 		}

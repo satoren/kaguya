@@ -47,6 +47,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 
 	kaguya::optional<const char*> csnullopt;
 	TEST_CHECK(!(s2 = csnullopt));
+	TEST_CHECK(!(s2 = csnullopt));
 	TEST_CHECK(!s2);
 
 
@@ -57,7 +58,7 @@ KAGUYA_TEST_FUNCTION_DEF(optional_copy)(kaguya::State&)
 
 KAGUYA_TEST_FUNCTION_DEF(optional_ref)(kaguya::State&)
 {
-	std::string str = "abc";
+	const std::string& str = "abc";
 	kaguya::optional<const std::string&> s1 = str; // constructor
 	TEST_EQUAL(std::string("abc"), *s1);
 
@@ -177,6 +178,119 @@ KAGUYA_TEST_FUNCTION_DEF(optional_move)(kaguya::State&)
 	TEST_EQUAL(12, s1->member);
 }
 #endif
+
+
+
+template<typename T>
+void optional_type_test(const typename kaguya::traits::decay<T>::type& init_value, const typename kaguya::traits::decay<T>::type& other_value)
+{
+	typedef kaguya::optional<T> test_type;
+
+	test_type init_v_opt(init_value);
+	test_type other_v_opt(other_value);
+	test_type nullopt_v_opt;
+
+
+	TEST_EQUAL(init_v_opt == other_v_opt, init_value == other_value);
+	TEST_EQUAL(init_v_opt != other_v_opt, init_value != other_value);
+	TEST_EQUAL(init_v_opt < other_v_opt, init_value < other_value);
+	TEST_EQUAL(init_v_opt > other_v_opt, init_value > other_value);
+	TEST_EQUAL(init_v_opt <= other_v_opt, init_value <= other_value);
+	TEST_EQUAL(init_v_opt >= other_v_opt, init_value >= other_value);
+
+	TEST_EQUAL(init_v_opt == nullopt_v_opt, false);
+	TEST_EQUAL(init_v_opt != nullopt_v_opt, true);
+	TEST_EQUAL(init_v_opt < nullopt_v_opt, false);
+	TEST_EQUAL(init_v_opt > nullopt_v_opt, true);
+	TEST_EQUAL(init_v_opt <= nullopt_v_opt, false);
+	TEST_EQUAL(init_v_opt >= nullopt_v_opt, true);
+
+	TEST_EQUAL(nullopt_v_opt == nullopt_v_opt, true);
+	TEST_EQUAL(nullopt_v_opt != nullopt_v_opt, false);
+	TEST_EQUAL(nullopt_v_opt < nullopt_v_opt, false);
+	TEST_EQUAL(nullopt_v_opt > nullopt_v_opt, false);
+	TEST_EQUAL(nullopt_v_opt <= nullopt_v_opt, true);
+	TEST_EQUAL(nullopt_v_opt >= nullopt_v_opt, true);
+
+	test_type opt1 = init_value;
+	TEST_EQUAL(init_value, opt1.value());
+	TEST_EQUAL(init_value, *opt1);
+	TEST_EQUAL(init_value, opt1.value_or(other_value));
+	TEST_CHECK(!(opt1 = nullopt_v_opt));
+	TEST_EQUAL(other_value, opt1.value_or(other_value));
+	TEST_CHECK(!(opt1 = nullopt_v_opt));
+
+	opt1 = init_value;
+	TEST_EQUAL(init_value, opt1.value());
+	TEST_EQUAL(init_value, *opt1);
+	TEST_EQUAL(init_value, opt1.value_or(T(other_value)));
+	TEST_CHECK(!(opt1 = nullopt_v_opt));
+	TEST_EQUAL(other_value, opt1.value_or(T(other_value)));
+	TEST_CHECK(!(opt1 = nullopt_v_opt));
+
+	bool except_catch = false;
+	try
+	{
+		opt1.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		except_catch = true;
+	}
+	TEST_CHECK(except_catch);
+
+	TEST_CHECK(opt1 = test_type(init_value));
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = test_type(other_value));
+	TEST_EQUAL(other_value, *opt1);
+
+	TEST_CHECK(opt1 = test_type(T(init_value)));
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = T(init_value));
+	TEST_EQUAL(init_value, *opt1);
+
+	TEST_CHECK(opt1 = init_v_opt);
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = other_v_opt);
+	TEST_EQUAL(other_value, *opt1);
+
+	
+	TEST_CHECK(opt1 = init_value);
+	TEST_EQUAL(init_value, *opt1);
+	TEST_CHECK(opt1 = other_value);
+	TEST_EQUAL(other_value, *opt1);
+
+	const test_type copt1 = init_value;
+	TEST_CHECK(copt1);
+	TEST_EQUAL(init_value, *copt1);
+
+	TEST_EQUAL(init_value, copt1.value_or(other_value));
+
+	const test_type copt2;
+	TEST_CHECK(!copt2);
+	except_catch = false;
+	try
+	{
+		copt2.value();
+	}
+	catch (const kaguya::bad_optional_access&)
+	{
+		except_catch = true;
+	}
+	TEST_CHECK(except_catch);
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(optional_type)(kaguya::State&)
+{
+	optional_type_test<int>(1, 4);
+	optional_type_test<const int&>(1, 4);
+	optional_type_test<double>(1, 4);
+	optional_type_test<const double&>(1, 4);
+	optional_type_test<const char*>("abc", "def");
+	optional_type_test<std::string>("abc", "def");
+	optional_type_test<const std::string&>("abc", "def");
+}
 
 
 

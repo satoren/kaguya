@@ -19,11 +19,6 @@ extern "C" {
 #endif
 #endif
 
-#ifndef KAGUYA_NO_SET_AT_PANIC
-//msvc 2013 and 2015(no update) strange error.
-//and lua_State status not update
-#define KAGUYA_NO_SET_AT_PANIC 1
-#endif
 
 #if KAGUYA_USE_CPP11
 #include <functional>
@@ -31,6 +26,7 @@ extern "C" {
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <initializer_list>
 #else
 #include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -45,6 +41,12 @@ extern "C" {
 
 #ifndef KAGUYA_ERROR_NO_THROW
 #define KAGUYA_ERROR_NO_THROW 1
+#endif
+
+
+
+#ifndef KAGUYA_NO_USERDATA_TYPE_CHECK
+#define KAGUYA_NO_USERDATA_TYPE_CHECK 0
 #endif
 
 #ifndef KAGUYA_USE_RVALUE_REFERENCE
