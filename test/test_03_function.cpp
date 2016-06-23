@@ -150,7 +150,7 @@ int overload7(void*)
 	return 7;
 }
 
-int overload8(Foo*)
+int overload8(const Foo*)
 {
 	return 8;
 }

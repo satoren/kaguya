@@ -372,6 +372,28 @@ KAGUYA_TEST_FUNCTION_DEF(call_error)(kaguya::State& state)
 	}
 }
 
+KAGUYA_TEST_FUNCTION_DEF(coroutine_error)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	{
+		last_error_message = "";
+		kaguya::LuaFunction nilfn = state["a"];
+		nilfn.call<void>();
+		TEST_CHECK(last_error_message.find("attempt to call a nil value") != std::string::npos);
+	}
+	{
+
+		TEST_CHECK(state("corfun = function(arg)"
+			"assert(false) "
+			" end"));
+		kaguya::LuaThread cor = state.newThread(state["corfun"]);
+
+		TEST_CHECK(!cor.isThreadDead());
+		cor();
+		TEST_CHECK(cor.isThreadDead());
+	}
+}
 
 KAGUYA_TEST_FUNCTION_DEF(function_result_for)(kaguya::State& state)
 {

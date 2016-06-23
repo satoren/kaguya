@@ -97,15 +97,14 @@ KAGUYA_TEST_FUNCTION_DEF(lua_rawlen_test)(kaguya::State& s)
 
 	s.pushToStack(A());
 	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), sizeof(A));
-
-
-	s.pushToStack(A());
-	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), sizeof(A));
-
+	
 	A a;
 	s.pushToStack(&a);
 	TEST_EQUAL(lua_type(s.state(), -1) , LUA_TLIGHTUSERDATA);
 	TEST_COMPARE_EQ(lua_rawlen(s.state(), -1), 0);
+
+	s.pushToStack(2);
+	TEST_EQUAL(lua_rawlen(s.state(), -1), 0);
 
 	lua_settop(s.state(),0);
 }
