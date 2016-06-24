@@ -643,7 +643,7 @@ namespace kaguya
 			{
 				TYPE_NONE = LUA_TNONE,//!< none type
 				TYPE_NIL = LUA_TNIL,//!< nil type
-				TYPE_BOOL = LUA_TBOOLEAN,//!< boolean type
+				TYPE_BOOLEAN = LUA_TBOOLEAN,//!< boolean type
 				TYPE_LIGHTUSERDATA = LUA_TLIGHTUSERDATA,//!< light userdata type
 				TYPE_NUMBER = LUA_TNUMBER,//!< number type
 				TYPE_STRING = LUA_TSTRING,//!< string type
