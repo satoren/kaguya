@@ -11,7 +11,18 @@ namespace kaguya
 	//for lua version compatibility
 	namespace compat
 	{
-#if LUA_VERSION_NUM < 502
+#if LUA_VERSION_NUM >= 503
+		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
+		{
+			return lua_rawgetp(L, idx, ptr);
+		}
+#elif LUA_VERSION_NUM == 502
+		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
+		{
+			lua_rawgetp(L, idx, ptr);
+			return lua_type(L, -1);
+		}
+#elif LUA_VERSION_NUM < 502
 		enum LUA_OPEQ
 		{
 			LUA_OPEQ,
@@ -30,9 +41,9 @@ namespace kaguya
 				return lua_equal(L, index1, index2) || lua_lessthan(L, index1, index2);
 			default:
 				return 0;
-			}		
+			}
 		}
-		
+
 		inline void lua_pushglobaltable(lua_State *L)
 		{
 			lua_pushvalue(L, LUA_GLOBALSINDEX);
@@ -55,7 +66,7 @@ namespace kaguya
 		{
 			return (idx > 0 || (idx <= LUA_REGISTRYINDEX)) ? idx : lua_gettop(L) + 1 + idx;
 		}
-		inline int lua_rawgetp(lua_State *L, int idx, const void* ptr)
+		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
 		{
 			int absidx = lua_absindex(L, idx);
 			lua_pushlightuserdata(L, (void*)ptr);
