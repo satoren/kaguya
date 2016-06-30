@@ -252,6 +252,59 @@ KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 	TEST_EQUAL(tbl["childtable"][1], 3);
 }
 
+
+
+int self_refcounted_object_count = 0;
+struct self_refcounted_object
+{
+	self_refcounted_object() :refcount(0)
+	{
+		self_refcounted_object_count++;
+	}
+	virtual ~self_refcounted_object() { self_refcounted_object_count--; }
+
+	int refcount;
+private:
+	self_refcounted_object(const self_refcounted_object&) = delete;
+	self_refcounted_object& operator=(const self_refcounted_object&) = delete;
+};
+struct self_refcounted_object_deleter
+{
+	void operator()(self_refcounted_object* d)
+	{
+		d->refcount--;
+		if (d->refcount <= 0)
+		{
+			delete d;
+		}
+	}
+};
+
+std::unique_ptr<self_refcounted_object, self_refcounted_object_deleter> self_refcounted_object_construct()
+{
+	self_refcounted_object* ptr = new self_refcounted_object();
+	ptr->refcount++;
+	return std::unique_ptr<self_refcounted_object, self_refcounted_object_deleter>(ptr);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(self_refcount_object)(kaguya::State&)
+{
+	TEST_EQUAL(self_refcounted_object_count, 0);
+	{
+		kaguya::State state;
+		state["self_refcount_object"].setClass(kaguya::UserdataMetatable<self_refcounted_object>()
+			.addStaticFunction("new", &self_refcounted_object_construct)
+		);
+
+		state.dostring("a = self_refcount_object.new()");
+
+		TEST_EQUAL(self_refcounted_object_count, 1);//available 1 object
+	}
+
+	TEST_EQUAL(self_refcounted_object_count, 0);//destructed
+}
+
+
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
 
 
