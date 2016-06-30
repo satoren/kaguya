@@ -383,6 +383,7 @@ KAGUYA_TEST_FUNCTION_DEF(registering_object_instance)(kaguya::State& state)
 struct Member
 {
 	Member() :a(0) {};
+	Member(int i) :a(i) {};
 	int a;
 };
 struct Base
@@ -390,6 +391,13 @@ struct Base
 	Base() :a(0) {};
 	int a;
 	Member member;
+
+	void set(int d) { a = d; }
+	int get()const { return a; }
+
+
+	void member_set(const Member& d) { member = d; }
+	const Member& member_get()const { return member; }
 };
 struct Derived :Base
 {
@@ -747,6 +755,35 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_case2)(kaguya::State& state)
 	TEST_CHECK(state("assert(2 == derived.a)"));
 	TEST_EQUAL(base.a, 1);
 	TEST_EQUAL(derived.a, 2);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(add_property_with_setter_getter)(kaguya::State& state)
+{
+	state["Member"].setClass(kaguya::UserdataMetatable<Member>()
+		.setConstructors<Member(), Member(int)>()
+		.addProperty("a", &Member::a)
+	);
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("prop", &Base::set, &Base::get)
+		.addProperty("class_prop", &Base::member_set, &Base::member_get)
+	);
+	Base base;
+	state["obj"] = &base;
+	TEST_CHECK(state("obj.prop=1"));
+	TEST_CHECK(state("assert(obj.prop==1)"));
+	TEST_EQUAL(base.a, 1);
+	TEST_CHECK(state("obj.prop=22"));
+	TEST_CHECK(state("assert(obj.prop==22)"));
+	TEST_EQUAL(base.a, 22);
+
+	TEST_CHECK(state("obj.class_prop=Member.new(5)"));//set
+	TEST_CHECK(state("assert(obj.class_prop.a==5)"));//get
+	TEST_EQUAL(base.member.a, 5);
+
+	TEST_CHECK(state("obj.class_prop=Member.new(33)"));//set
+	TEST_CHECK(state("assert(obj.class_prop.a==33)"));//get
+	TEST_EQUAL(base.member.a, 33);
 }
 
 struct Prop

@@ -167,6 +167,62 @@ namespace kaguya
 			property_map_[name] = AnyDataPusher(function(mem));
 			return *this;
 		}
+		
+		/**
+		* @name addProperty
+		* @brief add member property with getter function.(experimental)
+		* @param name function name for lua
+		* @param getter getter function
+		*/
+		template<typename GetType>
+		UserdataMetatable& addProperty(const char* name, GetType(class_type::*getter)()const)
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException("already registered.");
+				return *this;
+			}
+			property_map_[name] = AnyDataPusher(function(getter));
+			return *this;
+		}
+
+		/**
+		* @name addProperty
+		* @brief add member property with setter function.(experimental)
+		* @param name function name for lua
+		* @param setter setter function
+		*/
+		template<typename SetType>
+		UserdataMetatable& addProperty(const char* name, void (class_type::*setter)(SetType))
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException("already registered.");
+				return *this;
+			}
+			property_map_[name] = AnyDataPusher(function(setter));
+			return *this;
+		}
+
+
+		/**
+		* @name addProperty
+		* @brief add member property with setter, getter functions.(experimental)
+		* @param name function name for lua
+		* @param setter setter function
+		* @param getter getter function
+		*/
+		template<typename SetType, typename GetType>
+		UserdataMetatable& addProperty(const char* name, void (class_type::*setter)(SetType) , GetType(class_type::*getter)()const )
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException("already registered.");
+				return *this;
+			}
+			property_map_[name] = AnyDataPusher(overload(setter, getter));
+			return *this;
+		}
 
 		template<typename Fun>
 		UserdataMetatable& addStaticFunction(const char* name, Fun f)
