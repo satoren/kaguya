@@ -123,7 +123,7 @@ namespace kaguya
 		}
 #else
 		template< class U >
-		T value_or(U default_value)const
+		T value_or(const U& default_value)const
 		{
 			if (value_) { return *value_; }
 			return default_value;
@@ -192,15 +192,13 @@ namespace kaguya
 		}
 
 #if KAGUYA_USE_CPP11
-		template< class U >
-		T value_or(U&& default_value)  const
+		T& value_or(T& default_value)  const
 		{
 			if (value_) { return *value_; }
 			return default_value;
 		}
 #else
-		template< class U >
-		T value_or(U default_value)const
+		T& value_or(T& default_value)const
 		{
 			if (value_) { return *value_; }
 			return default_value;
