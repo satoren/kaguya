@@ -765,8 +765,8 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_with_setter_getter)(kaguya::State& state)
 	);
 	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
 		.setConstructors<Base()>()
-		.addProperty("prop", &Base::set, &Base::get)
-		.addProperty("class_prop", &Base::member_set, &Base::member_get)
+		.addProperty("prop", &Base::get, &Base::set)
+		.addProperty("class_prop", &Base::member_get, &Base::member_set)
 	);
 	Base base;
 	state["obj"] = &base;
