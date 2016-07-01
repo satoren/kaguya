@@ -263,6 +263,8 @@ struct self_refcounted_object
 	}
 	virtual ~self_refcounted_object() { self_refcounted_object_count--; }
 
+	int get_ref_count()const { return refcount; }
+
 	int refcount;
 private:
 	self_refcounted_object(const self_refcounted_object&) = delete;
@@ -294,9 +296,10 @@ KAGUYA_TEST_FUNCTION_DEF(self_refcount_object)(kaguya::State&)
 		kaguya::State state;
 		state["self_refcount_object"].setClass(kaguya::UserdataMetatable<self_refcounted_object>()
 			.addStaticFunction("new", &self_refcounted_object_construct)
+			.addProperty("ref_count", &self_refcounted_object::get_ref_count)
 		);
 
-		state.dostring("a = self_refcount_object.new()");
+		TEST_CHECK(state.dostring("a = self_refcount_object.new();assert(a.ref_count == 1)"));
 
 		TEST_EQUAL(self_refcounted_object_count, 1);//available 1 object
 	}
