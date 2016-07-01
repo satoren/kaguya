@@ -133,7 +133,7 @@ namespace kaguya
 			template<class F, class Ret, class... Args, size_t... Indexes>
 			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
 			{
-				return util::push_args(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
+				return push_return_value<Ret>(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
 			}
 			template<class F, class... Args, size_t... Indexes>
 			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
@@ -205,25 +205,11 @@ namespace kaguya
 						{
 							throw LuaTypeMismatch("type mismatch!!");
 						}
-						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
-						{
-							return util::push_args(state, standard::reference_wrapper<const MemType>(this_->*m));
-						}
-						else
-						{
-							return util::push_args(state, this_->*m);
-						}
+						return push_return_value<const MemType&>(state, this_->*m);
 					}
 					else
 					{
-						if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
-						{
-							return util::push_args(state, standard::reference_wrapper<MemType>(this_->*m));
-						}
-						else
-						{
-							return util::push_args(state, this_->*m);
-						}
+						return push_return_value<MemType&>(state, this_->*m);
 					}
 				}
 				else
