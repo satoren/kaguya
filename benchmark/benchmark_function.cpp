@@ -96,7 +96,7 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			"");
 	}
-#ifdef KAGUYA_USE_CPP11
+#if KAGUYA_USE_CPP11
 	void simple_get_set_unique_ptr(kaguya::State& state)
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()

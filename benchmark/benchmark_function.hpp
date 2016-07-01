@@ -6,7 +6,7 @@ namespace kaguya_api_benchmark______
 
 	void simple_get_set_raw_ptr(kaguya::State& state);
 	void simple_get_set_shared_ptr(kaguya::State& state);
-#ifdef KAGUYA_USE_CPP11
+#if KAGUYA_USE_CPP11
 	void simple_get_set_unique_ptr(kaguya::State& state);
 #endif
 	void overloaded_get_set(kaguya::State& state);

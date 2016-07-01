@@ -50,7 +50,7 @@ int main()
 
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_raw_ptr);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_shared_ptr);
-#ifdef KAGUYA_USE_CPP11
+#if KAGUYA_USE_CPP11
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_unique_ptr);
 #endif
 
