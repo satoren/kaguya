@@ -3,9 +3,14 @@ namespace kaguya_api_benchmark______
 {
 
 	void simple_get_set(kaguya::State& state);
+
+	void simple_get_set_raw_ptr(kaguya::State& state);
+	void simple_get_set_shared_ptr(kaguya::State& state);
+#ifdef KAGUYA_USE_CPP11
+	void simple_get_set_unique_ptr(kaguya::State& state);
+#endif
 	void overloaded_get_set(kaguya::State& state);
 	void simple_get_set_contain_propery_member(kaguya::State& state);
-	void object_pointer_register_get_set(kaguya::State& state);
 
 	void call_native_function(kaguya::State& state);
 	void call_overloaded_function(kaguya::State& state);

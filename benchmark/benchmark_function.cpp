@@ -55,6 +55,69 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			"");
 	}
+
+	void simple_get_set_raw_ptr(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.addFunction("set", &SetGet::set)
+			.addFunction("get", &SetGet::get)
+		);
+
+		SetGet getset;
+		state["getset"] = &getset;
+		state(
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+		);
+	}
+
+	void simple_get_set_shared_ptr(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.addFunction("set", &SetGet::set)
+			.addFunction("get", &SetGet::get)
+		);
+		state["getset"] = kaguya::standard::shared_ptr<SetGet>(new SetGet());
+
+		state(
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}
+#ifdef KAGUYA_USE_CPP11
+	void simple_get_set_unique_ptr(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
+			.setConstructors<SetGet()>()
+			.addFunction("set", &SetGet::set)
+			.addFunction("get", &SetGet::get)
+		);
+		state["getset"] = std::unique_ptr<SetGet>(new SetGet());
+
+		state(
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}
+#endif
+
 	void constructor_get_set(kaguya::State& state)
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
@@ -113,26 +176,6 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			"end\n"
 			"");
-	}
-	void object_pointer_register_get_set(kaguya::State& state)
-	{
-		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
-			.setConstructors<SetGet()>()
-			.addFunction("set", &SetGet::set)
-			.addFunction("get", &SetGet::get)
-			);
-
-		SetGet getset;
-		state["getset"] = &getset;
-		state(
-			"local times = 10000000\n"
-			"for i=1,times do\n"
-			"getset:set(i)\n"
-			"if(getset:get() ~= i)then\n"
-			"error('error')\n"
-			"end\n"
-			"end\n"
-			);
 	}
 	void call_native_function(kaguya::State& state)
 	{

@@ -47,10 +47,16 @@ int main()
 	ADD_BENCHMARK(empty);
 	ADD_BENCHMARK(original_api_no_type_check::simple_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set);
+
+	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_raw_ptr);
+	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_shared_ptr);
+#ifdef KAGUYA_USE_CPP11
+	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_unique_ptr);
+#endif
+
 	ADD_BENCHMARK(kaguya_api_benchmark______::overloaded_get_set);	
 	ADD_BENCHMARK(kaguya_api_benchmark______::property_access);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_contain_propery_member);
-	ADD_BENCHMARK(kaguya_api_benchmark______::object_pointer_register_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::call_native_function);
 	ADD_BENCHMARK(original_api_no_type_check::call_native_function);
 	ADD_BENCHMARK(kaguya_api_benchmark______::call_lua_function);
