@@ -190,10 +190,10 @@ namespace kaguya
 		* @name addProperty
 		* @brief add member property with setter, getter functions.(experimental)
 		* @param name function name for lua
-		* @param setter setter function
 		* @param getter getter function
+		* @param setter setter function
 		*/
-		template<typename SetType, typename GetType>
+		template<typename GetType, typename SetType>
 		UserdataMetatable& addProperty(const char* name, GetType(class_type::*getter)()const, void (class_type::*setter)(SetType))
 		{
 			if (has_key(name))
