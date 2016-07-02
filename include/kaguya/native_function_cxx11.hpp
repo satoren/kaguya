@@ -146,9 +146,9 @@ namespace kaguya
 			{
 				return true;
 			}
-			template<class...Args>bool all_true(bool b, Args... args)
-			{
-				return b && all_true(args...);
+			template<class Arg,class...Args>bool all_true(Arg f, Args... args)
+			{	//check from backward and lazy evaluation
+				return all_true(args...) && bool(f);
 			}
 
 			inline void join(std::string& result, const char* delim)
@@ -161,16 +161,37 @@ namespace kaguya
 				join(result,delim, args...);
 			}
 
+			template<typename T, size_t Index>
+			struct _wcheckeval
+			{
+				_wcheckeval(lua_State* s) :state(s) {}
+				lua_State* state;
+				operator bool()
+				{
+					return lua_type_traits<T>::checkType(state, Index);
+				}
+			};
+
+			template<typename T,size_t Index>
+			struct _scheckeval
+			{
+				_scheckeval(lua_State* s) :state(s) {}
+				lua_State* state;
+				operator bool()
+				{
+					return lua_type_traits<T>::strictCheckType(state, Index);
+				}
+			};
 
 			template<class R, class... Args, size_t... Indexes>
 			bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>)
 			{
-				return all_true(lua_type_traits<Args>::checkType(state, Indexes)...);
+				return all_true(_wcheckeval<Args, Indexes>(state)...);
 			}
 			template<class R, class... Args, size_t... Indexes>
 			bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>)
 			{
-				return all_true(lua_type_traits<Args>::strictCheckType(state, Indexes)...);
+				return all_true(_scheckeval<Args, Indexes>(state)...);
 			}
 			template<class R, class... Args>
 			std::string _type_name_apply(invoke_signature_type<R, Args...>)
@@ -239,22 +260,24 @@ namespace kaguya
 			template<class MemType, class T, class unusedindex>
 			bool _ctype_apply(lua_State* state, unusedindex, MemType T::*)
 			{
-				bool thistypecheck = lua_type_traits<T>::checkType(state, 1);
-				if (thistypecheck && lua_gettop(state) == 2)
+				if (lua_gettop(state) >= 2)
 				{
-					return lua_type_traits<MemType>::checkType(state, 2);
+					//setter typecheck
+					return lua_type_traits<MemType>::checkType(state, 2) && lua_type_traits<T>::checkType(state, 1);
 				}
-				return thistypecheck;
+				//getter typecheck
+				return  lua_type_traits<T>::checkType(state, 1);
 			}
 			template<class MemType, class T, class unusedindex>
 			bool _sctype_apply(lua_State* state, unusedindex, MemType T::*)
 			{
-				bool thistypecheck = lua_type_traits<T>::strictCheckType(state, 1);
-				if (thistypecheck && lua_gettop(state) == 2)
+				if (lua_gettop(state) >= 2)
 				{
-					return lua_type_traits<MemType>::strictCheckType(state, 2);
+					//setter typecheck
+					return lua_type_traits<MemType>::strictCheckType(state, 2) && lua_type_traits<T>::strictCheckType(state, 1);
 				}
-				return thistypecheck;
+				//getter typecheck
+				return lua_type_traits<T>::strictCheckType(state, 1);
 			}
 			template<class MemType, class T>
 			std::string _type_name_apply(MemType T::*)
