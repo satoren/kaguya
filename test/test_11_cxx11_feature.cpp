@@ -34,6 +34,8 @@ struct MoveOnlyClass
 	int member;
 
 	MoveOnlyClass(MoveOnlyClass&& src) :member(src.member) {}
+
+	MoveOnlyClass* self() { return this; }
 private:
 	MoveOnlyClass();
 	MoveOnlyClass(const MoveOnlyClass&);
@@ -44,6 +46,7 @@ KAGUYA_TEST_FUNCTION_DEF(movable_class_test)(kaguya::State& state)
 	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
 		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
+		.addFunction("self", &MoveOnlyClass::self)
 		);
 
 	state["moveonly"] = MoveOnlyClass(2);
@@ -56,6 +59,12 @@ KAGUYA_TEST_FUNCTION_DEF(movable_class_test)(kaguya::State& state)
 	state["func"](MoveOnlyClass(5));
 
 	state.newRef(MoveOnlyClass(5));
+
+	state("d = MoveOnlyClass.new(22)");
+	state("assert(d.member == 22)");
+	state("assert(d:self().member == 22)");
+	state("assert(d:self():self().member == 22)");
+	state("assert(d.member == 22)");
 }
 
 KAGUYA_TEST_FUNCTION_DEF(lambdafun)(kaguya::State& state)

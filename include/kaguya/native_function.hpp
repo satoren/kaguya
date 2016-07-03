@@ -13,6 +13,93 @@
 #include "kaguya/type.hpp"
 #include "kaguya/lua_ref.hpp"
 
+
+
+namespace kaguya
+{
+	namespace nativefunction
+	{
+#if KAGUYA_RETURN_VALUE_OPTIMIZATION
+		template<typename T>
+		struct is_return_reference_optimize :traits::integral_constant<bool,
+			is_usertype<typename traits::decay<T>::type>::value	&&
+			(traits::is_pointer<T>::value	||
+			traits::is_lvalue_reference<T>::value)>{};
+
+		template<typename T>
+		inline int optimized_push_return_value(lua_State* state,T* v)
+		{
+			int top = lua_gettop(state);
+			for (int i = 1; i <= top; ++i)
+			{
+				if (lua_type_traits<T*>::get(state, i))
+				{
+					lua_pushvalue(state, i);
+					return 1;
+				}
+			}
+			return util::push_args(state, v);
+		};
+		template<typename T>
+		inline int optimized_push_return_value(lua_State* state, T& v)
+		{
+			int top = lua_gettop(state);
+			for (int i = 1; i <= top; ++i)
+			{
+				if (lua_type_traits<T*>::get(state, i))
+				{
+					lua_pushvalue(state, i);
+					return 1;
+				}
+			}
+			return util::push_args(state, v);
+		}
+
+#if KAGUYA_USE_CPP11
+		template<typename T>
+		typename traits::enable_if<is_return_reference_optimize<T>::value, int>::type
+			push_return_value(lua_State* state, T&& v)
+		{
+			return optimized_push_return_value(state, v);
+		};
+		template<typename T>
+		typename traits::enable_if<!is_return_reference_optimize<T>::value, int>::type
+		 push_return_value(lua_State* state, T&& v)
+		{
+			return util::push_args(state, std::forward<T>(v));
+		};
+#else
+		template<typename T>
+		typename traits::enable_if<is_return_reference_optimize<T>::value, int>::type
+			push_return_value(lua_State* state, T v)
+		{
+			return optimized_push_return_value(state, v);
+		};
+		template<typename T>
+		typename traits::enable_if<!is_return_reference_optimize<T>::value, int>::type
+			push_return_value(lua_State* state, T v)
+		{
+			return util::push_args(state, v);
+		};
+#endif
+#else//KAGUYA_RETURN_VALUE_OPTIMIZATION
+#if KAGUYA_USE_CPP11
+		template<typename T>
+		int push_return_value(lua_State* state, T&& v)
+		{
+			return util::push_args(state, std::forward<T>(v));
+		};
+#else
+		template<typename T>
+		int push_return_value(lua_State* state, T v)
+		{
+			return util::push_args(state, v);
+		};
+#endif
+#endif
+	}
+}
+
 #if KAGUYA_USE_CPP11
 #include "kaguya/native_function_cxx11.hpp"
 #else
