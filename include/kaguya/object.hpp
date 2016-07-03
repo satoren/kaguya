@@ -143,7 +143,7 @@ namespace kaguya
 		bool const_value_;
 	};
 
-	template<class T>
+	template<typename T, typename ElementType = typename T::element_type>
 	struct ObjectSmartPointerWrapper : ObjectWrapperBase
 	{
 		ObjectSmartPointerWrapper(const T& sptr) :object_(sptr) {}
@@ -152,15 +152,15 @@ namespace kaguya
 #endif
 		virtual const std::type_info& type()
 		{
-			return metatableType<typename T::element_type>();
+			return metatableType<ElementType>();
 		}
 		virtual void* get()
 		{
-			return object_.get();
+			return object_ ? &(*object_) : 0;
 		}
 		virtual const void* cget()
 		{
-			return object_.get();
+			return object_ ? &(*object_) : 0;
 		}
 		virtual const std::type_info& native_type() 
 		{
