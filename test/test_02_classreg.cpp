@@ -472,6 +472,10 @@ int receive_base_shared_ptr_function_null(kaguya::standard::shared_ptr<Base> d) 
 	TEST_CHECK(!d);
 	return 4;
 }
+int receive_void_shared_ptr_function(kaguya::standard::shared_ptr<void> d) {
+	TEST_CHECK(d);
+	return 6;
+}
 KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 {
 	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -498,6 +502,7 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 
 
 	state["receive_shared_ptr_function_null"] = &receive_base_shared_ptr_function_null;
+	state["receive_void_shared_ptr_function"] = &receive_void_shared_ptr_function;
 	
 
 
@@ -515,6 +520,8 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 	TEST_CHECK(state("assert(2 == receive_base_shared_ptr_function(derived))"));
 	TEST_EQUAL(derived->a, 2);
 	TEST_CHECK(state("assert(4 == receive_shared_ptr_function_null(non_shared_base))"));
+	TEST_CHECK(state("assert(6 == receive_void_shared_ptr_function(base))"));
+	TEST_CHECK(state("assert(6 == receive_void_shared_ptr_function(derived))"));
 
 	TEST_EQUAL(derived->a, 2);
 	
