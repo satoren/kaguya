@@ -111,7 +111,7 @@ namespace kaguya
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<typename T>
 		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object_(std::move(standard::const_pointer_cast<typename standard::remove_const<T>::type>(sptr))), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value){}
+			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value) {}
 #endif
 		virtual const std::type_info& type()
 		{
@@ -125,7 +125,7 @@ namespace kaguya
 		{
 			return object_.get();
 		}
-		standard::shared_ptr<void> object()const { return const_value_? standard::shared_ptr<void>():object_; }
+		standard::shared_ptr<void> object()const { return const_value_ ? standard::shared_ptr<void>() : object_; }
 		standard::shared_ptr<const void> const_object()const { return object_; }
 		const std::type_info& shared_ptr_type()const { return shared_ptr_type_; }
 
@@ -162,7 +162,7 @@ namespace kaguya
 		{
 			return object_ ? &(*object_) : 0;
 		}
-		virtual const std::type_info& native_type() 
+		virtual const std::type_info& native_type()
 		{
 			return metatableType<T>();
 		}
@@ -529,9 +529,9 @@ namespace kaguya
 	template<class T>
 	const T* get_pointer(lua_State* l, int index, types::typetag<const T> tag)
 	{
-		return get_const_pointer<T>(l,index, types::typetag<T>());
+		return get_const_pointer<T>(l, index, types::typetag<T>());
 	}
-	
+
 	template<class T>
 	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> tag)
 	{
@@ -559,7 +559,7 @@ namespace kaguya
 	inline standard::shared_ptr<void> get_shared_pointer(lua_State* l, int index, types::typetag<void> tag)
 	{
 		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
-		if (ptr) 
+		if (ptr)
 		{
 			return ptr->object();
 		}
@@ -584,7 +584,7 @@ namespace kaguya
 				pointer->~T();
 			}
 		}
-		template<typename T>bool get_metatable(lua_State* l)
+		inline bool get_metatable(lua_State* l, const std::type_info& typeinfo)
 		{
 			int ttype = lua_rawgetp_rtype(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
 			if (ttype != LUA_TTABLE)
@@ -593,9 +593,13 @@ namespace kaguya
 				lua_rawsetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());
 				return false;
 			}
-			int type = lua_rawgetp_rtype(l, -1, &metatableType<T>());
+			int type = lua_rawgetp_rtype(l, -1, &typeinfo);
 			lua_remove(l, -2);//remove metatable registry table
 			return type != LUA_TNIL;
+		}
+		template<typename T>bool get_metatable(lua_State* l)
+		{
+			return get_metatable(l, metatableType<T>());
 		}
 		template<typename T>bool available_metatable(lua_State* l)
 		{
@@ -603,9 +607,9 @@ namespace kaguya
 			return get_metatable<T>(l);
 		}
 
-		template<typename T>bool newmetatable(lua_State* l)
+		inline bool newmetatable(lua_State* l, const std::type_info& typeinfo, const char* name)
 		{
-			if (get_metatable<T>(l)) //already register
+			if (get_metatable(l, typeinfo)) //already register
 			{
 				return false;  //
 			}
@@ -614,15 +618,19 @@ namespace kaguya
 			int metaregindex = lua_absindex(l, -1);
 
 			lua_createtable(l, 0, 2);
-			lua_pushstring(l, metatableName<T>());
-			lua_pushvalue(l,-1);
+			lua_pushstring(l, name);
+			lua_pushvalue(l, -1);
 			lua_setfield(l, -3, "__name");  // metatable.__name = name
 			lua_rawsetp(l, -2, metatable_name_key());
 			lua_pushvalue(l, -1);
-			lua_rawsetp(l, metaregindex, &metatableType<T>());
+			lua_rawsetp(l, metaregindex, &typeinfo);
 			lua_remove(l, metaregindex);//remove metatable registry table
 
 			return true;
+		}
+		template<typename T>bool newmetatable(lua_State* l)
+		{
+			return newmetatable(l, metatableType<T>(), metatableName<T>());
 		}
 
 
@@ -633,10 +641,10 @@ namespace kaguya
 			return 0;
 		}
 		struct UnknownType {};
-		template<typename T>void setmetatable(lua_State* l)
+		inline void setmetatable(lua_State* l, const std::type_info& typeinfo)
 		{
 			//if not available metatable, set unknown class metatable
-			if (!get_metatable<T>(l))
+			if (!get_metatable(l, typeinfo))
 			{
 				lua_pop(l, 1);
 				if (!get_metatable<UnknownType>(l))
@@ -648,6 +656,10 @@ namespace kaguya
 				}
 			}
 			lua_setmetatable(l, -2);
+		}
+		template<typename T>void setmetatable(lua_State* l)
+		{
+			setmetatable(l, metatableType<T>());
 		}
 	}
 	template<typename T>
