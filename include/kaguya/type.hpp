@@ -338,7 +338,7 @@ namespace kaguya
 		{
 			if (v)
 			{
-				typedef ObjectSmartPointerWrapper<std::unique_ptr<T, Deleter> > wrapper_type;
+				typedef ObjectSmartPointerWrapper<type> wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(std::forward<push_type>(v));
 				class_userdata::setmetatable<T>(l);
