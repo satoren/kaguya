@@ -133,7 +133,7 @@ namespace kaguya
 			template<class F, class Ret, class... Args, size_t... Indexes>
 			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
 			{
-				return push_return_value<Ret>(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
+				return util::push_args(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
 			}
 			template<class F, class... Args, size_t... Indexes>
 			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
