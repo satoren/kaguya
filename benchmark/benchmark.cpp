@@ -35,7 +35,7 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 			mintime = std::min(mintime, end - start);
 		}
 
-		std::cout << test_name << " min time:" << mintime<< std::endl;
+		std::cout << test_name << "," << mintime<< std::endl;
 	}
 }
 
@@ -45,6 +45,7 @@ int main()
 	benchmark_function_map_t functionmap;
 #define ADD_BENCHMARK(function) functionmap.push_back(std::make_pair(#function,&function));
 	ADD_BENCHMARK(empty);
+
 	ADD_BENCHMARK(original_api_no_type_check::simple_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set);
 
@@ -53,10 +54,14 @@ int main()
 #if KAGUYA_USE_CPP11
 	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_unique_ptr);
 #endif
+//	ADD_BENCHMARK(original_api_no_type_check::object_get_set);
+	ADD_BENCHMARK(kaguya_api_benchmark______::object_get_set);
+	ADD_BENCHMARK(kaguya_api_benchmark______::object_get_set_property);
+	ADD_BENCHMARK(kaguya_api_benchmark______::object_get_set_property_function);
 
 	ADD_BENCHMARK(kaguya_api_benchmark______::overloaded_get_set);	
 	ADD_BENCHMARK(kaguya_api_benchmark______::property_access);
-	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_contain_propery_member);
+	ADD_BENCHMARK(kaguya_api_benchmark______::simple_get_set_contain_property_member);
 	ADD_BENCHMARK(kaguya_api_benchmark______::call_native_function);
 	ADD_BENCHMARK(original_api_no_type_check::call_native_function);
 	ADD_BENCHMARK(kaguya_api_benchmark______::call_lua_function);
@@ -75,7 +80,6 @@ int main()
 	ADD_BENCHMARK(kaguya_api_benchmark______::table_to_vector);
 	ADD_BENCHMARK(kaguya_api_benchmark______::table_to_vector_with_typecheck);
 	
-
 	execute_benchmark(functionmap);
 
 }

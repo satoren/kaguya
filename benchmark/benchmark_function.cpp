@@ -31,6 +31,27 @@ namespace
 	private:
 		double _i;
 	};
+
+	struct Vector3
+	{
+		Vector3() :x(0), y(0), z(0) {}
+		Vector3(float ax, float ay, float az) :x(ax), y(ay), z(az) {}
+		float x, y, z;
+	};
+
+	struct ObjGetSet
+	{
+		ObjGetSet() :position() {}
+		void set(const Vector3& p)
+		{
+			position = p;
+		}
+		const Vector3& get()const
+		{
+			return position;
+		}
+		Vector3 position;
+	};
 }
 
 namespace kaguya_api_benchmark______
@@ -118,6 +139,75 @@ namespace kaguya_api_benchmark______
 	}
 #endif
 
+	kaguya::UserdataMetatable<Vector3> vec3meta = kaguya::UserdataMetatable<Vector3>()
+		.setConstructors<Vector3(), Vector3(float, float, float)>()
+		.addProperty("x", &Vector3::x)
+		.addProperty("y", &Vector3::y)
+		.addProperty("z", &Vector3::z);
+
+	void object_get_set(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
+			.setConstructors<ObjGetSet()>()
+			.addFunction("set", &ObjGetSet::set)
+			.addFunction("get", &ObjGetSet::get)
+		);
+		state["Vector3"].setClass(vec3meta);
+
+		state(
+			"local getset = SetGet.new()\n"
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset:set(Vector3.new(i,i+1,i+2))\n"
+			"if(getset:get().x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
+	void object_get_set_property(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
+			.setConstructors<ObjGetSet()>()
+			.addProperty("position", &ObjGetSet::position)
+			.addFunction("get", &ObjGetSet::get)
+		);
+		state["Vector3"].setClass(vec3meta);
+		state(
+			"local getset = SetGet.new()\n"
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset.position=Vector3.new(i,i+1,i+2)\n"
+			"if(getset.position.x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
+	void object_get_set_property_function(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
+			.setConstructors<ObjGetSet()>()
+			.addProperty("position", &ObjGetSet::get, &ObjGetSet::set)
+			.addFunction("get", &ObjGetSet::get)
+		);
+		state["Vector3"].setClass(vec3meta);
+		state(
+			"local getset = SetGet.new()\n"
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset.position=Vector3.new(i,i+1,i+2)\n"
+			"if(getset.position.x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
+
+
 	void constructor_get_set(kaguya::State& state)
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
@@ -156,7 +246,7 @@ namespace kaguya_api_benchmark______
 			"end\n"
 			"");
 	}
-	void simple_get_set_contain_propery_member(kaguya::State& state)
+	void simple_get_set_contain_property_member(kaguya::State& state)
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<SetGet>()
 			.setConstructors<SetGet()>()

@@ -10,7 +10,13 @@ namespace kaguya_api_benchmark______
 	void simple_get_set_unique_ptr(kaguya::State& state);
 #endif
 	void overloaded_get_set(kaguya::State& state);
-	void simple_get_set_contain_propery_member(kaguya::State& state);
+	void simple_get_set_contain_property_member(kaguya::State& state);
+
+
+	void object_get_set(kaguya::State& state);
+	void object_get_set_property(kaguya::State& state);
+	void object_get_set_property_function(kaguya::State& state);
+
 
 	void call_native_function(kaguya::State& state);
 	void call_overloaded_function(kaguya::State& state);
@@ -34,6 +40,7 @@ namespace kaguya_api_benchmark______
 namespace original_api_no_type_check
 {
 	void simple_get_set(kaguya::State& state);
+//	void object_get_set(kaguya::State& state);
 	void call_native_function(kaguya::State& state);
 	void call_lua_function(kaguya::State& state);
 	void lua_table_access(kaguya::State& state);
