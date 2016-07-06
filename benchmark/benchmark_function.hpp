@@ -16,6 +16,7 @@ namespace kaguya_api_benchmark______
 	void object_get_set(kaguya::State& state);
 	void object_get_set_property(kaguya::State& state);
 	void object_get_set_property_function(kaguya::State& state);
+	void object_to_table_get_set(kaguya::State& state);
 
 
 	void call_native_function(kaguya::State& state);

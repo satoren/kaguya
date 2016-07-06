@@ -58,6 +58,7 @@ int main()
 	ADD_BENCHMARK(kaguya_api_benchmark______::object_get_set);
 	ADD_BENCHMARK(kaguya_api_benchmark______::object_get_set_property);
 	ADD_BENCHMARK(kaguya_api_benchmark______::object_get_set_property_function);
+	ADD_BENCHMARK(kaguya_api_benchmark______::object_to_table_get_set);
 
 	ADD_BENCHMARK(kaguya_api_benchmark______::overloaded_get_set);	
 	ADD_BENCHMARK(kaguya_api_benchmark______::property_access);

@@ -38,6 +38,11 @@ namespace
 		Vector3(float ax, float ay, float az) :x(ax), y(ay), z(az) {}
 		float x, y, z;
 	};
+	struct Vector3Conv : Vector3
+	{
+		Vector3Conv() :Vector3() {}
+		Vector3Conv(const Vector3& src) :Vector3(src) {}
+	};
 
 	struct ObjGetSet
 	{
@@ -50,7 +55,61 @@ namespace
 		{
 			return position;
 		}
+
+		void setc(const Vector3Conv& p)
+		{
+			position = p;
+		}
+		Vector3Conv getc()const
+		{
+			return position;
+		}
 		Vector3 position;
+		Vector3Conv positionc;
+	};
+}
+namespace kaguya
+{
+	template<>struct lua_type_traits<Vector3Conv>
+	{
+		typedef Vector3Conv get_type;
+		typedef const Vector3Conv& push_type;
+		static bool checkType(lua_State* l, int index)
+		{
+			LuaStackRef t(l, index);
+			optional<float> x = t.getField<optional<float> >("x");
+			optional<float> y = t.getField<optional<float> >("y");
+			optional<float> z = t.getField<optional<float> >("z");
+			return x && y && z;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			LuaStackRef t(l, index);
+			optional<float> x = t.getField<optional<float> >("x");
+			optional<float> y = t.getField<optional<float> >("y");
+			optional<float> z = t.getField<optional<float> >("z");
+			return x && y && z;
+		}
+
+		static get_type get(lua_State* l, int index)
+		{
+			LuaStackRef t(l, index);
+			Vector3Conv data;
+			data.x = t.getField<float>("x");
+			data.y = t.getField<float>("y");
+			data.z = t.getField<float>("z");
+			return data;
+		}
+
+		static int push(lua_State* l, push_type v)
+		{
+			lua_createtable(l, 0, 3);
+			LuaStackRef table(l, -1);
+			table.setField("x", v.x);
+			table.setField("y", v.y);
+			table.setField("z", v.z);
+			return 1;
+		}
 	};
 }
 
@@ -171,7 +230,6 @@ namespace kaguya_api_benchmark______
 		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
 			.setConstructors<ObjGetSet()>()
 			.addProperty("position", &ObjGetSet::position)
-			.addFunction("get", &ObjGetSet::get)
 		);
 		state["Vector3"].setClass(vec3meta);
 		state(
@@ -191,7 +249,6 @@ namespace kaguya_api_benchmark______
 		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
 			.setConstructors<ObjGetSet()>()
 			.addProperty("position", &ObjGetSet::get, &ObjGetSet::set)
-			.addFunction("get", &ObjGetSet::get)
 		);
 		state["Vector3"].setClass(vec3meta);
 		state(
@@ -207,6 +264,26 @@ namespace kaguya_api_benchmark______
 			"");
 	}
 
+	void object_to_table_get_set(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
+			.setConstructors<ObjGetSet()>()
+			.addProperty("position", &ObjGetSet::positionc)
+		);
+		state["Vector3"].setClass(vec3meta);
+		state(
+			"local getset = SetGet.new()\n"
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset.position={x=i,y=i+1,z=i+2}\n"
+			"if(getset.position.x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
+	
 
 	void constructor_get_set(kaguya::State& state)
 	{
