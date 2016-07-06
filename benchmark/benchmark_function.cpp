@@ -113,7 +113,7 @@ namespace kaguya
 	};
 }
 
-namespace kaguya_api_benchmark______
+namespace kaguyaapi
 {
 	void simple_get_set(kaguya::State& state)
 	{
@@ -512,7 +512,7 @@ namespace kaguya_api_benchmark______
 }
 
 
-namespace original_api_no_type_check
+namespace plain_api
 {
 
 	void setmetatable(lua_State *L, const char *tname) {
