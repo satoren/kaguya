@@ -394,17 +394,17 @@ namespace kaguya
 
 
 				//@}
-			template<class ClassType, class FunType=void> struct functionToConstructorSignature;
+			template<class ClassType, class FunType=void> struct ConstructorFunction;
 			
 #define KAGUYA_F_TO_CONSIG_TYPE_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
 #define KAGUYA_F_TO_CONSIG_DEF(N) \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			struct functionToConstructorSignature<ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+			struct ConstructorFunction<ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
 			{\
 				typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
 			};\
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			struct functionToConstructorSignature<ClassType,ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+			struct ConstructorFunction<ClassType,ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
 			{\
 				typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
 			};
@@ -418,7 +418,8 @@ namespace kaguya
 		using cpp03impl::argTypesName;
 		using cpp03impl::argCount;
 		using cpp03impl::constructor_signature_type;
-		using cpp03impl::functionToConstructorSignature;
+		using cpp03impl::ConstructorFunction;
 		using cpp03impl::is_callable;
 	}
+	using nativefunction::ConstructorFunction;
 }

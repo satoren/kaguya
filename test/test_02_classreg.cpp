@@ -176,6 +176,46 @@ KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 	TEST_CHECK(state("value:setInt(33)"));
 	TEST_CHECK(state("assert(value:getInt() == 33)"));
 };
+
+
+ABC createABC(int,int,int)
+{
+	return ABC(324343);
+}
+KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor2)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.addOverloadedFunctions("new",
+			kaguya::ConstructorFunction<ABC()>::type(),
+			kaguya::ConstructorFunction<ABC(int)>::type(),
+			kaguya::ConstructorFunction<ABC(const char*)>::type(),
+			kaguya::ConstructorFunction<ABC(std::string)>::type(),
+			kaguya::ConstructorFunction<ABC(int, const std::string&)>::type(),
+			kaguya::ConstructorFunction<ABC(const std::string&, int)>::type(),
+			&createABC)
+		.addFunction("getString", &ABC::getString)
+		.addFunction("getInt", &ABC::getInt)
+		.addFunction("setInt", &ABC::setInt)
+	);
+
+	TEST_CHECK(state("value = assert(ABC.new(32))"));
+	TEST_CHECK(state("assert(value:getInt() == 32)"));
+	TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
+	TEST_CHECK(state("assert(value:getString() == 'string_value')"));
+	TEST_CHECK(state("value = assert(ABC.new('string_value2',54))"));
+	TEST_CHECK(state("assert(value:getString() == 'string_value2')"));
+	TEST_CHECK(state("assert(value:getInt() == 54)"));
+	TEST_CHECK(state("value = assert(ABC.new(64,'string_value3'))"));
+	TEST_CHECK(state("assert(value:getString() == 'string_value3')"));
+	TEST_CHECK(state("assert(value:getInt() == 64)"));
+
+	TEST_CHECK(state("value = assert(ABC.new(1,2,3))"));//use createABC
+	TEST_CHECK(state("assert(value:getInt() == 324343)"));
+
+	TEST_CHECK(state("value:setInt(33)"));
+	TEST_CHECK(state("assert(value:getInt() == 33)"));
+};
+
 KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -1297,7 +1337,6 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	state.setErrorHandler(ignore_error_fun);
 	
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
-		.setConstructors<ABC(int)>()
 		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
 		.addFunction("intdata", &ABC::intmember)
 		.addFunction("stringdata", &ABC::stringmember)
