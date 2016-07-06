@@ -37,19 +37,19 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 		}
 
 		scoremap[test_name] = mintime;
-		std::cout << test_name << "," << mintime<< std::endl;
+		std::cerr << test_name << "," << mintime << std::endl;
 	}
 
 	for (std::map<std::string, double>::iterator it = scoremap.begin(); it != scoremap.end(); ++it)
 	{
-		std::cerr << it->first << ",";
+		std::cout << it->first << ",";
 	}
-	std::cerr << std::endl;
+	std::cout << std::endl;
 	for (std::map<std::string, double>::iterator it = scoremap.begin(); it != scoremap.end(); ++it)
 	{
-		std::cerr << it->second << ",";
+		std::cout << it->second << ",";
 	}
-	std::cerr << std::endl;
+	std::cout << std::endl;
 }
 
 
@@ -67,7 +67,7 @@ int main()
 #if KAGUYA_USE_CPP11
 	ADD_BENCHMARK(kaguyaapi::simple_get_set_unique_ptr);
 #endif
-//	ADD_BENCHMARK(plain_api::object_get_set);
+	//	ADD_BENCHMARK(plain_api::object_get_set);
 	ADD_BENCHMARK(kaguyaapi::object_get_set);
 	ADD_BENCHMARK(kaguyaapi::object_get_set_property);
 	ADD_BENCHMARK(kaguyaapi::object_get_set_property_function);
@@ -87,13 +87,13 @@ int main()
 	ADD_BENCHMARK(kaguyaapi::lua_table_bracket_operator_assign);
 	ADD_BENCHMARK(kaguyaapi::lua_table_bracket_operator_get);
 	ADD_BENCHMARK(kaguyaapi::lua_table_bracket_const_operator_get);
-	
+
 	ADD_BENCHMARK(kaguyaapi::lua_allocation);
 	ADD_BENCHMARK(plain_api::lua_allocation);
 
 	ADD_BENCHMARK(kaguyaapi::table_to_vector);
 	ADD_BENCHMARK(kaguyaapi::table_to_vector_with_typecheck);
-	
+
 	execute_benchmark(functionmap);
 
 }
