@@ -40,7 +40,7 @@ namespace kaguya
 	template<class T>
 	struct SelfRefCountedPtrWrapper : ObjectPointerWrapper<T>
 	{
-		SelfRefCountedPtrWrapper(T* ptr):ObjectPointerWrapper(ptr)
+		SelfRefCountedPtrWrapper(T* ptr):ObjectPointerWrapper<T>(ptr)
 		{
 			if (ptr)
 			{
@@ -49,10 +49,9 @@ namespace kaguya
 		}
 		virtual ~SelfRefCountedPtrWrapper()
 		{
-			T* ptr = static_cast<T*>(get());
-			if (ptr)
+			if (ObjectPointerWrapper<T>::object_)
 			{
-				ptr->ReleaseRef();
+				ObjectPointerWrapper<T>::object_->ReleaseRef();
 			}
 		}
 	};
@@ -65,7 +64,7 @@ namespace kaguya
 	template<class T>
 	struct ObjectPointerWrapperType<T,typename traits::enable_if<isSelfCountedObjectPointer<T>::value>::type >
 	{
-		typedef typename SelfRefCountedPtrWrapper<typename traits::decay<T>::type> type;
+		typedef SelfRefCountedPtrWrapper<typename traits::decay<T>::type> type;
 	};
 }
 

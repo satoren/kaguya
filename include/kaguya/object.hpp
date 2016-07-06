@@ -195,7 +195,7 @@ namespace kaguya
 		~ObjectPointerWrapper()
 		{
 		}
-	private:
+	protected:
 		T* object_;
 	};
 
@@ -203,7 +203,7 @@ namespace kaguya
 	template<class T, class Enable = void>
 	struct ObjectPointerWrapperType
 	{
-		typedef typename ObjectPointerWrapper<T> type;
+		typedef ObjectPointerWrapper<T> type;
 	};
 
 	//for internal use
