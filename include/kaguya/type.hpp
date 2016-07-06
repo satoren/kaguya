@@ -105,7 +105,7 @@ namespace kaguya
 			}
 			else
 			{
-				typedef ObjectPointerWrapper<T> wrapper_type;
+				typedef ObjectPointerWrapperType<T>::type wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(&v);
 				class_userdata::setmetatable<T>(l);
@@ -166,7 +166,7 @@ namespace kaguya
 			}
 			else
 			{
-				typedef ObjectPointerWrapper<T> wrapper_type;
+				typedef ObjectPointerWrapperType<T>::type wrapper_type;
 				void *storage = lua_newuserdata(l, sizeof(wrapper_type));
 				new(storage) wrapper_type(v);
 				class_userdata::setmetatable<T>(l);

@@ -199,6 +199,13 @@ namespace kaguya
 		T* object_;
 	};
 
+	//Customizable for ObjectPointerWrapper
+	template<class T, class Enable = void>
+	struct ObjectPointerWrapperType
+	{
+		typedef typename ObjectPointerWrapper<T> type;
+	};
+
 	//for internal use
 	struct PointerConverter
 	{

@@ -1,6 +1,74 @@
 #include "kaguya/kaguya.hpp"
 #include "test_util.hpp"
 
+
+namespace
+{
+	struct SelfRefCounted
+	{
+		static int all_object_count;//for simple leak check
+
+		SelfRefCounted() :refcount(0)
+		{
+			all_object_count++;
+		}
+		virtual ~SelfRefCounted() { all_object_count--; }
+
+		void AddRef() { refcount++; }
+		void ReleaseRef() { refcount--;
+			if (refcount == 0)
+			{
+				delete this;
+			}
+		}
+
+		int get_ref_count()const { return refcount; }
+
+		int refcount;
+	private:
+		SelfRefCounted(const SelfRefCounted&);
+		SelfRefCounted& operator=(const SelfRefCounted&);
+	};
+	int SelfRefCounted::all_object_count = 0;
+
+	struct RefObjectA : SelfRefCounted {};
+	struct RefObjectB : SelfRefCounted {};
+}
+
+namespace kaguya
+{
+	template<class T>
+	struct SelfRefCountedPtrWrapper : ObjectPointerWrapper<T>
+	{
+		SelfRefCountedPtrWrapper(T* ptr):ObjectPointerWrapper(ptr)
+		{
+			if (ptr)
+			{
+				ptr->AddRef();
+			}
+		}
+		virtual ~SelfRefCountedPtrWrapper()
+		{
+			T* ptr = static_cast<T*>(get());
+			if (ptr)
+			{
+				ptr->ReleaseRef();
+			}
+		}
+	};
+
+	template<typename T>
+	struct isSelfCountedObjectPointer : kaguya::standard::conditional<
+		kaguya::standard::is_convertible<T*, SelfRefCounted*>::value,
+		kaguya::standard::true_type, kaguya::standard::false_type>::type {};
+
+	template<class T>
+	struct ObjectPointerWrapperType<T,typename traits::enable_if<isSelfCountedObjectPointer<T>::value>::type >
+	{
+		typedef typename SelfRefCountedPtrWrapper<typename traits::decay<T>::type> type;
+	};
+}
+
 KAGUYA_TEST_GROUP_START(test_02_classreg)
 
 using namespace kaguya_test_util;
@@ -1269,6 +1337,30 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	last_error_message = "";
 	state("test.const_pointer(other)");
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(self_refcounted_object)(kaguya::State& )
+{
+	//test for self reference counted class
+	//see SelfRefCountedPtrWrapper and specialized ObjectPointerWrapperType for SelfRefCounted
+	TEST_EQUAL(SelfRefCounted::all_object_count,0);
+	
+	{
+		kaguya::State state;
+		state["RefObjectA"].setClass(kaguya::UserdataMetatable<RefObjectA>());
+		state["RefObjectA"].setClass(kaguya::UserdataMetatable<RefObjectB>());
+
+		state["a"] = new RefObjectA;
+		state["b"] = new RefObjectB;
+		TEST_EQUAL(SelfRefCounted::all_object_count, 2);
+
+		RefObjectA* ptr = state["a"];
+		state["c"] = ptr;
+		TEST_EQUAL(SelfRefCounted::all_object_count, 2);
+	}
+	TEST_EQUAL(SelfRefCounted::all_object_count, 0);
+
 }
 
 KAGUYA_TEST_GROUP_END(test_02_classreg)
