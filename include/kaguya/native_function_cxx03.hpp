@@ -296,11 +296,12 @@ namespace kaguya
 				}
 				else
 				{
-					if (!this_ || !lua_type_traits<MemType>::checkType(state, 2))
+					optional<MemType> opt = lua_type_traits<optional<MemType> >::get(state, 2);
+					if (!this_ || !opt)
 					{
 						throw LuaTypeMismatch("type mismatch!!");
 					}
-					this_->*m = lua_type_traits<MemType>::get(state, 2);
+					this_->*m = *opt;
 					return 0;
 				}
 			}
@@ -313,12 +314,13 @@ namespace kaguya
 			template<class MemType, class T>
 			bool checkArgTypes(lua_State* state, MemType T::* m)
 			{
-				bool thistypecheck = lua_type_traits<T>::checkType(state, 1);
-				if (thistypecheck && lua_gettop(state) == 2)
+				if (lua_gettop(state) >= 2)
 				{
-					return lua_type_traits<MemType>::checkType(state, 2);
+					//setter typecheck
+					return lua_type_traits<MemType>::checkType(state, 2) && lua_type_traits<T>::checkType(state, 1);
 				}
-				return thistypecheck;
+				//getter typecheck
+				return  lua_type_traits<T>::checkType(state, 1);
 			}
 			template<class MemType, class T>
 			bool strictCheckArgTypes(lua_State* state, MemType T::* m)
