@@ -76,20 +76,23 @@ namespace kaguya
 			//end 
 			//return metatable[index]
 			//end
-			const char* strkey = lua_tostring(L, 2);
+			static const int table = 1;
+			static const int key = 2;
+			static const int metatable = lua_upvalueindex(1);
+			const char* strkey = lua_tostring(L, key);
 
 			if (strkey && strncmp(strkey, KAGUYA_PROPERTY_PREFIX, sizeof(KAGUYA_PROPERTY_PREFIX) - 1) != 0)
 			{
-				lua_getfield(L, lua_upvalueindex(1), (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
+				lua_getfield(L, metatable, (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
 				if (lua_type(L, -1) == LUA_TFUNCTION)
 				{
-					lua_pushvalue(L, 1);
+					lua_pushvalue(L, table);
 					lua_call(L, 1, 1);
 					return 1;
 				}
 			}
-			lua_pushvalue(L, 2);
-			lua_gettable(L, lua_upvalueindex(1));
+			lua_pushvalue(L, key);
+			lua_gettable(L, metatable);
 			return 1;
 		}
 		inline int property_newindex_function(lua_State* L)
@@ -105,25 +108,27 @@ namespace kaguya
 			// end 
 			// rawset(table,index,value) 
 			// end
+			static const int table = 1;
+			static const int key = 2;
+			static const int value = 3;
+			static const int metatable = lua_upvalueindex(1);
 			const char* strkey = lua_tostring(L, 2);
 
 			if (lua_type(L, 1) == LUA_TUSERDATA && strkey && strncmp(strkey, KAGUYA_PROPERTY_PREFIX, sizeof(KAGUYA_PROPERTY_PREFIX) - 1) != 0)
 			{
-				lua_getfield(L, lua_upvalueindex(1), (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
+				lua_getfield(L, metatable, (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
 				if (lua_type(L,-1) == LUA_TFUNCTION)
 				{
-					lua_pushvalue(L, 1);
-					lua_pushvalue(L, 3);
+					lua_pushvalue(L, table);
+					lua_pushvalue(L, value);
 					lua_call(L, 2, 0);
 					return 0;
 				}
-				lua_pushvalue(L, 2);
-				lua_pushvalue(L, 3);
-				lua_rawset(L, 1);
 			}
-			lua_pushvalue(L, 2);
-			lua_gettable(L, lua_upvalueindex(1));
-			return 1;
+			lua_pushvalue(L, key);
+			lua_pushvalue(L, value);
+			lua_rawset(L, table);
+			return 0;
 		}
 	}
 
