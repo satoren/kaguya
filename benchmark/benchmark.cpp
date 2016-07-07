@@ -23,7 +23,7 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 
 		kaguya::State clockstate;
 
-		static const int N = 20;
+		static const int N = 10;
 		for (int i = 0; i < N; ++i)
 		{
 			double start = clockstate["os"]["clock"]();
