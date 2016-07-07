@@ -281,5 +281,19 @@ KAGUYA_TEST_FUNCTION_DEF(functioncall)(kaguya::State& state)
 	TEST_EQUAL(called, 1);
 }
 
+int cfunction(lua_State* L)
+{
+	TEST_EQUAL(lua_tointeger(L,1), 3);
+	return 0;
+}
+
+KAGUYA_TEST_FUNCTION_DEF(luacfunction)(kaguya::State& state)
+{
+	state["cfunction"] = &cfunction;
+
+	state.dostring("cfunction(3)");
+}
+
+
 
 KAGUYA_TEST_GROUP_END(test_03_function)
