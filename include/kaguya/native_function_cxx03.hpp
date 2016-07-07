@@ -110,12 +110,12 @@ namespace kaguya
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return true KAGUYA_PP_REPEAT(N,KAGUYA_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return true KAGUYA_PP_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
@@ -178,14 +178,14 @@ namespace kaguya
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::checkType(state, 1) \
-					KAGUYA_PP_REPEAT(N,KAGUYA_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP) \
+				&& lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::checkType(state, 1);\
 			}\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::strictCheckType(state, 1) \
-					KAGUYA_PP_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
+				return true	KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP) \
+				&& lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::strictCheckType(state, 1);\
 			}\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
@@ -238,12 +238,12 @@ namespace kaguya
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return true KAGUYA_PP_REPEAT(N,KAGUYA_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return true KAGUYA_PP_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
@@ -372,12 +372,12 @@ namespace kaguya
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return true KAGUYA_PP_REPEAT(N,KAGUYA_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
 			{\
-				return true KAGUYA_PP_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
+				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
