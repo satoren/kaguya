@@ -506,6 +506,12 @@ namespace kaguya
 			{
 				return true;
 			}
+			std::string propkey = KAGUYA_PROPERTY_PREFIX + key;
+			if (member_map_.count(propkey) > 0)//_prop_keyname is reserved for property
+			{
+				return true;
+			}
+			if (key == "__index" || key == "__newindex") { return true; }//__index and __newindex is reserved for this class
 			return false;
 		}
 		void registerField(lua_State* state, const char* name, const AnyDataPusher& value)const
