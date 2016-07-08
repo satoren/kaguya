@@ -215,7 +215,7 @@ namespace kaguyaapi
 
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000\n"
+			"local times = 1000000\n"
 			"for i=1,times do\n"
 			"getset:set(Vector3.new(i,i+1,i+2))\n"
 			"if(getset:get().x ~= i)then\n"
@@ -234,7 +234,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000\n"
+			"local times = 1000000\n"
 			"for i=1,times do\n"
 			"getset.position=Vector3.new(i,i+1,i+2)\n"
 			"if(getset.position.x ~= i)then\n"
@@ -253,7 +253,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000\n"
+			"local times = 1000000\n"
 			"for i=1,times do\n"
 			"getset.position=Vector3.new(i,i+1,i+2)\n"
 			"if(getset.position.x ~= i)then\n"
@@ -274,7 +274,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000\n"
+			"local times = 1000000\n"
 			"for i=1,times do\n"
 			"getset:set({x=i,y=i+1,z=i+2})\n"
 			"if(getset:get().x ~= i)then\n"
@@ -293,7 +293,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000\n"
+			"local times = 1000000\n"
 			"for i=1,times do\n"
 			"getset.position={x=i,y=i+1,z=i+2}\n"
 			"if(getset.position.x ~= i)then\n"
