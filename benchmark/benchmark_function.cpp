@@ -56,11 +56,11 @@ namespace
 			return position;
 		}
 
-		void setc(const Vector3Conv& p)
+		void setconv(const Vector3Conv& p)
 		{
 			position = p;
 		}
-		Vector3Conv getc()const
+		Vector3Conv getconv()const
 		{
 			return position;
 		}
@@ -268,8 +268,8 @@ namespace kaguyaapi
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
 			.setConstructors<ObjGetSet()>()
-			.addFunction("get", &ObjGetSet::getc)
-			.addFunction("set", &ObjGetSet::setc)
+			.addFunction("get", &ObjGetSet::getconv)
+			.addFunction("set", &ObjGetSet::setconv)
 		);
 		state["Vector3"].setClass(vec3meta);
 		state(
