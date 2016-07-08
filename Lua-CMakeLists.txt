@@ -14,6 +14,11 @@ list(REMOVE_ITEM LIB_LUA_SRCS src/lua.c src/luac.c)
 add_library(liblua STATIC ${LIB_LUA_SRCS})
 SET_TARGET_PROPERTIES(liblua PROPERTIES OUTPUT_NAME lua)
 
+if(UNIX)
+add_definitions("-DLUA_USE_POSIX")
+target_link_libraries(liblua m)
+endif(UNIX)
+
 #add_executable(lua src/lua.c)
 #target_link_libraries(lua liblua)
 
