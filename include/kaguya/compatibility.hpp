@@ -16,6 +16,10 @@ namespace kaguya
 		{
 			return lua_rawgetp(L, idx, ptr);
 		}
+		inline int lua_getfield_rtype(lua_State *L, int idx, const char* k)
+		{
+			return lua_getfield(L, idx, k);
+		}
 #elif LUA_VERSION_NUM == 502
 		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
 		{
@@ -109,6 +113,17 @@ namespace kaguya
 			lua_pushinteger(L, i);
 			lua_rawget(L, absidx);
 			return lua_type(L, -1);
+		}
+		inline int lua_getfield_rtype(lua_State *L, int idx, const char* k)
+		{
+			lua_getfield(L, idx, k);
+			return lua_type(L, -1);
+		}
+#endif
+#if LUA_VERSION_NUM < 501
+		void lua_createtable(lua_State *L, int narr, int nrec)
+		{
+			lua_newtable(L);
 		}
 #endif
 	}

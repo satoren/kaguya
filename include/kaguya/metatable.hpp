@@ -70,8 +70,8 @@ namespace kaguya
 			//Lua
 			//local arg = {...};local metatable = arg[1];
 			//return function(table, index)
-			//if string.find(index,'" KAGUYA_PROPERTY_PREFIX "')~=0 then 
-			//local propfun = metatable['" KAGUYA_PROPERTY_PREFIX "'..index];
+			//if string.find(index,KAGUYA_PROPERTY_PREFIX)~=0 then 
+			//local propfun = metatable[KAGUYA_PROPERTY_PREFIX ..index];
 			//if propfun then return propfun(table) end 
 			//end 
 			//return metatable[index]
@@ -81,10 +81,10 @@ namespace kaguya
 			static const int metatable = lua_upvalueindex(1);
 			const char* strkey = lua_tostring(L, key);
 
-			if (strkey && strncmp(strkey, KAGUYA_PROPERTY_PREFIX, sizeof(KAGUYA_PROPERTY_PREFIX) - 1) != 0)
+			if (lua_type(L, 1) == LUA_TUSERDATA && strkey && strncmp(strkey, KAGUYA_PROPERTY_PREFIX, sizeof(KAGUYA_PROPERTY_PREFIX) - 1) != 0)
 			{
-				lua_getfield(L, metatable, (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
-				if (lua_type(L, -1) == LUA_TFUNCTION)
+				int type = lua_getfield_rtype(L, metatable, (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
+				if (type == LUA_TFUNCTION)
 				{
 					lua_pushvalue(L, table);
 					lua_call(L, 1, 1);
@@ -101,8 +101,8 @@ namespace kaguya
 			//local arg = {...};local metatable = arg[1];
 			// return function(table, index, value) 
 			// if type(table) == 'userdata' then 
-			// if string.find(index,'" KAGUYA_PROPERTY_PREFIX "')~=0 then 
-			// local propfun = metatable['" KAGUYA_PROPERTY_PREFIX "'..index];
+			// if string.find(index,KAGUYA_PROPERTY_PREFIX)~=0 then 
+			// local propfun = metatable[KAGUYA_PROPERTY_PREFIX..index];
 			// if propfun then return propfun(table,value) end 
 			// end 
 			// end 
@@ -116,8 +116,8 @@ namespace kaguya
 
 			if (lua_type(L, 1) == LUA_TUSERDATA && strkey && strncmp(strkey, KAGUYA_PROPERTY_PREFIX, sizeof(KAGUYA_PROPERTY_PREFIX) - 1) != 0)
 			{
-				lua_getfield(L, metatable, (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
-				if (lua_type(L,-1) == LUA_TFUNCTION)
+				int type = lua_getfield_rtype(L, metatable, (KAGUYA_PROPERTY_PREFIX + std::string(strkey)).c_str());
+				if (type == LUA_TFUNCTION)
 				{
 					lua_pushvalue(L, table);
 					lua_pushvalue(L, value);
