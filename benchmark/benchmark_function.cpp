@@ -268,6 +268,26 @@ namespace kaguyaapi
 	{
 		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
 			.setConstructors<ObjGetSet()>()
+			.addFunction("get", &ObjGetSet::getc)
+			.addFunction("set", &ObjGetSet::setc)
+		);
+		state["Vector3"].setClass(vec3meta);
+		state(
+			"local getset = SetGet.new()\n"
+			"local times = 10000000\n"
+			"for i=1,times do\n"
+			"getset:set({x=i,y=i+1,z=i+2})\n"
+			"if(getset:get().x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
+	void object_to_table_property(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet>()
+			.setConstructors<ObjGetSet()>()
 			.addProperty("position", &ObjGetSet::positionc)
 		);
 		state["Vector3"].setClass(vec3meta);
@@ -665,5 +685,8 @@ namespace plain_api
 			"end\n"
 			"");
 		lua_close(s);
+	}
+	void object_get_set()
+	{
 	}
 }

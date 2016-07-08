@@ -67,12 +67,13 @@ int main()
 #if KAGUYA_USE_CPP11
 	ADD_BENCHMARK(kaguyaapi::simple_get_set_unique_ptr);
 #endif
-	//	ADD_BENCHMARK(plain_api::object_get_set);
+//	ADD_BENCHMARK(plain_api::object_get_set);
+
 	ADD_BENCHMARK(kaguyaapi::object_get_set);
 	ADD_BENCHMARK(kaguyaapi::object_get_set_property);
 	ADD_BENCHMARK(kaguyaapi::object_get_set_property_function);
 	ADD_BENCHMARK(kaguyaapi::object_to_table_get_set);
-
+	ADD_BENCHMARK(kaguyaapi::object_to_table_property);	
 	ADD_BENCHMARK(kaguyaapi::overloaded_get_set);
 	ADD_BENCHMARK(kaguyaapi::property_access);
 	ADD_BENCHMARK(kaguyaapi::simple_get_set_contain_property_member);
@@ -93,7 +94,6 @@ int main()
 
 	ADD_BENCHMARK(kaguyaapi::table_to_vector);
 	ADD_BENCHMARK(kaguyaapi::table_to_vector_with_typecheck);
-
 	execute_benchmark(functionmap);
 
 }

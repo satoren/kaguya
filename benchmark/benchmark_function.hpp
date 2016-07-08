@@ -17,7 +17,8 @@ namespace kaguyaapi
 	void object_get_set_property(kaguya::State& state);
 	void object_get_set_property_function(kaguya::State& state);
 	void object_to_table_get_set(kaguya::State& state);
-
+	void object_to_table_property(kaguya::State& state);
+	
 
 	void call_native_function(kaguya::State& state);
 	void call_overloaded_function(kaguya::State& state);
@@ -41,7 +42,7 @@ namespace kaguyaapi
 namespace plain_api
 {
 	void simple_get_set(kaguya::State& state);
-//	void object_get_set(kaguya::State& state);
+	void object_get_set(kaguya::State& state);
 	void call_native_function(kaguya::State& state);
 	void call_lua_function(kaguya::State& state);
 	void lua_table_access(kaguya::State& state);
