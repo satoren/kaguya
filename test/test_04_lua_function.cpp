@@ -497,4 +497,18 @@ KAGUYA_TEST_FUNCTION_DEF(to_standard_function)(kaguya::State& state)
 }
 
 
+KAGUYA_TEST_FUNCTION_DEF(return_luastackref)(kaguya::State& state)
+{
+	state("testfun = function() return 3232 end");
+	kaguya::LuaRef testfunref = state["testfun"];
+
+	{
+		kaguya::LuaStackRef ret = testfunref.call<kaguya::LuaStackRef>();
+		TEST_EQUAL(ret, 3232);
+	}
+	{
+		kaguya::LuaStackRef ret = testfunref();
+		TEST_EQUAL(ret, 3232);
+	}
+}
 KAGUYA_TEST_GROUP_END(test_04_lua_function)

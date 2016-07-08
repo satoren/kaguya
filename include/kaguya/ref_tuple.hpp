@@ -17,7 +17,7 @@ namespace kaguya
 		ref_tuple(const RefTuple& va) :tref(va) {}
 		void operator=(const FunctionResults& fres)
 		{
-			tref = fres.get_result<GetTuple>();
+			tref = fres.get_result(types::typetag<GetTuple>());
 		}
 		template<class T>
 		void operator=(const T& fres)

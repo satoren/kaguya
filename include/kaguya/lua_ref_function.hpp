@@ -143,9 +143,14 @@ namespace kaguya
 
 
 		template<class Result>
-		Result get_result()const
+		Result get_result(types::typetag<Result> tag= types::typetag<Result>())const
 		{
 			return util::get_result<Result>(state_, stack_index_);
+		}
+		LuaStackRef get_result(types::typetag<LuaStackRef> tag)const
+		{
+			pop_ = 0;
+			return LuaStackRef(state_, stack_index_, true);
 		}
 		lua_State* state()const { return state_; }
 
@@ -177,6 +182,12 @@ namespace kaguya
 			return resultStatus_;
 		}
 
+		operator LuaStackRef()
+		{
+			pop_ = 0;
+			return LuaStackRef(state_, stack_index_,true);
+		}
+
 	private:
 		mutable lua_State* state_;
 		int resultStatus_;
@@ -189,7 +200,7 @@ namespace kaguya
 		template<typename RetType>
 		inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<RetType> tag)
 		{
-			return FunctionResults(state, return_status, retindex).get_result<RetType>();
+			return FunctionResults(state, return_status, retindex).get_result(types::typetag<RetType>());
 		}
 		inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<FunctionResults> tag)
 		{
