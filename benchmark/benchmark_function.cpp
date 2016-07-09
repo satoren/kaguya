@@ -44,7 +44,16 @@ namespace
 		Vector3Conv(const Vector3& src) :Vector3(src) {}
 	};
 
-	struct ObjGetSet
+	struct BaseA
+	{
+		int a;
+	};
+	struct BaseB
+	{
+		int b;
+	};
+
+	struct ObjGetSet:BaseA,BaseB
 	{
 		ObjGetSet() :position() {}
 		void set(const Vector3& p)
@@ -215,7 +224,7 @@ namespace kaguyaapi
 
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 1000000\n"
+			"local times = 10000000/10\n"
 			"for i=1,times do\n"
 			"getset:set(Vector3.new(i,i+1,i+2))\n"
 			"if(getset:get().x ~= i)then\n"
@@ -234,7 +243,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 1000000\n"
+			"local times = 10000000/10\n"
 			"for i=1,times do\n"
 			"getset.position=Vector3.new(i,i+1,i+2)\n"
 			"if(getset.position.x ~= i)then\n"
@@ -253,7 +262,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 1000000\n"
+			"local times = 10000000/10\n"
 			"for i=1,times do\n"
 			"getset.position=Vector3.new(i,i+1,i+2)\n"
 			"if(getset.position.x ~= i)then\n"
@@ -274,7 +283,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 1000000\n"
+			"local times = 10000000/10\n"
 			"for i=1,times do\n"
 			"getset:set({x=i,y=i+1,z=i+2})\n"
 			"if(getset:get().x ~= i)then\n"
@@ -293,7 +302,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 1000000\n"
+			"local times = 10000000/10\n"
 			"for i=1,times do\n"
 			"getset.position={x=i,y=i+1,z=i+2}\n"
 			"if(getset.position.x ~= i)then\n"
@@ -303,7 +312,58 @@ namespace kaguyaapi
 			"end\n"
 			"");
 	}
-	
+
+	void multiple_inheritance_get_set(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<BaseA>()
+			.addFunction("setA", &BaseA::a)
+			.addFunction("getA", &BaseA::a)
+		);
+		state["SetGet"].setClass(kaguya::UserdataMetatable<BaseB>()
+			.addFunction("set", &BaseB::b)
+			.addFunction("get", &BaseB::b)
+		);
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet,kaguya::MultipleBase<BaseA, BaseB> >()
+			.setConstructors<ObjGetSet()>()
+		);
+
+		state(
+			"local getset = SetGet.new()\n"
+			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
+			"local times = 10000000/10\n"
+			"for i=1,times do\n"
+			"getset:set(i)\n"
+			"if(getset:get() ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}
+	void multiple_inheritance_property(kaguya::State& state)
+	{
+		state["SetGet"].setClass(kaguya::UserdataMetatable<BaseA>()
+			.addProperty("a", &BaseA::a)
+		);
+		state["SetGet"].setClass(kaguya::UserdataMetatable<BaseB>()
+			.addFunction("set", &BaseB::b)
+			.addFunction("get", &BaseB::b)
+		);
+		state["SetGet"].setClass(kaguya::UserdataMetatable<ObjGetSet, kaguya::MultipleBase<BaseA, BaseB> >()
+			.setConstructors<ObjGetSet()>()
+		);
+
+		state(
+			"local getset = SetGet.new()\n"
+			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
+			"local times = 10000000/10\n"
+			"for i=1,times do\n"
+			"getset.a=i\n"
+			"if(getset.a ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"end\n"
+			"");
+	}
 
 	void constructor_get_set(kaguya::State& state)
 	{

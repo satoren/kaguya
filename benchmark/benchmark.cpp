@@ -14,6 +14,7 @@ void empty(kaguya::State&)
 void execute_benchmark(const benchmark_function_map_t& testmap)
 {
 	std::map<std::string, double> scoremap;
+
 	for (benchmark_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it)
 	{
 		const std::string& test_name = it->first;
@@ -40,14 +41,16 @@ void execute_benchmark(const benchmark_function_map_t& testmap)
 		std::cerr << test_name << "," << mintime << std::endl;
 	}
 
-	for (std::map<std::string, double>::iterator it = scoremap.begin(); it != scoremap.end(); ++it)
+
+	for (benchmark_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it)
 	{
 		std::cout << it->first << ",";
 	}
 	std::cout << std::endl;
-	for (std::map<std::string, double>::iterator it = scoremap.begin(); it != scoremap.end(); ++it)
+
+	for (benchmark_function_map_t::const_iterator it = testmap.begin(); it != testmap.end(); ++it)
 	{
-		std::cout << it->second << ",";
+		std::cout << scoremap[it->first] << ",";
 	}
 	std::cout << std::endl;
 }
@@ -66,6 +69,7 @@ int main()
 	ADD_BENCHMARK(kaguyaapi::simple_get_set_shared_ptr);
 #if KAGUYA_USE_CPP11
 	ADD_BENCHMARK(kaguyaapi::simple_get_set_unique_ptr);
+	ADD_BENCHMARK(kaguyaapi::simple_get_set_contain_property_member);
 #endif
 //	ADD_BENCHMARK(plain_api::object_get_set);
 
@@ -76,7 +80,10 @@ int main()
 	ADD_BENCHMARK(kaguyaapi::object_to_table_property);	
 	ADD_BENCHMARK(kaguyaapi::overloaded_get_set);
 	ADD_BENCHMARK(kaguyaapi::property_access);
-	ADD_BENCHMARK(kaguyaapi::simple_get_set_contain_property_member);
+
+	ADD_BENCHMARK(kaguyaapi::multiple_inheritance_get_set);
+	ADD_BENCHMARK(kaguyaapi::multiple_inheritance_property);	
+	
 	ADD_BENCHMARK(kaguyaapi::call_native_function);
 	ADD_BENCHMARK(plain_api::call_native_function);
 	ADD_BENCHMARK(kaguyaapi::call_lua_function);
