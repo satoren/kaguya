@@ -1,5 +1,8 @@
 #include "kaguya/kaguya.hpp"
 
+#define KAGUYA_BENCHMARK_COUNT 1000000
+#define KAGUYA_BENCHMARK_COUNT_STR "1000000"
+
 namespace
 {
 
@@ -135,7 +138,7 @@ namespace kaguyaapi
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -156,7 +159,7 @@ namespace kaguyaapi
 		SetGet getset;
 		state["getset"] = &getset;
 		state(
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -176,7 +179,7 @@ namespace kaguyaapi
 		state["getset"] = kaguya::standard::shared_ptr<SetGet>(new SetGet());
 
 		state(
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -196,7 +199,7 @@ namespace kaguyaapi
 		state["getset"] = std::unique_ptr<SetGet>(new SetGet());
 
 		state(
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -224,7 +227,7 @@ namespace kaguyaapi
 
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(Vector3.new(i,i+1,i+2))\n"
 			"if(getset:get().x ~= i)then\n"
@@ -243,7 +246,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset.position=Vector3.new(i,i+1,i+2)\n"
 			"if(getset.position.x ~= i)then\n"
@@ -262,7 +265,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset.position=Vector3.new(i,i+1,i+2)\n"
 			"if(getset.position.x ~= i)then\n"
@@ -283,7 +286,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set({x=i,y=i+1,z=i+2})\n"
 			"if(getset:get().x ~= i)then\n"
@@ -302,7 +305,7 @@ namespace kaguyaapi
 		state["Vector3"].setClass(vec3meta);
 		state(
 			"local getset = SetGet.new()\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset.position={x=i,y=i+1,z=i+2}\n"
 			"if(getset.position.x ~= i)then\n"
@@ -330,7 +333,7 @@ namespace kaguyaapi
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -355,7 +358,7 @@ namespace kaguyaapi
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000/10\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset.a=i\n"
 			"if(getset.a ~= i)then\n"
@@ -374,7 +377,7 @@ namespace kaguyaapi
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -394,7 +397,7 @@ namespace kaguyaapi
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -415,7 +418,7 @@ namespace kaguyaapi
 		state(
 			"local getset = SetGet.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -428,7 +431,7 @@ namespace kaguyaapi
 	{
 		state["nativefun"] = &test_native_function;
 		state(
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"local r = nativefun(i)\n"
 			"if(r ~= i)then\n"
@@ -442,7 +445,7 @@ namespace kaguyaapi
 	{
 		state["nativefun"] = kaguya::overload(&test_native_function2,&test_native_function);
 		state(
-			"local times = 1000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"local r = nativefun(i)\n"
 			"if(r ~= i)then\n"
@@ -457,7 +460,7 @@ namespace kaguyaapi
 		state("lua_function=function(i)return i;end");
 
 		kaguya::LuaRef lua_function = state["lua_function"];
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			int r = lua_function.call<int>(i);
 			if (r != i) { throw std::logic_error(""); }
@@ -468,7 +471,7 @@ namespace kaguyaapi
 		state("lua_function=function(i)return i;end");
 
 		kaguya::LuaFunction lua_function = state["lua_function"];
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			int r = lua_function(i);
 			if (r != i) { throw std::logic_error(""); }
@@ -479,7 +482,7 @@ namespace kaguyaapi
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_table.setField("value", i);
 			int v = lua_table.getField<int>("value");
@@ -491,7 +494,7 @@ namespace kaguyaapi
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_table["value"] = i;
 			int v = lua_table["value"];
@@ -502,7 +505,7 @@ namespace kaguyaapi
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_table.setField("value",i);
 			int v = lua_table["value"];
@@ -513,7 +516,7 @@ namespace kaguyaapi
 	{
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_table["value"] = i;
 			int v = lua_table.getField<int>("value");
@@ -526,7 +529,7 @@ namespace kaguyaapi
 		state("lua_table={value=0}");
 		kaguya::LuaTable lua_table = state["lua_table"];
 		const kaguya::LuaTable& const_lua_table = lua_table;
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_table["value"] = i;
 			int v = const_lua_table.getField("value");
@@ -550,7 +553,7 @@ namespace kaguyaapi
 		state(
 			"local getset = Prop.new()\n"
 			//"getset={set = function(self,v) self.i = v end,get=function(self) return self.i end}\n"
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset.d =i\n"
 			"if(getset.d ~= i)then\n"
@@ -562,7 +565,7 @@ namespace kaguyaapi
 	void lua_allocation(kaguya::State& state)
 	{
 		state("lua_table = { } "
-			"local times = 100000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"lua_table['key'..i] =i\n"
 			"end\n"
@@ -574,7 +577,7 @@ namespace kaguyaapi
 	{
 		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			std::vector<double> r = lua_table;
 		}
@@ -583,7 +586,7 @@ namespace kaguyaapi
 	{
 		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
 		kaguya::LuaTable lua_table = state["lua_table"];
-		for (int i = 0; i < 1000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			bool was_valid;
 			std::vector<double> r = lua_table.get<std::vector<double> >(was_valid);
@@ -656,7 +659,7 @@ namespace plain_api
 
 		luaL_dostring(s,
 			"local getset = SetGet.new()\n"
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"getset:set(i)\n"
 			"if(getset:get() ~= i)then\n"
@@ -683,7 +686,7 @@ namespace plain_api
 		lua_setglobal(s,"nativefun");
 
 		luaL_dostring(s,
-			"local times = 10000000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"local r = nativefun(i)\n"
 			"if(r ~= i)then\n"
@@ -700,7 +703,7 @@ namespace plain_api
 		luaL_dostring(s,"lua_function=function(i)return i;end");
 		lua_getglobal(s, "lua_function");
 		int funref = luaL_ref(s, LUA_REGISTRYINDEX);
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_rawgeti(s, LUA_REGISTRYINDEX, funref);
 			lua_pushnumber(s, i);
@@ -719,7 +722,7 @@ namespace plain_api
 
 		lua_getglobal(s, "lua_table");
 		int table_ref = luaL_ref(s, LUA_REGISTRYINDEX);//get lua_table reference
-		for (int i = 0; i < 10000000; i++)
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			lua_rawgeti(s, LUA_REGISTRYINDEX, table_ref);
 			lua_pushnumber(s, i);
@@ -739,7 +742,7 @@ namespace plain_api
 	{
 		lua_State* s = luaL_newstate();
 		luaL_dostring(s, "lua_table = { } "
-			"local times = 100000\n"
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
 			"for i=1,times do\n"
 			"lua_table['key'..i] =i\n"
 			"end\n"
