@@ -741,6 +741,8 @@ struct Base2
 	int test() { return 794; }
 	int consttest()const { return 794; }
 };
+
+struct Base3 {};
 struct MultipleInheritance :Base, Base2
 {
 	MultipleInheritance() :d(0) {};
@@ -748,6 +750,11 @@ struct MultipleInheritance :Base, Base2
 	int test() { return 1192; }
 	int test3() { return 710; }
 	int consttest2()const { return 1560; }
+};
+struct MultipleInheritance2 :MultipleInheritance, Base3
+{
+	MultipleInheritance2() :e(0) {};
+	int e;
 };
 
 
@@ -762,12 +769,17 @@ KAGUYA_TEST_FUNCTION_DEF(multiple_inheritance)(kaguya::State& state)
 		.addFunction("test2", &Base2::test2)
 		.addFunction("consttest", &Base2::consttest)
 		);
+	state["Base3"].setClass(kaguya::UserdataMetatable<Base3>()
+	);
 	state["MultipleInheritance"].setClass(kaguya::UserdataMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
 		.addFunction("d", &MultipleInheritance::d)
 		.addProperty("propd", &MultipleInheritance::d)
 		.addFunction("test", &MultipleInheritance::test)
 		.addFunction("consttest2", &MultipleInheritance::consttest2)
 		.addFunction("test3", &MultipleInheritance::test3));
+
+	state["MultipleInheritance2"].setClass(kaguya::UserdataMetatable<MultipleInheritance2, kaguya::MultipleBase<MultipleInheritance, Base3> >()
+		.addFunction("e", &MultipleInheritance2::e));
 
 	MultipleInheritance data;
 
@@ -794,6 +806,22 @@ KAGUYA_TEST_FUNCTION_DEF(multiple_inheritance)(kaguya::State& state)
 	TEST_CHECK(state("testobj.b= 5"));
 	TEST_CHECK(state("assert(testobj.b == 5)"));
 	TEST_EQUAL(data.b, 5);
+
+
+	{
+		MultipleInheritance test;
+		state["test"] = &test;
+		TEST_CHECK(state("test.b= 2"));
+		TEST_CHECK(state("assert(test.b == 2)"));
+		TEST_EQUAL(test.b, 2);
+	}
+	{
+		MultipleInheritance2 test;
+		state["test"] = &test;
+		TEST_CHECK(state("test.b= 4"));
+		TEST_CHECK(state("assert(test.b == 4)"));
+		TEST_EQUAL(test.b, 4);
+	}
 
 
 	state["constobj"] = static_cast<const MultipleInheritance*>(&data);

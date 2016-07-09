@@ -20,6 +20,10 @@ namespace kaguya
 		{
 			return lua_getfield(L, idx, k);
 		}
+		inline int lua_gettable_rtype(lua_State *L, int idx)
+		{
+			return lua_gettable(L, idx);
+		}
 #elif LUA_VERSION_NUM == 502
 		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
 		{
@@ -117,6 +121,11 @@ namespace kaguya
 		inline int lua_getfield_rtype(lua_State *L, int idx, const char* k)
 		{
 			lua_getfield(L, idx, k);
+			return lua_type(L, -1);
+		}
+		inline int lua_gettable_rtype(lua_State *L, int idx)
+		{
+			lua_gettable(L, idx);
 			return lua_type(L, -1);
 		}
 #endif
