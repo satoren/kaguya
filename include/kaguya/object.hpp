@@ -322,7 +322,7 @@ namespace kaguya
 			static char kaguya_ptrcvt_key_ptr;
 			util::ScopedSavedStack save(state);
 			lua_pushlightuserdata(state, &kaguya_ptrcvt_key_ptr);
-			lua_gettable(state, LUA_REGISTRYINDEX);
+			lua_rawget(state, LUA_REGISTRYINDEX);
 			if (lua_isuserdata(state, -1))
 			{
 				return *static_cast<PointerConverter*>(lua_touserdata(state, -1));
@@ -332,7 +332,7 @@ namespace kaguya
 				void* ptr = lua_newuserdata(state, sizeof(PointerConverter));//dummy data for gc call
 				PointerConverter* converter = new(ptr) PointerConverter();
 
-				lua_createtable(state, 0, 0);
+				lua_createtable(state, 0, 2);
 				lua_pushcclosure(state, &deleter, 0);
 				lua_setfield(state, -2, "__gc");
 				lua_pushvalue(state, -1);
@@ -340,7 +340,7 @@ namespace kaguya
 				lua_setmetatable(state, -2);//set to userdata
 				lua_pushlightuserdata(state, &kaguya_ptrcvt_key_ptr);
 				lua_pushvalue(state, -2);
-				lua_settable(state, LUA_REGISTRYINDEX);
+				lua_rawset(state, LUA_REGISTRYINDEX);
 				return *converter;
 			}
 		}

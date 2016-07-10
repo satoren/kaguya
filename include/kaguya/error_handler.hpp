@@ -109,7 +109,7 @@ namespace kaguya
 					lua_setfield(state, -1, "__index");
 					lua_setmetatable(state, -2);
 
-					lua_settable(state, LUA_REGISTRYINDEX);
+					lua_rawset(state, LUA_REGISTRYINDEX);
 				}
 				*funptr = f;
 			}
@@ -148,7 +148,7 @@ namespace kaguya
 			{
 				util::ScopedSavedStack save(state);
 				lua_pushlightuserdata(state, handlerRegistryKey());
-				lua_gettable(state, LUA_REGISTRYINDEX);
+				lua_rawget(state, LUA_REGISTRYINDEX);
 				function_type* ptr = (function_type*)lua_touserdata(state, -1);
 				return ptr;
 			}
