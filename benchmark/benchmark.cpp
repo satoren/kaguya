@@ -61,7 +61,6 @@ int main()
 	benchmark_function_map_t functionmap;
 #define ADD_BENCHMARK(function) functionmap.push_back(std::make_pair(#function,&function));
 	ADD_BENCHMARK(empty);
-
 	ADD_BENCHMARK(plain_api::simple_get_set);
 	ADD_BENCHMARK(kaguyaapi::simple_get_set);
 
@@ -101,6 +100,10 @@ int main()
 
 	ADD_BENCHMARK(kaguyaapi::table_to_vector);
 	ADD_BENCHMARK(kaguyaapi::table_to_vector_with_typecheck);
+	
+
+	ADD_BENCHMARK(kaguyaapi::vector_to_table);	
+
 	execute_benchmark(functionmap);
 
 }

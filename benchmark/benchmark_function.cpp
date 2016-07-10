@@ -575,7 +575,7 @@ namespace kaguyaapi
 
 	void table_to_vector(kaguya::State& state)
 	{
-		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
+		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5}");
 		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
@@ -584,12 +584,25 @@ namespace kaguyaapi
 	}
 	void table_to_vector_with_typecheck(kaguya::State& state)
 	{
-		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5,4}");
+		state("lua_table={4,2,3,4,4,23,32,34,23,34,4,245,235,432,6,7,76,37,64,5}");
 		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
 			bool was_valid;
 			std::vector<double> r = lua_table.get<std::vector<double> >(was_valid);
+		}
+	}
+	void vector_to_table(kaguya::State& state)
+	{
+		std::vector<double> v;
+		for (double d = 0; d < 20; d+=1)
+		{
+			v.push_back(d);
+		}
+		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
+		{
+			state.pushToStack(v);
+			state.popFromStack();
 		}
 	}
 }

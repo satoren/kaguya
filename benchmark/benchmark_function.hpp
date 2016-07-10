@@ -37,6 +37,8 @@ namespace kaguyaapi
 
 	void table_to_vector(kaguya::State& state);
 	void table_to_vector_with_typecheck(kaguya::State& state);
+	void vector_to_table(kaguya::State& state);
+	
 
 	void lua_allocation(kaguya::State& state);
 }
