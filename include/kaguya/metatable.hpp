@@ -204,20 +204,31 @@ namespace kaguya
 
 				if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
 				{
-					metatable.push(state);
-					lua_pushcclosure(state, &detail::property_index_function, 1);
-					LuaStackRef indexfun(state, -1);
-					metatable.setRawField("__index", indexfun);
+
+					if (member_map_.count("__index") == 0)
+					{
+						metatable.push(state);
+						lua_pushcclosure(state, &detail::property_index_function, 1);
+						LuaStackRef indexfun(state, -1);
+						metatable.setRawField("__index", indexfun);
+					}
 
 
-					metatable.push(state);
-					lua_pushcclosure(state, &detail::property_newindex_function, 1);
-					LuaStackRef newindexfun(state, -1);
-					metatable.setRawField("__newindex", newindexfun);
+
+					if (member_map_.count("__newindex") == 0)
+					{
+						metatable.push(state);
+						lua_pushcclosure(state, &detail::property_newindex_function, 1);
+						LuaStackRef newindexfun(state, -1);
+						metatable.setRawField("__newindex", newindexfun);
+					}
 				}
 				else
 				{
-					metatable.setRawField("__index", metatable);
+					if (member_map_.count("__index") == 0)
+					{
+						metatable.setRawField("__index", metatable);
+					}
 				}
 
 				set_base_metatable(state, metatable, types::typetag<base_class_type>());
