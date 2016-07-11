@@ -248,11 +248,14 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			if (!lua_type_traits<T>::checkType(l, index)) {
+			try
+			{
+				return lua_type_traits<T>::get(l, index);
+			}
+			catch (...)
+			{
 				return get_type();
 			}
-			get_type opt = lua_type_traits<T>::get(l, index);
-			return opt;
 		}
 
 		static int push(lua_State* l, push_type v)
@@ -434,7 +437,12 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			return static_cast<T>(lua_tonumber(l, index));
+			int isnum=0;
+			get_type num = static_cast<T>(lua_tonumberx(l,index,&isnum));
+			if (!isnum) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return num;
 		}
 		static int push(lua_State* l, lua_Number s)
 		{
@@ -460,7 +468,12 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)
 		{
-			return static_cast<T>(lua_tointeger(l, index));
+			int isnum = 0;
+			get_type num = static_cast<T>(lua_tointegerx(l, index, &isnum));
+			if (!isnum) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return num;
 		}
 		static int push(lua_State* l, lua_Integer s)
 		{
@@ -528,7 +541,11 @@ namespace kaguya
 		}
 		static const char* get(lua_State* l, int index)
 		{
-			return lua_tostring(l, index);
+			const char* buffer = lua_tostring(l, index);
+			if (!buffer) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return buffer;
 		}
 		static int push(lua_State* l, const char* s)
 		{
@@ -551,7 +568,11 @@ namespace kaguya
 		}
 		static const char* get(lua_State* l, int index)
 		{
-			return lua_tostring(l, index);
+			const char* buffer = lua_tostring(l, index);
+			if (!buffer) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return buffer;
 		}
 		static int push(lua_State* l, const char s[N])
 		{
@@ -577,6 +598,9 @@ namespace kaguya
 		{
 			size_t size = 0;
 			const char* buffer = lua_tolstring(l, index, &size);
+			if (!buffer) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
 			return std::string(buffer, size);
 		}
 		static int push(lua_State* l, const std::string& s)
@@ -697,6 +721,12 @@ namespace kaguya
 				lua_State* state = state_();
 				util::ScopedSavedStack save(state);
 				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
+			}
+			template<typename T,typename U>typename lua_type_traits<T>::get_type value_or(U v)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<optional<T> >::get(state, state ? pushStackIndex_(state) : 0).value_or(v);
 			}
 
 			//deprecated. use get<kaguya::optional<T> >() instead;

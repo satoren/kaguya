@@ -296,12 +296,11 @@ namespace kaguya
 				}
 				else
 				{
-					optional<MemType> opt = lua_type_traits<optional<MemType> >::get(state, 2);
-					if (!this_ || !opt)
+					if (!this_)
 					{
 						throw LuaTypeMismatch("type mismatch!!");
 					}
-					this_->*m = *opt;
+					this_->*m = lua_type_traits<MemType>::get(state, 2);
 					return 0;
 				}
 			}

@@ -101,6 +101,11 @@ namespace kaguya
 				lua_setglobal(L, modname);
 			}
 		}
+		inline lua_Number lua_tonumberx(lua_State *L, int index, int *isnum)
+		{
+			if (isnum) { *isnum = lua_isnumber(L, index); }
+			return lua_tonumber(L, index);
+		}
 #endif
 #if LUA_VERSION_NUM < 503
 		inline void lua_seti(lua_State *L, int index, lua_Integer n)
