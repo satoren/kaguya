@@ -847,11 +847,16 @@ KAGUYA_TEST_FUNCTION_DEF(add_property)(kaguya::State& state)
 		.addProperty("b", &Derived::b)
 		);
 
+	state["Derived"]["test_value"] = 55;
+
 	Derived derived;
 	Base base;
 	const Base* constbase = &base;
 	state["base"] = &base;
 	state["derived"] = kaguya::standard::ref(derived);
+
+	TEST_CHECK(state("assert(55 == derived.test_value)"));
+
 	TEST_CHECK(state("base.a=1"));
 	TEST_CHECK(state("derived.a = 2"));
 	TEST_CHECK(state("derived.b=3"));
@@ -1265,6 +1270,55 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
 			.addProperty("a", &Base::a)
 			.addOverloadedFunctions("a", &Base::a)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+	
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addOverloadedFunctions("a", &Base::a)
+			.addProperty("a", &Base::get)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+
+
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addOverloadedFunctions("a", &Base::a)
+			.addProperty("a", &Base::get, &Base::set)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addFunction("a", &Base::a)
+			.addFunction("a", &Base::get)
 		);
 	}
 	catch (const kaguya::KaguyaException& e)
