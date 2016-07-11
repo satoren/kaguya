@@ -159,13 +159,13 @@ KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 5.5,value)"));
 	{
-		kaguya::optional<double> v = state["value"];
+		kaguya::optional<double> v = state["value"].get<kaguya::optional<double> >();
 		TEST_EQUAL(*v, 5.5);
 	}
 	state["value"] = kaguya::optional<double>();
 	TEST_CHECK(state("assert(value == nil)"));
 	{
-		kaguya::optional<double> v = state["value"];
+		kaguya::optional<double> v = state["value"].get<kaguya::optional<double> >();
 		TEST_CHECK(!v);
 	}
 
@@ -175,13 +175,13 @@ KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 'test')"));
 	{
-		kaguya::optional<const char*> v = state["value"];
+		kaguya::optional<const char*> v = state["value"].get<kaguya::optional<const char*> >();
 		TEST_CHECK(strcmp(*v, "test")==0);
 	}
 	state["value"] = kaguya::optional<const char*>();
 	TEST_CHECK(state("assert(value == nil)"));
 	{
-		kaguya::optional<double> v = state["value"];
+		kaguya::optional<const char*> v = state["value"].get<kaguya::optional<const char*> >();
 		TEST_CHECK(!v);
 	}
 
@@ -191,13 +191,13 @@ KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 'test')"));
 	{
-		kaguya::optional<std::string> v = state["value"];
+		kaguya::optional<std::string> v = state["value"].get<kaguya::optional<std::string> >();
 		TEST_EQUAL(*v, "test");
 	}
 	state["value"] = kaguya::optional<std::string>();
 	TEST_CHECK(state("assert(value == nil)"));
 	{
-		kaguya::optional<std::string> v = state["value"];
+		kaguya::optional<std::string> v = state["value"].get<kaguya::optional<std::string> >();
 		TEST_CHECK(!v);
 	}
 };
