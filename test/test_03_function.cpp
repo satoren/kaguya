@@ -97,16 +97,20 @@ KAGUYA_TEST_FUNCTION_DEF(native_function_call_test)(kaguya::State& state)
 	state.newRef(&foo).push();
 	state.newRef("Bar").push();
 	call(state.state(), &Foo::setBar);
+
+	lua_settop(state.state(), 0);
 #if KAGUYA_USE_CPP11
 	state.newRef(&foo).push();
 	state.newRef(9).push();
 	call(state.state(), [](Foo* foo, int b) {
+		TEST_EQUAL(b, 9);
 		foo->setBar("fromlambda");
 	});
 	TEST_EQUAL(foo.bar, "fromlambda");
 
 	std::string capture("capture");
 	call(state.state(), [=](Foo* foo, int b) {
+		TEST_EQUAL(b, 9);
 		foo->setBar(capture + "lambda");
 	});
 	TEST_EQUAL(foo.bar, "capturelambda");
