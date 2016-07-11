@@ -404,6 +404,21 @@ namespace kaguya
 			lua_remove(state, -2);//remove table
 			return LuaStackRef(state, -1, true);
 		}
+		template<typename T> template <typename KEY>
+		LuaStackRef LuaTableOrUserDataImpl<T>::getRawField(const KEY& key)const
+		{
+			lua_State* state = state_();
+			if (!state)
+			{
+				except::typeMismatchError(state, "is nil");
+				return LuaStackRef();
+			}
+			push_(state);
+			util::one_push(state, key);//push key
+			lua_rawget(state, -2);//get table[key]
+			lua_remove(state, -2);//remove table
+			return LuaStackRef(state, -1, true);
+		}
 
 		template<typename T> template<typename KEY>
 		LuaStackRef LuaTableOrUserDataImpl<T>::operator[](KEY key)const

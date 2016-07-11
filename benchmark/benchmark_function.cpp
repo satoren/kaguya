@@ -117,9 +117,9 @@ namespace kaguya
 		{
 			lua_createtable(l, 0, 3);
 			LuaStackRef table(l, -1);
-			table.setField("x", v.x);
-			table.setField("y", v.y);
-			table.setField("z", v.z);
+			table.setRawField("x", v.x);
+			table.setRawField("y", v.y);
+			table.setRawField("z", v.z);
 			return 1;
 		}
 	};
@@ -588,8 +588,7 @@ namespace kaguyaapi
 		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
-			bool was_valid;
-			std::vector<double> r = lua_table.get<std::vector<double> >(was_valid);
+			std::vector<double> r = lua_table.get<std::vector<double> >();
 		}
 	}
 	void vector_to_table(kaguya::State& state)

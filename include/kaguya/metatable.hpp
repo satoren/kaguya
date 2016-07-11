@@ -207,17 +207,17 @@ namespace kaguya
 					metatable.push(state);
 					lua_pushcclosure(state, &detail::property_index_function, 1);
 					LuaStackRef indexfun(state, -1);
-					metatable.setField("__index", indexfun);
+					metatable.setRawField("__index", indexfun);
 
 
 					metatable.push(state);
 					lua_pushcclosure(state, &detail::property_newindex_function, 1);
 					LuaStackRef newindexfun(state, -1);
-					metatable.setField("__newindex", newindexfun);
+					metatable.setRawField("__newindex", newindexfun);
 				}
 				else
 				{
-					metatable.setField("__index", metatable);
+					metatable.setRawField("__index", metatable);
 				}
 
 				set_base_metatable(state, metatable, types::typetag<base_class_type>());
@@ -488,14 +488,14 @@ namespace kaguya
 		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			metabases.setField(metabases.size() + 1, LuaTable(state, StackTop()));
+			metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop()));
 			pvtreg.add_type_conversion<Base, class_type>();
 		}
 		template<typename Base, typename... Remain>
 		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			metabases.setField(metabases.size() + 1, LuaTable(state, StackTop()));
+			metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop()));
 			pvtreg.add_type_conversion<Base, class_type>();
 			metatables(state, metabases, pvtreg, types::typetag<MultipleBase<Remain...> >());
 		}
@@ -514,7 +514,7 @@ namespace kaguya
 #else
 #define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
 #define KAGUYA_GET_BASE_METATABLE(N) class_userdata::get_metatable<KAGUYA_PP_CAT(A,N)>(state);\
-		metabases.setField(metabases.size() + 1, LuaTable(state, StackTop())); \
+		metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop())); \
 		pconverter.add_type_conversion<KAGUYA_PP_CAT(A,N),class_type>();
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\

@@ -464,6 +464,8 @@ KAGUYA_TEST_FUNCTION_DEF(get_field)(kaguya::State& state)
 	TEST_EQUAL(const_table[1], 32);
 	TEST_EQUAL(const_table.getField(1), 32);
 	TEST_EQUAL(const_table.getField<int>(state.newRef(1)),32);
+	TEST_EQUAL(const_table.getRawField(1), 32);
+	TEST_EQUAL(const_table.getRawField<int>(state.newRef(1)), 32);
 }
 
 
@@ -547,6 +549,13 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 	TEST_CHECK(!v.setField("s", kaguya::NilValue()));
 	TEST_CHECK(!v.setField(kaguya::NilValue(), kaguya::NilValue()));
 
+
+	TEST_CHECK(!v.setRawField("s", 2));
+	TEST_CHECK(!v.setRawField("s", "a"));
+	TEST_CHECK(!v.setRawField("s", std::string("a")));
+	TEST_CHECK(!v.setRawField("s", table));
+	TEST_CHECK(!v.setRawField("s", kaguya::NilValue()));
+	TEST_CHECK(!v.setRawField(kaguya::NilValue(), kaguya::NilValue()));
 
 	TEST_CHECK(!table.getFunctionEnv());
 	TEST_CHECK(!thread.getMetatable());

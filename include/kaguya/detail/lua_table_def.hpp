@@ -145,6 +145,49 @@ namespace kaguya
 			template<typename KEY>
 			LuaStackRef getField(const KEY& key)const;
 
+
+			/**
+			* @brief value = rawget(table,key);
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename T, typename KEY>
+			typename lua_type_traits<T>::get_type getRawField(const KEY& key)const
+			{
+				lua_State* state = state_();
+				typedef typename lua_type_traits<T>::get_type get_type;
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return get_type();
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, key);
+				lua_rawget(state, stackIndex);
+				return lua_type_traits<T>::get(state, -1);
+			}
+			template<typename KEY>
+			LuaStackRef getRawField(const KEY& key)const;
+			/**
+			* @brief value = rawget(table,key);
+			* @param key key of table
+			* @return reference of field value
+			*/
+			template<typename T>
+			typename lua_type_traits<T>::get_type getRawField(luaInt key)const
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return typename lua_type_traits<T>::get_type();
+				}
+				util::ScopedSavedStack save(state);
+				lua_rawgeti(state, pushStackIndex_(state), key);
+				return lua_type_traits<T>::get(state, -1);
+			}
+
 			/**
 			* @brief foreach table fields
 			*/
@@ -375,7 +418,40 @@ namespace kaguya
 				lua_setfield(state, stackIndex, key);//thistable[key] = value
 				return true;
 			}
+			template<typename K, typename V>
+			bool setRawField(K&& key, V&& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, key);//push table key
+				util::one_push(state, value);//push value
+				lua_rawset(state, stackIndex);//thistable[key] = value
+				return true;
+			}
 #endif
+
+			template<typename K, typename V>
+			bool setRawField(const K& key, const V& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				util::one_push(state, key);//push table key
+				util::one_push(state, value);//push value
+				lua_rawset(state, stackIndex);//thistable[key] = value
+				return true;
+			}
 		};
 	}
 }
