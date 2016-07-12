@@ -53,8 +53,8 @@ namespace kaguya
 				(this_->*f)(std::forward<Args>(args)...);
 			}
 			template<class F, class... Args>
-			typename standard::result_of<F(Args...)>::type
-				invoke_fn(F&& f, Args&&... args)
+			//MSVC 2013 std::result_of is broken.
+			auto invoke_fn(F&& f, Args&&... args) -> decltype(f(std::forward<Args>(args)...))
 			{
 				return f(std::forward<Args>(args)...);
 			}
