@@ -97,6 +97,10 @@ namespace kaguya
 			struct functor_f_signature<Ret(T::*)(Args...) const> {
 				typedef invoke_signature_type<Ret, Args...> type;
 			};
+			template <typename T, typename Ret, typename... Args>
+			struct functor_f_signature<Ret(T::*)(Args...)> {
+				typedef invoke_signature_type<Ret, Args...> type;
+			};
 
 #if _MSC_VER
 			template <typename T>

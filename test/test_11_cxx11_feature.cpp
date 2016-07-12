@@ -111,6 +111,8 @@ KAGUYA_TEST_FUNCTION_DEF(lambdafun)(kaguya::State& state)
 	state("assert(overload('2') == 2)");//string version
 	state("assert(overload() == 3)");//no argument version
 
+	state["lamda2"] = kaguya::function([]()mutable {return 12; });//mutable functor
+	state("assert(lamda2() == 12)");
 }
 
 KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
