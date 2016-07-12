@@ -560,7 +560,6 @@ namespace kaguya
 			{
 				return true;
 			}
-			if (key == "__index" || key == "__newindex") { return true; }//__index and __newindex is reserved for this class
 			return false;
 		}
 		void registerField(lua_State* state, const char* name, const AnyDataPusher& value)const
