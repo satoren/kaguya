@@ -1504,5 +1504,17 @@ KAGUYA_TEST_FUNCTION_DEF(self_register_index_object)(kaguya::State& state)
 	state("assert(obj[3]==9);");
 	state("obj[1]=3;");
 
+	{//other way
+		kaguya::State state;
+		state["ABC"].setClass(kaguya::UserdataMetatable<ABC>());
+
+		state["ABC"]["__index"] = kaguya::function(&testindexfn);
+		state["ABC"]["__newindex"] = kaguya::function(&testindexfn);
+
+		ABC obj;
+		state["obj"] = ABC(3);
+		state("assert(obj[3]==9);");
+		state("obj[1]=3;");
+	}
 }
 KAGUYA_TEST_GROUP_END(test_02_classreg)
