@@ -18,7 +18,7 @@ namespace kaguya
 		namespace cpp11impl
 		{
 			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke(Res(ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
+			Res invoke_fn(Res(ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
 			{
 				if (!this_)
 				{
@@ -28,7 +28,7 @@ namespace kaguya
 			}
 
 			template<class ThisType, class... FArgs, class... Args>
-			void invoke(void (ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
+			void invoke_fn(void (ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
 			{
 				if (!this_)
 				{
@@ -38,7 +38,7 @@ namespace kaguya
 			}
 
 			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke(Res(ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
+			Res invoke_fn(Res(ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
 			{
 				if (!this_)
 				{
@@ -48,13 +48,13 @@ namespace kaguya
 			}
 
 			template<class ThisType, class... FArgs, class... Args>
-			void invoke(void (ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
+			void invoke_fn(void (ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
 			{
 				(this_->*f)(std::forward<Args>(args)...);
 			}
 			template<class F, class... Args>
 			typename standard::result_of<F(Args...)>::type
-				invoke(const F& f, Args&&... args)
+				invoke_fn(F&& f, Args&&... args)
 			{
 				return f(std::forward<Args>(args)...);
 			}
@@ -135,14 +135,14 @@ namespace kaguya
 			};
 
 			template<class F, class Ret, class... Args, size_t... Indexes>
-			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
+			int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
 			{
-				return util::push_args(state, invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
+				return util::push_args(state, invoke_fn(f, lua_type_traits<Args>::get(state, Indexes)...));
 			}
 			template<class F, class... Args, size_t... Indexes>
-			int _call_apply(lua_State* state, const F& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
+			int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
 			{
-				invoke(f, lua_type_traits<Args>::get(state, Indexes)...);
+				invoke_fn(f, lua_type_traits<Args>::get(state, Indexes)...);
 				return 0;
 			}
 
@@ -321,7 +321,7 @@ namespace kaguya
 
 
 			template<class F>
-			int call(lua_State* state, const F& f)
+			int call(lua_State* state, F&& f)
 			{
 				typedef typename traits::decay<F>::type ftype;
 				typedef typename f_signature<ftype>::type fsigtype;

@@ -44,7 +44,7 @@ KAGUYA_TEST_FUNCTION_DEF(movable_class_test)(kaguya::State& state)
 	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
 		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
-		);
+	);
 
 	state["moveonly"] = MoveOnlyClass(2);
 
@@ -120,7 +120,7 @@ KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
 	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
 		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
-		);
+	);
 
 	state["uniqueptr"] = std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(2));
 
@@ -196,7 +196,7 @@ KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
 {
 	state["Base"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>());
 
-	state["test"] =std::unique_ptr<MoveOnlyClass>();
+	state["test"] = std::unique_ptr<MoveOnlyClass>();
 	TEST_CHECK(state("assert(test==nil)"));
 }
 
@@ -240,7 +240,7 @@ KAGUYA_TEST_FUNCTION_DEF(result_range_based_for)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 {
 	state["table"] = kaguya::TableData{ 23,"test",{"key","value"},
-	{ "childtable",kaguya::TableData{3} }};
+	{ "childtable",kaguya::TableData{3} } };
 	kaguya::LuaTable tbl = state["table"];
 
 

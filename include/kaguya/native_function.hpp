@@ -268,11 +268,11 @@ namespace kaguya
 			}
 			return best_score_index;
 		}
-		template<typename Fn> int invoke_index(lua_State* state, int index, int current_index, const Fn& fn)
+		template<typename Fn> int invoke_index(lua_State* state, int index, int current_index, Fn&& fn)
 		{
 			return nativefunction::call(state, fn);
 		}
-		template<typename Fn, typename... Functions> int invoke_index(lua_State* state, int index, int current_index, const Fn& fn, const Functions&... fns)
+		template<typename Fn, typename... Functions> int invoke_index(lua_State* state, int index, int current_index, Fn&& fn, Functions&&... fns)
 		{
 			if (index == current_index)
 			{
@@ -284,12 +284,12 @@ namespace kaguya
 			}
 		}
 
-		template<typename Fun> int best_match_invoke(lua_State* state, const Fun& fn)
+		template<typename Fun> int best_match_invoke(lua_State* state, Fun&& fn)
 		{
 			return nativefunction::call(state, fn);
 		}
 
-		template<typename Fun, typename... Functions> int best_match_invoke(lua_State* state, const Fun& fn, const Functions&... fns)
+		template<typename Fun, typename... Functions> int best_match_invoke(lua_State* state, Fun&& fn, Functions&&... fns)
 		{
 			int index = best_function_index(state, fn, fns...);
 			if (index >= 0)
