@@ -1483,4 +1483,26 @@ KAGUYA_TEST_FUNCTION_DEF(self_refcounted_object)(kaguya::State& )
 
 }
 
+int testindexfn(ABC* self, int key)
+{
+	return self->intmember * key;
+}
+void testnewindexfn(ABC* self, int key,int value)
+{
+	TEST_EQUAL(key, 1);
+	TEST_EQUAL(value, 3);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(self_register_index_object)(kaguya::State& state)
+{
+
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.addStaticFunction("__index", &testindexfn)
+		.addStaticFunction("__newindex", &testnewindexfn));
+	ABC obj;
+	state["obj"] = ABC(3);
+	state("assert(obj[3]==9);");
+	state("obj[1]=3;");
+
+}
 KAGUYA_TEST_GROUP_END(test_02_classreg)
