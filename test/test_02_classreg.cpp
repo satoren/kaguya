@@ -1517,4 +1517,50 @@ KAGUYA_TEST_FUNCTION_DEF(self_register_index_object)(kaguya::State& state)
 		state("obj[1]=3;");
 	}
 }
+
+KAGUYA_TEST_FUNCTION_DEF(int_call_constructor)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("getInt", &ABC::getInt)
+	);
+	kaguya::LuaTable constructor_table = state.newTable();
+	constructor_table["__call"] = kaguya::LuaCodeChunkResult("return function(t,...) return t.new(...) end");
+	state["ABC"].setMetatable(constructor_table);
+
+	TEST_CHECK(state("value = assert(ABC(32))"));
+	TEST_CHECK(state("assert(value:getInt() == 32)"));
+};
+
+
+KAGUYA_TEST_FUNCTION_DEF(constructor_arg_type_mismatch_error)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("getInt", &ABC::getInt)
+	);
+	state.setErrorHandler(ignore_error_fun);
+	
+	last_error_message = "";
+	bool res = state("v = ABC.new('abc')");
+	TEST_CHECK(!res);
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+};
+
+KAGUYA_TEST_FUNCTION_DEF(arg_type_mismatch_error)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("setInt", &ABC::setInt)
+	);
+	state.setErrorHandler(ignore_error_fun);
+
+	last_error_message = "";
+	TEST_CHECK(state("value = assert(ABC.new(32))"));
+
+	TEST_CHECK(!state("value:setInt('abc')"));
+
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+};
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)

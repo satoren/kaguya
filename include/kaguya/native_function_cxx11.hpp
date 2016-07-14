@@ -312,7 +312,7 @@ namespace kaguya
 			{
 				typedef ObjectWrapper<ClassType> wrapper_type;
 				void *storage = lua_newuserdata(state, sizeof(wrapper_type));
-				new(storage) wrapper_type(lua_type_traits<Args>::get(state, Indexes)...);
+				try { new(storage) wrapper_type(lua_type_traits<Args>::get(state, Indexes)...); }catch (...) { lua_pop(state, 1); throw; }
 
 				class_userdata::setmetatable<ClassType>(state);
 				return 1;

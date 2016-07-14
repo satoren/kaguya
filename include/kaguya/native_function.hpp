@@ -215,14 +215,19 @@ namespace kaguya
 					lua_pushliteral(state, ",");
 				}
 
-				ObjectWrapperBase* object = object_wrapper(state, i);
-				if (object)
+				int type = lua_type(state, i);
+				if (type == LUA_TUSERDATA)
 				{
-					lua_pushstring(state, object->type().name());
+					int nametype = luaL_getmetafield(state, i, "__name");
+					if (nametype != LUA_TSTRING)
+					{
+						lua_pop(state, 1);
+						lua_pushstring(state, lua_typename(state, type));
+					}
 				}
 				else
 				{
-					lua_pushstring(state, lua_typename(state, lua_type(state, i)));
+					lua_pushstring(state, lua_typename(state, type));
 				}
 			}
 			return lua_gettop(state) - top;
