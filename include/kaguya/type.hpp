@@ -852,20 +852,9 @@ namespace kaguya
 			optional<typename lua_type_traits<T>::get_type> checkGet_()const
 			{
 				lua_State* state = state_();
-				if (!state) {
-					return optional<typename lua_type_traits<T>::get_type>();
-				}
 				util::ScopedSavedStack save(state);
 				int stackindex = pushStackIndex_(state);
-				bool was_valid = lua_type_traits<T>::checkType(state, stackindex);
-				if (was_valid)
-				{
-					return optional<typename lua_type_traits<T>::get_type>(lua_type_traits<T>::get(state, stackindex));
-				}
-				else
-				{
-					return optional<typename lua_type_traits<T>::get_type>();
-				}
+				return lua_type_traits<optional<typename lua_type_traits<T>::get_type> >::get(state, stackindex);
 			}
 		};
 		template<typename D>
