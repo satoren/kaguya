@@ -1523,7 +1523,6 @@ KAGUYA_TEST_FUNCTION_DEF(call_constructor)(kaguya::State& state)
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 		.setConstructors<ABC(int)>()
 		.addFunction("getInt", &ABC::getInt)
-		.enableCallConstruct()
 	);
 
 	TEST_CHECK(state("value = assert(ABC(32))"));
@@ -1531,7 +1530,6 @@ KAGUYA_TEST_FUNCTION_DEF(call_constructor)(kaguya::State& state)
 
 	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>()
 		.setConstructors<Foo()>()
-		.enableCallConstruct()
 	);
 	TEST_CHECK(state("value = assert(Foo())"));
 	
