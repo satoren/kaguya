@@ -210,11 +210,41 @@ namespace kaguyaapi
 	}
 #endif
 
+
 	kaguya::UserdataMetatable<Vector3> vec3meta = kaguya::UserdataMetatable<Vector3>()
 		.setConstructors<Vector3(), Vector3(float, float, float)>()
 		.addProperty("x", &Vector3::x)
 		.addProperty("y", &Vector3::y)
 		.addProperty("z", &Vector3::z);
+
+	void call_construct(kaguya::State& state)
+	{
+		state["Vector3"].setClass(vec3meta);
+		state(
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
+			"for i=1,times do\n"
+			"local a = Vector3(i,i+1,i+2)\n"
+			"if(a.x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
+	void new_construct(kaguya::State& state)
+	{
+		state["Vector3"].setClass(vec3meta);
+		state(
+			"local times = " KAGUYA_BENCHMARK_COUNT_STR "\n"
+			"for i=1,times do\n"
+			"local a = Vector3.new(i,i+1,i+2)\n"
+			"if(a.x ~= i)then\n"
+			"error('error')\n"
+			"end\n"
+			"if (collectgarbage('count') > 10240) then collectgarbage() end\n"
+			"end\n"
+			"");
+	}
 
 	void object_get_set(kaguya::State& state)
 	{

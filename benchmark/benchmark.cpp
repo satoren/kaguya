@@ -71,7 +71,9 @@ int main()
 	ADD_BENCHMARK(kaguyaapi::simple_get_set_contain_property_member);
 #endif
 //	ADD_BENCHMARK(plain_api::object_get_set);
-
+	ADD_BENCHMARK(kaguyaapi::new_construct);
+	ADD_BENCHMARK(kaguyaapi::call_construct);
+	
 	ADD_BENCHMARK(kaguyaapi::object_get_set);
 	ADD_BENCHMARK(kaguyaapi::object_get_set_property);
 	ADD_BENCHMARK(kaguyaapi::object_get_set_property_function);

@@ -12,6 +12,8 @@ namespace kaguyaapi
 	void overloaded_get_set(kaguya::State& state);
 	void simple_get_set_contain_property_member(kaguya::State& state);
 
+	void call_construct(kaguya::State& state);
+	void new_construct(kaguya::State& state);
 
 	void object_get_set(kaguya::State& state);
 	void object_get_set_property(kaguya::State& state);
