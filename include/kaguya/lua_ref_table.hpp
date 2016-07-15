@@ -378,7 +378,10 @@ namespace kaguya
 				except::typeMismatchError(state, lua_typename(state, t) + std::string(" is not table"));
 				return LuaTable();
 			}
-			lua_getmetatable(state, stackindex);
+			if (!lua_getmetatable(state, stackindex))
+			{
+				lua_pushnil(state);
+			}
 			return LuaTable(state, StackTop());
 		}
 		template<typename T>

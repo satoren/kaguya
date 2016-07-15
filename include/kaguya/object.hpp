@@ -668,6 +668,23 @@ namespace kaguya
 		{
 			setmetatable(l, metatableType<T>());
 		}
+
+		inline void get_call_constructor_metatable(lua_State* L)
+		{
+			static int key=0;
+
+			int ttype = lua_rawgetp_rtype(L, LUA_REGISTRYINDEX, &key);
+			if (ttype != LUA_TTABLE)
+			{
+				lua_pop(L,1);
+				lua_createtable(L, 0, 1);
+				lua_pushstring(L, "__call");
+				luaL_dostring(L, "return function(t,...) return t.new(...) end");
+				lua_rawset(L,-3);
+				lua_pushvalue(L, -1);
+				lua_rawsetp(L, LUA_REGISTRYINDEX, &key);
+			}		
+		}
 	}
 	template<typename T>
 	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())

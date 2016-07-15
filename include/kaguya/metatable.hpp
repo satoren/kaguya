@@ -197,49 +197,58 @@ namespace kaguya
 		LuaTable createMatatable(lua_State* state)const
 		{
 			util::ScopedSavedStack save(state);
-			if (class_userdata::newmetatable<class_type>(state))
+			if (!class_userdata::newmetatable<class_type>(state))
 			{
-				LuaStackRef metatable(state, -1);
-				registerMember(state);
+				except::OtherError(state, typeid(class_type*).name() + std::string(" is already registered"));
+				return LuaTable();
+			}
+			LuaStackRef metatable(state, -1);
+			registerMember(state);
 
-				if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
+			if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
+			{
+
+				if (member_map_.count("__index") == 0)
 				{
-
-					if (member_map_.count("__index") == 0)
-					{
-						metatable.push(state);
-						lua_pushcclosure(state, &detail::property_index_function, 1);
-						LuaStackRef indexfun(state, -1);
-						metatable.setRawField("__index", indexfun);
-					}
-
-
-
-					if (member_map_.count("__newindex") == 0)
-					{
-						metatable.push(state);
-						lua_pushcclosure(state, &detail::property_newindex_function, 1);
-						LuaStackRef newindexfun(state, -1);
-						metatable.setRawField("__newindex", newindexfun);
-					}
-				}
-				else
-				{
-					if (member_map_.count("__index") == 0)
-					{
-						metatable.setRawField("__index", metatable);
-					}
+					metatable.push(state);
+					lua_pushcclosure(state, &detail::property_index_function, 1);
+					LuaStackRef indexfun(state, -1);
+					metatable.setRawField("__index", indexfun);
 				}
 
-				set_base_metatable(state, metatable, types::typetag<base_class_type>());
 
-				return metatable;
+
+				if (member_map_.count("__newindex") == 0)
+				{
+					metatable.push(state);
+					lua_pushcclosure(state, &detail::property_newindex_function, 1);
+					LuaStackRef newindexfun(state, -1);
+					metatable.setRawField("__newindex", newindexfun);
+				}
 			}
 			else
 			{
-				except::OtherError(state, typeid(class_type*).name() + std::string(" is already registered"));
+				if (member_map_.count("__index") == 0)
+				{
+					metatable.setRawField("__index", metatable);
+				}
 			}
-			return LuaTable();
+
+			set_base_metatable(state, metatable, types::typetag<base_class_type>());
+
+			class_userdata::get_call_constructor_metatable(state);
+			LuaStackRef call_construct_table(state, -1, true);
+			LuaTable basemetatable = metatable.getMetatable();
+			if (basemetatable)
+			{
+				basemetatable["__call"] = call_construct_table["__call"];
+			}
+			else
+			{
+				metatable.setMetatable(call_construct_table);
+			}
+
+			return metatable;
 		}
 
 
@@ -260,7 +269,7 @@ namespace kaguya
 		addOverloadedFunctions("new",KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF));\
 		return *this;\
 	}
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_SET_CON_FN_DEF)
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_SET_CON_FN_DEF)
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_SET_CON_FN_DEF
 #undef KAGUYA_SET_CON_TYPE_DEF
@@ -280,7 +289,7 @@ namespace kaguya
 			property_map_[name] = AnyDataPusher(function(mem));
 			return *this;
 		}
-		
+
 		/**
 		* @name addProperty
 		* @brief add member property with getter function.(experimental)
@@ -346,7 +355,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			
+
 			member_map_[name] = AnyDataPusher(LuaCodeChunkResult(lua_code_chunk));
 			return *this;
 		}
@@ -370,7 +379,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered."); 
+				throw KaguyaException("already registered.");
 				return *this;
 			}
 
@@ -438,7 +447,7 @@ namespace kaguya
 			return *this;
 		}
 #endif
-		
+
 
 #if defined(_MSC_VER) && _MSC_VER <= 1800
 		//can not use add at MSVC2013

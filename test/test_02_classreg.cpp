@@ -1518,7 +1518,54 @@ KAGUYA_TEST_FUNCTION_DEF(self_register_index_object)(kaguya::State& state)
 	}
 }
 
-KAGUYA_TEST_FUNCTION_DEF(int_call_constructor)(kaguya::State& state)
+KAGUYA_TEST_FUNCTION_DEF(call_constructor)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("getInt", &ABC::getInt)
+		.enableCallConstruct()
+	);
+
+	TEST_CHECK(state("value = assert(ABC(32))"));
+	TEST_CHECK(state("assert(value:getInt() == 32)"));
+
+	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>()
+		.setConstructors<Foo()>()
+		.enableCallConstruct()
+	);
+	TEST_CHECK(state("value = assert(Foo())"));
+	
+
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.addProperty("a", &Base::a)
+		.addFunction("__call", &Base::get)
+		.setConstructors<Base()>()
+	);
+	state["Base2"].setClass(kaguya::UserdataMetatable<Base2>()
+		.addProperty("b", &Base2::b)
+		.addFunction("__call", &Base2::test)
+		.setConstructors<Base2()>()
+	);
+	state["MultipleInheritance"].setClass(kaguya::UserdataMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
+		.setConstructors<MultipleInheritance()>()
+		.addFunction("__call", &MultipleInheritance::test)
+		.addFunction("d", &MultipleInheritance::d)
+	);
+
+	TEST_CHECK(state("multiinheritance = assert(MultipleInheritance())"));
+	TEST_CHECK(state("assert(multiinheritance:d() == 0)"));
+	TEST_CHECK(state("assert(multiinheritance.a == 0)"));
+	TEST_CHECK(state("assert(multiinheritance.b == 0)"));
+	TEST_CHECK(state("assert(multiinheritance() == 1192)"));
+
+	TEST_CHECK(state("base2 = assert(Base2())"));
+	TEST_CHECK(state("assert(base2.b == 0)"));
+	TEST_CHECK(state("assert(base2() == 794)"));
+	TEST_CHECK(state("base = assert(Base())"));
+	TEST_CHECK(state("assert(base.a == 0)"));
+	TEST_CHECK(state("base.a = 4 assert(base.a == 4) assert(base() == 4)"));
+};
+KAGUYA_TEST_FUNCTION_DEF(int_call_constructor_manual)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 		.setConstructors<ABC(int)>()
