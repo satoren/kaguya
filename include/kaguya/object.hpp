@@ -670,7 +670,7 @@ namespace kaguya
 		}
 		namespace detail
 		{
-			inline int call_constructor_metamethods(lua_State* L)
+			inline int call_constructor_metamethod(lua_State* L)
 			{
 				lua_getfield(L,1,"new");
 				lua_replace(L, 1);
@@ -688,7 +688,7 @@ namespace kaguya
 				lua_pop(L,1);
 				lua_createtable(L, 0, 1);
 				lua_pushstring(L, "__call");
-				lua_pushcfunction(L, &detail::call_constructor_metamethods);
+				lua_pushcfunction(L, &detail::call_constructor_metamethod);
 //				luaL_dostring(L, "return function(t,...) return t.new(...) end");
 				lua_rawset(L,-3);
 				lua_pushvalue(L, -1);
