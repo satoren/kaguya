@@ -241,7 +241,7 @@ namespace kaguya
 			LuaTable basemetatable = metatable.getMetatable();
 			if (basemetatable)
 			{
-				basemetatable["__call"] = call_construct_table["__call"];
+				basemetatable.setRawField("__call",call_construct_table["__call"]);
 			}
 			else
 			{
