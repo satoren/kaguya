@@ -18,6 +18,16 @@ namespace kaguya_test_util
 #endif
 		return buffer;
 	}
+	inline std::string to_string(size_t v)
+	{
+		char buffer[64] = {};
+#if (defined(_MSC_VER) && _MSC_VER < 1900)
+		sprintf_s(buffer, "%zd", v);
+#else
+		snprintf(buffer, 64, "%zd", v);
+#endif
+		return buffer;
+	}
 
 	inline std::vector<std::string> split(std::string s, const char delim)
 	{
@@ -230,6 +240,11 @@ namespace kaguya_test_util
 			return stringmember;
 		}
 		void setString(std::string str) { stringmember = str; }
+
+		int default_arg(int a = 3, int b = 2, int c = 1)
+		{
+			return a*b*c;
+		}
 
 		TestClass copy()const { return *this; }
 		const TestClass& references()const { return *this; }

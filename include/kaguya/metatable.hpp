@@ -447,6 +447,16 @@ namespace kaguya
 			return *this;
 		}
 #endif
+		UserdataMetatable& addFunction(const char* name, PolymorphicMemberInvoker f)
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
+				return *this;
+			}
+			member_map_[name] = AnyDataPusher(function(f));
+			return *this;
+		}
 
 
 #if defined(_MSC_VER) && _MSC_VER <= 1800

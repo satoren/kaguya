@@ -164,7 +164,7 @@ int overload9(Bar*)
 }
 int overload10(const kaguya::standard::function<int()> fn)
 {
-	TEST_EQUAL(fn() , 1);
+	TEST_EQUAL(fn(), 1);
 	return 10;
 }
 
@@ -181,7 +181,7 @@ KAGUYA_TEST_FUNCTION_DEF(overload)(kaguya::State& state)
 		, overload7
 		, overload8
 		, overload9
-		);
+	);
 	kaguya::LuaFunction f = state["overloaded_function"];
 	TEST_EQUAL(f(), 1);
 	TEST_EQUAL(f(""), 2);
@@ -233,7 +233,7 @@ KAGUYA_TEST_FUNCTION_DEF(nested_function_call_test)(kaguya::State& state)
 	state("nested_function_call(function(value,value2) assert(value == 32);assert(value2 == 'text') end,32,'text')");
 }
 
-void nested_function_call2(kaguya::LuaStackRef function,const kaguya::LuaStackRef& table, kaguya::LuaStackRef value2)
+void nested_function_call2(kaguya::LuaStackRef function, const kaguya::LuaStackRef& table, kaguya::LuaStackRef value2)
 {
 	function(table["key"], value2);
 }
@@ -267,14 +267,14 @@ KAGUYA_TEST_FUNCTION_DEF(functioncall)(kaguya::State& state)
 	kaguya::standard::function<void(int)> f2 = testcall2;
 	state["testcall"] = &testcall;
 	state["testcall"]();
-	TEST_EQUAL(called , 1);
+	TEST_EQUAL(called, 1);
 	called = 0;
 
 	state["testcall"] = kaguya::function(f);
 	state["testcall"]();
-	TEST_EQUAL(called ,1);
+	TEST_EQUAL(called, 1);
 
-	state["overloaded"] = kaguya::overload(testcall2, testcall,f,f2);
+	state["overloaded"] = kaguya::overload(testcall2, testcall, f, f2);
 	state["overloaded"]();
 	TEST_EQUAL(called, 1);
 	state["overloaded"](1);
@@ -287,7 +287,7 @@ KAGUYA_TEST_FUNCTION_DEF(functioncall)(kaguya::State& state)
 
 int cfunction(lua_State* L)
 {
-	TEST_EQUAL(lua_tointeger(L,1), 3);
+	TEST_EQUAL(lua_tointeger(L, 1), 3);
 	return 0;
 }
 
@@ -296,8 +296,44 @@ KAGUYA_TEST_FUNCTION_DEF(luacfunction)(kaguya::State& state)
 	state["cfunction"] = &cfunction;
 
 	state.dostring("cfunction(3)");
+
+
 }
 
+int defargfn(int a = 3, int b = 2, int c = 1)
+{
+	return a*b*c;
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
+{
+	KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn,0,3)
+
+	state["defargfn"] = kaguya::function(defargfn_wrapper);
+
+	state.dostring("assert(defargfn() == 6)");
+	state.dostring("assert(defargfn(6) == 12)");
+	state.dostring("assert(defargfn(6,5) == 30)");
+	state.dostring("assert(defargfn(2,2,2) == 8)");
+}
+
+KAGUYA_TEST_FUNCTION_DEF(member_function_defaultarguments)(kaguya::State& state)
+{
+	KAGUYA_MEMBER_FUNCTION_OVERLOADS(defargfn_wrapper, TestClass, default_arg, 0, 3)
+
+	state["TestClass"].setClass(kaguya::UserdataMetatable<TestClass>()
+		.setConstructors<TestClass()>()
+		.addFunction("defargfn", defargfn_wrapper)
+	);
+
+	state.dostring("test = TestClass.new()");
+
+	state.dostring("assert(test:defargfn() == 6)");
+	state.dostring("assert(test:defargfn(6) == 12)");
+	state.dostring("assert(test:defargfn(6,5) == 30)");
+	state.dostring("assert(test:defargfn(2,2,2) == 8)");
+}
 
 
 KAGUYA_TEST_GROUP_END(test_03_function)
