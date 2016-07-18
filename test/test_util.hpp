@@ -20,13 +20,7 @@ namespace kaguya_test_util
 	}
 	inline std::string to_string(size_t v)
 	{
-		char buffer[64] = {};
-#if (defined(_MSC_VER) && _MSC_VER < 1900)
-		sprintf_s(buffer, "%zd", v);
-#else
-		snprintf(buffer, 64, "%zd", v);
-#endif
-		return buffer;
+		return to_string(int(v));
 	}
 
 	inline std::vector<std::string> split(std::string s, const char delim)

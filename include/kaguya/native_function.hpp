@@ -35,7 +35,7 @@ namespace kaguya
 	};
 	struct PolymorphicInvoker
 	{
-		typedef typename standard::shared_ptr<FunctionImpl> holder_type;
+		typedef standard::shared_ptr<FunctionImpl> holder_type;
 		PolymorphicInvoker(const holder_type& fptr) :fnc(fptr) {}
 		int invoke(lua_State *state)const { return fnc->invoke(state); }
 		std::string argTypeNames()const { return fnc->argTypeNames(); }
