@@ -217,6 +217,12 @@ namespace kaguya
 			luaL_requiref(state_, lib.first.c_str(), lib.second, 1);
 			return LuaStackRef(state_, -1, true);
 		}
+		LuaStackRef openlib(std::string name, lua_CFunction f)
+		{
+			return openlib(LoadLib(name, f));
+		}
+
+		
 		
 		/**
 		* @name openlibs

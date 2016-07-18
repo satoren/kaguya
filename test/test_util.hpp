@@ -188,6 +188,60 @@ namespace kaguya_test_util
 		}
 
 	};
+
+	//test target class
+	struct TestClass
+	{
+		int intmember;
+		std::string stringmember;
+		TestClass() :intmember(0) {}
+		TestClass(int a) :intmember(a) { }
+		TestClass(const char* a) :intmember(0), stringmember(a) { }
+		TestClass(std::string a) :intmember(0), stringmember(a) { }
+		TestClass(int intmem, const std::string& strmem) :intmember(intmem), stringmember(strmem) { }
+		TestClass(const std::string& strmem, int intmem) :intmember(intmem), stringmember(strmem) { }
+		TestClass(const TestClass&src) :intmember(src.intmember), stringmember(src.stringmember) {}
+
+		bool operator ==(const TestClass& rhs)const {
+			return intmember == rhs.intmember && stringmember == rhs.stringmember;
+		}
+		bool operator <(const TestClass& rhs)const {
+			return intmember < rhs.intmember || (intmember == rhs.intmember && stringmember < rhs.stringmember);
+		}
+		bool operator !=(const TestClass& rhs)const {
+			return !(*this == rhs);
+		}
+		bool operator >(const TestClass& rhs)const {
+			return (rhs < *this);
+		}
+		bool operator >=(const TestClass& rhs)const {
+			return !(*this < rhs);
+		}
+		bool operator <=(const TestClass& rhs)const {
+			return !(*this > rhs);
+		}
+		int getInt() const {
+			return intmember;
+		}
+		void setInt(const int& n) {
+			intmember = n;
+		}
+		std::string getString()const {
+			return stringmember;
+		}
+		void setString(std::string str) { stringmember = str; }
+
+		TestClass copy()const { return *this; }
+		const TestClass& references()const { return *this; }
+		const TestClass& const_references()const { return *this; }
+		TestClass& references() { return *this; }
+		TestClass* pointer() { return this; }
+		const TestClass* const_pointer()const { return this; }
+		kaguya::standard::shared_ptr<TestClass> shared_copy() { return kaguya::standard::shared_ptr<TestClass>(new TestClass(*this)); }
+	};
+
+
+
 }
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya_test_util::to_string(__LINE__) + "\nCHECKCODE:" #B );
