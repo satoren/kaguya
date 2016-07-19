@@ -119,7 +119,6 @@ namespace kaguya
 		struct is_callable<PolymorphicMemberInvoker> :traits::integral_constant<bool, true> {};
 	}
 
-
 	class VariadicArgType
 	{
 	public:
@@ -186,6 +185,11 @@ namespace kaguya
 				stack_index_ += n;
 				return iterator(state_, stack_index_);
 			}
+			/**
+			* @name relational operators
+			* @brief
+			*/
+			//@{
 			bool operator==(const iterator& other)const
 			{
 				return state_ == other.state_ && stack_index_ == other.stack_index_;
@@ -194,6 +198,7 @@ namespace kaguya
 			{
 				return !(*this == other);
 			}
+			//@}
 		private:
 			lua_State* state_;
 			int stack_index_;
@@ -251,6 +256,8 @@ namespace kaguya
 		int startIndex_;
 		int endIndex_;
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for VariadicArgType
 	template<> struct lua_type_traits<VariadicArgType>
 	{
 		typedef VariadicArgType get_type;
@@ -556,6 +563,8 @@ namespace kaguya
 #endif
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctionInvokerType
 	template<typename FunctionTuple> struct lua_type_traits<FunctionInvokerType<FunctionTuple> >
 	{
 		typedef FunctionInvokerType<FunctionTuple> userdatatype;
@@ -624,7 +633,8 @@ namespace kaguya
 	};
 
 
-	//specialize for c function
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for c function
 	template<typename T> struct lua_type_traits < T
 		, typename traits::enable_if<traits::is_function<typename traits::remove_pointer<T>::type>::value>::type >
 	{
@@ -633,7 +643,8 @@ namespace kaguya
 			return util::one_push(l, function(f));
 		}
 	};
-	//specialize for lua_CFunction
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for lua_CFunction
 	template<> struct lua_type_traits < lua_CFunction >
 	{
 		typedef lua_CFunction push_type;
@@ -659,6 +670,8 @@ namespace kaguya
 
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::function or boost::function
 	template<typename T> struct lua_type_traits<standard::function<T> > {
 		typedef const standard::function<T>& push_type;
 		typedef standard::function<T> get_type;
@@ -745,40 +758,32 @@ kaguya::PolymorphicMemberInvoker GENERATE_NAME = kaguya::PolymorphicMemberInvoke
 #define KAGUYA_INTERNAL_OVERLOAD_MEMBER_VOID_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == 1 + KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { this_->FNAME(KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N)))); return 0; }
 
 
-/**
-* @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
-* @param GENERATE_NAME generate function object name
-* @param FNAME target function name
-* @param MINARG minimum arguments count
-* @param MAXARG maximum arguments count
-*/
+/// @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
+/// @param GENERATE_NAME generate function object name
+/// @param FNAME target function name
+/// @param MINARG minimum arguments count
+/// @param MAXARG maximum arguments count
 #define KAGUYA_FUNCTION_OVERLOADS(GENERATE_NAME,FNAME, MINARG, MAXARG) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_FUNCTION_INVOKE)
 
-/**
-* @brief Generate wrapper function object for count based overloads with void return function. Include default arguments parameter function
-* @param GENERATE_NAME generate function object name
-* @param FNAME target function name
-* @param MINARG minimum arguments count
-* @param MAXARG maximum arguments count
-*/
+/// @brief Generate wrapper function object for count based overloads with void return function. Include default arguments parameter function
+/// @param GENERATE_NAME generate function object name
+/// @param FNAME target function name
+/// @param MINARG minimum arguments count
+/// @param MAXARG maximum arguments count
 #define KAGUYA_VOID_FUNCTION_OVERLOADS(GENERATE_NAME,FNAME, MINARG, MAXARG) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_VOID_FUNCTION_INVOKE)
 
-/**
-* @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
-* @param GENERATE_NAME generate function object name
-* @param CLASS target class name
-* @param FNAME target function name
-* @param MINARG minimum arguments count
-* @param MAXARG maximum arguments count
-*/
+/// @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
+/// @param GENERATE_NAME generate function object name
+/// @param CLASS target class name
+/// @param FNAME target function name
+/// @param MINARG minimum arguments count
+/// @param MAXARG maximum arguments count
 #define KAGUYA_MEMBER_FUNCTION_OVERLOADS(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_INVOKE)
 
-/**
-* @brief Generate wrapper function object for count based overloads with void return function. Include default arguments parameter function
-* @param GENERATE_NAME generate function object name
-* @param CLASS target class name
-* @param FNAME target function name
-* @param MINARG minimum arguments count
-* @param MAXARG maximum arguments count
-*/
+/// @brief Generate wrapper function object for count based overloads with void return function. Include default arguments parameter function
+/// @param GENERATE_NAME generate function object name
+/// @param CLASS target class name
+/// @param FNAME target function name
+/// @param MINARG minimum arguments count
+/// @param MAXARG maximum arguments count
 #define KAGUYA_MEMBER_VOID_FUNCTION_OVERLOADS(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_MEMBER_VOID_FUNCTION_INVOKE)

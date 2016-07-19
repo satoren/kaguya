@@ -208,7 +208,6 @@ namespace kaguya
 		}
 
 		///! for data member
-		//@{
 		template <typename T, typename MemType>
 		struct f_signature<MemType T::*> {
 			typedef MemType T::*type;
@@ -293,10 +292,8 @@ namespace kaguya
 		{
 			return std::string(typeid(T*).name()) + ",[OPT] " + typeid(MemType).name();
 		}
-		//@}
 
 		///! for constructor
-		//@{
 		template<class ClassType, class... Args>
 		struct constructor_signature_type :invoke_signature_type<ClassType, Args...>
 		{
@@ -326,7 +323,6 @@ namespace kaguya
 			class_userdata::setmetatable<ClassType>(state);
 			return 1;
 		}
-		//@}
 
 
 		template<class F>

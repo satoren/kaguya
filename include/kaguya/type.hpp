@@ -16,8 +16,11 @@
 
 #include "kaguya/push_tuple.hpp"
 
+
+
 namespace kaguya
 {
+
 	//default implements
 	template<typename T, typename Enable>
 	bool lua_type_traits<T, Enable>::checkType(lua_State* l, int index)
@@ -62,11 +65,15 @@ namespace kaguya
 	}
 #endif
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for const reference type
 	template<typename T> struct lua_type_traits<T
 		, typename traits::enable_if<traits::is_const_reference<T>::value>::type> :lua_type_traits<typename traits::remove_const_reference<T>::type > {};
 
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for lvalue reference type
 	template<typename REF> struct lua_type_traits < REF
 		, typename traits::enable_if<traits::is_lvalue_reference<REF>::value && !traits::is_const<typename traits::remove_reference<REF>::type>::value>::type >
 	{
@@ -114,6 +121,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for pointer type
 	template<typename PTR> struct lua_type_traits < PTR
 		, typename traits::enable_if<traits::is_pointer<typename traits::remove_const_reference<PTR>::type>::value && !traits::is_function<typename traits::remove_pointer<PTR>::type>::value>::type >
 	{
@@ -175,7 +184,8 @@ namespace kaguya
 		}
 	};
 
-	///! traits for bool
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for bool
 	template<>	struct lua_type_traits<bool> {
 		typedef bool get_type;
 		typedef bool push_type;
@@ -199,6 +209,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for void
 	template<>	struct lua_type_traits<void> {
 		typedef void* get_type;
 		typedef void* push_type;
@@ -222,7 +234,8 @@ namespace kaguya
 	};
 
 
-	///! traits for reference_wrapper
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for reference_wrapper
 	template<typename T> struct lua_type_traits<standard::reference_wrapper<T> > {
 		typedef const standard::reference_wrapper<T>& push_type;
 
@@ -233,7 +246,8 @@ namespace kaguya
 	};
 
 
-	///! traits for optional
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for optional
 	template<typename T> struct lua_type_traits<optional<T> > {
 		typedef const optional<T>& push_type;
 		typedef optional<T> get_type;
@@ -272,7 +286,8 @@ namespace kaguya
 		}
 	};
 
-	///! traits for shared_ptr
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for shared_ptr
 	template<typename T> struct lua_type_traits<standard::shared_ptr<T> > {
 		typedef const standard::shared_ptr<T>& push_type;
 		typedef standard::shared_ptr<T> get_type;
@@ -312,7 +327,8 @@ namespace kaguya
 		}
 	};
 #if KAGUYA_USE_CPP11
-	///! traits for unique_ptr
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for unique_ptr
 	template<typename T, typename Deleter> struct lua_type_traits<std::unique_ptr<T, Deleter> > {
 		typedef std::unique_ptr<T, Deleter>&& push_type;
 		typedef std::unique_ptr<T, Deleter>& get_type;
@@ -353,7 +369,8 @@ namespace kaguya
 			return 1;
 		}
 	};
-	///! traits for nullptr
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for nullptr
 	template<>	struct lua_type_traits<std::nullptr_t> {
 		typedef const std::nullptr_t& push_type;
 		typedef std::nullptr_t get_type;
@@ -382,8 +399,8 @@ namespace kaguya
 	};
 #endif
 
-	///! traits for ObjectWrapperBase*
-	/// implement for __gc desrcutor
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for ObjectWrapperBase*
 	template<>	struct lua_type_traits<ObjectWrapperBase*> {
 		typedef ObjectWrapperBase* get_type;
 		typedef ObjectWrapperBase* push_type;
@@ -402,7 +419,8 @@ namespace kaguya
 		}
 	};
 
-	///! traits for native type of Luathread
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for native type of luathread(lua_State*)
 	template<>	struct lua_type_traits<lua_State*> {
 		typedef lua_State* get_type;
 		typedef lua_State* push_type;
@@ -421,6 +439,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for floating point number value
 	template<typename T> struct lua_type_traits < T
 		, typename traits::enable_if<traits::is_floating_point<T>::value>::type >
 	{
@@ -451,6 +471,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for integral number value
 	template<typename T> struct lua_type_traits<T
 		, typename traits::enable_if<traits::is_integral<T>::value>::type>
 	{
@@ -502,6 +524,8 @@ namespace kaguya
 #endif
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for enum
 	template<typename T> struct lua_type_traits<T
 		, typename traits::enable_if<traits::is_enum<T>::value>::type>
 	{
@@ -527,6 +551,8 @@ namespace kaguya
 	};
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for cstring
 	template<>	struct lua_type_traits<const char*> {
 		typedef std::string get_type;
 		typedef const char* push_type;
@@ -554,6 +580,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for cstring
 	template<int N>	struct lua_type_traits<char[N]> {
 		typedef std::string get_type;
 		typedef const char* push_type;
@@ -580,8 +608,12 @@ namespace kaguya
 			return 1;
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for cstring
 	template<int N>	struct lua_type_traits<const char[N]> :lua_type_traits<char[N]> {};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::string
 	template<>	struct lua_type_traits<std::string> {
 		typedef std::string get_type;
 		typedef const std::string& push_type;
@@ -623,6 +655,8 @@ namespace kaguya
 
 	struct NoTypeCheck {};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for NewTable, push only
 	template<>	struct lua_type_traits<NewTable> {
 		static int push(lua_State* l, const NewTable& table)
 		{
@@ -630,6 +664,9 @@ namespace kaguya
 			return 1;
 		}
 	};
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for NewThread, push only
 	template<>	struct lua_type_traits<NewThread> {
 		static int push(lua_State* l, const NewThread&)
 		{
@@ -637,6 +674,9 @@ namespace kaguya
 			return 1;
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for NilValue, push only
+	/// If you using C++11, recommend use nullptr instead.
 	template<>	struct lua_type_traits<NilValue> {
 		static int push(lua_State* l, const NilValue&)
 		{
@@ -644,6 +684,8 @@ namespace kaguya
 			return 1;
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for GlobalTable, push only
 	template<>	struct lua_type_traits<GlobalTable> {
 		static int push(lua_State* l, const GlobalTable&)
 		{
@@ -677,17 +719,16 @@ namespace kaguya
 				TYPE_THREAD = LUA_TTHREAD//!< thread(coroutine) type
 			};
 
+			/// @brief If reference value is none or nil return true. Otherwise false.
 			bool isNilref_()const {
 				int t = type();
 				return t == LUA_TNIL || t == LUA_TNONE;
 			}
 
-			/**
-			* @brief Equivalent to `#` operator for strings and tables with no metamethods.
-			* Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
-			* than tables, strings or userdatas return 0.
-			* @return Size of table, string length or userdata memory block size.
-			*/
+			/// @brief Equivalent to `#` operator for strings and tables with no metamethods.
+			/// Follows Lua's reference manual documentation of `lua_rawlen`, ie. types other
+			/// than tables, strings or userdatas return 0.
+			/// @return Size of table, string length or userdata memory block size.
 			size_t size() const {
 				lua_State* state = state_();
 				if (!state) { return 0; }

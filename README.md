@@ -25,7 +25,7 @@ Kaguya is Lua binding library for C++
 ## Usage
 add "kaguya/include" directory to "header search path" of your project.
 
-Or generate one header file.
+Or generate single header file and add tou your project.
 ```
 cd  utils
 python generate_one_header.py > ../kaguya.hpp

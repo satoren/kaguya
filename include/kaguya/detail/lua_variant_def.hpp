@@ -39,6 +39,7 @@ namespace kaguya
 			using LuaBasicTypeFunctions<Derived>::type;
 			using LuaBasicTypeFunctions<Derived>::typeName;
 
+			/// @brief typetest
 			template<typename T>
 			bool typeTest()const
 			{
@@ -46,6 +47,7 @@ namespace kaguya
 				util::ScopedSavedStack save(state);
 				return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
 			}
+			/// @brief typetest
 			template<typename T>
 			bool weakTypeTest()const
 			{

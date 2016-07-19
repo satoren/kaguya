@@ -11,11 +11,15 @@ int squared(int a) { return a * a; }
 KAGUYA_BINDINGS(test_bind){
 	class_<TestClass>("TestClass")
 		.constructor<int>()
-		.function("getInt", &TestClass::getInt);
+		.def("getInt", &TestClass::getInt);
 
 	{
 		scope newscope("submodule");
-		def("squared", &squared);	
+		def("squared", &squared);
+		{
+			scope newscope("submodule");
+			def("squared3", &squared);
+		}
 	}
 	function("squared", &squared);
 }
@@ -28,6 +32,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 	TEST_CHECK(state("assert(value:getInt() == 32)"));
 	TEST_CHECK(state("assert(test_bind.squared(3) == 9)"));
 	TEST_CHECK(state("assert(test_bind.submodule.squared(6) == 36)"));
+	TEST_CHECK(state("assert(test_bind.submodule.submodule.squared3(6) == 36)"));
 };
 
 

@@ -12,21 +12,29 @@ namespace kaguya
 {
 	namespace util
 	{
+		/// @brief save stack count and restore on destructor
 		class ScopedSavedStack {
 			lua_State * state_;
 			int saved_top_index_;
 
 		public:
+			/// @brief save stack count
+			/// @param state
 			explicit ScopedSavedStack(lua_State * state)
 				: state_(state),
 				saved_top_index_(state_ ? lua_gettop(state_):0)
 			{
 			}
+
+			/// @brief save stack count
+			/// @param state
+			/// @param count stack count
 			explicit ScopedSavedStack(lua_State * state, int count)
 				: state_(state),
 				saved_top_index_(count)
 			{}
 
+			/// @brief restore stack count
 			~ScopedSavedStack() {
 				if (state_) {
 					lua_settop(state_, saved_top_index_);

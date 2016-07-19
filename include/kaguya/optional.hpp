@@ -9,9 +9,13 @@
 
 namespace kaguya
 {
-
+	/// @addtogroup optional
+	///  @{
+	
 	struct bad_optional_access :std::exception {};
 	struct nullopt_t {};
+
+	/// @brief self implement for std::optional(C++17 feature).
 	template<class T>class optional
 	{
 		typedef void (optional::*bool_type)() const;
@@ -148,6 +152,8 @@ namespace kaguya
 		T* value_;
 	};
 
+	/// @brief specialize optional for reference.
+	/// sizeof(optional<T&>) == sizeof(T*)
 	template<class T>class optional<T&>
 	{
 		typedef void (optional::*bool_type)() const;
@@ -213,6 +219,9 @@ namespace kaguya
 		T* value_;
 	};
 
+	/// @name relational operators
+	/// @brief
+	///@{
 	template< class T >
 	bool operator==(const optional<T>& lhs, const optional<T>& rhs)
 	{
@@ -247,4 +256,7 @@ namespace kaguya
 	{
 		return !(lhs < rhs);
 	}
+	/// @}
+
+	/// @}
 }

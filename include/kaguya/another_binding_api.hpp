@@ -7,7 +7,10 @@
 #include "kaguya/kaguya.hpp"
 
 
-//Boost.python like binding API.(experimental) Need C++11 compiler 
+/// @addtogroup another_binding_api
+/// @brief Boost.python like binding API.(experimental)
+/// @{
+
 
 #if defined(KAGUYA_DYNAMIC_LIB)
 #if defined(_WIN32) || defined(_WIN64)
@@ -19,6 +22,7 @@
 #define KAGUYA_EXPORT
 #endif
 
+/// @brief start define binding 
 #define KAGUYA_BINDINGS(MODULE_NAME)\
 void KAGUYA_PP_CAT(kaguya_bind_internal_,MODULE_NAME)();\
 KAGUYA_EXPORT int KAGUYA_PP_CAT(luaopen_, MODULE_NAME)(lua_State* L) { return kaguya::detail::bind_internal(L,&KAGUYA_PP_CAT(kaguya_bind_internal_, MODULE_NAME)); }\
@@ -53,6 +57,8 @@ namespace kaguya
 	}
 
 
+	/// @ingroup another_binding_api
+	/// @brief binding scope
 	struct scope
 	{
 		scope(const std::string& name)
@@ -89,6 +95,8 @@ namespace kaguya
 		}
 	}
 
+	/// @ingroup another_binding_api
+	/// @brief define class binding 
 	template<typename ClassType, typename BaseType = void>
 	struct class_ : private UserdataMetatable<ClassType, BaseType>
 	{
@@ -119,41 +127,64 @@ namespace kaguya
 #undef KAGUYA_ADD_CON_FN_DEF
 #endif
 
+		/// @brief function binding 
 		template<typename F>
 		class_& function(const char* name, F f) { this-> addFunction(name, f); return *this; }
 
-		template<typename F>
-		class_& property(const char* name, F f) { this-> addPropaty(name, f); return *this; }
 
+		/// @brief property binding 
 		template<typename F>
-		class_& property(const char* name, F getter, F setter) { this-> addPropaty(name, getter, setter); return *this; }
+		class_& property(const char* name, F f) { this->addPropaty(name, f); return *this; }
 
+		/// @brief property binding with getter and sette function
+		template<typename Getter, typename Setter>
+		class_& property(const char* name, Getter getter, Setter setter) { this->addPropaty(name, getter, setter); return *this; }
+
+		/// @brief class function binding
 		template<typename F>
-		class_& class_function(const char* name, F f) { this-> addStaticFunction(name, f); return *this; }
+		class_& class_function(const char* name, F f) { this->addStaticFunction(name, f); return *this; }
+
+		/// @defgroup boostpythonlikeapi Boost.python like interface
+		/// @{
+
+		/// @brief function binding 
+		template<typename F>
+		class_& def(const char* name, F f) { this->addFunction(name, f); return *this; }
+
+		/// @brief property binding with getter and sette function
+		template<typename Getter, typename Setter>
+		class_& add_property(const char* name, Getter getter, Setter setter) { property(name, getter, setter); return *this; }
+
+		/// @brief property binding 
+		template<typename F>
+		class_& add_property(const char* name, F f) { property(name, f); return *this; }
+
+
+		/// @brief static property binding 
+		template<typename Data>
+		class_& add_static_property(const char* name, Data data) { this->addStaticField(name, data); return *this; }
+
+		/// @}
 
 	private:
 		std::string name_;
 	};
 
+	/// @ingroup another_binding_api
+	/// @brief function binding 
 	template<typename F>
 	void function(const char* name, F f) {
 		LuaTable scope = detail::scope_stack::instance().current_scope();
 		if (scope)
 		{
-			scope[name] = kaguya::function(f);
+			scope[name] = function(f);
 		}
 	}
+
+	/// @ingroup boostpythonlikeapi
+	/// @brief function binding 
 	template<typename F>
 	void def(const char* name, F f) { function(name, f); }
-
-
-	template<typename F>
-	void overloads(const char* name, F f) {
-		LuaTable scope = detail::scope_stack::instance().current_scope();
-		if (scope)
-		{
-			scope[name] = kaguya::function(f);
-		}
-	}
 }
+/// @}
 

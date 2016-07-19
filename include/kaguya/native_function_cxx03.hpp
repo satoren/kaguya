@@ -280,7 +280,6 @@ namespace kaguya
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 
 			///! for data member
-			//@{
 			template<class MemType, class T>
 		int call(lua_State* state, MemType T::* m)
 		{
@@ -367,10 +366,8 @@ namespace kaguya
 		{
 			return 2;
 		}
-		//@}
 
 		///! for constructor
-		//@{
 		struct null_type {};
 
 		template<class ClassType, class A1 = null_type, class A2 = null_type
@@ -423,7 +420,6 @@ namespace kaguya
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 
 
-			//@}
 			template<class ClassType, class FunType = void> struct ConstructorFunction;
 
 #define KAGUYA_F_TO_CONSIG_TYPE_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>

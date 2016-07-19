@@ -21,21 +21,6 @@
 
 namespace kaguya
 {
-
-	class LuaUserData;
-	class LuaTable;
-	class LuaFunction;
-	class LuaThread;
-	template<typename KEY>
-	class TableKeyReference;
-	class FunctionResults;
-	class MemberFunctionBinder;
-
-	class LuaRef;
-	class LuaStackRef;
-
-
-
 	namespace util
 	{
 		template<class Result>
@@ -92,16 +77,12 @@ namespace kaguya
 		}
 	}
 
+	/// @addtogroup Lua_reference_types
 
-	/**
-	* Reference of Lua any type value.
-	*/
+	/// @ingroup Lua_reference_types
+	/// @brief Reference to any Lua data.
 	class LuaRef :public Ref::RegistoryRef, public detail::LuaVariantImpl<LuaRef>
 	{
-		friend class LuaUserData;
-		friend class LuaTable;
-		friend class LuaFunction;
-		friend class LuaThread;
 	private:
 		typedef void (LuaRef::*bool_type)() const;
 		void this_type_does_not_support_comparisons() const {}
@@ -209,7 +190,6 @@ namespace kaguya
 			push(state());
 			return lua_topointer(state(), -1);
 		}
-		//@}
 		static void putindent(std::ostream& os, int indent)
 		{
 			while (indent-- > 0)
@@ -220,6 +200,8 @@ namespace kaguya
 	};
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaRef
 	template<>
 	struct lua_type_traits<LuaRef>
 	{
@@ -245,6 +227,8 @@ namespace kaguya
 			return v.push(l);
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaRef
 	template<>	struct lua_type_traits<const LuaRef&> :lua_type_traits<LuaRef> {};
 
 
@@ -259,7 +243,7 @@ namespace kaguya
 		LuaStackRef(lua_State* s, int index) :Ref::StackRef(s, index, false)
 		{
 		}
-		LuaStackRef(lua_State* s, int index,bool popAtDestruct) :Ref::StackRef(s, index, popAtDestruct)
+		LuaStackRef(lua_State* s, int index, bool popAtDestruct) :Ref::StackRef(s, index, popAtDestruct)
 		{
 		}
 #if KAGUYA_USE_CPP11
@@ -296,6 +280,8 @@ namespace kaguya
 
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaStackRef
 	template<>
 	struct lua_type_traits<LuaStackRef>
 	{
@@ -320,11 +306,14 @@ namespace kaguya
 			return v.push(l);
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaStackRef
 	template<>	struct lua_type_traits<const LuaStackRef&> :lua_type_traits<LuaStackRef> {};
-	
-	//! Reference to Lua userdata
+
+	/// @ingroup Lua_reference_types
+	/// @brief Reference to Lua userdata.
 	class  LuaUserData :public Ref::RegistoryRef
-		, public detail:: LuaTableOrUserDataImpl<LuaUserData>
+		, public detail::LuaTableOrUserDataImpl<LuaUserData>
 		, public detail::LuaBasicTypeFunctions<LuaUserData>
 	{
 
@@ -347,7 +336,7 @@ namespace kaguya
 			typecheck();
 		}
 		template<typename TYPE>
-		LuaUserData(lua_State* state, const TYPE& table) :Ref::RegistoryRef(state, table)
+		LuaUserData(lua_State* state, const TYPE& table) : Ref::RegistoryRef(state, table)
 		{
 			typecheck();
 		}
@@ -374,6 +363,8 @@ namespace kaguya
 	};
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaUserData
 	template<>	struct lua_type_traits<LuaUserData> {
 		typedef LuaUserData get_type;
 		typedef LuaUserData push_type;
@@ -396,9 +387,13 @@ namespace kaguya
 			return ref.push(l);
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaUserData
 	template<>	struct lua_type_traits<const LuaUserData&> :lua_type_traits<LuaUserData> {};
 
 
+	/// @ingroup Lua_reference_types
+	/// @brief Reference to Lua table.
 	class LuaTable :public Ref::RegistoryRef
 		, public detail::LuaTableImpl<LuaTable>
 		, public detail::LuaTableOrUserDataImpl<LuaTable>
@@ -437,6 +432,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaTable
 	template<>	struct lua_type_traits<LuaTable> {
 		typedef LuaTable get_type;
 		typedef LuaTable push_type;
@@ -459,11 +456,12 @@ namespace kaguya
 			return ref.push(l);
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaTable
 	template<>	struct lua_type_traits<const LuaTable&> :lua_type_traits<LuaTable> {};
 
-	/**
-	* Reference of Lua function.
-	*/
+	/// @ingroup Lua_reference_types
+	/// @brief Reference to Lua function.
 	class LuaFunction :public Ref::RegistoryRef
 		, public detail::LuaFunctionImpl<LuaFunction>
 		, public detail::LuaBasicTypeFunctions<LuaFunction>
@@ -477,95 +475,6 @@ namespace kaguya
 				RegistoryRef::unref();
 			}
 		}
-
-	public:
-
-		/**
-		* @name constructor
-		* @brief construct with state and function .
-		* @param state pointer to lua_State
-		* @param function e.g. kaguya::function(function_ptr),kaguya::overload(function_ptr)
-		*/
-		template<typename F>
-		LuaFunction(lua_State* state, F f) :Ref::RegistoryRef(state, f)
-		{
-			typecheck();
-		}
-
-		/**
-		* @name constructor
-		* @brief construct with stack top value.
-		* @param state pointer to lua_State
-		* @param StackTop tag
-		*/
-		LuaFunction(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
-		{
-			typecheck();
-		}
-
-		/**
-		* @name constructor
-		* @brief construct nil reference.
-		*/
-		LuaFunction()
-		{
-		}
-
-		/**
-		* @name loadstring
-		* @brief load lua code .
-		* @param state pointer to lua_State
-		* @param luacode string
-		*/
-		static LuaFunction loadstring(lua_State* state, const std::string& luacode)
-		{
-			return loadstring(state, luacode.c_str());
-		}
-		/**
-		* @name loadstring
-		* @brief load lua code .
-		* @param state pointer to lua_State
-		* @param luacode string
-		*/
-		static LuaFunction loadstring(lua_State* state, const char* luacode)
-		{
-			util::ScopedSavedStack save(state);
-			int status = luaL_loadstring(state, luacode);
-
-			if (status)
-			{
-				ErrorHandler::handle(status, state);
-				lua_pushnil(state);
-			}
-			return LuaFunction(state, StackTop());
-		}
-
-
-		/**
-		* @name loadfile
-		* @brief If there are no errors,compiled file as a Lua function and return.
-		*  Otherwise send error message to error handler and return nil reference
-		* @param file  file path of lua script
-		* @return reference of lua function
-		*/
-		static LuaFunction loadfile(lua_State* state, const std::string& file)
-		{
-			return loadfile(state, file.c_str());
-		}
-		static LuaFunction loadfile(lua_State* state, const char* file)
-		{
-			util::ScopedSavedStack save(state);
-
-			int status = luaL_loadfile(state, file);
-
-			if (status)
-			{
-				ErrorHandler::handle(status, state);
-				lua_pushnil(state);
-			}
-			return LuaFunction(state, StackTop());
-		}
-
 
 		struct LuaLoadStreamWrapper
 		{
@@ -596,7 +505,7 @@ namespace kaguya
 						return;
 					}
 				}
-				
+
 				//skip comment
 				if (!buffer_.empty() && buffer_.front() == '#')
 				{
@@ -605,7 +514,7 @@ namespace kaguya
 					std::getline(stream_, comment);
 				}
 			}
-			
+
 
 			static const char *getdata(lua_State *, void *ud, size_t *size) {
 				LuaLoadStreamWrapper *loader = static_cast<LuaLoadStreamWrapper *>(ud);
@@ -625,21 +534,95 @@ namespace kaguya
 					loader->buffer_.push_back(c);
 				}
 				*size = loader->buffer_.size();
-				return loader->buffer_.empty()?0:&loader->buffer_[0];
+				return loader->buffer_.empty() ? 0 : &loader->buffer_[0];
 			}
 		private:
 			bool preloaded_;
 			std::vector<char> buffer_;
 			std::istream& stream_;
 		};
+	public:
 
-		/**
-		* @name loadstream
-		* @brief If there are no errors,compiled stream as a Lua function and return.
-		*  Otherwise send error message to error handler and return nil reference
-		* @param file  file path of lua script
-		* @return reference of lua function
-		*/
+		/// @brief construct with state and function .
+		/// @param state pointer to lua_State
+		/// @param f execute function for lua thread. e.g. kaguya::function(function_ptr),kaguya::overload(function_ptr)
+		template<typename F>
+		LuaFunction(lua_State* state, F f) :Ref::RegistoryRef(state, f)
+		{
+			typecheck();
+		}
+
+		/// @brief construct with stack top value.
+		/// @param state pointer to lua_State
+		LuaFunction(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
+		{
+			typecheck();
+		}
+
+		/// @brief construct with nil reference.
+		LuaFunction()
+		{
+		}
+
+		/// @brief load lua code .
+		/// @param state pointer to lua_State
+		/// @param luacode string
+		static LuaFunction loadstring(lua_State* state, const std::string& luacode)
+		{
+			return loadstring(state, luacode.c_str());
+		}
+		/// @brief load lua code .
+		/// @param state pointer to lua_State
+		/// @param luacode string
+		static LuaFunction loadstring(lua_State* state, const char* luacode)
+		{
+			util::ScopedSavedStack save(state);
+			int status = luaL_loadstring(state, luacode);
+
+			if (status)
+			{
+				ErrorHandler::handle(status, state);
+				lua_pushnil(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
+
+
+		/// @brief If there are no errors,compiled file as a Lua function and return.
+		///  Otherwise send error message to error handler and return nil reference
+		/// @param state pointer to lua_State
+		/// @param file  file path of lua script
+		/// @return reference of lua function
+		static LuaFunction loadfile(lua_State* state, const std::string& file)
+		{
+			return loadfile(state, file.c_str());
+		}
+
+		/// @brief If there are no errors,compiled file as a Lua function and return.
+		///  Otherwise send error message to error handler and return nil reference
+		/// @param state pointer to lua_State
+		/// @param file  file path of lua script
+		/// @return reference of lua function
+		static LuaFunction loadfile(lua_State* state, const char* file)
+		{
+			util::ScopedSavedStack save(state);
+
+			int status = luaL_loadfile(state, file);
+
+			if (status)
+			{
+				ErrorHandler::handle(status, state);
+				lua_pushnil(state);
+			}
+			return LuaFunction(state, StackTop());
+		}
+
+		/// @brief If there are no errors,compiled stream as a Lua function and return.
+		///  Otherwise send error message to error handler and return nil reference
+		/// @param state pointer to lua_State
+		/// @param stream  stream of lua script data
+		/// @param chunkname  use for error message.
+		/// @return reference of lua function
 		static LuaStackRef loadstreamtostack(lua_State* state, std::istream& stream, const char* chunkname = 0)
 		{
 			LuaLoadStreamWrapper wrapper(stream);
@@ -653,9 +636,15 @@ namespace kaguya
 				ErrorHandler::handle(status, state);
 				lua_pushnil(state);
 			}
-			return LuaStackRef(state,-1,true);
+			return LuaStackRef(state, -1, true);
 		}
 
+		/// @brief If there are no errors,compiled stream as a Lua function and return.
+		///  Otherwise send error message to error handler and return nil reference
+		/// @param state pointer to lua_State
+		/// @param stream  stream of lua script data
+		/// @param chunkname  use for error message.
+		/// @return reference of lua function
 		static LuaFunction loadstream(lua_State* state, std::istream& stream, const char* chunkname = 0)
 		{
 			util::ScopedSavedStack save(state);
@@ -674,9 +663,8 @@ namespace kaguya
 		}
 	};
 
-	/**
-	* Reference of Lua thread(==coroutine).
-	*/
+	/// @ingroup Lua_reference_types
+	/// @brief Reference to Lua thread(coroutine).
 	class LuaThread :public Ref::RegistoryRef
 		, public detail::LuaThreadImpl<LuaThread>
 		, public detail::LuaBasicTypeFunctions<LuaThread>
@@ -691,24 +679,31 @@ namespace kaguya
 			}
 		}
 	public:
+		/// @brief construct with stack top value.
 		LuaThread(lua_State* state, StackTop) :Ref::RegistoryRef(state, StackTop())
 		{
 			typecheck();
 		}
+		/// @brief construct with new thread.
 		LuaThread(lua_State* state, const NewThread& t) :Ref::RegistoryRef(state, t)
 		{
 		}
+		/// @brief construct with nil reference.
 		LuaThread(lua_State* state) :Ref::RegistoryRef(state, NewThread())
 		{
 		}
+		/// @brief construct with nil reference.
 		LuaThread()
 		{
 		}
+
+
+		/// @brief set function for thread running.
 		void setFunction(const LuaFunction& f)
 		{
 			typecheck();
 			lua_State* corstate = get<lua_State*>();
-			lua_settop(corstate,0);
+			lua_settop(corstate, 0);
 			f.push(corstate);
 		}
 	};

@@ -20,6 +20,8 @@
 
 namespace kaguya
 {
+	/// @brief function result value proxy class.
+	/// don't direct use.
 	class FunctionResults :public Ref::StackRef, public detail::LuaVariantImpl<FunctionResults>
 	{
 		FunctionResults(lua_State* state, int return_status, int startIndex) :Ref::StackRef(state, startIndex, true), state_(state), resultStatus_(return_status), resultCount_(lua_gettop(state) + 1 - startIndex)
@@ -98,6 +100,11 @@ namespace kaguya
 				stack_index += n;
 				return iterator_base(state, stack_index);
 			}
+			/**
+			* @name relational operators
+			* @brief
+			*/
+			//@{
 			bool operator==(const iterator_base& other)const
 			{
 				return state == other.state && stack_index == other.stack_index;
@@ -106,6 +113,7 @@ namespace kaguya
 			{
 				return !(*this == other);
 			}
+			//@}
 			int index() const { return stack_index; }
 		private:
 			template<typename U> friend struct iterator_base;
@@ -318,6 +326,8 @@ namespace kaguya
 	}
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctionResults
 	template<>	struct lua_type_traits<FunctionResults> {
 		static int push(lua_State* l, const FunctionResults& ref)
 		{
@@ -330,6 +340,8 @@ namespace kaguya
 		}
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctionResults::reference
 	template<>	struct lua_type_traits<FunctionResults::reference> {
 		static int push(lua_State* l, const FunctionResults::reference& ref)
 		{
@@ -339,6 +351,8 @@ namespace kaguya
 	template <unsigned int I>
 	FunctionResults::reference get(const FunctionResults& res) { return res.result_at(I); }
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaFunction
 	template<>	struct lua_type_traits<LuaFunction> {
 		typedef LuaFunction get_type;
 		typedef LuaFunction push_type;
@@ -361,8 +375,12 @@ namespace kaguya
 			return ref.push(l);
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaFunction
 	template<>	struct lua_type_traits<const LuaFunction&> :lua_type_traits<LuaFunction> {};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaThread
 	template<>	struct lua_type_traits<LuaThread> {
 		typedef LuaThread get_type;
 		typedef LuaThread push_type;
@@ -385,6 +403,8 @@ namespace kaguya
 			return ref.push(l);
 		}
 	};
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for LuaThread
 	template<>	struct lua_type_traits<const LuaThread&> :lua_type_traits<LuaThread> {};
 
 
@@ -431,19 +451,15 @@ namespace kaguya
 		}
 
 		/**
-		* @name operator()
 		* @brief If type is function, call lua function.
-		If type is lua thread,start or resume lua thread.
-		Otherwise send error message to error handler
-		* @param arg... function args
+		* If type is lua thread,start or resume lua thread.
+		* Otherwise send error message to error handler
 		*/
-		//@{
 		FunctionResults operator()()
 		{
 			return KAGUYA_DELEGATE_LUAREF(KAGUYA_DELEGATE_FIRST_ARG);
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
-			//@}
 
 #define KAGUYA_CALL_DEF(N) \
 		template<class Result,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \

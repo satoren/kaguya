@@ -65,11 +65,6 @@ namespace kaguya
 
 		public:
 			/**
-			* @name function type
-			*/
-			//@{
-
-			/**
 			* set function environment table
 			*/
 			bool setFunctionEnv(const LuaTable& env);
@@ -81,8 +76,6 @@ namespace kaguya
 			* get function environment table
 			*/
 			LuaTable getFunctionEnv()const;
-
-			//@}
 
 #if KAGUYA_USE_CPP11
 			template<class Result, class...Args> Result call(Args&&... args)
@@ -166,7 +159,6 @@ namespace kaguya
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
-				//@}
 #endif
 
 
@@ -284,11 +276,9 @@ namespace kaguya
 #undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
-				//@}
 #endif
 
 
-		//@{
 		/**
 		* @return state status
 		*/
@@ -374,7 +364,6 @@ namespace kaguya
 			{
 				return costatus() == COSTAT_DEAD;
 			}
-			//@}
 		};
 	}
 }

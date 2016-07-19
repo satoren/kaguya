@@ -18,13 +18,15 @@
 
 namespace kaguya
 {
+	/// @brief StackTop tag type
 	struct StackTop {};
+
 	namespace Ref
 	{
+		/// @brief NoMainCheck tag type
 		struct NoMainCheck {};
 
-
-
+		/// @brief reference to Lua stack value
 		class StackRef
 		{
 		protected:
@@ -122,6 +124,7 @@ namespace kaguya
 			lua_State *state()const { return state_; }
 		};
 
+		/// @brief Reference to Lua value. Retain reference by LUA_REGISTRYINDEX
 		class RegistoryRef
 		{
 			typedef void (RegistoryRef::*bool_type)() const;
@@ -240,11 +243,12 @@ namespace kaguya
 				catch (...) {}//can't throw at Destructor
 			}
 
-			//push to Lua stack
+			/// @brief push to Lua stack
 			int push()const
 			{
 				return push(state_);
 			}
+			/// @brief push to Lua stack
 			int push(lua_State* state)const
 			{
 				if (isNilref())

@@ -455,6 +455,8 @@ namespace kaguya
 		}
 	}
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for TableKeyReference<KEY>
 	template<typename KEY>
 	struct lua_type_traits<TableKeyReference<KEY> > {
 		static int push(lua_State* l, const TableKeyReference<KEY>& ref)
@@ -464,6 +466,9 @@ namespace kaguya
 	};
 
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::vector<T, A>
 	template<typename T, typename A>
 	struct lua_type_traits<std::vector<T, A> >
 	{
@@ -534,6 +539,8 @@ namespace kaguya
 #endif
 
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::map<K, V, C, A>
 	template<typename K, typename V, typename C, typename A>
 	struct lua_type_traits<std::map<K, V, C, A> >
 	{
@@ -620,6 +627,9 @@ namespace kaguya
 		TableData(std::initializer_list<TableDataElement> list) :elements(list.begin(), list.end()) {}
 		std::vector<TableDataElement> elements;
 	};
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for TableData
 	template<>
 	struct lua_type_traits<TableData> {
 		static int push(lua_State* l, const TableData& list)

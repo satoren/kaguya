@@ -30,6 +30,9 @@ namespace kaguya
 			return util::push_args(l, std::get<Indexes>(v)...);
 		}
 	}
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::tuple or boost::tuple
 	template<class... Args>
 	struct lua_type_traits<standard::tuple<Args...> >
 	{

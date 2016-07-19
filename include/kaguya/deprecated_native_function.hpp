@@ -189,7 +189,8 @@ namespace kaguya
 	typedef std::vector<FunctorType> FunctorOverloadType;
 
 
-	//!deperecated
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctorType(deprecated)
 	template<> struct lua_type_traits<FunctorType> {
 		typedef FunctorType get_type;
 		typedef FunctorType push_type;
@@ -215,8 +216,13 @@ namespace kaguya
 #endif
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctorType(deprecated)
 	template<>	struct lua_type_traits<const FunctorType&> :lua_type_traits<FunctorType> {};
 
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctorOverloadType(deprecated)
 	template<>	struct lua_type_traits<FunctorOverloadType> {
 		typedef const FunctorOverloadType& push_type;
 
