@@ -424,7 +424,7 @@ namespace kaguya
 
 			return invoke_tuple_impl(state, tuple, indexrange());
 		}
-		
+
 		template<typename Fun> void  push_arg_typename(lua_State *state,const Fun& fn)
 		{
 			lua_pushliteral(state, "\t\t");
@@ -521,7 +521,7 @@ namespace kaguya
 	{
 		return f;
 	}
-	
+
 
 	template<typename FTYPE, typename T>
 	inline FunctionInvokerType<standard::tuple<standard::function<FTYPE> > > function(T f)
@@ -560,7 +560,7 @@ namespace kaguya
 	{
 		typedef FunctionInvokerType<FunctionTuple> userdatatype;
 		typedef const FunctionInvokerType<FunctionTuple>& push_type;
-		
+
 		static const char* build_arg_error_message(lua_State *state,const char* msg, FunctionTuple* tuple)
 		{
 			int stack_top = lua_gettop(state);
@@ -688,18 +688,18 @@ namespace kaguya
 }
 
 
+
 #define KAGUYA_INTERNAL_OVERLOAD_FUNCTION_GET_REP(N) kaguya::LuaStackRef(state, N)
 #define KAGUYA_INTERNAL_OVERLOAD_FUNCTION_GET_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_INTERNAL_OVERLOAD_FUNCTION_GET_REP)
-#define KAGUYA_INTERNAL_OVERLOAD_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { return kaguya::util::push_args(state, FNAME(KAGUYA_INTERNAL_OVERLOAD_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))))); }
 
 
-#define KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG)\
+#define KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,INVOKE_TYPE)\
 struct KAGUYA_PP_CAT(GENERATE_NAME,Functor) : kaguya::FunctionImpl\
 {\
 	virtual int invoke(lua_State *state)\
 	{\
 		int argcount = lua_gettop(state);\
-		KAGUYA_PP_REPEAT_DEF_VA_ARG(KAGUYA_PP_INC(KAGUYA_PP_SUB(MAXARG, MINARG)), KAGUYA_INTERNAL_OVERLOAD_FUNCTION_INVOKE,FNAME,MINARG, MAXARG)\
+		KAGUYA_PP_REPEAT_DEF_VA_ARG(KAGUYA_PP_INC(KAGUYA_PP_SUB(MAXARG, MINARG)), INVOKE_TYPE,FNAME,MINARG, MAXARG)\
 		throw kaguya::LuaTypeMismatch("argument count mismatch");\
 		return 0;\
 	}\
@@ -715,17 +715,16 @@ kaguya::PolymorphicInvoker GENERATE_NAME = kaguya::PolymorphicInvoker::holder_ty
 
 #define KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REP(N) kaguya::LuaStackRef(state, N + 1)
 #define KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REP)
-#define KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == 1 + KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { return kaguya::util::push_args(state, this_->FNAME(KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))))); }
 
 
-#define KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG)\
+#define KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,INVOKE_TYPE)\
 struct KAGUYA_PP_CAT(GENERATE_NAME,Functor) : kaguya::FunctionImpl\
 {\
 	virtual int invoke(lua_State *state)\
 	{\
 		int argcount = lua_gettop(state);\
 		CLASS* this_ = kaguya::LuaStackRef(state, 1);\
-		KAGUYA_PP_REPEAT_DEF_VA_ARG(KAGUYA_PP_INC(KAGUYA_PP_SUB(MAXARG, MINARG)), KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_INVOKE,FNAME,MINARG, MAXARG)\
+		KAGUYA_PP_REPEAT_DEF_VA_ARG(KAGUYA_PP_INC(KAGUYA_PP_SUB(MAXARG, MINARG)), INVOKE_TYPE,FNAME,MINARG, MAXARG)\
 		throw kaguya::LuaTypeMismatch("argument count mismatch");\
 		return 0;\
 	}\
@@ -738,26 +737,48 @@ struct KAGUYA_PP_CAT(GENERATE_NAME,Functor) : kaguya::FunctionImpl\
 kaguya::FunctionImpl* KAGUYA_PP_CAT(GENERATE_NAME, FunctorPtr) = new KAGUYA_PP_CAT(GENERATE_NAME, Functor);\
 kaguya::PolymorphicMemberInvoker GENERATE_NAME = kaguya::PolymorphicMemberInvoker::holder_type(KAGUYA_PP_CAT(GENERATE_NAME, FunctorPtr));
 
+#define KAGUYA_INTERNAL_OVERLOAD_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { return kaguya::util::push_args(state, FNAME(KAGUYA_INTERNAL_OVERLOAD_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))))); }
+#define KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == 1 + KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { return kaguya::util::push_args(state, this_->FNAME(KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))))); }
 
+
+#define KAGUYA_INTERNAL_OVERLOAD_VOID_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { FNAME(KAGUYA_INTERNAL_OVERLOAD_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N)))); return 0; }
+#define KAGUYA_INTERNAL_OVERLOAD_MEMBER_VOID_FUNCTION_INVOKE(N,FNAME,MINARG, MAXARG) if (argcount == 1 + KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N))) { this_->FNAME(KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_GET_REPEAT(KAGUYA_PP_ADD(MINARG,KAGUYA_PP_DEC(N)))); return 0; }
 
 
 /**
-* @name KAGUYA_FUNCTION_OVERLOADS
-* @brief Generate wrapper function object for count based overloads. Include default arguments parameter function
+* @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
 * @param GENERATE_NAME generate function object name
 * @param FNAME target function name
 * @param MINARG minimum arguments count
 * @param MAXARG maximum arguments count
 */
-#define KAGUYA_FUNCTION_OVERLOADS(GENERATE_NAME,FNAME, MINARG, MAXARG) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG)
+#define KAGUYA_FUNCTION_OVERLOADS(GENERATE_NAME,FNAME, MINARG, MAXARG) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_FUNCTION_INVOKE)
 
 /**
-* @name KAGUYA_FUNCTION_OVERLOADS
-* @brief Generate wrapper function object for count based overloads. Include default arguments parameter function
+* @brief Generate wrapper function object for count based overloads with void return function. Include default arguments parameter function
+* @param GENERATE_NAME generate function object name
+* @param FNAME target function name
+* @param MINARG minimum arguments count
+* @param MAXARG maximum arguments count
+*/
+#define KAGUYA_VOID_FUNCTION_OVERLOADS(GENERATE_NAME,FNAME, MINARG, MAXARG) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_VOID_FUNCTION_INVOKE)
+
+/**
+* @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
 * @param GENERATE_NAME generate function object name
 * @param CLASS target class name
 * @param FNAME target function name
 * @param MINARG minimum arguments count
 * @param MAXARG maximum arguments count
 */
-#define KAGUYA_MEMBER_FUNCTION_OVERLOADS(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG)
+#define KAGUYA_MEMBER_FUNCTION_OVERLOADS(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_MEMBER_FUNCTION_INVOKE)
+
+/**
+* @brief Generate wrapper function object for count based overloads with void return function. Include default arguments parameter function
+* @param GENERATE_NAME generate function object name
+* @param CLASS target class name
+* @param FNAME target function name
+* @param MINARG minimum arguments count
+* @param MAXARG maximum arguments count
+*/
+#define KAGUYA_MEMBER_VOID_FUNCTION_OVERLOADS(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,KAGUYA_INTERNAL_OVERLOAD_MEMBER_VOID_FUNCTION_INVOKE)

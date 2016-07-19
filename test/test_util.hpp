@@ -239,6 +239,10 @@ namespace kaguya_test_util
 		{
 			return a*b*c;
 		}
+		void default_set(int a = 3, int b = 2, int c = 1)
+		{
+			setInt(a*b*c);
+		}
 
 		TestClass copy()const { return *this; }
 		const TestClass& references()const { return *this; }

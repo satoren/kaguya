@@ -336,4 +336,43 @@ KAGUYA_TEST_FUNCTION_DEF(member_function_defaultarguments)(kaguya::State& state)
 }
 
 
+void void_defargfn(int a = 3, int b = 2, int c = 1)
+{
+TEST_EQUAL(a, 3);
+TEST_EQUAL(b, 2);
+TEST_EQUAL(c, 1);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(void_defaultarguments)(kaguya::State& state)
+{
+	KAGUYA_VOID_FUNCTION_OVERLOADS(defargfn_wrapper, void_defargfn,0,3)
+
+	state["defargfn"] = kaguya::function(defargfn_wrapper);
+
+	state.dostring("defargfn()");
+	state.dostring("defargfn(3)");
+	state.dostring("defargfn(3,2)");
+	state.dostring("defargfn(3,2,1)");
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(member_void_function_defaultarguments)(kaguya::State& state)
+{
+	KAGUYA_MEMBER_VOID_FUNCTION_OVERLOADS(defargfn_wrapper, TestClass, default_set, 0, 3)
+
+	state["TestClass"].setClass(kaguya::UserdataMetatable<TestClass>()
+		.setConstructors<TestClass()>()
+		.addFunction("defargfn", defargfn_wrapper)
+		.addFunction("getInt", &TestClass::getInt)
+	);
+
+	state.dostring("test = TestClass.new()");
+
+	state.dostring("test:defargfn() assert(test:getInt() == 6)");
+	state.dostring("test:defargfn(6) assert(test:getInt() == 12)");
+	state.dostring("test:defargfn(6,5) assert(test:getInt() == 30)");
+	state.dostring("test:defargfn(2,2,2) assert(test:getInt() == 8)");
+}
+
+
 KAGUYA_TEST_GROUP_END(test_03_function)
