@@ -292,7 +292,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			property_map_[name] = AnyDataPusher(function(mem));
+			property_map_[name] = AnyDataPusher(kaguya::function(mem));
 			return *this;
 		}
 
@@ -307,7 +307,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			property_map_[name] = AnyDataPusher(function(getter));
+			property_map_[name] = AnyDataPusher(kaguya::function(getter));
 			return *this;
 		}
 
@@ -338,7 +338,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");
 				return *this;
 			}
-			member_map_[name] = AnyDataPusher(function(f));
+			member_map_[name] = AnyDataPusher(kaguya::function(f));
 			return *this;
 		}
 
@@ -416,7 +416,7 @@ namespace kaguya
 				throw KaguyaException("already registered.");\
 				return *this;\
 			}\
-			member_map_[name] = AnyDataPusher(overload(KAGUYA_PP_ARG_REPEAT(N)));\
+			member_map_[name] = AnyDataPusher(kaguya::overload(KAGUYA_PP_ARG_REPEAT(N)));\
 			return *this;\
 		}
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF)
@@ -436,7 +436,7 @@ namespace kaguya
 				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
-			member_map_[name] = AnyDataPusher(function(f));
+			member_map_[name] = AnyDataPusher(kaguya::function(f));
 			return *this;
 		}
 #else
@@ -451,7 +451,7 @@ namespace kaguya
 				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
-			member_map_[name] = AnyDataPusher(function(f));
+			member_map_[name] = AnyDataPusher(kaguya::function(f));
 			return *this;
 		}
 #endif
@@ -465,7 +465,7 @@ namespace kaguya
 				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
 				return *this;
 			}
-			member_map_[name] = AnyDataPusher(function(f));
+			member_map_[name] = AnyDataPusher(kaguya::function(f));
 			return *this;
 		}
 

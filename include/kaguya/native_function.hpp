@@ -640,7 +640,7 @@ namespace kaguya
 	{
 		static int push(lua_State* l, T f)
 		{
-			return util::one_push(l, function(f));
+			return util::one_push(l, kaguya::function(f));
 		}
 	};
 	/// @ingroup lua_type_traits
@@ -695,7 +695,7 @@ namespace kaguya
 
 		static int push(lua_State* l, push_type v)
 		{
-			return util::one_push(l, function(v));
+			return util::one_push(l, kaguya::function(v));
 		}
 	};
 }

@@ -177,14 +177,14 @@ namespace kaguya
 		LuaTable scope = detail::scope_stack::instance().current_scope();
 		if (scope)
 		{
-			scope[name] = function(f);
+			scope[name] = kaguya::function(f);
 		}
 	}
 
 	/// @ingroup boostpythonlikeapi
 	/// @brief function binding 
 	template<typename F>
-	void def(const char* name, F f) { function(name, f); }
+	void def(const char* name, F f) { kaguya::function(name, f); }
 }
 /// @}
 
