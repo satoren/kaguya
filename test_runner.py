@@ -21,9 +21,9 @@ test_msvc_vers = [("msvc2015","Visual Studio 14 2015","")
     ,("msvc2008","Visual Studio 9 2008","-DADDITIONAL_INCLUDE_PATH="+boost_dir)]
 
 test_compilers = [
-    ('gcc-3.3','g++-3.3','-DCMAKE_CXX_FLAGS=-std=c++03')
-    ,('gcc-4.4','g++-4.4','-DCMAKE_CXX_FLAGS=-std=c++03')
-    ,('gcc-4.5','g++-4.5','-DCMAKE_CXX_FLAGS=-std=c++03')
+    ('gcc-3.3','g++-3.3','')
+    ,('gcc-4.4','g++-4.4','')
+    ,('gcc-4.5','g++-4.5','')
     ,('gcc-4.6','g++-4.6','-DCMAKE_CXX_FLAGS=-std=c++03')
     ,('gcc-4.7','g++-4.7','-DCMAKE_CXX_FLAGS=-std=c++03')
     ,('gcc-4.7','g++-4.7','-DCMAKE_CXX_FLAGS=-std=c++11')
