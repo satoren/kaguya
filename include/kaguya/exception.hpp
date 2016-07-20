@@ -6,6 +6,8 @@
 #pragma once
 
 #include <exception>
+#include <stdexcept>
+
 
 #include "kaguya/utility.hpp"
 
