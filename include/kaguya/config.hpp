@@ -83,7 +83,7 @@ extern "C" {
 //MSVC depecated
 #define KAGUYA_DEPRECATED_FEATURE(MSG) __declspec(deprecated(MSG)) 
 #elif defined(__GNUC__) || defined(__clang__)
-#define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated(MSG)))
+#define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated))
 #else
 #define KAGUYA_DEPRECATED_FEATURE(MSG)
 #endif
