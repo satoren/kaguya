@@ -568,7 +568,7 @@ KAGUYA_TEST_FUNCTION_DEF(full_gc_test)(kaguya::State& state)
 	state.gc().collect();
 	int current = state.gc().count();
 	TEST_COMPARE_GT(used, current);
-	TEST_COMPARE_LE(first, current);
+	TEST_COMPARE_GE(first, current);
 }
 KAGUYA_TEST_FUNCTION_DEF(inc_gc_test)(kaguya::State& state)
 {

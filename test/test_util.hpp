@@ -128,7 +128,7 @@ namespace kaguya_test_util
 				std::cout << test_name << "  (" << testindex << "/" << testcount << ") ...";
 
 				std::string error_message = "";
-
+				std::cout << std::flush;
 				bool result = false;
 				try
 				{

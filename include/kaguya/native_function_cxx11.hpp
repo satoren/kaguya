@@ -16,39 +16,27 @@ namespace kaguya
 	namespace nativefunction
 	{
 		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke_fn(Res(ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
+		Res invoke_fn(Res(ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
 		{
-			if (!this_)
-			{
-				throw LuaTypeMismatch("type mismatch!!");
-			}
-			return (this_->*f)(std::forward<Args>(args)...);
+			return (this_.*f)(std::forward<Args>(args)...);
 		}
 
 		template<class ThisType, class... FArgs, class... Args>
-		void invoke_fn(void (ThisType::*f)(FArgs...), ThisType* this_, Args&&... args)
+		void invoke_fn(void (ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
 		{
-			if (!this_)
-			{
-				throw LuaTypeMismatch("type mismatch!!");
-			}
-			(this_->*f)(std::forward<Args>(args)...);
+			(this_.*f)(std::forward<Args>(args)...);
 		}
 
 		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke_fn(Res(ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
+		Res invoke_fn(Res(ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
 		{
-			if (!this_)
-			{
-				throw LuaTypeMismatch("type mismatch!!");
-			}
-			return (this_->*f)(std::forward<Args>(args)...);
+			return (this_.*f)(std::forward<Args>(args)...);
 		}
 
 		template<class ThisType, class... FArgs, class... Args>
-		void invoke_fn(void (ThisType::*f)(FArgs...)const, const ThisType* this_, Args&&... args)
+		void invoke_fn(void (ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
 		{
-			(this_->*f)(std::forward<Args>(args)...);
+			(this_.*f)(std::forward<Args>(args)...);
 		}
 		template<class F, class... Args>
 		//MSVC 2013 std::result_of is broken.
@@ -125,11 +113,11 @@ namespace kaguya
 
 		template <typename T, typename Ret, typename... Args>
 		struct f_signature<Ret(T::*)(Args...)> {
-			typedef invoke_signature_type<Ret, T*, Args...> type;
+			typedef invoke_signature_type<Ret, T&, Args...> type;
 		};
 		template <typename T, typename Ret, typename... Args>
 		struct f_signature<Ret(T::*)(Args...) const> {
-			typedef invoke_signature_type<Ret, const T*, Args...> type;
+			typedef invoke_signature_type<Ret, const T&, Args...> type;
 		};
 		template<class Ret, class... Args>
 		struct f_signature<Ret(*)(Args...)> {
@@ -229,18 +217,14 @@ namespace kaguya
 			{
 				if (!this_)
 				{
-					const T* this_ = lua_type_traits<const T*>::get(state, 1);
-					if (!this_)
-					{
-						throw LuaTypeMismatch("type mismatch!!");
-					}
+					const T& this_ = lua_type_traits<const T&>::get(state, 1);
 					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 					{
-						return util::push_args(state, standard::reference_wrapper<const MemType>(this_->*m));
+						return util::push_args(state, standard::reference_wrapper<const MemType>(this_.*m));
 					}
 					else
 					{
-						return util::push_args(state, this_->*m);
+						return util::push_args(state, this_.*m);
 					}
 				}
 				else

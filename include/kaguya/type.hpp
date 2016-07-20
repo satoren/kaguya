@@ -260,7 +260,7 @@ namespace kaguya
 		{
 			return true;
 		}
-		static get_type get(lua_State* l, int index)
+		static get_type get(lua_State* l, int index)KAGUYA_NOEXCEPT
 		{
 			try
 			{
@@ -272,7 +272,7 @@ namespace kaguya
 			}
 		}
 
-		static int push(lua_State* l, push_type v)
+		static int push(lua_State* l, push_type v)KAGUYA_NOEXCEPT
 		{
 			if (v)
 			{

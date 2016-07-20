@@ -38,11 +38,6 @@ extern "C" {
 #include "kaguya/preprocess.hpp"
 
 
-#ifndef KAGUYA_ERROR_NO_THROW
-#define KAGUYA_ERROR_NO_THROW 1
-#endif
-
-
 
 #ifndef KAGUYA_NO_USERDATA_TYPE_CHECK
 #define KAGUYA_NO_USERDATA_TYPE_CHECK 0
@@ -67,6 +62,13 @@ extern "C" {
 #define KAGUYA_DETECT_USE_DEPRECATED_FEATURE 0
 #endif
 
+#ifndef KAGUYA_NOEXCEPT
+# if KAGUYA_USE_CPP11 && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+#  define KAGUYA_NOEXCEPT noexcept
+# else
+#  define KAGUYA_NOEXCEPT throw()
+# endif
+#endif
 
 #ifndef KAGUYA_DEPRECATED_FEATURE
 #if __cplusplus >= 201402L && defined(__has_cpp_attribute)

@@ -176,9 +176,6 @@ namespace kaguya
 			{
 				return;
 			}
-#if !KAGUYA_ERROR_NO_THROW
-			throw KaguyaException(message);
-#endif
 		}
 		inline void typeMismatchError(lua_State *state, const std::string& message)
 		{
@@ -186,9 +183,6 @@ namespace kaguya
 			{
 				return;
 			}
-#if !KAGUYA_ERROR_NO_THROW
-			throw LuaTypeMismatch(message);
-#endif
 		}
 		inline void memoryError(lua_State *state, const char* message)
 		{
@@ -196,9 +190,6 @@ namespace kaguya
 			{
 				return;
 			}
-#if !KAGUYA_ERROR_NO_THROW
-			throw LuaMemoryError(lua_status(state), message ? std::string(message) : "lua memory allocation error");
-#endif
 		}
 		inline bool checkErrorAndThrow(int status, lua_State *state)
 		{
@@ -208,9 +199,6 @@ namespace kaguya
 				{
 					return false;
 				}
-#if !KAGUYA_ERROR_NO_THROW
-				throwDefaultError(status, lua_tostring(state, -1));
-#endif
 				return false;
 			}
 			return true;
