@@ -35,16 +35,17 @@ test_compilers = [
     ,('gcc-5','g++-5','-DCMAKE_CXX_FLAGS=-std=c++11')
     ,('gcc-6','g++-6','-DCMAKE_CXX_FLAGS=-std=c++03')
     ,('gcc-6','g++-6','-DCMAKE_CXX_FLAGS=-std=c++11')
+    ,('gcc','g++','')
     ,('clang','clang++','-DCMAKE_CXX_FLAGS=-std=c++03')
     ,('clang','clang++','-DCMAKE_CXX_FLAGS=-std=c++11')]
 
-def build_and_exec_test(compiler,lua_version,build_type):
+def build_and_exec_test(compiler,lua_version,build_type,dir_opt):
     ccompiler = compiler[0]
     cxxcompiler = compiler[1]
     addopt = compiler[2]
     if os.system(cxxcompiler+' -v 2> /dev/null')!=0: return
 
-    buildpath = "_build/"+compiler[0]+"_"+lua_version+"_"+build_type
+    buildpath = "_build/"+compiler[0]+"_"+lua_version+"_"+build_type+"_"+dir_opt
     if not os.path.exists(buildpath):
         os.makedirs(buildpath)
     os.chdir(buildpath)
@@ -57,9 +58,9 @@ def build_and_exec_test(compiler,lua_version,build_type):
     os.chdir("../../")
 
 def build_with_target_compiler(lua_version):
-    for compiler in test_compilers:
-        build_and_exec_test(compiler,lua_version,"Debug")
-        build_and_exec_test(compiler,lua_version,"Release")
+    for i,compiler in enumerate(test_compilers):
+        build_and_exec_test(compiler,lua_version,"Debug",str(i))
+        build_and_exec_test(compiler,lua_version,"Release",str(i))
 
 def build_msvc_and_exec_test(msvcver,lua_version,build_type):
     buildpath = '_build/'+msvcver[0]+'_'+lua_version
