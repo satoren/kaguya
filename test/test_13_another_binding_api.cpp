@@ -22,6 +22,7 @@ KAGUYA_BINDINGS(test_bind){
 		}
 	}
 	function("squared", &squared);
+	scope().attr("x") = 1;
 }
 
 KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
@@ -33,6 +34,9 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 	TEST_CHECK(state("assert(test_bind.squared(3) == 9)"));
 	TEST_CHECK(state("assert(test_bind.submodule.squared(6) == 36)"));
 	TEST_CHECK(state("assert(test_bind.submodule.submodule.squared3(6) == 36)"));
+
+
+	TEST_CHECK(state("assert(test_bind.x == 1)"));
 };
 
 

@@ -102,7 +102,7 @@ namespace kaguya
 	* This class is the type returned by members of non-const LuaRef(Table) when directly accessing its elements.
 	*/
 	template<typename KEY>
-	class TableKeyReference : public detail::LuaVariantImpl<TableKeyReference<KEY> >
+	class TableKeyReferenceProxy : public detail::LuaVariantImpl<TableKeyReferenceProxy<KEY> >
 	{
 	public:
 
@@ -117,7 +117,7 @@ namespace kaguya
 		friend class State;
 
 		//! this is not copy.same assign from referenced value.
-		TableKeyReference& operator=(const TableKeyReference& src)
+		TableKeyReferenceProxy& operator=(const TableKeyReferenceProxy& src)
 		{
 			table_proxy::set(state_, table_index_, key_, src);
 			return *this;
@@ -126,7 +126,7 @@ namespace kaguya
 
 		//! assign from T
 		template<typename T>
-		TableKeyReference& operator=(const T& src)
+		TableKeyReferenceProxy& operator=(const T& src)
 		{
 			table_proxy::set(state_, table_index_, key_, src);
 
@@ -134,7 +134,7 @@ namespace kaguya
 		}
 #if KAGUYA_USE_CPP11
 		template<typename T>
-		TableKeyReference& operator=(T&& src)
+		TableKeyReferenceProxy& operator=(T&& src)
 		{
 			table_proxy::set(state_, table_index_, key_, std::forward<T>(src));
 			return *this;
@@ -211,7 +211,7 @@ namespace kaguya
 			return lua_type(state_, -1);
 		}
 
-		~TableKeyReference()
+		~TableKeyReferenceProxy()
 		{
 			if (state_)
 			{
@@ -220,13 +220,13 @@ namespace kaguya
 		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(const TableKeyReference& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_(src.key_)
+		TableKeyReferenceProxy(const TableKeyReferenceProxy& src) : state_(src.state_), stack_top_(src.stack_top_), table_index_(src.table_index_), key_(src.key_)
 		{
 			src.state_ = 0;
 		}
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(lua_State* state, int table_index, KEY key, int revstacktop) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_(key)
+		TableKeyReferenceProxy(lua_State* state, int table_index, KEY key, int revstacktop) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_(key)
 		{
 		}
 	private:
@@ -247,17 +247,17 @@ namespace kaguya
 
 
 		///!constructs the reference. Accessible only to kaguya::LuaRef itself 
-		TableKeyReference(lua_State* state, int table_index, const KEY& key, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_(key)
+		TableKeyReferenceProxy(lua_State* state, int table_index, const KEY& key, int revstacktop, const NoTypeCheck&) : state_(state), stack_top_(revstacktop), table_index_(table_index), key_(key)
 		{
 		}
 
-		TableKeyReference(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
+		TableKeyReferenceProxy(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			util::one_push(state_, table);
 			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 		}
-		TableKeyReference(const LuaRef& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
+		TableKeyReferenceProxy(const LuaRef& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			util::one_push(state_, table);
 			util::one_push(state_, key);
@@ -276,7 +276,7 @@ namespace kaguya
 	};
 
 	template<typename KEY>
-	inline std::ostream& operator<<(std::ostream& os, const TableKeyReference<KEY>& ref)
+	inline std::ostream& operator<<(std::ostream& os, const TableKeyReferenceProxy<KEY>& ref)
 	{
 		lua_State* state = ref.state();
 		util::ScopedSavedStack save(state);
@@ -446,20 +446,20 @@ namespace kaguya
 		}
 
 		template<typename T> template <typename K>
-		TableKeyReference<K> LuaTableOrUserDataImpl<T>::operator[](K key)
+		TableKeyReferenceProxy<K> LuaTableOrUserDataImpl<T>::operator[](K key)
 		{
 			lua_State* state = state_();
 			int stack_top = lua_gettop(state);
 			int stackindex = pushStackIndex_(state);
-			return TableKeyReference<K>(state, stackindex, key, stack_top);
+			return TableKeyReferenceProxy<K>(state, stackindex, key, stack_top);
 		}
 	}
 
 	/// @ingroup lua_type_traits
-	/// @brief lua_type_traits for TableKeyReference<KEY>
+	/// @brief lua_type_traits for TableKeyReferenceProxy<KEY>
 	template<typename KEY>
-	struct lua_type_traits<TableKeyReference<KEY> > {
-		static int push(lua_State* l, const TableKeyReference<KEY>& ref)
+	struct lua_type_traits<TableKeyReferenceProxy<KEY> > {
+		static int push(lua_State* l, const TableKeyReferenceProxy<KEY>& ref)
 		{
 			return ref.push(l);
 		}

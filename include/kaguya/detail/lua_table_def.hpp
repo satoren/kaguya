@@ -20,7 +20,7 @@ namespace kaguya
 	class LuaStackRef;
 	class LuaTable;
 	template<typename KEY>
-	class TableKeyReference;
+	class TableKeyReferenceProxy;
 	class MemberFunctionBinder;
 
 	namespace detail
@@ -323,7 +323,7 @@ namespace kaguya
 			/// @param key key of table
 			/// @return reference of field value
 			template<typename K>
-			TableKeyReference<K> operator[](K key);
+			TableKeyReferenceProxy<K> operator[](K key);
 		};
 
 		template<typename Derived>

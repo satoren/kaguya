@@ -390,12 +390,12 @@ namespace kaguya
 		/// @brief return element reference from global table
 		/// @param str table key
 		/// @return proxy class for reference to table.
-		TableKeyReference<std::string> operator[](const std::string& str)
+		TableKeyReferenceProxy<std::string> operator[](const std::string& str)
 		{
 			int stack_top = lua_gettop(state_);
 			util::push_args(state_, GlobalTable());
 			int table_index = stack_top + 1;
-			return TableKeyReference<std::string>(state_, table_index, str, stack_top, NoTypeCheck());
+			return TableKeyReferenceProxy<std::string>(state_, table_index, str, stack_top, NoTypeCheck());
 		}
 
 		
@@ -403,12 +403,12 @@ namespace kaguya
 		/// @param str table key
 		/// @return proxy class for reference to table.
 		
-		TableKeyReference<const char*> operator[](const char* str)
+		TableKeyReferenceProxy<const char*> operator[](const char* str)
 		{
 			int stack_top = lua_gettop(state_);
 			util::push_args(state_, GlobalTable());
 			int table_index = stack_top + 1;
-			return TableKeyReference<const char*>(state_, table_index, str, stack_top, NoTypeCheck());
+			return TableKeyReferenceProxy<const char*>(state_, table_index, str, stack_top, NoTypeCheck());
 		}
 
 		

@@ -14,7 +14,7 @@ namespace kaguya
 	class LuaRef;
 	class LuaTable;
 	template<typename KEY>
-	class TableKeyReference;
+	class TableKeyReferenceProxy;
 	class MemberFunctionBinder;
 
 	namespace detail {
