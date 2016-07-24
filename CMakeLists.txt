@@ -4,6 +4,10 @@ project(Kaguya)
 
 include(cmake/FindLua.cmake)
 
+
+option(KAGUYA_BUILD_EXAMPLES "Build the Kaguya example programs" ON)
+option(KAGUYA_BUILD_EXAMPLE_GLFW_BIND "Build the Kaguya example glfw bind" OFF)
+
 include_directories(${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
 include_directories("include")
@@ -51,6 +55,9 @@ set(BENCHMARK_SRCS benchmark/benchmark.cpp benchmark/benchmark_function.cpp benc
 add_executable(benchmark ${BENCHMARK_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(benchmark ${LUA_LIBRARIES})
 
+if(KAGUYA_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif(KAGUYA_BUILD_EXAMPLES)
 
 enable_testing()
 if(COVERAGE)

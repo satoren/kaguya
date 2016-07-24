@@ -15,8 +15,8 @@ add_library(liblua STATIC ${LIB_LUA_SRCS})
 SET_TARGET_PROPERTIES(liblua PROPERTIES OUTPUT_NAME lua)
 
 if(UNIX)
-add_definitions("-DLUA_USE_POSIX")
-target_link_libraries(liblua m)
+add_definitions("-DLUA_USE_POSIX -DLUA_USE_DLOPEN")
+target_link_libraries(liblua m dl)
 endif(UNIX)
 
 #add_executable(lua src/lua.c)
