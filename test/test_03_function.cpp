@@ -374,5 +374,30 @@ KAGUYA_TEST_FUNCTION_DEF(member_void_function_defaultarguments)(kaguya::State& s
 	state.dostring("test:defargfn(2,2,2) assert(test:getInt() == 8)");
 }
 
+kaguya::TableData ret_table()
+{
+	using namespace kaguya;
+	kaguya::TableData ret;
+
+	ret.elements.push_back(TableDataElement("data", "value"));
+	ret.elements.push_back(TableDataElement("num", 32));
+
+	return ret;
+}
+
+kaguya::LuaCodeChunkResult ret_from_luacode()
+{
+	return kaguya::LuaCodeChunkResult("return 1");
+}
+
+KAGUYA_TEST_FUNCTION_DEF(return_value_type)(kaguya::State& state)
+{
+	state["ret_table"] = &ret_table;
+	state("assert(ret_table().data == 'value')");
+	state("assert(ret_table().num == 32)");
+
+	state["ret_from_luacode"] = &ret_from_luacode;
+	state("assert(ret_from_luacode() == 1)");
+}
 
 KAGUYA_TEST_GROUP_END(test_03_function)

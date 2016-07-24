@@ -9,6 +9,7 @@
 
 /// @addtogroup another_binding_api
 /// @brief Boost.python like binding API.(experimental)
+/// this api is not multi-thread-safe.
 /// @{
 
 
@@ -52,6 +53,10 @@ namespace kaguya
 				stack.pop_back();
 			}
 		private:
+			scope_stack() {}
+			scope_stack(const scope_stack&);
+			scope_stack& operator=(const scope_stack&);
+
 			std::vector<LuaTable> stack;
 		};
 	}
@@ -85,6 +90,9 @@ namespace kaguya
 
 		TableKeyReferenceProxy<std::string> attr(const std::string& name) {
 			return scope_table_.operator[]<std::string>(name);
+		}
+		LuaTable table() {
+			return scope_table_;
 		}
 
 		~scope()

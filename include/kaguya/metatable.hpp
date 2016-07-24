@@ -34,9 +34,10 @@ namespace kaguya
 {
 	struct LuaCodeChunk
 	{
-		LuaCodeChunk(const std::string& src) :code_(src) {}
-		LuaCodeChunk(const char* src) :code_(src) {}
+		LuaCodeChunk(const std::string& src, const std::string& name = "") :code_(src), chunk_name_(name) {}
+		LuaCodeChunk(const char* src, const char* name = "") :code_(src), chunk_name_(name ? name : "") {}
 		std::string code_;
+		std::string chunk_name_;
 	};
 
 	/// @ingroup lua_type_traits
@@ -44,21 +45,22 @@ namespace kaguya
 	template<>	struct lua_type_traits<LuaCodeChunk> {
 		static int push(lua_State* state, const LuaCodeChunk& ref)
 		{
-			int status = luaL_loadstring(state, ref.code_.c_str());
+			int status = luaL_loadbuffer(state, ref.code_.c_str(), ref.code_.size(), ref.chunk_name_.empty() ? ref.code_.c_str() : ref.chunk_name_.c_str());
 			if (!except::checkErrorAndThrow(status, state)) { return 0; }
 			return 1;
 		}
 	};
-	struct LuaCodeChunkResult : LuaCodeChunk {
-		LuaCodeChunkResult(const std::string& src) :LuaCodeChunk(src) {}
-		LuaCodeChunkResult(const char* src) :LuaCodeChunk(src) {}
+	struct LuaCodeChunkExecute : LuaCodeChunk {
+		LuaCodeChunkExecute(const std::string& src, const std::string& name = "") :LuaCodeChunk(src, name) {}
+		LuaCodeChunkExecute(const char* src, const char* name = "") :LuaCodeChunk(src, name) {}
 	};
+	typedef LuaCodeChunkExecute LuaCodeChunkResult;
 	/// @ingroup lua_type_traits
 	/// @brief lua_type_traits for LuaCodeChunkResult
-	template<>	struct lua_type_traits<LuaCodeChunkResult> {
-		static int push(lua_State* state, const LuaCodeChunkResult& ref)
+	template<>	struct lua_type_traits<LuaCodeChunkExecute> {
+		static int push(lua_State* state, const LuaCodeChunkExecute& ref)
 		{
-			int status = luaL_loadstring(state, ref.code_.c_str());
+			int status = luaL_loadbuffer(state, ref.code_.c_str(), ref.code_.size(), ref.chunk_name_.empty()? ref.code_.c_str(): ref.chunk_name_.c_str());
 			if (!except::checkErrorAndThrow(status, state)) { return 0; }
 			status = lua_pcall_wrap(state, 0, 1);
 			if (!except::checkErrorAndThrow(status, state)) { return 0; }
@@ -245,7 +247,7 @@ namespace kaguya
 			LuaTable basemetatable = metatable.getMetatable();
 			if (basemetatable)
 			{
-				basemetatable.setRawField("__call",call_construct_table.getRawField("__call"));
+				basemetatable.setRawField("__call", call_construct_table.getRawField("__call"));
 			}
 			else
 			{

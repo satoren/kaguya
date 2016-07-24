@@ -609,7 +609,6 @@ namespace kaguya
 	};
 #endif
 
-#if KAGUYA_USE_CPP11
 	struct TableDataElement {
 		typedef std::pair<AnyDataPusher, AnyDataPusher> keyvalue_type;
 
@@ -624,7 +623,13 @@ namespace kaguya
 	struct TableData {
 		typedef std::pair<AnyDataPusher, AnyDataPusher> data_type;
 
+#if KAGUYA_USE_CPP11
 		TableData(std::initializer_list<TableDataElement> list) :elements(list.begin(), list.end()) {}
+#endif
+		template<typename IT>
+		TableData(IT beg,IT end) :elements(beg, end) {}
+
+		TableData(){}
 		std::vector<TableDataElement> elements;
 	};
 
@@ -636,8 +641,9 @@ namespace kaguya
 		{
 			lua_createtable(l, int(list.elements.size()), int(list.elements.size()));
 			int count = 1;//array is 1 origin in Lua
-			for (auto&& v : list.elements)
+			for (std::vector<TableDataElement>::const_iterator it = list.elements.begin(); it != list.elements.end() ; ++it)
 			{
+				const TableDataElement& v = *it;
 				if (v.keyvalue.first.empty())
 				{
 					util::one_push(l, v.keyvalue.second);
@@ -653,5 +659,4 @@ namespace kaguya
 			return 1;
 		}
 	};
-#endif
 }
