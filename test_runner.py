@@ -49,7 +49,7 @@ def build_and_exec_test(compiler,lua_version,build_type,dir_opt):
     if not os.path.exists(buildpath):
         os.makedirs(buildpath)
     os.chdir(buildpath)
-    ret = os.system('CC='+ccompiler+' CXX='+cxxcompiler+' cmake ../../ -DCMAKE_BUILD_TYPE=Debug '+addopt+' -DLUA_SEARCH_LIB_NAME='+lua_version+' -DCMAKE_BUILD_TYPE='+build_type)
+    ret = os.system('CC='+ccompiler+' CXX='+cxxcompiler+' cmake ../../  -DKAGUYA_BUILD_EXAMPLES=OFF '+addopt+' -DLUA_SEARCH_LIB_NAME='+lua_version+' -DCMAKE_BUILD_TYPE='+build_type)
     if ret != 0: raise Exception("cmake error at"+buildpath)
     ret = os.system('make -j')
     if ret != 0: raise Exception("build error at"+buildpath)
