@@ -717,8 +717,8 @@ struct KAGUYA_PP_CAT(GENERATE_NAME,Functor) : kaguya::FunctionImpl\
 		return 0;\
 	}\
 	virtual std::string argTypeNames()const { return kaguya::nativefunction::argTypesName(FNAME); }\
-	virtual bool checkArgTypes(lua_State* state)const { return true; }\
-	virtual bool strictCheckArgTypes(lua_State* state)const { return true; }\
+	virtual bool checkArgTypes(lua_State* state)const { return kaguya::nativefunction::checkArgTypes(state,FNAME,MAXARG-MINARG); }\
+	virtual bool strictCheckArgTypes(lua_State* state)const { return kaguya::nativefunction::strictCheckArgTypes(state,FNAME,MAXARG-MINARG); }\
 	virtual int minArgCount()const { return MINARG; }\
 	virtual int maxArgCount()const { return MAXARG; }\
 };\
@@ -742,8 +742,8 @@ struct KAGUYA_PP_CAT(GENERATE_NAME,Functor) : kaguya::FunctionImpl\
 		return 0;\
 	}\
 	virtual std::string argTypeNames()const { return kaguya::nativefunction::argTypesName(&CLASS::FNAME); }\
-	virtual bool checkArgTypes(lua_State* state)const { return true; }\
-	virtual bool strictCheckArgTypes(lua_State* state)const { return true; }\
+	virtual bool checkArgTypes(lua_State* state)const { return kaguya::nativefunction::checkArgTypes(state,&CLASS::FNAME,MAXARG-MINARG); }\
+	virtual bool strictCheckArgTypes(lua_State* state)const { return kaguya::nativefunction::strictCheckArgTypes(state,&CLASS::FNAME,MAXARG-MINARG); }\
 	virtual int minArgCount()const { return MINARG + 1; }\
 	virtual int maxArgCount()const { return MAXARG + 1; }\
 };\

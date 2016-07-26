@@ -31,11 +31,11 @@ namespace kaguya
 		}
 		template<>struct is_callable< void(*)()> : traits::integral_constant<bool, true> {};
 
-		inline bool checkArgTypes(lua_State* state, void(*f)())
+		inline bool checkArgTypes(lua_State* state, void(*f)(), int opt_count = 0)
 		{
 			return true;
 		}
-		inline bool strictCheckArgTypes(lua_State* state, void(*f)())
+		inline bool strictCheckArgTypes(lua_State* state, void(*f)(), int opt_count = 0)
 		{
 			return true;
 		}
@@ -58,11 +58,11 @@ namespace kaguya
 			return 0;
 		}
 		template<>struct is_callable<standard::function<void()> > : traits::integral_constant<bool, true> {};
-		inline bool checkArgTypes(lua_State* state, standard::function<void()> f)
+		inline bool checkArgTypes(lua_State* state, standard::function<void()> f, int opt_count = 0)
 		{
 			return true;
 		}
-		inline bool strictCheckArgTypes(lua_State* state, standard::function<void()> f)
+		inline bool strictCheckArgTypes(lua_State* state, standard::function<void()> f, int opt_count = 0)
 		{
 			return true;
 		}
@@ -81,9 +81,8 @@ namespace kaguya
 #define KAGUYA_GET_OFFSET 
 #define KAGUYA_GET_CONCAT_REP(N) ,lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N KAGUYA_GET_OFFSET)
 #define KAGUYA_GET_REP(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N KAGUYA_GET_OFFSET)
-
-#define KAGUYA_STRICT_TYPECHECK_REP(N) && lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, N KAGUYA_GET_OFFSET)
-#define KAGUYA_TYPECHECK_REP(N) && lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, N KAGUYA_GET_OFFSET)
+#define KAGUYA_STRICT_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N KAGUYA_GET_OFFSET) && lua_isnoneornil(state, N KAGUYA_GET_OFFSET)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, N KAGUYA_GET_OFFSET))
+#define KAGUYA_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N KAGUYA_GET_OFFSET) && lua_isnoneornil(state, N KAGUYA_GET_OFFSET)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, N KAGUYA_GET_OFFSET))
 #define KAGUYA_TYPENAME_REP(N) + typeid(KAGUYA_PP_CAT(A,N)).name() + ","
 
 #define KAGUYA_GET_REPEAT_CONCAT(N) KAGUYA_PP_REPEAT(N,KAGUYA_GET_CONCAT_REP)
@@ -114,13 +113,15 @@ namespace kaguya
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
@@ -185,14 +186,16 @@ namespace kaguya
 			}\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP) \
 				&& lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::checkType(state, 1);\
 			}\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true	KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP) \
 				&& lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::strictCheckType(state, 1);\
 			}\
@@ -250,13 +253,15 @@ namespace kaguya
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
@@ -325,7 +330,7 @@ namespace kaguya
 #endif
 
 		template<class MemType, class T>
-		bool checkArgTypes(lua_State* state, MemType T::* m)
+		bool checkArgTypes(lua_State* state, MemType T::* m, int opt_count = 0)
 		{
 			if (lua_gettop(state) >= 2)
 			{
@@ -336,7 +341,7 @@ namespace kaguya
 			return  lua_type_traits<T>::checkType(state, 1);
 		}
 		template<class MemType, class T>
-		bool strictCheckArgTypes(lua_State* state, MemType T::* m)
+		bool strictCheckArgTypes(lua_State* state, MemType T::* m, int opt_count = 0)
 		{
 			bool thistypecheck = lua_type_traits<T>::strictCheckType(state, 1);
 			if (thistypecheck && lua_gettop(state) == 2)
@@ -386,13 +391,15 @@ namespace kaguya
 			}\
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_DEF(N)> : traits::integral_constant<bool, true> {}; \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
+				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\

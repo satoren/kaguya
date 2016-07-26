@@ -158,34 +158,37 @@ namespace kaguya
 		template<typename T, size_t Index>
 		struct _wcheckeval
 		{
-			_wcheckeval(lua_State* s) :state(s) {}
+			_wcheckeval(lua_State* s, bool opt) :state(s), opt_arg(opt) {}
 			lua_State* state;
+			bool opt_arg;
 			operator bool()
 			{
-				return lua_type_traits<T>::checkType(state, Index);
+				return (opt_arg && lua_isnoneornil(state, Index) )|| lua_type_traits<T>::checkType(state, Index);
 			}
 		};
 
 		template<typename T, size_t Index>
 		struct _scheckeval
 		{
-			_scheckeval(lua_State* s) :state(s) {}
+			_scheckeval(lua_State* s, bool opt) :state(s), opt_arg(opt) {}
 			lua_State* state;
+			bool opt_arg;
 			operator bool()
 			{
-				return lua_type_traits<T>::strictCheckType(state, Index);
+				return (opt_arg && lua_isnoneornil(state, Index)) || lua_type_traits<T>::strictCheckType(state, Index);
 			}
 		};
 
 		template<class R, class... Args, size_t... Indexes>
-		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>)
+		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>, int opt_count)
 		{
-			return all_true(_wcheckeval<Args, Indexes>(state)...);
+			return all_true(_wcheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 		template<class R, class... Args, size_t... Indexes>
-		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>)
+		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>, int opt_count)
 		{
-			return all_true(_scheckeval<Args, Indexes>(state)...);
+
+			return all_true(_scheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 		template<class R, class... Args>
 		std::string _type_name_apply(invoke_signature_type<R, Args...>)
@@ -250,7 +253,7 @@ namespace kaguya
 			}
 		}
 		template<class MemType, class T, class unusedindex>
-		bool _ctype_apply(lua_State* state, unusedindex, MemType T::*)
+		bool _ctype_apply(lua_State* state, unusedindex, MemType T::*, int opt_count)
 		{
 			if (lua_gettop(state) >= 2)
 			{
@@ -261,7 +264,7 @@ namespace kaguya
 			return  lua_type_traits<T>::checkType(state, 1);
 		}
 		template<class MemType, class T, class unusedindex>
-		bool _sctype_apply(lua_State* state, unusedindex, MemType T::*)
+		bool _sctype_apply(lua_State* state, unusedindex, MemType T::*, int opt_count)
 		{
 			if (lua_gettop(state) >= 2)
 			{
@@ -319,20 +322,20 @@ namespace kaguya
 			return _call_apply(state, f, index(), fsigtype());
 		}
 		template<class F>
-		bool checkArgTypes(lua_State* state, const F& f)
+		bool checkArgTypes(lua_State* state, const F& f, int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename f_signature<ftype>::type fsigtype;
 			typedef typename arg_index_range<fsigtype>::type index;
-			return _ctype_apply(state, index(), fsigtype());
+			return _ctype_apply(state, index(), fsigtype(), opt_count);
 		}
 		template<class F>
-		bool strictCheckArgTypes(lua_State* state, const F& f)
+		bool strictCheckArgTypes(lua_State* state, const F& f, int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename f_signature<ftype>::type fsigtype;
 			typedef typename arg_index_range<fsigtype>::type index;
-			return _sctype_apply(state, index(), fsigtype());
+			return _sctype_apply(state, index(), fsigtype(), opt_count);
 		}
 
 		template<class F>

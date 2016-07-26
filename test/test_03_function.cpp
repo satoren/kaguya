@@ -374,6 +374,30 @@ KAGUYA_TEST_FUNCTION_DEF(member_void_function_defaultarguments)(kaguya::State& s
 	state.dostring("test:defargfn(2,2,2) assert(test:getInt() == 8)");
 }
 
+
+std::string defargfn2(std::string a, std::string b = "b", std::string c = "c")
+{
+	return a + b + c;
+}
+
+KAGUYA_TEST_FUNCTION_DEF(defaultarguments_overload)(kaguya::State& state)
+{
+	KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 0, 3)
+	KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper2, defargfn2, 1, 3)
+
+	state["defargfn"] = kaguya::overload(defargfn_wrapper, defargfn_wrapper2);
+
+	state.dostring("assert(defargfn() == 6)");
+	state.dostring("assert(defargfn(6) == 12)");
+	state.dostring("assert(defargfn(6,5) == 30)");
+	state.dostring("assert(defargfn(2,2,2) == 8)");
+
+	state.dostring("assert(defargfn('a') == 'abc')");
+	state.dostring("assert(defargfn('a','b') == 'abc')");
+	state.dostring("assert(defargfn('a','b','c') == 'abc')");
+	state.dostring("assert(defargfn('d','e','f') == 'def')");
+}
+
 kaguya::TableData ret_table()
 {
 	using namespace kaguya;
