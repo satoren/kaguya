@@ -920,6 +920,13 @@ struct GENERATE_NAME\
 /// @param MAXARG maximum arguments count
 #define KAGUYA_FUNCTION_OVERLOADS(GENERATE_NAME,FNAME, MINARG, MAXARG) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,create(FNAME))
 
+
+/// @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
+/// @param GENERATE_NAME generate function object name
+/// @param FNAME target function name
+/// @param MINARG minimum arguments count
+/// @param MAXARG maximum arguments count
+/// @param SIGNATURE function signature. e,g, int(int)
 #define KAGUYA_FUNCTION_OVERLOADS_WITH_SIGNATURE(GENERATE_NAME,FNAME, MINARG, MAXARG,SIGNATURE) KAGUYA_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,FNAME, MINARG, MAXARG,create<SIGNATURE>())
 
 
@@ -931,4 +938,11 @@ struct GENERATE_NAME\
 /// @param MAXARG maximum arguments count
 #define KAGUYA_MEMBER_FUNCTION_OVERLOADS(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,create(&CLASS::FNAME))
 
+/// @brief Generate wrapper function object for count based overloads with nonvoid return function. Include default arguments parameter function
+/// @param GENERATE_NAME generate function object name
+/// @param CLASS target class name
+/// @param FNAME target function name
+/// @param MINARG minimum arguments count
+/// @param MAXARG maximum arguments count
+/// @param SIGNATURE function signature. e,g, int(Test::*)(int)
 #define KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,SIGNATURE) KAGUYA_MEMBER_FUNCTION_OVERLOADS_INTERNAL(GENERATE_NAME,CLASS,FNAME, MINARG, MAXARG,create<SIGNATURE>())
