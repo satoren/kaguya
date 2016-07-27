@@ -31,5 +31,5 @@ endif(NOT LUA_INCLUDE_DIRS)
 
 
 if(NOT EXISTS ${LUA_INCLUDE_DIRS}/lua.h)
-  message(SEND_STATUS "Can't find lua.h in ${LUA_INCLUDE_DIRS}")
+  message(SEND_ERROR "Can't find lua.h in ${LUA_INCLUDE_DIRS}")
 endif()
