@@ -6,6 +6,7 @@ include(cmake/FindLua.cmake)
 
 
 option(KAGUYA_BUILD_EXAMPLES "Build the Kaguya example programs" ON)
+option(KAGUYA_BUILD_BENCHMARK "Build the Kaguya benchmark programs" OFF)
 option(KAGUYA_BUILD_EXAMPLE_GLFW_BIND "Build the Kaguya example glfw bind" OFF)
 
 include_directories(${LUA_INCLUDE_DIRS})
@@ -51,9 +52,11 @@ if(CYGWIN OR WIN32)
       unset(HAVE_FLAG_SANITIZE_ADDRESS)
 endif()
 
+if(KAGUYA_BUILD_BENCHMARK)
 set(BENCHMARK_SRCS benchmark/benchmark.cpp benchmark/benchmark_function.cpp benchmark/benchmark_function.hpp)
 add_executable(benchmark ${BENCHMARK_SRCS} ${KAGUYA_HEADER})
 target_link_libraries(benchmark ${LUA_LIBRARIES})
+endif(KAGUYA_BUILD_BENCHMARK)
 
 if(KAGUYA_BUILD_EXAMPLES)
   add_subdirectory(examples)
