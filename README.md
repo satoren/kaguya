@@ -257,7 +257,7 @@ int defargfn(int a = 3, int b = 2, int c = 1)
 }
 
 KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn,0,3)
-state["defarg"] = kaguya::function(defargfn_wrapper);
+state["defarg"] = kaguya::function(defargfn_wrapper());
 state.dostring("assert(defarg() == 6)");
 state.dostring("assert(defarg(6) == 12)");
 state.dostring("assert(defarg(6,5) == 30)");
@@ -274,7 +274,7 @@ struct TestClass
 KAGUYA_MEMBER_FUNCTION_OVERLOADS(defargfn_wrapper, TestClass, default_arg, 0, 3)
 state["TestClass"].setClass(kaguya::UserdataMetatable<TestClass>()
   .setConstructors<TestClass()>()
-  .addFunction("defarg", defargfn_wrapper)
+  .addFunction("defarg", defargfn_wrapper())
 );
 	state.dostring("test = TestClass.new()");
 	state.dostring("assert(test:defargfn() == 6)");
