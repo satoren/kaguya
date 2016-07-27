@@ -15,36 +15,6 @@ namespace kaguya
 {
 	namespace nativefunction
 	{
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke_fn(Res(ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-
-		template<class ThisType, class... FArgs, class... Args>
-		void invoke_fn(void (ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
-		{
-			(this_.*f)(std::forward<Args>(args)...);
-		}
-
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke_fn(Res(ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-
-		template<class ThisType, class... FArgs, class... Args>
-		void invoke_fn(void (ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
-		{
-			(this_.*f)(std::forward<Args>(args)...);
-		}
-		template<class F, class... Args>
-		//MSVC 2013 std::result_of is broken.
-		auto invoke_fn(F&& f, Args&&... args) -> decltype(f(std::forward<Args>(args)...))
-		{
-			return f(std::forward<Args>(args)...);
-		}
-
 		template<std::size_t... indexes>
 		struct index_tuple {};
 
@@ -119,20 +89,32 @@ namespace kaguya
 		struct f_signature<Ret(T::*)(Args...) const> {
 			typedef invoke_signature_type<Ret, const T&, Args...> type;
 		};
+		template <typename T, typename Ret, typename... Args>
+		struct f_signature<Ret(T::* &)(Args...)> {
+			typedef invoke_signature_type<Ret, T&, Args...> type;
+		};
+		template <typename T, typename Ret, typename... Args>
+		struct f_signature<Ret(T::* &)(Args...) const> {
+			typedef invoke_signature_type<Ret, const T&, Args...> type;
+		};
 		template<class Ret, class... Args>
 		struct f_signature<Ret(*)(Args...)> {
+			typedef invoke_signature_type<Ret, Args...> type;
+		};
+		template<class Ret, class... Args>
+		struct f_signature<Ret(Args...)> {
 			typedef invoke_signature_type<Ret, Args...> type;
 		};
 
 		template<class F, class Ret, class... Args, size_t... Indexes>
 		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
 		{
-			return util::push_args(state, invoke_fn(f, lua_type_traits<Args>::get(state, Indexes)...));
+			return util::push_args(state, util::invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
 		}
 		template<class F, class... Args, size_t... Indexes>
 		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
 		{
-			invoke_fn(f, lua_type_traits<Args>::get(state, Indexes)...);
+			util::invoke(f, lua_type_traits<Args>::get(state, Indexes)...);
 			return 0;
 		}
 
@@ -318,6 +300,7 @@ namespace kaguya
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename f_signature<ftype>::type fsigtype;
 			typedef typename arg_index_range<fsigtype>::type index;
+//			index_range<1, util::FunctionSignature<F>::type::argument_count + 1> index;
 
 			return _call_apply(state, f, index(), fsigtype());
 		}
@@ -376,59 +359,6 @@ namespace kaguya
 		{
 			typedef constructor_signature_type<ClassType, Args...> type;
 		};
-
-		/*
-		template<class arg1, class... args>
-		struct typeTuple {
-			typedef arg1 first_type;
-		};
-
-		template<std::size_t remain, class result, bool flag = remain <= 0>
-		struct type_get
-		{
-			typedef typename result::first_type type;
-		};
-
-		template<std::size_t remain, class arg, class... args >
-		struct type_get<remain, typeTuple<arg, args...>, false>
-			: type_get<remain - 1, typeTuple<args...> >
-		{
-		};
-		template< typename F>
-		struct fsig_arg_to_type_tuple;
-
-		template<class Ret, class... Args>
-		struct fsig_arg_to_type_tuple<invoke_signature_type<Ret, Args...>>
-		{
-			typedef typeTuple<Args...> type;
-		};
-		template< typename F>
-		struct fsig_ret_type;
-
-		template<class Ret, class... Args>
-		struct fsig_ret_type<invoke_signature_type<Ret, Args...>>
-		{
-			typedef Ret type;
-		};
-
-
-		template<typename F>
-		struct functionArgumentsTypeTuple
-		{
-			typedef typename fsig_arg_to_type_tuple<typename f_signature<F>::type>::type type;
-		};
-		template<typename F>
-		struct functionResultType
-		{
-			typedef typename fsig_ret_type<typename f_signature<F>::type>::type type;
-		};
-
-		template<int N, typename F>
-		struct argumentTypeGet
-		{
-			typedef typename type_get<N, typename functionArgumentsTypeTuple<F>::type>::type type;
-		};*/
-
 	}
 	using nativefunction::ConstructorFunction;
 }

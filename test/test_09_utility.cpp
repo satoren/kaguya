@@ -114,6 +114,18 @@ void checkf()
 {
 }
 
+template<typename F>void function_argcount_check(F f, int count)
+{
+	TEST_EQUAL(kaguya::util::FunctionSignature<F>::type::argument_count, count);
+}
+
+template<typename RET, typename F>void function_return_type_check(F f)
+{
+	bool ret = kaguya::standard::is_same<
+		typename kaguya::util::FunctionSignature<F>::type::result_type
+		, RET>::value;
+	TEST_CHECK(ret);
+}
 KAGUYA_TEST_FUNCTION_DEF(check_function_signature)(kaguya::State& s)
 {
 	using namespace kaguya;
@@ -137,6 +149,22 @@ KAGUYA_TEST_FUNCTION_DEF(check_function_signature)(kaguya::State& s)
 	TEST_EQUAL(nativefunction::argTypesName(stdfn), std::string(""));
 	TEST_EQUAL(nativefunction::minArgCount(stdfn), 0);
 	TEST_EQUAL(nativefunction::maxArgCount(stdfn), 0);
+
+	bool ret = traits::is_same<int, int>::value;
+	TEST_CHECK(ret);
+	ret = traits::is_same<int, util::ArgumentType<0, void(int, int)>::type>::value;
+	TEST_CHECK(ret);
+	ret = traits::is_same<std::string, util::ArgumentType < 1, void(int, std::string) > ::type>::value;
+	TEST_CHECK(ret);
+
+
+	function_argcount_check(checkf, 0);
+	function_argcount_check(&TestClass::default_arg, 4);
+	function_argcount_check(stdfn, 0);
+
+	function_return_type_check<void>(checkf);
+	function_return_type_check<int>(&TestClass::default_arg);
+	function_return_type_check<void>(stdfn);
 }
 
 

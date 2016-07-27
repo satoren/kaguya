@@ -243,6 +243,14 @@ namespace kaguya_test_util
 		{
 			setInt(a*b*c);
 		}
+		void default_set_overload(int a, int b = 2, int c = 1)
+		{
+			setInt(a*b*c);
+		}
+		void default_set_overload(std::string a, std::string b = "b", std::string c = "c")
+		{
+			setString(a+b+c);
+		}
 
 		TestClass copy()const { return *this; }
 		const TestClass& references()const { return *this; }
