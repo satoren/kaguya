@@ -154,15 +154,18 @@ namespace kaguya
 #undef KAGUYA_ADD_CON_FN_DEF
 #endif
 
+		/// @ingroup another_binding_api
 		/// @brief function binding 
 		template<typename F>
 		class_& function(const char* name, F f) { this-> addFunction(name, f); return *this; }
 
 
+		/// @ingroup another_binding_api
 		/// @brief property binding 
 		template<typename F>
 		class_& property(const char* name, F f) { this->addProperty(name, f); return *this; }
 
+		/// @ingroup another_binding_api
 		/// @brief property binding with getter and sette function
 		template<typename Getter, typename Setter>
 		class_& property(const char* name, Getter getter, Setter setter) { this->addProperty(name, getter, setter); return *this; }
@@ -171,28 +174,28 @@ namespace kaguya
 		template<typename F>
 		class_& class_function(const char* name, F f) { this->addStaticFunction(name, f); return *this; }
 
-		/// @defgroup boostpythonlikeapi Boost.python like interface
-		/// @{
 
+		/// @ingroup another_binding_api
 		/// @brief function binding 
 		template<typename F>
 		class_& def(const char* name, F f) { this->addFunction(name, f); return *this; }
 
+		/// @ingroup another_binding_api
 		/// @brief property binding with getter and sette function
 		template<typename Getter, typename Setter>
 		class_& add_property(const char* name, Getter getter, Setter setter) { property(name, getter, setter); return *this; }
 
+		/// @ingroup another_binding_api
 		/// @brief property binding 
 		template<typename F>
 		class_& add_property(const char* name, F f) { property(name, f); return *this; }
 
 
+		/// @ingroup another_binding_api
 		/// @brief static property binding 
 		template<typename Data>
 		class_& add_static_property(const char* name, Data data) { this->addStaticField(name, data); return *this; }
-
-		/// @}
-
+		
 	private:
 		std::string name_;
 	};
@@ -208,7 +211,7 @@ namespace kaguya
 		}
 	}
 
-	/// @ingroup boostpythonlikeapi
+	/// @ingroup another_binding_api
 	/// @brief function binding 
 	template<typename F>
 	void def(const char* name, F f) { kaguya::function(name, f); }
