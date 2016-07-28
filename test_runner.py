@@ -11,7 +11,7 @@ if not boost_dir:
     boost_dir='D:\\boost_1_60_0'
 
 lua_versions = ["lua-5.3.3","lua-5.2.4","lua-5.1.5","luajit"]
-maijor_test_lua_versions = ["lua-5.3.3","luajit"]
+maijor_test_lua_versions = ["lua-5.3.3"]
 
 test_msvc_vers = [("msvc2015","Visual Studio 14 2015","",True)
     ,("msvc2015win64","Visual Studio 14 2015 Win64","",True)
@@ -63,6 +63,8 @@ def build_and_exec_test(compiler,lua_version,build_type,dir_opt):
     os.chdir(buildpath)
     ret = os.system('CC='+ccompiler+' CXX='+cxxcompiler+' cmake ../../  -DKAGUYA_BUILD_EXAMPLES=OFF '+addopt+' -DLUA_SEARCH_LIB_NAME='+lua_version+' -DCMAKE_BUILD_TYPE='+build_type)
     if ret != 0:#pass through cmake failed. e.g. not found lua
+        if lua_version in maijor_test_lua_versions:
+            raise Exception("cmake error at"+buildpath)
         os.chdir("../../")
         return
     ret = os.system('make -j')
@@ -86,6 +88,8 @@ def build_msvc_and_exec_test(msvcver,lua_version,build_type):
     os.chdir(buildpath)
     ret = os.system('cmake ../../ -DLUA_SEARCH_LIB_NAME='+lua_version+' -G "'+msvcver[1]+'" '+msvcver[2])
     if ret != 0:#pass through cmake failed. e.g. not found lua
+        if lua_version in maijor_test_lua_versions:
+            raise Exception("cmake error at"+buildpath)
         os.chdir("../../")
         return
     ret = os.system('cmake --build . --config '+build_type)
