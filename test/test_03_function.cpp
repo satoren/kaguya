@@ -464,6 +464,21 @@ KAGUYA_TEST_FUNCTION_DEF(member_function_different_type_overload)(kaguya::State&
 	state.dostring("test:defargfn('a','a','a') assert(test:getString() == 'aaa')");
 }
 
+std::string defargfn3(const std::string& a, const std::string& b = "b", const std::string& c = "c")
+{
+	return a + b + c;
+}
+KAGUYA_FUNCTION_OVERLOADS(defargfn3_wrapper, defargfn3, 1, 3);
+
+KAGUYA_TEST_FUNCTION_DEF(defaultarguments_const_reference)(kaguya::State& state)
+{
+	state["defargfn"] = kaguya::function(defargfn3_wrapper());
+	
+	state.dostring("assert(defargfn('a') == 'abc')");
+	state.dostring("assert(defargfn('a','b') == 'abc')");
+	state.dostring("assert(defargfn('a','b','c') == 'abc')");
+	state.dostring("assert(defargfn('d','e','f') == 'def')");
+}
 
 kaguya::TableData ret_table()
 {

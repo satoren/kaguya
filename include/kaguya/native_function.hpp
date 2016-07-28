@@ -54,7 +54,8 @@ namespace kaguya
 	namespace nativefunction
 	{
 		template<size_t INDEX,typename F>
-		typename util::ArgumentType<INDEX, F>::type getArgument(lua_State* state)
+		typename lua_type_traits<typename util::ArgumentType<INDEX, F>::type>::get_type			
+			getArgument(lua_State* state)
 		{
 			return lua_type_traits<typename util::ArgumentType<INDEX, F>::type>::get(state, INDEX + 1);
 		}
