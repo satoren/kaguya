@@ -114,7 +114,7 @@ void checkf()
 {
 }
 
-template<typename F>void function_argcount_check(F f, int count)
+template<typename F>void function_argcount_check(F f, size_t count)
 {
 	TEST_EQUAL(kaguya::util::FunctionSignature<F>::type::argument_count, count);
 }
