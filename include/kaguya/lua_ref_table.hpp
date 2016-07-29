@@ -465,8 +465,9 @@ namespace kaguya
 		}
 	};
 	
+#if KAGUYA_USE_CPP11
 	/// @ingroup lua_type_traits
-	/// @brief lua_type_traits for std::vector<T, A>
+	/// @brief lua_type_traits for std::array<T, A>
 	template<typename T, size_t S>
 	struct lua_type_traits<std::array<T, S> >
 	{
@@ -522,6 +523,7 @@ namespace kaguya
 			return 1;
 		}
 	};
+#endif
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 
 	/// @ingroup lua_type_traits
