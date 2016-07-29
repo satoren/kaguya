@@ -1,8 +1,10 @@
 #include "kaguya/kaguya.hpp"
 #include "test_util.hpp"
 
-#if KAGUYA_USE_CPP11
 
+
+#if KAGUYA_USE_CPP11
+#include <array>
 
 KAGUYA_TEST_GROUP_START(test_11_cxx11_feature)
 
@@ -254,6 +256,22 @@ KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 	TEST_EQUAL(tbl["childtable"][1], 3);
 }
 
+KAGUYA_TEST_FUNCTION_DEF(std_array)(kaguya::State& state)
+{
+	std::array<int, 3> arr{ 2,3,4 };
+	state["value"] = arr;
+
+
+	state("assert(value[1] == 2)");
+	state("assert(value[2] == 3)");
+	state("assert(value[3] == 4)");
+	std::array<int, 3> get = state["value"];
+	TEST_EQUAL(get[0], 2);
+	TEST_EQUAL(get[1], 3);
+	TEST_EQUAL(get[2], 4);
+	bool v = state["value"].weakTypeTest<std::array<int, 3> >();
+	TEST_CHECK(v);
+}
 
 
 int self_refcounted_object_count = 0;

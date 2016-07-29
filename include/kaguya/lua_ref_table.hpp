@@ -464,7 +464,64 @@ namespace kaguya
 			return ref.push(l);
 		}
 	};
+	
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::vector<T, A>
+	template<typename T, size_t S>
+	struct lua_type_traits<std::array<T, S> >
+	{
+		typedef std::array<T, S> get_type;
+		typedef const std::array<T, S>& push_type;
 
+		static bool checkType(lua_State* l, int index)
+		{
+			if (lua_type(l, index) != LUA_TTABLE) { return false; }
+
+			LuaStackRef table(l, index);
+			if (table.size() != S) { return false; }//TODO
+			bool valid = true;
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(
+				[&](const LuaStackRef& k, const LuaStackRef& v) {valid = valid && k.typeTest<size_t>() && v.typeTest<T>(); return valid; });
+			return valid;
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			if (lua_type(l, index) != LUA_TTABLE) { return false; }
+
+			LuaStackRef table(l, index);
+			if (table.size() != S) { return false; }//TODO
+			bool valid = true;
+			table.foreach_table_breakable<LuaStackRef, LuaStackRef>(
+				[&](const LuaStackRef& k, const LuaStackRef& v) {valid = valid && k.typeTest<size_t>() && v.typeTest<T>(); return valid; });
+			return valid;
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (lua_type(l, index) != LUA_TTABLE)
+			{
+				except::typeMismatchError(l, std::string("type mismatch"));
+				return get_type();
+			}
+			LuaStackRef t(l, index);
+			if (t.size() != S)//TODO
+			{
+				except::typeMismatchError(l, std::string("type mismatch"));
+			}
+			get_type res;
+			t.foreach_table<size_t, const T&>([&](size_t k, const T& v) { if (k > 0 && k <= S) { res[k - 1] = v; } });
+			return res;
+		}
+		static int push(lua_State* l, push_type v)
+		{
+			lua_createtable(l, int(S), 0);
+			for (int i = 0;i<S;++i)
+			{
+				util::one_push(l, v[i]);
+				lua_rawseti(l, -2, i+1);
+			}
+			return 1;
+		}
+	};
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
 
 	/// @ingroup lua_type_traits
