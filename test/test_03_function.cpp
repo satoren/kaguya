@@ -13,6 +13,10 @@ int free_standing_function2()
 {
 	return 12;
 }
+int free_standing_function3(const char* text)
+{
+	return atoi(text);
+}
 
 KAGUYA_TEST_FUNCTION_DEF(free_standing_function_test)(kaguya::State& state)
 {
@@ -21,6 +25,9 @@ KAGUYA_TEST_FUNCTION_DEF(free_standing_function_test)(kaguya::State& state)
 	state["free2"] = &free_standing_function2;
 	TEST_EQUAL(arg, 54);
 	TEST_CHECK(state["free2"]() == 12.0);
+
+	state["free3"] = &free_standing_function3;
+	TEST_CHECK(state["free3"]("54") == 54.0);
 }
 
 
@@ -479,6 +486,24 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments_const_reference)(kaguya::State& state)
 	state.dostring("assert(defargfn('a','b','c') == 'abc')");
 	state.dostring("assert(defargfn('d','e','f') == 'def')");
 }
+
+
+std::string defargfn4(const std::string& a, const char* b = "b", const char* c = "c")
+{
+	return a + b + c;
+}
+
+KAGUYA_FUNCTION_OVERLOADS(defargfn4_wrapper, defargfn4, 1, 3);
+KAGUYA_TEST_FUNCTION_DEF(defaultarguments_const_char)(kaguya::State& state)
+{
+	state["defargfn"] = kaguya::function(defargfn4_wrapper());
+
+	state.dostring("assert(defargfn('a') == 'abc')");
+	state.dostring("assert(defargfn('a','b') == 'abc')");
+	state.dostring("assert(defargfn('a','b','c') == 'abc')");
+	state.dostring("assert(defargfn('d','e','f') == 'def')");
+}
+
 
 kaguya::TableData ret_table()
 {
