@@ -67,7 +67,50 @@ namespace kaguya
 		template<class MemType, class T>
 		struct is_callable<MemType T::*> : traits::integral_constant<bool, true> {};
 
-		///! for data member
+
+
+		template<typename T>
+		struct is_callable<ConstructorFunctor<T> > :traits::integral_constant<bool, true> {};
+
+		// for constructors
+		template<class T>
+		int call(lua_State* state, ConstructorFunctor<T>& con)
+		{
+			return con(state);
+		}
+		template<class T>
+		int call(lua_State* state, const ConstructorFunctor<T>& con)
+		{
+			return con(state);
+		}
+		template<class T>
+		bool checkArgTypes(lua_State* state, const ConstructorFunctor<T>& con, int opt_count = 0)
+		{
+			return con.checkArgTypes(state, opt_count);
+		}
+		template<class T>
+		bool strictCheckArgTypes(lua_State* state, const ConstructorFunctor<T>& con, int opt_count = 0)
+		{
+			return con.strictCheckArgTypes(state, opt_count);
+		}
+		template<class T>
+		std::string argTypesName(const ConstructorFunctor<T>& con)
+		{
+			return con.argTypesName();
+		}
+		template<class T>
+		int minArgCount(const ConstructorFunctor<T>& con)
+		{
+			return ConstructorFunctor<T>::signature_type::argument_count;
+		}
+		template<class T>
+		int maxArgCount(const ConstructorFunctor<T>& con)
+		{
+			return ConstructorFunctor<T>::signature_type::argument_count;
+		}
+
+
+		// for data member
 		template<class MemType, class T>
 		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
 		call(lua_State* state, MemType T::* mptr)
@@ -152,6 +195,7 @@ namespace kaguya
 			return 2;
 		}
 
+
 		inline int call(lua_State* state, const PolymorphicInvoker& f)
 		{
 			return f.invoke(state);
@@ -180,6 +224,7 @@ namespace kaguya
 		{
 			return f.maxArgCount();
 		}
+
 
 		template<>
 		struct is_callable<PolymorphicInvoker>:traits::integral_constant<bool, true> {};

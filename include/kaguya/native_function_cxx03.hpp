@@ -14,327 +14,152 @@ namespace kaguya
 {
 	namespace nativefunction
 	{
-		inline int call(lua_State* state, void(*f)())
-		{
-			f();
-			return 0;
-		}
+		
 
-		inline bool checkArgTypes(lua_State* state, void(*f)(), int opt_count = 0)
-		{
-			return true;
-		}
-		inline bool strictCheckArgTypes(lua_State* state, void(*f)(), int opt_count = 0)
-		{
-			return true;
-		}
-		inline std::string argTypesName(void(*f)())
-		{
-			return "";
-		}
-		inline int minArgCount(void(*f)())
-		{
-			return 0;
-		}
-		inline int maxArgCount(void(*f)())
-		{
-			return 0;
-		}
+		
+#define KAGUYA_INVOKE_SIG_TARG_DEF_CONCAT_REP(N) ,typename util::ArgumentType<N-1,F>::type
+#define KAGUYA_INVOKE_SIG_TARG_DEF_REPEAT_CONCAT(N) KAGUYA_PP_REPEAT(N, KAGUYA_INVOKE_SIG_TARG_DEF_CONCAT_REP)
 
-		inline int call(lua_State* state, standard::function<void()> f)
-		{
-			f();
-			return 0;
-		}
-		inline bool checkArgTypes(lua_State* state, standard::function<void()> f, int opt_count = 0)
-		{
-			return true;
-		}
-		inline bool strictCheckArgTypes(lua_State* state, standard::function<void()> f, int opt_count = 0)
-		{
-			return true;
-		}
-		inline std::string argTypesName(standard::function<void()> f)
-		{
-			return "";
-		}
-		inline int minArgCount(standard::function<void()> f)
-		{
-			return 0;
-		}
-		inline int maxArgCount(standard::function<void()> f)
-		{
-			return 0;
-		}
-#define KAGUYA_GET_OFFSET 
-#define KAGUYA_GET_CONCAT_REP(N) ,lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N KAGUYA_GET_OFFSET)
-#define KAGUYA_GET_REP(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N KAGUYA_GET_OFFSET)
-#define KAGUYA_STRICT_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N KAGUYA_GET_OFFSET) && lua_isnoneornil(state, N KAGUYA_GET_OFFSET)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, N KAGUYA_GET_OFFSET))
-#define KAGUYA_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N KAGUYA_GET_OFFSET) && lua_isnoneornil(state, N KAGUYA_GET_OFFSET)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, N KAGUYA_GET_OFFSET))
+#define KAGUYA_GET_REP(N) ,lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N)
+#define KAGUYA_FUNC_DEF(N) const util::FunctionSignatureType<Ret KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>& fsig
 #define KAGUYA_TYPENAME_REP(N) + typeid(KAGUYA_PP_CAT(A,N)).name() + ","
-
-#define KAGUYA_GET_REPEAT_CONCAT(N) KAGUYA_PP_REPEAT(N,KAGUYA_GET_CONCAT_REP)
-#define KAGUYA_GET_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_GET_REP)
-
-#define KAGUYA_FUNC_DEF(N) void (*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
-#define KAGUYA_FUNC_TYPE(N) void (*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
+#define KAGUYA_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N) && lua_isnoneornil(state, N)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, N))
+#define KAGUYA_STRICT_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N) && lua_isnoneornil(state, N)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, N))
 #define KAGUYA_CALL_FN_DEF(N) \
-			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
-			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
+			template<typename F,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			inline typename traits::enable_if<!traits::is_same<void,Ret>::value,int>::type \
+			_call_apply(lua_State* state,F& f, KAGUYA_FUNC_DEF(N))\
 			{\
-				f(KAGUYA_GET_REPEAT(N));\
+				return util::push_args(state, util::invoke<F KAGUYA_INVOKE_SIG_TARG_DEF_REPEAT_CONCAT(N)>(f KAGUYA_PP_REPEAT(N,KAGUYA_GET_REP)));\
+			}\
+			template<typename F,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+			inline typename traits::enable_if<traits::is_same<void,Ret>::value,int>::type \
+			_call_apply(lua_State* state,F& f, KAGUYA_FUNC_DEF(N))\
+			{\
+				util::invoke<F KAGUYA_INVOKE_SIG_TARG_DEF_REPEAT_CONCAT(N)>(f KAGUYA_PP_REPEAT(N,KAGUYA_GET_REP));\
 				return 0;\
-			}
-
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
-#undef KAGUYA_CALL_FN_DEF
-#undef KAGUYA_FUNC_DEF
-#undef KAGUYA_FUNC_TYPE
-#define KAGUYA_FUNC_DEF(N) Ret (*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
-#define KAGUYA_FUNC_TYPE(N) Ret (*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))
-#define KAGUYA_CALL_FN_DEF(N) \
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
-			{\
-				return util::push_args(state, f(KAGUYA_GET_REPEAT(N)));\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
+			bool _ctype_apply(lua_State* state,KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
+				const int MAX_ARG = N;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
+			bool _sctype_apply(lua_State* state,KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
+				const int MAX_ARG = N;(void)MAX_ARG;\
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
+			std::string _type_name_apply(KAGUYA_FUNC_DEF(N))\
 			{\
 				return std::string() KAGUYA_PP_REPEAT(N,KAGUYA_TYPENAME_REP);\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int minArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N  KAGUYA_GET_OFFSET;\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int maxArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N  KAGUYA_GET_OFFSET; \
 			}
 
-			KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
-
-#undef KAGUYA_GET_OFFSET
-#define KAGUYA_GET_OFFSET + 1
-#undef KAGUYA_CALL_FN_DEF
-#define KAGUYA_MEM_ATTRBUTE 
-#undef KAGUYA_FUNC_DEF
-#undef KAGUYA_FUNC_TYPE				
-#define KAGUYA_FUNC_DEF(N) void (ThisType::*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
-#define KAGUYA_FUNC_TYPE(N) void (ThisType::*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
-#define KAGUYA_CALL_FN_DEF(N) \
-			template<typename ThisType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
-			{\
-				KAGUYA_MEM_ATTRBUTE ThisType& this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType&>::get(state, 1); \
-				(this_.*f)(KAGUYA_GET_REPEAT(N));\
-				return 0;\
-			}
-
-			KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
-
-#undef KAGUYA_MEM_ATTRBUTE
-#define KAGUYA_MEM_ATTRBUTE const  
-			KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
-#undef KAGUYA_MEM_ATTRBUTE
-
+		KAGUYA_CALL_FN_DEF(0);
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF);
 
 #undef KAGUYA_CALL_FN_DEF
-#define KAGUYA_MEM_ATTRBUTE 
 #undef KAGUYA_FUNC_DEF
-#undef KAGUYA_FUNC_TYPE
-#define KAGUYA_FUNC_DEF(N) Ret (ThisType::*f)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
-#define KAGUYA_FUNC_TYPE(N) Ret (ThisType::*)(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))KAGUYA_MEM_ATTRBUTE
-#define KAGUYA_CALL_FN_DEF(N) \
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			inline int call(lua_State* state,KAGUYA_FUNC_DEF(N))\
-			{\
-				KAGUYA_MEM_ATTRBUTE ThisType& this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType&>::get(state, 1); \
-				return util::push_args(state, (this_.*f)(KAGUYA_GET_REPEAT(N)));\
-			}\
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
-			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
-				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP) \
-				&& lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::checkType(state, 1);\
-			}\
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
-			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
-				return true	KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP) \
-				&& lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType*>::strictCheckType(state, 1);\
-			}\
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
-			{\
-				return typeid(ThisType).name() + std::string(",") KAGUYA_PP_REPEAT(N,KAGUYA_TYPENAME_REP);\
-			}\
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int minArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N  KAGUYA_GET_OFFSET;\
-			}\
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int maxArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N  KAGUYA_GET_OFFSET;\
-			}
-			KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 
-#undef KAGUYA_MEM_ATTRBUTE
-#define KAGUYA_MEM_ATTRBUTE const  
-			KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
-#undef KAGUYA_MEM_ATTRBUTE
+		template<class F>
+		int call(lua_State* state,F f)
+		{
+			typedef typename traits::decay<F>::type ftype;
+			typedef typename util::FunctionSignature<ftype>::type fsigtype;
+			return _call_apply(state, f, fsigtype());
+		}
+		template<class F>
+		bool checkArgTypes(lua_State* state, const F& f, int opt_count = 0)
+		{
+			typedef typename traits::decay<F>::type ftype;
+			typedef typename util::FunctionSignature<ftype>::type fsigtype;
+			return _ctype_apply(state,  fsigtype(), opt_count);
+		}
+		template<class F>
+		bool strictCheckArgTypes(lua_State* state, const F& f, int opt_count = 0)
+		{
+			typedef typename traits::decay<F>::type ftype;
+			typedef typename util::FunctionSignature<ftype>::type fsigtype;
+			return _sctype_apply(state, fsigtype(), opt_count);
+		}
 
-#undef KAGUYA_GET_OFFSET
-#define KAGUYA_GET_OFFSET
-#undef KAGUYA_CALL_FN_DEF
-#undef KAGUYA_FUNC_DEF
-#undef KAGUYA_FUNC_TYPE
-#define KAGUYA_FUNC_DEF(N) const standard::function<void (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>& f
-#define KAGUYA_FUNC_TYPE(N) standard::function<void (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>
-#define KAGUYA_CALL_FN_DEF(N) \
-			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
-			inline int call(lua_State* state,KAGUYA_FUNC_DEF(N))\
-			{\
-				f(KAGUYA_GET_REPEAT(N));\
-				return 0;\
-			}
-
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
-#undef KAGUYA_CALL_FN_DEF
-#undef KAGUYA_FUNC_DEF
-#undef KAGUYA_FUNC_TYPE
-#define KAGUYA_FUNC_DEF(N) const standard::function<Ret (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>& f
-#define KAGUYA_FUNC_TYPE(N) standard::function<Ret (KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>
-#define KAGUYA_CALL_FN_DEF(N) \
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
-			{\
-				return util::push_args(state,f(KAGUYA_GET_REPEAT(N)));\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
-			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
-				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
-			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
-				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
-			{\
-				return std::string() KAGUYA_PP_REPEAT(N,KAGUYA_TYPENAME_REP);\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int minArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N  KAGUYA_GET_OFFSET;\
-			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int maxArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N  KAGUYA_GET_OFFSET;\
-			}
-			KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
+		template<class F>
+		std::string argTypesName(const F& f)
+		{
+			typedef typename traits::decay<F>::type ftype;
+			typedef typename util::FunctionSignature<ftype>::type fsigtype;
+			return _type_name_apply(fsigtype());
+		}
+		template<class F>
+		int minArgCount(const F& f)
+		{
+			typedef typename traits::decay<F>::type ftype;
+			typedef typename util::FunctionSignature<ftype>::type fsigtype;
+			return fsigtype::argument_count;
+		}
+		template<class F>
+		int maxArgCount(const F& f)
+		{
+			typedef typename traits::decay<F>::type ftype;
+			typedef typename util::FunctionSignature<ftype>::type fsigtype;
+			return fsigtype::argument_count;
+		}
 
 		///! for constructor
-		struct null_type {};
+		template<typename T>struct ConstructorFunctor;
 
-		template<class ClassType, class A1 = null_type, class A2 = null_type
-			, class A3 = null_type, class A4 = null_type, class A5 = null_type
-			, class A6 = null_type, class A7 = null_type, class A8 = null_type,
-			class A9 = null_type>struct constructor_signature_type {
-		};
-
-#undef KAGUYA_CALL_FN_DEF
-#undef KAGUYA_FUNC_DEF
-#undef KAGUYA_FUNC_TYPE
-#define KAGUYA_FUNC_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
-#define KAGUYA_CALL_FN_DEF(N) \
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			inline int call(lua_State* state, KAGUYA_FUNC_DEF(N))\
+#define KAGUYA_CONSTRUCTOR_GET_REP(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(L, N)
+#define KAGUYA_CONSTRUCTOR_CALL_FN_DEF(N) \
+		template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+		struct ConstructorFunctor<util::FunctionSignatureType<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)> >\
+		{\
+			typedef util::FunctionSignatureType<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)> signature_type;\
+			int operator()(lua_State* L)const\
 			{\
 				typedef ObjectWrapper<ClassType> wrapper_type;\
-				void *storage = lua_newuserdata(state, sizeof(wrapper_type));\
-				try { new(storage) wrapper_type(KAGUYA_GET_REPEAT(N)); }catch (...) { lua_pop(state, 1); throw; }\
-				class_userdata::setmetatable<ClassType>(state);\
+				void *storage = lua_newuserdata(L, sizeof(wrapper_type));\
+				try { new(storage) wrapper_type(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_CONSTRUCTOR_GET_REP)); }\
+				catch (...) { lua_pop(L, 1); throw; }\
+				class_userdata::setmetatable<ClassType>(L);\
 				return 1;\
 			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
+			bool checkArgTypes(lua_State* L, int opt_count = 0)const\
 			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
-				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_TYPECHECK_REP);\
+				return _ctype_apply(L, signature_type(), opt_count);\
 			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			bool strictCheckArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
+			bool strictCheckArgTypes(lua_State* L, int opt_count = 0)const\
 			{\
-				const int MAX_ARG = N KAGUYA_GET_OFFSET;(void)MAX_ARG;\
-				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
+				return _sctype_apply(L, signature_type(), opt_count);\
 			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			std::string argTypesName(KAGUYA_FUNC_DEF(N))\
+			std::string argTypesName()const\
 			{\
-				return std::string() KAGUYA_PP_REPEAT(N,KAGUYA_TYPENAME_REP);\
+				return _type_name_apply(signature_type());\
 			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int minArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N KAGUYA_GET_OFFSET;\
-			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			int maxArgCount(KAGUYA_FUNC_DEF(N))\
-			{\
-				return N KAGUYA_GET_OFFSET;\
-			}
-		KAGUYA_CALL_FN_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
+		};
+
+		KAGUYA_CONSTRUCTOR_CALL_FN_DEF(0);
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CONSTRUCTOR_CALL_FN_DEF);
 
 
-			template<class ClassType, class FunType = void> struct ConstructorFunction;
+		template<class ClassType, class FunType = void> struct ConstructorFunction;
 
-#define KAGUYA_F_TO_CONSIG_TYPE_DEF(N)  constructor_signature_type<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>
+#define KAGUYA_F_TO_CONSIG_TYPE_DEF(N)  ConstructorFunctor<util::FunctionSignatureType<ClassType KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)> >
 #define KAGUYA_F_TO_CONSIG_DEF(N) \
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			struct ConstructorFunction<ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
-			{\
-				typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
-			};\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			struct ConstructorFunction<ClassType,ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
-			{\
-				typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
-			};
+		template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+		struct ConstructorFunction<ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+		{\
+			typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
+		};\
+		template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+		struct ConstructorFunction<ClassType,ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+		{\
+			typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
+		};
 
-		KAGUYA_F_TO_CONSIG_DEF(0)
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_F_TO_CONSIG_DEF)
+		KAGUYA_F_TO_CONSIG_DEF(0);
+		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_F_TO_CONSIG_DEF);
 	}
 	using nativefunction::ConstructorFunction;
 }

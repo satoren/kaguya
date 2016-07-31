@@ -12,48 +12,6 @@ namespace kaguya
 {
 	namespace util
 	{
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke(Res(ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-		
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke(Res(ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-#if defined(_MSC_VER) && _MSC_VER >= 1900 || defined(__cpp_ref_qualifiers)
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke(Res(ThisType::*f)(FArgs...) &, ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-		
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke(Res(ThisType::*f)(FArgs...)const &, const ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke(Res(ThisType::*f)(FArgs...) &&, ThisType&& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-
-		template<class ThisType, class Res, class... FArgs, class... Args>
-		Res invoke(Res(ThisType::*f)(FArgs...)const &&, const ThisType& this_, Args&&... args)
-		{
-			return (this_.*f)(std::forward<Args>(args)...);
-		}
-#endif
-
-		template<class F, class... Args>
-		auto invoke(F&& f, Args&&... args) -> decltype(f(std::forward<Args>(args)...))
-		{
-			return f(std::forward<Args>(args)...);
-		}
-
 
 		template<class... Args>
 		struct TypeTuple {
@@ -63,7 +21,7 @@ namespace kaguya
 			typedef Ret result_type;
 			typedef TypeTuple<Args...> argument_type_tuple;
 			static const int argument_count = sizeof...(Args);
-			typedef Ret (*c_function_type)(Args...);
+			typedef Ret(*c_function_type)(Args...);
 		};
 		template <typename T>
 		struct FunctorSignature {};
@@ -83,7 +41,7 @@ namespace kaguya
 #else
 
 		template <typename T, typename Enable = void>
-		struct FunctionSignature ;
+		struct FunctionSignature;
 
 		template < typename T, typename = void>
 		struct has_operator_fn :std::false_type {};
@@ -136,7 +94,7 @@ namespace kaguya
 		template<std::size_t remain, class Arg, bool flag = remain <= 0>
 		struct TypeIndexGet;
 
-		template<std::size_t remain, class Arg,class... Args >
+		template<std::size_t remain, class Arg, class... Args >
 		struct TypeIndexGet<remain, TypeTuple<Arg, Args...>, true>
 		{
 			typedef Arg type;
@@ -152,6 +110,59 @@ namespace kaguya
 		{
 			typedef typename TypeIndexGet<N, typename FunctionSignature<F>::type::argument_type_tuple>::type type;
 		};
+
+
+
+		namespace detail
+		{
+			template<class ThisType, class Res, class... FArgs, class... Args>
+			Res invoke_helper(Res(ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
+			{
+				return (this_.*f)(std::forward<Args>(args)...);
+			}
+
+			template<class ThisType, class Res, class... FArgs, class... Args>
+			Res invoke_helper(Res(ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
+			{
+				return (this_.*f)(std::forward<Args>(args)...);
+			}
+#if defined(_MSC_VER) && _MSC_VER >= 1900 || defined(__cpp_ref_qualifiers)
+			template<class ThisType, class Res, class... FArgs, class... Args>
+			Res invoke_helper(Res(ThisType::*f)(FArgs...) &, ThisType& this_, Args&&... args)
+			{
+				return (this_.*f)(std::forward<Args>(args)...);
+			}
+
+			template<class ThisType, class Res, class... FArgs, class... Args>
+			Res invoke_helper(Res(ThisType::*f)(FArgs...)const &, const ThisType& this_, Args&&... args)
+			{
+				return (this_.*f)(std::forward<Args>(args)...);
+			}
+			template<class ThisType, class Res, class... FArgs, class... Args>
+			Res invoke_helper(Res(ThisType::*f)(FArgs...) && , ThisType&& this_, Args&&... args)
+			{
+				return (this_.*f)(std::forward<Args>(args)...);
+			}
+
+			template<class ThisType, class Res, class... FArgs, class... Args>
+			Res invoke_helper(Res(ThisType::*f)(FArgs...)const &&, const ThisType& this_, Args&&... args)
+			{
+				return (this_.*f)(std::forward<Args>(args)...);
+			}
+#endif
+
+			template<class F, class... Args>
+			auto invoke_helper(F&& f, Args&&... args) -> decltype(f(std::forward<Args>(args)...))
+			{
+				return f(std::forward<Args>(args)...);
+			}
+		}
+		template<class F, class... Args>
+		typename FunctionResultType<typename traits::decay<F>::type>::type invoke(F&& f, Args&&... args)
+		{
+			return detail::invoke_helper(f, std::forward<Args>(args)...);
+		}
+
 	}
 
 }
