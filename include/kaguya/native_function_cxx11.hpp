@@ -29,13 +29,10 @@ namespace kaguya
 			: index_range<step + 1, last, index_tuple<indexes..., step>>
 		{};
 
-		template<class Ret, class... Args>
-		struct invoke_signature_type {};
-
 		template<class F>
 		struct arg_count;
 		template<class R, class... Args>
-		struct arg_count<invoke_signature_type<R, Args...> > : traits::integral_constant<size_t, sizeof...(Args)>
+		struct arg_count<util::FunctionSignatureType<R, Args...> > : traits::integral_constant<size_t, sizeof...(Args)>
 		{};
 		template<class T>
 		struct min_arg_count : arg_count<T> {};
@@ -46,73 +43,45 @@ namespace kaguya
 		struct arg_index_range;
 
 		template<class R, class... Args>
-		struct arg_index_range<invoke_signature_type<R, Args...> > : index_range<1, sizeof...(Args)+1>
+		struct arg_index_range<util::FunctionSignatureType<R, Args...> > : index_range<1, sizeof...(Args)+1>
 		{};
-
-
+		
 		template <typename T>
-		struct functor_f_signature {};
-
-		template <typename T, typename Ret, typename... Args>
-		struct functor_f_signature<Ret(T::*)(Args...) const> {
-			typedef invoke_signature_type<Ret, Args...> type;
-		};
-		template <typename T, typename Ret, typename... Args>
-		struct functor_f_signature<Ret(T::*)(Args...)> {
-			typedef invoke_signature_type<Ret, Args...> type;
-		};
-
-#if _MSC_VER
-		template <typename T>
-		struct f_signature : public functor_f_signature<decltype(&T::operator())> {};
-#else
-
-		template <typename T, typename Enable = void>
-		struct f_signature {};
-
-		template < typename T, typename = void>
-		struct has_operator_fn :std::false_type {};
-		template < typename T >
-		struct has_operator_fn<T, typename std::enable_if<!std::is_same<void, decltype(&T::operator())>::value>::type> :std::true_type {};
-
-		template <typename T>
-		struct f_signature<T, typename std::enable_if<has_operator_fn<T>::value>::type>
-			: public functor_f_signature<decltype(&T::operator())> {};
-#endif
+		struct f_signature : public util::FunctionSignature<T> {};
 
 
 		template <typename T, typename Ret, typename... Args>
 		struct f_signature<Ret(T::*)(Args...)> {
-			typedef invoke_signature_type<Ret, T&, Args...> type;
+			typedef util::FunctionSignatureType<Ret, T&, Args...> type;
 		};
 		template <typename T, typename Ret, typename... Args>
 		struct f_signature<Ret(T::*)(Args...) const> {
-			typedef invoke_signature_type<Ret, const T&, Args...> type;
+			typedef util::FunctionSignatureType<Ret, const T&, Args...> type;
 		};
 		template <typename T, typename Ret, typename... Args>
 		struct f_signature<Ret(T::* &)(Args...)> {
-			typedef invoke_signature_type<Ret, T&, Args...> type;
+			typedef util::FunctionSignatureType<Ret, T&, Args...> type;
 		};
 		template <typename T, typename Ret, typename... Args>
 		struct f_signature<Ret(T::* &)(Args...) const> {
-			typedef invoke_signature_type<Ret, const T&, Args...> type;
+			typedef util::FunctionSignatureType<Ret, const T&, Args...> type;
 		};
 		template<class Ret, class... Args>
 		struct f_signature<Ret(*)(Args...)> {
-			typedef invoke_signature_type<Ret, Args...> type;
+			typedef util::FunctionSignatureType<Ret, Args...> type;
 		};
 		template<class Ret, class... Args>
 		struct f_signature<Ret(Args...)> {
-			typedef invoke_signature_type<Ret, Args...> type;
+			typedef util::FunctionSignatureType<Ret, Args...> type;
 		};
 
 		template<class F, class Ret, class... Args, size_t... Indexes>
-		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, invoke_signature_type<Ret, Args...>)
+		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, util::FunctionSignatureType<Ret, Args...>)
 		{
 			return util::push_args(state, util::invoke(f, lua_type_traits<Args>::get(state, Indexes)...));
 		}
 		template<class F, class... Args, size_t... Indexes>
-		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, invoke_signature_type<void, Args...>)
+		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, util::FunctionSignatureType<void, Args...>)
 		{
 			util::invoke(f, lua_type_traits<Args>::get(state, Indexes)...);
 			return 0;
@@ -162,109 +131,27 @@ namespace kaguya
 		};
 
 		template<class R, class... Args, size_t... Indexes>
-		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>, int opt_count)
+		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
 		{
 			return all_true(_wcheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 		template<class R, class... Args, size_t... Indexes>
-		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, invoke_signature_type<R, Args...>, int opt_count)
+		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
 		{
 
 			return all_true(_scheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 		template<class R, class... Args>
-		std::string _type_name_apply(invoke_signature_type<R, Args...>)
+		std::string _type_name_apply(util::FunctionSignatureType<R, Args...>)
 		{
 			std::string result;
 			join(result, ",", typeid(Args).name()...);
 			return result;
 		}
 
-		///! for data member
-		template <typename T, typename MemType>
-		struct f_signature<MemType T::*> {
-			typedef MemType T::*type;
-		};
-		template<class MemType, class T>
-		struct min_arg_count<MemType T::*> : traits::integral_constant<size_t, 1>
-		{};
-		template<class MemType, class T>
-		struct max_arg_count<MemType T::*> : traits::integral_constant<size_t, 2>
-		{};
-		template <typename T, typename MemType>
-		struct arg_index_range<MemType T::*> : index_range<1, 2> {};
-
-		template<class MemType, class T, class unusedindex>
-		int _call_apply(lua_State* state, MemType T::* m, unusedindex, MemType T::*)
-		{
-			T* this_ = lua_type_traits<T*>::get(state, 1);
-			if (lua_gettop(state) == 1)
-			{
-				if (!this_)
-				{
-					const T& this_ = lua_type_traits<const T&>::get(state, 1);
-					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
-					{
-						return util::push_args(state, standard::reference_wrapper<const MemType>(this_.*m));
-					}
-					else
-					{
-						return util::push_args(state, this_.*m);
-					}
-				}
-				else
-				{
-					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
-					{
-						return util::push_args(state, standard::reference_wrapper<MemType>(this_->*m));
-					}
-					else
-					{
-						return util::push_args(state, this_->*m);
-					}
-				}
-			}
-			else
-			{
-				if (!this_)
-				{
-					throw LuaTypeMismatch("type mismatch!!");
-				}
-				this_->*m = lua_type_traits<MemType>::get(state, 2);
-				return 0;
-			}
-		}
-		template<class MemType, class T, class unusedindex>
-		bool _ctype_apply(lua_State* state, unusedindex, MemType T::*, int opt_count)
-		{
-			if (lua_gettop(state) >= 2)
-			{
-				//setter typecheck
-				return lua_type_traits<MemType>::checkType(state, 2) && lua_type_traits<T>::checkType(state, 1);
-			}
-			//getter typecheck
-			return  lua_type_traits<T>::checkType(state, 1);
-		}
-		template<class MemType, class T, class unusedindex>
-		bool _sctype_apply(lua_State* state, unusedindex, MemType T::*, int opt_count)
-		{
-			if (lua_gettop(state) >= 2)
-			{
-				//setter typecheck
-				return lua_type_traits<MemType>::strictCheckType(state, 2) && lua_type_traits<T>::strictCheckType(state, 1);
-			}
-			//getter typecheck
-			return lua_type_traits<T>::strictCheckType(state, 1);
-		}
-		template<class MemType, class T>
-		std::string _type_name_apply(MemType T::*)
-		{
-			return std::string(typeid(T*).name()) + ",[OPT] " + typeid(MemType).name();
-		}
-
 		///! for constructor
 		template<class ClassType, class... Args>
-		struct constructor_signature_type :invoke_signature_type<ClassType, Args...>
+		struct constructor_signature_type :util::FunctionSignatureType<ClassType, Args...>
 		{
 		};
 		template <class ClassType, class... Args>
@@ -300,8 +187,6 @@ namespace kaguya
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename f_signature<ftype>::type fsigtype;
 			typedef typename arg_index_range<fsigtype>::type index;
-//			index_range<1, util::FunctionSignature<F>::type::argument_count + 1> index;
-
 			return _call_apply(state, f, index(), fsigtype());
 		}
 		template<class F>
@@ -342,13 +227,6 @@ namespace kaguya
 			typedef typename f_signature<ftype>::type fsigtype;
 			return max_arg_count<fsigtype>::value;
 		}
-
-		template< typename T, typename Enable = void>
-		struct is_callable : traits::integral_constant<bool, false> {};
-		template< typename T>
-		struct is_callable<T, typename traits::enable_if<
-			!traits::is_same<void, typename f_signature<T>::type>::value
-			, void>::type > : traits::integral_constant<bool, true> {};
 
 		template<typename ClassType, typename... Args> struct ConstructorFunction;
 		template<typename ClassType, typename... Args> struct ConstructorFunction<ClassType(Args...) >

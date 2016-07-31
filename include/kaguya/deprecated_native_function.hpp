@@ -77,7 +77,7 @@ namespace kaguya
 			template<typename F>
 			static base_ptr_ create(F fun)
 			{
-				KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::decay<F>::type>::value, "argument need callable");
+//				KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::decay<F>::type>::value, "argument need callable");
 
 				typedef FunInvoker<F> InvokerType;
 				return base_ptr_(new InvokerType(fun));

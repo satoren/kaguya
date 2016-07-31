@@ -60,17 +60,17 @@ namespace kaguya
 			return lua_type_traits<typename util::ArgumentType<INDEX, F>::type>::get(state, INDEX + 1);
 		}
 
-		/*
+
+		template< typename T, typename Enable = void>
+		struct is_callable : traits::integral_constant<bool, !traits::is_same<void, typename util::FunctionSignature<T>::type>::value> {};
+
 		template<class MemType, class T>
-		struct PropertyAccessor
-		{
-			PropertyAccessor(MemType T::* ptr) :dataptr(ptr){}
-			MemType T::* dataptr;
-		};
+		struct is_callable<MemType T::*> : traits::integral_constant<bool, true> {};
 
 		///! for data member
 		template<class MemType, class T>
-		int call(lua_State* state,const PropertyAccessor<MemType,T>& m)
+		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
+		call(lua_State* state, MemType T::* mptr)
 		{
 			T* this_ = lua_type_traits<T*>::get(state, 1);
 			if (lua_gettop(state) == 1)
@@ -80,22 +80,22 @@ namespace kaguya
 					const T& this_ = lua_type_traits<const T&>::get(state, 1);
 					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 					{
-						return util::push_args(state, standard::reference_wrapper<const MemType>(this_.*(m.dataptr)));
+						return util::push_args(state, standard::reference_wrapper<const MemType>(this_.*mptr));
 					}
 					else
 					{
-						return util::push_args(state, this_.*(m.dataptr));
+						return util::push_args(state, this_.*mptr);
 					}
 				}
 				else
 				{
 					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
 					{
-						return util::push_args(state, standard::reference_wrapper<MemType>(this_->*(m.dataptr)));
+						return util::push_args(state, standard::reference_wrapper<MemType>(this_->*mptr));
 					}
 					else
 					{
-						return util::push_args(state, this_->*(m.dataptr));
+						return util::push_args(state, this_->*mptr);
 					}
 				}
 			}
@@ -105,19 +105,13 @@ namespace kaguya
 				{
 					throw LuaTypeMismatch("type mismatch!!");
 				}
-				this_->*(m.dataptr) = lua_type_traits<MemType>::get(state, 2);
+				this_->*mptr = lua_type_traits<MemType>::get(state, 2);
 				return 0;
 			}
 		}
 		template<class MemType, class T>
-		int call(lua_State* state, PropertyAccessor<MemType, T>& m)
-		{
-			return call(state, static_cast<const PropertyAccessor<MemType, T>&>(m));
-		}
-
-
-		template<class MemType, class T>
-		bool checkArgTypes(lua_State* state, const PropertyAccessor<MemType, T>& m, int opt_count = 0)
+		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, bool>::type
+		checkArgTypes(lua_State* state, MemType T::* mptr, int opt_count = 0)
 		{
 			if (lua_gettop(state) >= 2)
 			{
@@ -128,7 +122,8 @@ namespace kaguya
 			return  lua_type_traits<T>::checkType(state, 1);
 		}
 		template<class MemType, class T>
-		bool strictCheckArgTypes(lua_State* state, const PropertyAccessor<MemType, T>& m, int opt_count = 0)
+		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, bool>::type
+		 strictCheckArgTypes(lua_State* state, MemType T::* mptr, int opt_count = 0)
 		{
 			if (lua_gettop(state) == 2)
 			{
@@ -139,24 +134,23 @@ namespace kaguya
 			return  lua_type_traits<T>::strictCheckType(state, 1);
 		}
 		template<class MemType, class T>
-		std::string argTypesName(const PropertyAccessor<MemType, T>&)
+		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, std::string>::type
+		argTypesName(MemType T::* mptr)
 		{
 			return std::string(typeid(T*).name()) + ",[OPT] " + typeid(MemType).name();
 		}
 		template<class MemType, class T>
-		int minArgCount(const PropertyAccessor<MemType, T>&)
+		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
+		minArgCount(MemType T::* mptr)
 		{
 			return 1;
 		}
 		template<class MemType, class T>
-		int maxArgCount(const PropertyAccessor<MemType, T>&)
+		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
+		maxArgCount(MemType T::* mptr)
 		{
 			return 2;
 		}
-		template<class MemType, class T>
-		struct is_callable<PropertyAccessor<MemType,T> > : traits::integral_constant<bool, true> {};
-
-		*/
 
 		inline int call(lua_State* state, const PolymorphicInvoker& f)
 		{
@@ -622,6 +616,9 @@ namespace kaguya
 		FunctionTuple functions;
 		FunctionInvokerType(const FunctionTuple& t) :functions(t) {}
 	};
+	
+
+
 	template<typename T>
 	inline FunctionInvokerType<standard::tuple<T> > function(T f)
 	{

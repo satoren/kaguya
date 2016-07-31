@@ -14,22 +14,11 @@ namespace kaguya
 {
 	namespace nativefunction
 	{
-
-#if defined(_MSC_VER) && _MSC_VER <= 1700
-		//can not detect callable at MSVC
-		template< typename T>
-		struct is_callable : traits::integral_constant<bool, true> {};
-#else
-		template< typename T>
-		struct is_callable : traits::integral_constant<bool, false> {};
-#endif
-
 		inline int call(lua_State* state, void(*f)())
 		{
 			f();
 			return 0;
 		}
-		template<>struct is_callable< void(*)()> : traits::integral_constant<bool, true> {};
 
 		inline bool checkArgTypes(lua_State* state, void(*f)(), int opt_count = 0)
 		{
@@ -57,7 +46,6 @@ namespace kaguya
 			f();
 			return 0;
 		}
-		template<>struct is_callable<standard::function<void()> > : traits::integral_constant<bool, true> {};
 		inline bool checkArgTypes(lua_State* state, standard::function<void()> f, int opt_count = 0)
 		{
 			return true;
@@ -96,8 +84,7 @@ namespace kaguya
 			{\
 				f(KAGUYA_GET_REPEAT(N));\
 				return 0;\
-			}\
-			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};
+			}
 
 		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 #undef KAGUYA_CALL_FN_DEF
@@ -111,7 +98,6 @@ namespace kaguya
 			{\
 				return util::push_args(state, f(KAGUYA_GET_REPEAT(N)));\
 			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
@@ -158,8 +144,7 @@ namespace kaguya
 				KAGUYA_MEM_ATTRBUTE ThisType& this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType&>::get(state, 1); \
 				(this_.*f)(KAGUYA_GET_REPEAT(N));\
 				return 0;\
-			}\
-			template<typename ThisType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};
+			}
 
 			KAGUYA_CALL_FN_DEF(0)
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
@@ -184,7 +169,6 @@ namespace kaguya
 				KAGUYA_MEM_ATTRBUTE ThisType& this_ = lua_type_traits<KAGUYA_MEM_ATTRBUTE ThisType&>::get(state, 1); \
 				return util::push_args(state, (this_.*f)(KAGUYA_GET_REPEAT(N)));\
 			}\
-			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename ThisType,typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
@@ -236,8 +220,7 @@ namespace kaguya
 			{\
 				f(KAGUYA_GET_REPEAT(N));\
 				return 0;\
-			}\
-			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N) > : traits::integral_constant<bool, true> {};
+			}
 
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 #undef KAGUYA_CALL_FN_DEF
@@ -251,7 +234,6 @@ namespace kaguya
 			{\
 				return util::push_args(state,f(KAGUYA_GET_REPEAT(N)));\
 			}\
-			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_TYPE(N)> : traits::integral_constant<bool, true> {};\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\
@@ -282,90 +264,6 @@ namespace kaguya
 			KAGUYA_CALL_FN_DEF(0)
 			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CALL_FN_DEF)
 
-			///! for data member
-			template<class MemType, class T>
-		int call(lua_State* state, MemType T::* m)
-		{
-			T* this_ = lua_type_traits<T*>::get(state, 1);
-			if (lua_gettop(state) == 1)
-			{
-				if (!this_)
-				{
-					const T& this_ = lua_type_traits<const T&>::get(state, 1);
-					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
-					{
-						return util::push_args(state, standard::reference_wrapper<const MemType>(this_.*m));
-					}
-					else
-					{
-						return util::push_args(state, this_.*m);
-					}
-				}
-				else
-				{
-					if (is_usertype<MemType>::value && !traits::is_pointer<MemType>::value)
-					{
-						return util::push_args(state, standard::reference_wrapper<MemType>(this_->*m));
-					}
-					else
-					{
-						return util::push_args(state, this_->*m);
-					}
-				}
-			}
-			else
-			{
-				if (!this_)
-				{
-					throw LuaTypeMismatch("type mismatch!!");
-				}
-				this_->*m = lua_type_traits<MemType>::get(state, 2);
-				return 0;
-			}
-		}
-#if defined(_MSC_VER) && _MSC_VER <= 1700
-		//can not detect callable at MSVC
-#else
-		template<class MemType, class T>struct is_callable<MemType T::*> : traits::integral_constant<bool, true> {};
-#endif
-
-		template<class MemType, class T>
-		bool checkArgTypes(lua_State* state, MemType T::* m, int opt_count = 0)
-		{
-			if (lua_gettop(state) >= 2)
-			{
-				//setter typecheck
-				return lua_type_traits<MemType>::checkType(state, 2) && lua_type_traits<T>::checkType(state, 1);
-			}
-			//getter typecheck
-			return  lua_type_traits<T>::checkType(state, 1);
-		}
-		template<class MemType, class T>
-		bool strictCheckArgTypes(lua_State* state, MemType T::* m, int opt_count = 0)
-		{
-			bool thistypecheck = lua_type_traits<T>::strictCheckType(state, 1);
-			if (thistypecheck && lua_gettop(state) == 2)
-			{
-				return lua_type_traits<MemType>::strictCheckType(state, 2);
-			}
-			return thistypecheck;
-		}
-		template<class MemType, class T>
-		std::string argTypesName(MemType T::*)
-		{
-			return std::string(typeid(T*).name()) + ",[OPT] " + typeid(MemType).name();
-		}
-		template<class MemType, class T>
-		int minArgCount(MemType T::*)
-		{
-			return 1;
-		}
-		template<class MemType, class T>
-		int maxArgCount(MemType T::*)
-		{
-			return 2;
-		}
-
 		///! for constructor
 		struct null_type {};
 
@@ -389,7 +287,6 @@ namespace kaguya
 				class_userdata::setmetatable<ClassType>(state);\
 				return 1;\
 			}\
-			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>struct is_callable<KAGUYA_FUNC_DEF(N)> : traits::integral_constant<bool, true> {}; \
 			template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
 			bool checkArgTypes(lua_State* state, KAGUYA_FUNC_DEF(N),int opt_count=0)\
 			{\

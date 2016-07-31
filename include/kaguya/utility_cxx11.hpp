@@ -76,8 +76,24 @@ namespace kaguya
 		struct FunctorSignature<Ret(T::*)(Args...)> {
 			typedef FunctionSignatureType<Ret, Args...> type;
 		};
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
 		template <typename T>
 		struct FunctionSignature : public FunctorSignature<decltype(&T::operator())> {};
+#else
+
+		template <typename T, typename Enable = void>
+		struct FunctionSignature ;
+
+		template < typename T, typename = void>
+		struct has_operator_fn :std::false_type {};
+		template < typename T >
+		struct has_operator_fn<T, typename std::enable_if<!std::is_same<void, decltype(&T::operator())>::value>::type> :std::true_type {};
+
+		template <typename T>
+		struct FunctionSignature<T, typename std::enable_if<has_operator_fn<T>::value>::type>
+			: public FunctorSignature<decltype(&T::operator())> {};
+#endif
 
 		template <typename T, typename Ret, typename... Args>
 		struct FunctionSignature<Ret(T::*)(Args...)> {
@@ -87,6 +103,19 @@ namespace kaguya
 		struct FunctionSignature<Ret(T::*)(Args...) const> {
 			typedef FunctionSignatureType<Ret, const T&, Args...> type;
 		};
+
+#if defined(_MSC_VER) && _MSC_VER >= 1900 || defined(__cpp_ref_qualifiers)
+		template <typename T, typename Ret, typename... Args>
+		struct FunctionSignature<Ret(T::*)(Args...) const &> {
+			typedef FunctionSignatureType<Ret, const T&, Args...> type;
+		};
+		template <typename T, typename Ret, typename... Args>
+		struct FunctionSignature<Ret(T::*)(Args...) const &&> {
+			typedef FunctionSignatureType<Ret, const T&, Args...> type;
+		};
+#endif
+
+
 		template<class Ret, class... Args>
 		struct FunctionSignature<Ret(*)(Args...)> {
 			typedef FunctionSignatureType<Ret, Args...> type;
