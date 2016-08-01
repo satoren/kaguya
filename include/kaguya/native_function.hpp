@@ -111,8 +111,9 @@ namespace kaguya
 
 
 		// for data member
+		//using is_member_function_pointer in MSVC2010 : fatal error LNK1179: invalid or corrupt file: duplicate COMDAT '?value@?$result_@P8ABC@test_02_classreg@@AE?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ@?$is_mem_fun_pointer_select@$0A@@detail@boost@@2_NB'
 		template<class MemType, class T>
-		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
+		typename traits::enable_if<traits::is_object<MemType>::value, int>::type
 		call(lua_State* state, MemType T::* mptr)
 		{
 			T* this_ = lua_type_traits<T*>::get(state, 1);
@@ -153,7 +154,7 @@ namespace kaguya
 			}
 		}
 		template<class MemType, class T>
-		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, bool>::type
+		typename traits::enable_if<traits::is_object<MemType>::value, bool>::type
 		checkArgTypes(lua_State* state, MemType T::* mptr, int opt_count = 0)
 		{
 			if (lua_gettop(state) >= 2)
@@ -165,7 +166,7 @@ namespace kaguya
 			return  lua_type_traits<T>::checkType(state, 1);
 		}
 		template<class MemType, class T>
-		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, bool>::type
+		typename traits::enable_if<traits::is_object<MemType>::value, bool>::type
 		 strictCheckArgTypes(lua_State* state, MemType T::* mptr, int opt_count = 0)
 		{
 			if (lua_gettop(state) == 2)
@@ -177,19 +178,19 @@ namespace kaguya
 			return  lua_type_traits<T>::strictCheckType(state, 1);
 		}
 		template<class MemType, class T>
-		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, std::string>::type
+		typename traits::enable_if<traits::is_object<MemType>::value, std::string>::type
 		argTypesName(MemType T::* mptr)
 		{
 			return std::string(typeid(T*).name()) + ",[OPT] " + typeid(MemType).name();
 		}
 		template<class MemType, class T>
-		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
+		typename traits::enable_if<traits::is_object<MemType>::value, int>::type
 		minArgCount(MemType T::* mptr)
 		{
 			return 1;
 		}
 		template<class MemType, class T>
-		typename traits::enable_if<!standard::is_member_function_pointer<MemType T::*>::value, int>::type
+		typename traits::enable_if<traits::is_object<MemType>::value, int>::type
 		maxArgCount(MemType T::* mptr)
 		{
 			return 2;

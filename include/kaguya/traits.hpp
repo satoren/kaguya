@@ -47,6 +47,14 @@ namespace kaguya
 		{
 		};
 
+		template< class T>
+		struct is_object : integral_constant<bool,
+			standard::is_scalar<T>::value ||
+			standard::is_array<T>::value ||
+			standard::is_union<T>::value ||
+			standard::is_class<T>::value> {};
+
+
 		/// @brief same std::decay
 		template< class T >
 		struct decay {
