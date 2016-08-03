@@ -652,7 +652,7 @@ namespace kaguya
 	struct NewThread {};
 	struct GlobalTable {};
 	struct NilValue {};
-
+	
 	struct NoTypeCheck {};
 
 	/// @ingroup lua_type_traits
@@ -675,15 +675,47 @@ namespace kaguya
 		}
 	};
 	/// @ingroup lua_type_traits
-	/// @brief lua_type_traits for NilValue, push only
+	/// @brief lua_type_traits for NilValue, similar to nullptr_t
 	/// If you using C++11, recommend use nullptr instead.
 	template<>	struct lua_type_traits<NilValue> {
+		typedef NilValue get_type;
+		typedef NilValue push_type;
+
+		static bool checkType(lua_State* l, int index)
+		{
+			return lua_isnoneornil(l, index);
+		}
+		static bool strictCheckType(lua_State* l, int index)
+		{
+			return lua_isnil(l, index);
+		}
+		
+		static get_type get(lua_State* l, int index)
+		{
+			if (!checkType(l, index)) {
+				throw LuaTypeMismatch("type mismatch!!");
+			}
+			return NilValue();
+		}
 		static int push(lua_State* l, const NilValue&)
 		{
 			lua_pushnil(l);
 			return 1;
 		}
 	};
+	inline std::ostream& operator<<(std::ostream& os, const NilValue&)
+	{
+		return os << "nil";
+	}
+	inline bool operator==(const NilValue&, const NilValue&)
+	{
+		return true;
+	}
+	inline bool operator!=(const NilValue&, const NilValue&)
+	{
+		return false;
+	}
+
 	/// @ingroup lua_type_traits
 	/// @brief lua_type_traits for GlobalTable, push only
 	template<>	struct lua_type_traits<GlobalTable> {

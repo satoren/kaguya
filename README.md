@@ -289,10 +289,31 @@ state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
 ```
 
 #### Multiple Results to Lua
-If return type of function is tuple, it returns the multiple results to Lua
+If return type of function is tuple, it returns multiple results to Lua
 ```c++
 state["multireturn"] = kaguya::function([]() { return std::tuple<int, int>(32, 34); });
 state("print(multireturn())");//32    34
+```
+
+#### Nil values
+Luas `nil` converts to `nullptr` or 0 for pointer types, can be checked for with `isNilref()` and is different than the integer `0`.
+When you want to pass `nil` to lua either pass `nullptr`/`(void*)0` or `kaguya::NilValue`.
+```c++
+state["value"] = kaguya::NilValue();
+//or state["value"] = nullptr;
+//or state["value"] = (void*) 0;
+state("assert(value == nil)");
+state("assert(value ~= 0)");
+assert(state["value"].isNilref());
+assert(state["value"] == kaguya::NilValue());
+assert(state["value"] == nullptr);
+
+state["value"] = 0;
+state("assert(value ~= nil)");
+state("assert(value == 0)");
+assert(!state["value"].isNilref());
+assert(state["value"] != kaguya::NilValue());
+assert(state["value"] != nullptr);
 ```
 
 #### Coroutine

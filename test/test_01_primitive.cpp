@@ -143,13 +143,45 @@ KAGUYA_TEST_FUNCTION_DEF(table_set)(kaguya::State& state)
 	state["value"]["abc"]["bbb"] = "test";
 	TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test')"));
 };
-KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
+
+KAGUYA_TEST_FUNCTION_DEF(nilAndNull)(kaguya::State& state)
 {
+	// Nil and 0 resolve to different values
 	state["value"] = (void*)0;
-//	TEST_EQUAL(state["value"], 0); // can not compare nil and number
-	TEST_EQUAL(state["value"], (void*)0);
-	TEST_CHECK(!state["value"]);
 	TEST_CHECK(state("assert(value == nil)"));
+	TEST_CHECK(state("assert(value ~= 0)"));
+	state["value"] = kaguya::NilValue();
+	TEST_CHECK(state("assert(value == nil)"));
+	TEST_CHECK(state("assert(value ~= 0)"));
+	state["value"] = 0;
+	TEST_CHECK(state("assert(value ~= nil)"));
+	TEST_CHECK(state("assert(value == 0)"));
+	
+	state("value = 0");
+	TEST_CHECK(state["value"]); // !=nil && != false
+	TEST_CHECK(!state["value"].isNilref());
+	TEST_CHECK(!state["value"].typeTest<kaguya::NilValue>());
+	TEST_CHECK(state["value"].typeTest<unsigned>());
+	TEST_CHECK(state["value"].typeTest<int>());
+	TEST_EQUAL(state["value"], 0);
+	TEST_COMPARE_NE(state["value"], (void*)0);
+	TEST_COMPARE_NE(state["value"], kaguya::NilValue());
+#if KAGUYA_USE_CPP11
+	TEST_COMPARE_NE(state["value"], nullptr);
+#endif
+	
+	state("value = nil");
+	TEST_CHECK(!state["value"]);
+	TEST_CHECK(state["value"].isNilref());
+	TEST_CHECK(state["value"].typeTest<kaguya::NilValue>());
+	TEST_CHECK(!state["value"].typeTest<unsigned>());
+	TEST_CHECK(!state["value"].typeTest<int>());
+	TEST_EQUAL(state["value"], (void*)0);
+	TEST_COMPARE_NE(state["value"], 0);
+	TEST_EQUAL(state["value"], kaguya::NilValue());
+#if KAGUYA_USE_CPP11
+	TEST_EQUAL(state["value"], nullptr);
+#endif
 };
 
 KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
