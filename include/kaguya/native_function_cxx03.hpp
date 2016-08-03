@@ -22,7 +22,7 @@ namespace kaguya
 
 #define KAGUYA_GET_REP(N) ,lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N)
 #define KAGUYA_FUNC_DEF(N) const util::FunctionSignatureType<Ret KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>& fsig
-#define KAGUYA_TYPENAME_REP(N) + typeid(KAGUYA_PP_CAT(A,N)).name() + ","
+#define KAGUYA_TYPENAME_REP(N) + ((MAX_ARG - opt_count < N)?"[OPT]":"") + typeid(KAGUYA_PP_CAT(A,N)).name() + ","
 #define KAGUYA_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N) && lua_isnoneornil(state, N)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, N))
 #define KAGUYA_STRICT_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N) && lua_isnoneornil(state, N)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, N))
 #define KAGUYA_CALL_FN_DEF(N) \
@@ -52,8 +52,9 @@ namespace kaguya
 				return true KAGUYA_PP_REVERSE_REPEAT(N,KAGUYA_STRICT_TYPECHECK_REP);\
 			}\
 			template<typename Ret KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			std::string _type_name_apply(KAGUYA_FUNC_DEF(N))\
+			std::string _type_name_apply(KAGUYA_FUNC_DEF(N),int opt_count)\
 			{\
+				const int MAX_ARG = N;(void)MAX_ARG;\
 				return std::string() KAGUYA_PP_REPEAT(N,KAGUYA_TYPENAME_REP);\
 			}
 
@@ -86,11 +87,11 @@ namespace kaguya
 		}
 
 		template<class F>
-		std::string argTypesName(const F& f)
+		std::string argTypesName(const F& f, int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
-			return _type_name_apply(fsigtype());
+			return _type_name_apply(fsigtype(), opt_count);
 		}
 		template<class F>
 		int minArgCount(const F& f)
@@ -133,9 +134,9 @@ namespace kaguya
 			{\
 				return _sctype_apply(L, signature_type(), opt_count);\
 			}\
-			std::string argTypesName()const\
+			std::string argTypesName(int opt_count = 0)const\
 			{\
-				return _type_name_apply(signature_type());\
+				return _type_name_apply(signature_type(),0);\
 			}\
 		};
 

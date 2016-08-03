@@ -94,11 +94,14 @@ namespace kaguya
 		{
 			return all_true(_scheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
-		template<class R, class... Args>
-		std::string _type_name_apply(util::FunctionSignatureType<R, Args...>)
+
+		
+		template<class R, class... Args, size_t... Indexes>
+		std::string _type_name_apply(index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
 		{
 			std::string result;
-			join(result, ",", typeid(Args).name()...);
+			const int max_arg = sizeof...(Args);
+			join(result, ",",(((max_arg -opt_count < Indexes)? std::string("[OPT]") :std::string(""))  + typeid(Args).name())...);
 			return result;
 		}
 
@@ -129,11 +132,12 @@ namespace kaguya
 		}
 
 		template<class F>
-		std::string argTypesName(const F& f)
+		std::string argTypesName(const F& f, int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
-			return _type_name_apply(fsigtype());
+			typedef typename index_range<1, fsigtype::argument_count + 1>::type index;
+			return _type_name_apply(index(),fsigtype(), opt_count);
 		}
 		template<class F>
 		int minArgCount(const F& f)
@@ -184,9 +188,9 @@ namespace kaguya
 			{
 				return _sctype_apply(L, get_index(), signature_type(), opt_count);
 			}
-			std::string argTypesName()const
+			std::string argTypesName(int opt_count = 0)const
 			{
-				return _type_name_apply(signature_type());
+				return _type_name_apply(get_index(), signature_type(), opt_count);
 			}
 		};
 

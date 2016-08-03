@@ -860,7 +860,7 @@ namespace kaguya
 		{
 			return util::push_args(state, invoke_type(state));
 		}
-		virtual std::string argTypeNames()const { return nativefunction::argTypesName(c_function_type(0)); }
+		virtual std::string argTypeNames()const { return nativefunction::argTypesName(c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool checkArgTypes(lua_State* state)const { return kaguya::nativefunction::checkArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool strictCheckArgTypes(lua_State* state)const { return kaguya::nativefunction::strictCheckArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 	};
@@ -878,7 +878,7 @@ namespace kaguya
 			invoke_type(state);
 			return 0;
 		}
-		virtual std::string argTypeNames()const { return nativefunction::argTypesName(c_function_type(0)); }
+		virtual std::string argTypeNames()const { return nativefunction::argTypesName(c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool checkArgTypes(lua_State* state)const { return kaguya::nativefunction::checkArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool strictCheckArgTypes(lua_State* state)const { return kaguya::nativefunction::strictCheckArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 	};
