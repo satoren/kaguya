@@ -671,12 +671,6 @@ namespace kaguya
 		KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::decay<T>::type>::value, "argument need callable");
 		return FunctionInvokerType<standard::tuple<T> >(standard::tuple<T>(f));
 	}
-	//specialize for lua_CFunction
-	inline lua_CFunction function(lua_CFunction f)
-	{
-		return f;
-	}
-
 
 	template<typename FTYPE, typename T>
 	inline FunctionInvokerType<standard::tuple<standard::function<FTYPE> > > function(T f)

@@ -190,7 +190,12 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int corStackIndex = pushStackIndex_(state);
-				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
+				lua_State* thread = lua_tothread(state, corStackIndex);
+				if (!thread)
+				{
+					except::typeMismatchError(state, "not thread");
+					return Result();
+				}
 				int argstart = 1;//exist function in stack at first resume.
 				if (lua_status(thread) == LUA_YIELD)
 				{
@@ -223,7 +228,12 @@ namespace kaguya
 			}\
 			util::ScopedSavedStack save(state);\
 			int corStackIndex = pushStackIndex_(state);\
-			lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);\
+			lua_State* thread = lua_tothread(state, corStackIndex);\
+			if (!thread)\
+			{\
+				except::typeMismatchError(state, "not thread");\
+				return Result();\
+			}\
 			int argstart = 1;\
 			if (lua_status(thread) == LUA_YIELD)\
 			{\
@@ -292,7 +302,7 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int corStackIndex = pushStackIndex_(state);
-				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
+				lua_State* thread = lua_tothread(state, corStackIndex);
 
 				if (!thread)
 				{
@@ -321,7 +331,7 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int corStackIndex = pushStackIndex_(state);
-				lua_State* thread = lua_type_traits<lua_State*>::get(state, corStackIndex);
+				lua_State* thread = lua_tothread(state, corStackIndex);
 
 				if (!thread)
 				{
