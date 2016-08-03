@@ -515,7 +515,7 @@ namespace kaguya
 		static int push(lua_State* l, push_type v)
 		{
 			lua_createtable(l, int(S), 0);
-			for (int i = 0;i<S;++i)
+			for (size_t i = 0;i<S;++i)
 			{
 				util::one_push(l, v[i]);
 				lua_rawseti(l, -2, i+1);
