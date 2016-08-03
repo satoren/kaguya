@@ -305,13 +305,23 @@ int cfunction(lua_State* L)
 	return 0;
 }
 
+int coroutinefn(lua_State* cor)
+{
+	lua_resume(cor, 0, 0);
+	return static_cast<int>(lua_tointeger(cor, 1));
+}
+
 KAGUYA_TEST_FUNCTION_DEF(luacfunction)(kaguya::State& state)
 {
 	state["cfunction"] = kaguya::luacfunction(&cfunction);
 
 	state.dostring("cfunction(3)");
 
+	state["coroutinefn"] = kaguya::function(&coroutinefn);
+	state.dostring("assert(coroutinefn( coroutine.create(function () return 8 end) ) == 8)");
 
+	state["coroutinefn"] = &coroutinefn;
+	state.dostring("assert(coroutinefn( coroutine.create(function () return 3 end) ) == 3)");
 }
 
 int defargfn(int a = 3, int b = 2, int c = 1)
