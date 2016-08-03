@@ -19,8 +19,6 @@ namespace kaguya
 		using standard::is_lvalue_reference;
 		using standard::remove_reference;
 		using standard::remove_pointer;
-		using standard::remove_const;
-		using standard::is_pointer;
 		using standard::is_function;
 		using standard::is_floating_point;
 		using standard::is_integral;
@@ -28,10 +26,14 @@ namespace kaguya
 		using standard::is_convertible;
 		using standard::is_same;
 
+		using standard::is_arithmetic;
+		using standard::is_union;
+		using standard::is_class;
+
 		/// @brief same std::enable_if
 		template<bool B, class T = void>struct enable_if {};
 		/// @brief same std::enable_if
-		template<class T>struct enable_if<true, T> { 
+		template<class T>struct enable_if<true, T> {
 			///@	T (defined only if Cond is true)
 			typedef T type;
 		};
@@ -46,6 +48,7 @@ namespace kaguya
 		struct is_void<void> :integral_constant<bool, true>
 		{
 		};
+
 
 		/// @brief same std::decay
 		template< class T >
@@ -118,6 +121,33 @@ namespace kaguya
 		/// @brief Trait class that identifies whether T is a std::map type.
 		template<class T> struct is_std_map : integral_constant<bool, false> {};
 		template<class K, class V, class C, class A> struct is_std_map<std::map<K, V, C, A> > : integral_constant<bool, true> {};
+
+
+
+
+		//Until Boost 1.59.0 error:'value' is not a member of 'boost::is_pointer<int() const>' 
+		template< class T > struct remove_const { typedef T type; };
+		template< class T > struct remove_const<const T> { typedef T type; };
+		template< class T > struct remove_volatile { typedef T type; };
+		template< class T > struct remove_volatile<volatile T> { typedef T type; };
+		template< class T >
+		struct remove_cv {
+			typedef typename remove_volatile<typename remove_const<T>::type>::type type;
+		};
+
+		template< class T > struct is_pointer_helper : integral_constant<bool, false> {};
+		template< class T > struct is_pointer_helper<T*> : integral_constant<bool, true> {};
+		template< class T > struct is_pointer : is_pointer_helper<typename remove_cv<T>::type> {};
+
+		template< class T >
+		struct is_object : integral_constant<bool,
+			standard::is_arithmetic<T>::value ||
+			is_enum<T>::value ||
+			is_pointer<T>::value ||
+			standard::is_array<T>::value ||
+			standard::is_union<T>::value ||
+			standard::is_class<T>::value> {};
+
 	}
 
 

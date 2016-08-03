@@ -95,7 +95,7 @@ namespace kaguya
 		template<typename... Args>
 		ClassMetatable& addConstructor()
 		{
-			typedef typename nativefunction::constructor_signature_type<class_type, Args...> cons;
+			typedef typename ConstructorFunction<class_type(Args...)>::type cons;
 			function_map_["new"].push_back(cons());
 			return *this;
 		}
@@ -105,7 +105,7 @@ namespace kaguya
 	KAGUYA_TEMPLATE_PARAMETER(N)\
 	inline ClassMetatable& addConstructor()\
 	{\
-		typedef typename nativefunction::constructor_signature_type<class_type KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)> cons;\
+		typedef typename ConstructorFunction<class_type(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>::type cons;\
 		function_map_["new"].push_back(cons());\
 		return *this;\
 	}
@@ -121,7 +121,7 @@ namespace kaguya
 			//		template<>ClassMetatable& addConstructor(types::typetag<VariadicArgType>* )
 			ClassMetatable& addConstructorVariadicArg()
 		{
-			typedef typename nativefunction::constructor_signature_type<class_type, VariadicArgType> cons;
+			typedef typename ConstructorFunction<class_type(VariadicArgType)>::type cons;
 			function_map_["new"].push_back(FunctorType(cons()));
 			return *this;
 		}
