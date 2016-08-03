@@ -39,17 +39,32 @@ namespace kaguya
 			using LuaBasicTypeFunctions<Derived>::type;
 			using LuaBasicTypeFunctions<Derived>::typeName;
 
-			/// @brief typetest
+			/// @brief deprecated, use isType instead.
 			template<typename T>
 			bool typeTest()const
+			{
+				return isType<T>();
+			}
+
+
+			/// @brief deprecated, use isConvertible instead.
+			template<typename T>
+			bool weakTypeTest()const
+			{
+				return isConvertible<T>();
+			}
+
+			/// @brief is type test
+			template<typename T>
+			bool isType()const
 			{
 				lua_State* state = state_();
 				util::ScopedSavedStack save(state);
 				return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
 			}
-			/// @brief typetest
+
 			template<typename T>
-			bool weakTypeTest()const
+			bool isConvertible()const
 			{
 				lua_State* state = state_();
 				util::ScopedSavedStack save(state);
