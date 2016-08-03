@@ -265,6 +265,13 @@ namespace kaguya_test_util
 
 }
 
+#if KAGUYA_USE_CPP11
+inline std::ostream& operator << (std::ostream& os, std::nullptr_t)
+{
+	return os << "nullptr";
+}
+#endif
+
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya_test_util::to_string(__LINE__) + "\nCHECKCODE:" #B );
 
 #define TEST_COMPARE(A,B,OP)  if(!((A) OP (B)))\

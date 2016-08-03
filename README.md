@@ -18,14 +18,14 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/8930/badge.svg)](https://scan.coverity.com/projects/satoren-kaguya)
 
 ## Introduction
-Kaguya is Lua binding library for C++
+Kaguya is a Lua binding library for C++
 - header-file only
 - seamless access to lua elements
 
 ## Usage
 add "kaguya/include" directory to "header search path" of your project.
 
-Or generate single header file and add tou your project.
+Or generate single header file and add it to your project.
 ```
 cd  utils
 python generate_one_header.py > ../kaguya.hpp
@@ -41,59 +41,58 @@ int main()
 }
 ```
 
-### Or using exist lua state
+### Or use an existing lua state
 ```c++
 extern "C" int luaopen_modulename(lua_State *L)
 {
-   kaguya::State state(l);
-   kaguya::LuaTable module = state.newTable();
-   module["function"] = kaguya::funtion(somefunction);
-   return module.push();//number of return lib
+	kaguya::State state(l);
+	kaguya::LuaTable module = state.newTable();
+	module["function"] = kaguya::funtion(somefunction);
+	return module.push();//number of return lib
 }
 ```
 
 ### Runnig Lua code
 ```c++
-  kaguya::State state;
-  state("a = 'test'");//load and execute from string
-  state.dofile("path/to/luascript.lua");//load and execute from file
+kaguya::State state;
+state("a = 'test'");//load and execute from string
+state.dofile("path/to/luascript.lua");//load and execute from file
 
-  kaguya::LuaFunction f1 = state.loadfile("path/to/luascript.lua");//load file without execute
-  f1();//execute
-  kaguya::LuaFunction f2 = state.loadstring("a = 'test'");//load string without execute
-  f2();//execute
+kaguya::LuaFunction f1 = state.loadfile("path/to/luascript.lua");//load file without executing it
+f1();//execute
+kaguya::LuaFunction f2 = state.loadstring("a = 'test'");//load string without executing it
+f2();//execute
 ```
 
 ### Accessing values
 ```c++
-  kaguya::State state;
-  state("a = \"test\"");
-  std::string a_value = state["a"];
-  assert(a_value == "test");
+kaguya::State state;
+state("a = \"test\"");
+std::string a_value = state["a"];
+assert(a_value == "test");
 
-  state["tbl"] = kaguya::NewTable();//tbl ={};
-  state["tbl"]["value"] = 1;//tbl.value = 1 in lua
+state["tbl"] = kaguya::NewTable();//tbl ={};
+state["tbl"]["value"] = 1;//tbl.value = 1 in lua
 
-  state["tbl"] = kaguya::TableData{ 23,"test",{"key","value"}}; //using initializer list(C++11)
-  state("assert(tbl[1] == 23)");
-  state("assert(tbl[2] == 'test')");
-  state("assert(tbl['key'] == 'value')");
-
+state["tbl"] = kaguya::TableData{ 23,"test",{"key","value"}}; //using initializer list(C++11)
+state("assert(tbl[1] == 23)");
+state("assert(tbl[2] == 'test')");
+state("assert(tbl['key'] == 'value')");
 ```
 
 ### Retain Lua value from C++
 LuaRef type is like a Variant type.
-You can use for holding a Lua-value in native code.
+You can use it for holding a Lua-value in native code.
 ```c++
-  kaguya::State state;
-  state["a"] = "test";
-  LuaRef a = state["a"];
-  assert(a == "test");
+kaguya::State state;
+state["a"] = "test";
+LuaRef a = state["a"];
+assert(a == "test");
 
-  state["tbl"] = kaguya::NewTable();//tbl ={};
-  LuaTable tbl = state["tbl"];//holding Lua Table
-  tbl["value"] = 1;//tbl.value = 1 in lua
-  state("assert(tbl.value == 1)");
+state["tbl"] = kaguya::NewTable();//tbl ={};
+LuaTable tbl = state["tbl"];//holding Lua Table
+tbl["value"] = 1;//tbl.value = 1 in lua
+state("assert(tbl.value == 1)");
 ```
 
 ## Call lua function
@@ -107,17 +106,15 @@ assert(ret == 32);
 
 ### Multiple Results from Lua
 ```c++
-		state("multresfun =function() return 1,2,4 end");//registering multiple results function
-    int a, b, c;
-		kaguya::tie(a, b, c) = state["multresfun"]();
-    assert(a == 1 && b == 2 && c == 4 );
-    //or
-		std::tuple<int,int,int> result_tuple = state["multresfun"].call<std::tuple<int,int,int>>();
-    TEST_EQUAL(std::get<0>(result_tuple), 1);
-		TEST_EQUAL(std::get<1>(result_tuple), 2);
-		TEST_EQUAL(std::get<2>(result_tuple), 4);
-    //or
-
+state("multresfun =function() return 1,2,4 end");//registering multiple results function
+int a, b, c;
+kaguya::tie(a, b, c) = state["multresfun"]();
+assert(a == 1 && b == 2 && c == 4 );
+//or
+std::tuple<int,int,int> result_tuple = state["multresfun"].call<std::tuple<int,int,int>>();
+TEST_EQUAL(std::get<0>(result_tuple), 1);
+TEST_EQUAL(std::get<1>(result_tuple), 2);
+TEST_EQUAL(std::get<2>(result_tuple), 4);
 ```
 
 ### Registering Classes
@@ -137,7 +134,7 @@ state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 	.setConstructors<ABC(),ABC(int)>()
 	.addFunction("get_value", &ABC::value)
 	.addFunction("set_value", &ABC::setValue)
-  .addOverloadedFunctions("overload", &ABC::overload1, &ABC::overload2)
+	.addOverloadedFunctions("overload", &ABC::overload1, &ABC::overload2)
 	.addStaticFunction("nonmemberfun", [](ABC* self,int){return 1;})//c++11 lambda function
 	);
 ```
@@ -178,16 +175,16 @@ int base_function(Base* b) {
 //
 kaguya::State state;
 state["Base"].setClass(kaguya::UserdataMetatable<Base>()
-  .addFunction("a", &Base::a)
-  );
+	.addFunction("a", &Base::a)
+	);
 state["Derived"].setClass(kaguya::UserdataMetatable<Derived, Base>()
-  .addFunction("b", &Derived::b)
-  );
+	.addFunction("b", &Derived::b)
+	);
 
 //can use kaguya::MultipleBase<BaseTypes...> for multiple inheritance class
 state["MultipleInheritance"].setClass(kaguya::UserdataMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
-  .addFunction("b", &MultipleInheritance::b)
-  );
+	.addFunction("b", &MultipleInheritance::b)
+	);
 
 state["base_function"] = &base_function;
 Derived derived;
@@ -202,16 +199,16 @@ state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
 	.addFunction("get_value", &ABC::value)
 	.addFunction("set_value", &ABC::setValue)
 	);
-	ABC abc(43);
-  //register object pointer
-	state["abc"] = &abc;
-	state("assert(43 == abc:get_value())");
-  //or copy instance
-	state["copy_abc"] = abc;
-	state("assert(43 == copy_abc:get_value())");
-  //or registering shared instance
-	state["shared_abc"] = kaguya::standard::shared_ptr<ABC>(new ABC(43));//kaguya::standard::shared_ptr is std::shared_ptr or boost::shared_ptr.
-	state("assert(43 == shared_abc:get_value())");
+ABC abc(43);
+//register object pointer
+state["abc"] = &abc;
+state("assert(43 == abc:get_value())");
+//or copy instance
+state["copy_abc"] = abc;
+state("assert(43 == copy_abc:get_value())");
+//or registering shared instance
+state["shared_abc"] = kaguya::standard::shared_ptr<ABC>(new ABC(43));//kaguya::standard::shared_ptr is std::shared_ptr or boost::shared_ptr.
+state("assert(43 == shared_abc:get_value())");
 ```
 #### Object lifetime
 ```c++
@@ -238,7 +235,8 @@ state["lambda"] = kaguya::function([]{std::cout << "lambda called" << std::endl;
 state("lambda()");//lambda called
 
 
-state["overload"] = kaguya::overload([](int) {std::cout << "int version" << std::endl; },
+state["overload"] = kaguya::overload(
+	[](int) {std::cout << "int version" << std::endl; },
 	[](const std::string&) {std::cout << "string version" << std::endl; },
 	[]() {std::cout << "no arg version" << std::endl; }
 );
@@ -266,21 +264,21 @@ state.dostring("assert(defarg(2,2,2) == 8)");
 //member function
 struct TestClass
 {
-  int defargfn(int a = 3, int b = 2, int c = 1)
-  {
-	  return a*b*c;
-  }
+	int defargfn(int a = 3, int b = 2, int c = 1)
+	{
+		return a*b*c;
+	}
 }
 KAGUYA_MEMBER_FUNCTION_OVERLOADS(defargfn_wrapper, TestClass, default_arg, 0, 3)
 state["TestClass"].setClass(kaguya::UserdataMetatable<TestClass>()
-  .setConstructors<TestClass()>()
-  .addFunction("defarg", defargfn_wrapper())
+	.setConstructors<TestClass()>()
+	.addFunction("defarg", defargfn_wrapper())
 );
-	state.dostring("test = TestClass.new()");
-	state.dostring("assert(test:defargfn() == 6)");
-	state.dostring("assert(test:defargfn(6) == 12)");
-	state.dostring("assert(test:defargfn(6,5) == 30)");
-	state.dostring("assert(test:defargfn(2,2,2) == 8)");
+state.dostring("test = TestClass.new()");
+state.dostring("assert(test:defargfn() == 6)");
+state.dostring("assert(test:defargfn(6) == 12)");
+state.dostring("assert(test:defargfn(6,5) == 30)");
+state.dostring("assert(test:defargfn(2,2,2) == 8)");
 ```
 
 #### Variadic arguments function
@@ -291,10 +289,31 @@ state("va_fun(3,4,6,\"text\",6,444)");//3,4,6,text,6,444,
 ```
 
 #### Multiple Results to Lua
-If return type of function is tuple, it returns the multiple results to Lua
+If return type of function is tuple, it returns multiple results to Lua
 ```c++
 state["multireturn"] = kaguya::function([]() { return std::tuple<int, int>(32, 34); });
 state("print(multireturn())");//32    34
+```
+
+#### Nil values
+Luas `nil` converts to `nullptr` or 0 for pointer types, can be checked for with `isNilref()` and is different than the integer `0`.
+When you want to pass `nil` to lua either pass `nullptr`/`(void*)0` or `kaguya::NilValue`.
+```c++
+state["value"] = kaguya::NilValue();
+//or state["value"] = nullptr;
+//or state["value"] = (void*) 0;
+state("assert(value == nil)");
+state("assert(value ~= 0)");
+assert(state["value"].isNilref());
+assert(state["value"] == kaguya::NilValue());
+assert(state["value"] == nullptr);
+
+state["value"] = 0;
+state("assert(value ~= nil)");
+state("assert(value == 0)");
+assert(!state["value"].isNilref());
+assert(state["value"] != kaguya::NilValue());
+assert(state["value"] != nullptr);
 ```
 
 #### Coroutine
@@ -320,13 +339,13 @@ kaguya::LuaThread cor2 = state.newThread();
 //3,6,9,12,
 while(!cor2.isThreadDead())
 {
-    std::cout << cor2.resume<int>(corfun, 3) << ",";
+	std::cout << cor2.resume<int>(corfun, 3) << ",";
 }
 ```
 
 
 ### Automatic type conversion
-std::map and std::vector will be convert to a lua-table by default
+std::map and std::vector will be converted to a lua-table by default
 ```c++
 kaguya::State s;
 std::vector<int> vect = { 2,4,6,1 };
@@ -358,57 +377,57 @@ cat     124
 apple   3
 ```
 
-#### Type conversion customize
-  If you want to customize the conversion to type of lua yourself ,implement specialize of kaguya::lua_type_traits
+#### Type conversion customization
+If you want to customize the type conversion from/to lua, specialize kaguya::lua_type_traits
 
-  example: this code is default implements for std::string
-  ```c++
-  template<>	struct lua_type_traits<std::string> {
-  typedef std::string get_type;
-  typedef const std::string& push_type;
+example: (this is already implemented for std::string per default)
+```c++
+template<>  struct lua_type_traits<std::string> {
+	typedef std::string get_type;
+	typedef const std::string& push_type;
 
-  static bool strictCheckType(lua_State* l, int index)
-  {
-    return lua_type(l, index) == LUA_TSTRING;
-  }
-  static bool checkType(lua_State* l, int index)
-  {
-    return lua_isstring(l, index) != 0;
-  }
-  static get_type get(lua_State* l, int index)
-  {
-    size_t size = 0;
-    const char* buffer = lua_tolstring(l, index, &size);
-    return std::string(buffer, size);
-  }
-  static int push(lua_State* l, push_type s)
-  {
-    lua_pushlstring(l, s.c_str(), s.size());
-    return 1;
-  }
+	static bool strictCheckType(lua_State* l, int index)
+	{
+		return lua_type(l, index) == LUA_TSTRING;
+	}
+	static bool checkType(lua_State* l, int index)
+	{
+		return lua_isstring(l, index) != 0;
+	}
+	static get_type get(lua_State* l, int index)
+	{
+		size_t size = 0;
+		const char* buffer = lua_tolstring(l, index, &size);
+		return std::string(buffer, size);
+	}
+	static int push(lua_State* l, push_type s)
+	{
+		lua_pushlstring(l, s.c_str(), s.size());
+		return 1;
+	}
 };
   ```
 
 #### Handling Errors
-  Lua error encountered will write to the console by default, and it is customizable:
-  ``` c++
-    void HandleError(int errCode, const char * szError)
-    {  //customize your error handling, eg. write to file...
-    }
-    kaguya::State l;
-    l.setErrorHandler(HandleError);
-    l.dofile("./scripts/custom.lua"); // eg. accesing a file not existed will invoke HandleError above
-  ```
+Encountered lua errors will be written to the console by default, but you can change this:
+``` c++
+void HandleError(int errCode, const char * szError)
+{  //customize your error handling, eg. write to file...
+}
+kaguya::State l;
+l.setErrorHandler(HandleError);
+l.dofile("./scripts/custom.lua"); // eg. accesing a non-existing file will invoke HandleError above
+```
 
 ## run test
-  ```
-  mkdir build
-  cd build
-  cmake ..
-  make
-  ctest
-  ```
-  If you want to use a non-system default library, add three option to cmake command
-  ```
-  cmake -DLUA_INCLUDE_DIRS=path/to/lua/header/dir -DLUA_LIBRARY_DIRS=/abspath/to/lua/library/dir -DLUA_LIBRARIES=lualibname
-  ```
+```
+mkdir build
+cd build
+cmake ..
+make
+ctest
+```
+If you don't want to use the default (system) library, add these 3 options to the cmake command
+```
+cmake -DLUA_INCLUDE_DIRS=path/to/lua/header/dir -DLUA_LIBRARY_DIRS=/abspath/to/lua/library/dir -DLUA_LIBRARIES=lualibname
+```

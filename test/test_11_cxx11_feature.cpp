@@ -258,7 +258,7 @@ KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 
 KAGUYA_TEST_FUNCTION_DEF(std_array)(kaguya::State& state)
 {
-	std::array<int, 3> arr{ 2,3,4 };
+	std::array<int, 3> arr{{ 2,3,4 }};
 	state["value"] = arr;
 
 
