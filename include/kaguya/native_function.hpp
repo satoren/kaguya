@@ -704,6 +704,14 @@ namespace kaguya
 #undef KAGUYA_FOVERLOAD_DEF
 #endif
 
+	struct luacfunction
+	{
+		lua_CFunction ptr;
+
+		luacfunction(lua_CFunction f) :ptr(f) {}
+		operator lua_CFunction() { return ptr; }
+	};
+
 
 	/// @ingroup lua_type_traits
 	/// @brief lua_type_traits for FunctionInvokerType
@@ -786,11 +794,11 @@ namespace kaguya
 		}
 	};
 	/// @ingroup lua_type_traits
-	/// @brief lua_type_traits for lua_CFunction
-	template<> struct lua_type_traits < lua_CFunction >
+	/// @brief lua_type_traits for luacfunction
+	template<> struct lua_type_traits < luacfunction >
 	{
-		typedef lua_CFunction push_type;
-		typedef lua_CFunction get_type;
+		typedef luacfunction push_type;
+		typedef luacfunction get_type;
 		static bool strictCheckType(lua_State* l, int index)
 		{
 			return lua_iscfunction(l, index) != 0;
@@ -803,13 +811,12 @@ namespace kaguya
 		{
 			return lua_tocfunction(l,index);
 		}
-		static int push(lua_State* l, lua_CFunction f)
+		static int push(lua_State* l, push_type f)
 		{
 			lua_pushcfunction(l, f);
 			return 1;
 		}
 	};
-
 
 
 	/// @ingroup lua_type_traits

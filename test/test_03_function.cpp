@@ -307,7 +307,7 @@ int cfunction(lua_State* L)
 
 KAGUYA_TEST_FUNCTION_DEF(luacfunction)(kaguya::State& state)
 {
-	state["cfunction"] = &cfunction;
+	state["cfunction"] = kaguya::luacfunction(&cfunction);
 
 	state.dostring("cfunction(3)");
 
