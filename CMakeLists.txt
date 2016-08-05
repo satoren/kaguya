@@ -25,6 +25,7 @@ endif()
 
 if(NOT MSVC)#-Wall nonsense on MSVC
 add_definitions("-Wall")
+add_definitions ("-Wno-unused-local-typedefs")
 #add_definitions("-std=c++11")
 endif(NOT MSVC)
 

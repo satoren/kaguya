@@ -20,7 +20,7 @@ namespace kaguya
 		struct FunctionSignatureType {
 			typedef Ret result_type;
 			typedef TypeTuple<Args...> argument_type_tuple;
-			static const int argument_count = sizeof...(Args);
+			static const size_t argument_count = sizeof...(Args);
 			typedef Ret(*c_function_type)(Args...);
 		};
 		template <typename T>

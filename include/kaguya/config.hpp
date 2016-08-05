@@ -58,11 +58,6 @@ extern "C" {
 #define KAGUYA_NO_STD_MAP_TO_TABLE
 #endif
 
-
-#ifndef KAGUYA_DETECT_USE_DEPRECATED_FEATURE
-#define KAGUYA_DETECT_USE_DEPRECATED_FEATURE 0
-#endif
-
 #ifndef KAGUYA_FUNCTION_MAX_ARGS
 ///! max argumeent number for binding function. this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_ARGS 9
