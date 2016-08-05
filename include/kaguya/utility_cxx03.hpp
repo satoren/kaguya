@@ -12,8 +12,6 @@ namespace kaguya
 {
 	namespace util
 	{
-		
-		
 		///! 
 		struct null_type {};
 
@@ -21,7 +19,7 @@ namespace kaguya
 #define KAGUYA_PP_STRUCT_TDEF_REP(N) KAGUYA_PP_CAT(typename A,N) = null_type
 #define KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_STRUCT_TDEF_REP)
 
-		template<KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(9)>
+		template<KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
 			struct TypeTuple {
 		};
 
@@ -35,7 +33,7 @@ namespace kaguya
 		};\
 
 		KAGUYA_TYPE_TUPLE_SIZE_DEF(0);
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_TYPE_TUPLE_SIZE_DEF);
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_TYPE_TUPLE_SIZE_DEF);
 #undef KAGUYA_TYPE_TUPLE_SIZE_DEF
 
 		template<typename Ret, typename typetuple>struct CFuntionType;
@@ -47,14 +45,14 @@ namespace kaguya
 		};\
 
 		KAGUYA_CFUNCTION_TYPE_DEF(0);
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_CFUNCTION_TYPE_DEF);
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CFUNCTION_TYPE_DEF);
 #undef KAGUYA_CFUNCTION_TYPE_DEF
 
 
-		template<typename Ret , KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(9)>
+		template<typename Ret , KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
 			struct FunctionSignatureType {
 				typedef Ret result_type; 
-				typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(9)> argument_type_tuple;
+				typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)> argument_type_tuple;
 				static const size_t argument_count = TypeTupleSize<argument_type_tuple>::value;
 				typedef typename CFuntionType<Ret, argument_type_tuple>::type c_function_type;
 		};
@@ -88,9 +86,9 @@ namespace kaguya
 		};\
 
 		KAGUYA_MEMBER_FUNCTION_SIGNATURE_DEF(0);
-		KAGUYA_PP_REPEAT_DEF(8, KAGUYA_MEMBER_FUNCTION_SIGNATURE_DEF);
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_PP_DEC(KAGUYA_FUNCTION_MAX_ARGS), KAGUYA_MEMBER_FUNCTION_SIGNATURE_DEF);
 		KAGUYA_FUNCTION_SIGNATURE_DEF(0);
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_FUNCTION_SIGNATURE_DEF);
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_FUNCTION_SIGNATURE_DEF);
 #undef KAGUYA_MEMBER_FUNCTION_SIGNATURE_DEF
 #undef KAGUYA_FUNCTION_SIGNATURE_DEF
 
@@ -118,7 +116,7 @@ namespace kaguya
 		};\
 
 //		KAGUYA_TYPE_INDEX_GET_DEF(0);
-		KAGUYA_PP_REPEAT_DEF(8, KAGUYA_TYPE_INDEX_GET_DEF);
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_PP_DEC(KAGUYA_FUNCTION_MAX_ARGS), KAGUYA_TYPE_INDEX_GET_DEF);
 
 		template<std::size_t N, typename F>
 		struct ArgumentType
@@ -142,13 +140,13 @@ namespace kaguya
 				return (this_.*f)(KAGUYA_PP_ARG_REPEAT(N));\
 			}\
 			template<class F KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-			typename standard::result_of<F(KAGUYA_PP_ARG_DEF_REPEAT(N))>::type invoke_helper(F f KAGUYA_PP_ARG_DEF_REPEAT_CONCAT(N))\
+			typename FunctionResultType<F>::type invoke_helper(F f KAGUYA_PP_ARG_DEF_REPEAT_CONCAT(N))\
 			{\
 				return f(KAGUYA_PP_ARG_REPEAT(N));\
 			}\
 
 			KAGUYA_INVOKE_HELPER_DEF(0);
-			KAGUYA_PP_REPEAT_DEF(9, KAGUYA_INVOKE_HELPER_DEF);
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_INVOKE_HELPER_DEF);
 		}
 
 		
@@ -160,7 +158,7 @@ namespace kaguya
 		}\
 		
 		KAGUYA_INVOKE_DEF(0);
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_INVOKE_DEF);
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_INVOKE_DEF);
 
 	}
 

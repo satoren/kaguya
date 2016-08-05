@@ -37,7 +37,6 @@ extern "C" {
 #include <boost/static_assert.hpp>
 #include <boost/utility/result_of.hpp>
 #endif
-#include "kaguya/preprocess.hpp"
 
 
 
@@ -62,6 +61,16 @@ extern "C" {
 
 #ifndef KAGUYA_DETECT_USE_DEPRECATED_FEATURE
 #define KAGUYA_DETECT_USE_DEPRECATED_FEATURE 0
+#endif
+
+#ifndef KAGUYA_FUNCTION_MAX_ARGS
+#define KAGUYA_FUNCTION_MAX_ARGS 9
+#endif
+#ifndef KAGUYA_FUNCTION_MAX_TUPLE_SIZE
+#define KAGUYA_FUNCTION_MAX_TUPLE_SIZE 9
+#endif
+#ifndef KAGUYA_FUNCTION_MAX_OVERLOADS
+#define KAGUYA_FUNCTION_MAX_OVERLOADS KAGUYA_FUNCTION_MAX_TUPLE_SIZE
 #endif
 
 #ifndef KAGUYA_NOEXCEPT
