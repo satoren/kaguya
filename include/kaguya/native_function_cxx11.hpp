@@ -101,7 +101,7 @@ namespace kaguya
 		{
 			std::string result;
 			const int max_arg = sizeof...(Args);
-			join(result, ",",(((max_arg -opt_count < Indexes)? std::string("[OPT]") :std::string(""))  + typeid(Args).name())...);
+			join(result, ",",(((max_arg -opt_count < int(Indexes))? std::string("[OPT]") :std::string(""))  + typeid(Args).name())...);
 			return result;
 		}
 
