@@ -50,18 +50,14 @@ namespace kaguya
 		{
 			return standard::tuple<>();
 		}
-
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_TARG(N) KAGUYA_PP_CAT(A,N)
+		
 #define KAGUYA_GET_DEF(N) lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(l, N + startindex - 1) 
-#define KAGUYA_GET_TUPLE_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> get_result_impl(lua_State *l,int startindex,types::typetag<standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG)> >)\
+#define KAGUYA_GET_TUPLE_DEF(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+		inline standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> get_result_impl(lua_State *l,int startindex,types::typetag<standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> >)\
 		{\
-			return standard::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TARG) >(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_GET_DEF));\
+			return standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N) >(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_GET_DEF));\
 		}
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_TUPLE_SIZE, KAGUYA_GET_TUPLE_DEF)
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_TARG
 #undef KAGUYA_GET_DEF
 #undef KAGUYA_GET_TUPLE_DEF
 #endif

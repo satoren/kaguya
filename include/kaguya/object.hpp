@@ -64,25 +64,12 @@ namespace kaguya
 #else
 
 		ObjectWrapper() : object_() {}
-		template<class Arg1>
-		ObjectWrapper(const Arg1& v1) : object_(v1) {}
-		template<class Arg1, class Arg2>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2) : object_(v1, v2) {}
-		template<class Arg1, class Arg2, class Arg3>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3) : object_(v1, v2, v3) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4) : object_(v1, v2, v3, v4) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5) : object_(v1, v2, v3, v4, v5) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6) : object_(v1, v2, v3, v4, v5, v6) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7) : object_(v1, v2, v3, v4, v5, v6, v7) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8) : object_(v1, v2, v3, v4, v5, v6, v7, v8) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8, const Arg9& v9) : object_(v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
+#define KAGUYA_OBJECT_WRAPPER_CONSTRUCTOR_DEF(N) \
+		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+			ObjectWrapper(KAGUYA_PP_ARG_DEF_REPEAT(N)):object_(KAGUYA_PP_ARG_REPEAT(N)){}
 
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OBJECT_WRAPPER_CONSTRUCTOR_DEF);
+#undef KAGUYA_OBJECT_WRAPPER_CONSTRUCTOR_DEF
 #endif
 
 		virtual const std::type_info& type()

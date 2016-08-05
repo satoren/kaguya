@@ -205,19 +205,15 @@ namespace kaguya
 			return 0;
 		}
 
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
 #define KAGUYA_PUSH_DEF(N) c+=lua_type_traits<KAGUYA_PP_CAT(A,N) >::push(l, KAGUYA_PP_CAT(a,N)); 
-#define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline int push_args(lua_State *l,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+#define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+		inline int push_args(lua_State *l,KAGUYA_PP_ARG_CR_DEF_REPEAT(N))\
 		{\
 			int c =0;\
 			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF)\
 			return c;\
 		}
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_PUSH_ARG_DEF)
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
 #undef KAGUYA_PUSH_DEF
 #undef KAGUYA_PUSH_ARG_DEF
 #endif

@@ -62,6 +62,7 @@ namespace kaguya
 
 		KAGUYA_CALL_FN_DEF(0);
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CALL_FN_DEF);
+#undef KAGUYA_CALL_FN_DEF
 
 #undef KAGUYA_CALL_FN_DEF
 #undef KAGUYA_FUNC_DEF
@@ -144,6 +145,7 @@ namespace kaguya
 
 		KAGUYA_CONSTRUCTOR_CALL_FN_DEF(0);
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONSTRUCTOR_CALL_FN_DEF);
+#undef KAGUYA_CONSTRUCTOR_CALL_FN_DEF
 
 
 		template<class ClassType, class FunType = void> struct ConstructorFunction;
@@ -163,6 +165,7 @@ namespace kaguya
 
 		KAGUYA_F_TO_CONSIG_DEF(0);
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_F_TO_CONSIG_DEF);
+#undef KAGUYA_F_TO_CONSIG_DEF
 	}
 	using nativefunction::ConstructorFunction;
 }

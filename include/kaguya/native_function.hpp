@@ -679,28 +679,19 @@ namespace kaguya
 	}
 #if KAGUYA_USE_CPP11
 
-
 	template<typename... Functions>
 	FunctionInvokerType<fntuple::tuple<Functions...> > overload(Functions... fns)
 	{
 		return FunctionInvokerType<fntuple::tuple<Functions...> >(fntuple::tuple<Functions...>(fns...));
 	}
 #else
-#define KAGUYA_DEF_TEMPLATE(N) KAGUYA_PP_CAT(typename F,N)
-#define KAGUYA_TEMPLATE_ARG_DEF(N) KAGUYA_PP_CAT(F,N)
-#define KAGUYA_TUPLE_ARG_DEF(N) KAGUYA_PP_CAT(f,N)
-#define KAGUYA_ARG_DEF(N) KAGUYA_PP_CAT(F,N) KAGUYA_PP_CAT(f,N)
-#define KAGUYA_FOVERLOAD_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_DEF_TEMPLATE)>\
-		FunctionInvokerType<fntuple::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_TEMPLATE_ARG_DEF)> > overload(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_ARG_DEF))\
+#define KAGUYA_FOVERLOAD_DEF(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+		FunctionInvokerType<fntuple::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > overload(KAGUYA_PP_ARG_DEF_REPEAT(N))\
 		{\
-			typedef typename fntuple::tuple<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_TEMPLATE_ARG_DEF)> ttype;\
-			return FunctionInvokerType<ttype>(ttype(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_TUPLE_ARG_DEF)));\
+			typedef typename fntuple::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> ttype;\
+			return FunctionInvokerType<ttype>(ttype(KAGUYA_PP_ARG_REPEAT(N)));\
 		}
 	KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_OVERLOADS, KAGUYA_FOVERLOAD_DEF)
-#undef KAGUYA_DEF_TEMPLATE
-#undef KAGUYA_TEMPLATE_ARG_DEF
-#undef KAGUYA_TUPLE_ARG_DEF
-#undef KAGUYA_ARG_DEF
 #undef KAGUYA_FOVERLOAD_DEF
 #endif
 

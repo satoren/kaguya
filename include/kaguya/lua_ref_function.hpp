@@ -253,59 +253,53 @@ namespace kaguya
 #define KAGUYA_TEMPLATE_PARAMETER(N)template<typename Derived>
 #define KAGUYA_FUNCTION_ARGS_DEF(N)
 #define KAGUYA_CALL_ARGS(N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
 
 #define KAGUYA_OP_FN_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults LuaFunctionImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-			return this->template call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-	}\
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults LuaThreadImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-			return this->template resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-	}\
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults LuaVariantImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
-	{\
-			int t = type();\
-			if (t == LUA_TTHREAD)\
-			{\
-				return this->template resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-			}\
-			else if (t == LUA_TFUNCTION)\
-			{\
+		KAGUYA_TEMPLATE_PARAMETER(N)\
+		inline FunctionResults LuaFunctionImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
+		{\
 				return this->template call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
-			}\
-			else\
-			{\
-				except::typeMismatchError(state_(), " is not function or thread");\
-				return FunctionResults(state_());\
-			}\
-	}
+		}\
+		KAGUYA_TEMPLATE_PARAMETER(N)\
+		inline FunctionResults LuaThreadImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
+		{\
+				return this->template resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+		}\
+		KAGUYA_TEMPLATE_PARAMETER(N)\
+		inline FunctionResults LuaVariantImpl<Derived>::operator()(KAGUYA_FUNCTION_ARGS_DEF(N))\
+		{\
+				int t = type();\
+				if (t == LUA_TTHREAD)\
+				{\
+					return this->template resume<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+				}\
+				else if (t == LUA_TFUNCTION)\
+				{\
+					return this->template call<FunctionResults>(KAGUYA_CALL_ARGS(N)); \
+				}\
+				else\
+				{\
+					except::typeMismatchError(state_(), " is not function or thread");\
+					return FunctionResults(state_());\
+				}\
+		}
 
-		KAGUYA_OP_FN_DEF(0)
+		KAGUYA_OP_FN_DEF(0);
 
 #undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_FUNCTION_ARGS_DEF
 #undef KAGUYA_CALL_ARGS
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<typename Derived> template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
-#define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
-#define KAGUYA_CALL_ARGS(N) KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF)
+#define KAGUYA_TEMPLATE_PARAMETER(N) template<typename Derived> template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
+#define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_ARG_CR_DEF_REPEAT(N)
+#define KAGUYA_CALL_ARGS(N) KAGUYA_PP_ARG_REPEAT(N)
 
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
 
-			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OP_FN_DEF)
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OP_FN_DEF);
 #undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_TEMPLATE_PARAMETER
 
 #undef KAGUYA_CALL_ARGS
 #undef KAGUYA_FUNCTION_ARGS_DEF
-#undef KAGUYA_PUSH_ARG_DEF
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
 #undef KAGUYA_CALL_DEF
 #undef KAGUYA_OP_FN_DEF
 #endif
@@ -440,14 +434,11 @@ namespace kaguya
 		}
 #else
 
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N)
 #define KAGUYA_OP_FN_DEF(N) \
-		template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
-		FunctionResults operator()(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+		FunctionResults operator()(KAGUYA_PP_ARG_CR_DEF_REPEAT(N))\
 		{\
-			return KAGUYA_DELEGATE_LUAREF(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF));\
+			return KAGUYA_DELEGATE_LUAREF(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_ARG_REPEAT(N));\
 		}
 
 		/**
@@ -461,11 +452,13 @@ namespace kaguya
 		}
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OP_FN_DEF)
 
+#undef KAGUYA_OP_FN_DEF
+
 #define KAGUYA_CALL_DEF(N) \
-		template<class Result,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)> \
-		Result call(KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+		template<class Result,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+		Result call(KAGUYA_PP_ARG_CR_DEF_REPEAT(N))\
 		{\
-			return KAGUYA_DELEGATE_LUAREF.call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PUSH_ARG_DEF));\
+			return KAGUYA_DELEGATE_LUAREF.call<Result>(KAGUYA_DELEGATE_FIRST_ARG_C KAGUYA_PP_ARG_REPEAT(N));\
 		}
 
 			template<class Result>
@@ -475,12 +468,7 @@ namespace kaguya
 		}
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CALL_DEF)
 
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
-#undef KAGUYA_PUSH_ARG_DEF
-#undef KAGUYA_OP_FN_DEF
 #undef KAGUYA_CALL_DEF
-#undef KAGUYA_RESUME_DEF
 #endif
 
 #undef KAGUYA_DELEGATE_FIRST_ARG_C

@@ -141,16 +141,13 @@ namespace kaguya
 		template<typename... Args>
 		class_& constructor() { this->template setConstructors<ClassType(Args...)>(); return *this; }
 #else
-#define KAGUYA_TEMPLATE_PARAMETER(N)
+		class_& constructor() { this->template setConstructors<ClassType()>(); return *this; }
+
 #define KAGUYA_ADD_CON_FN_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
+	template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
 	class_& constructor() { this->template setConstructors<ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>(); return *this; }
 
-		KAGUYA_ADD_CON_FN_DEF(0)
-#undef KAGUYA_TEMPLATE_PARAMETER
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
 			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_ADD_CON_FN_DEF)
-#undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_ADD_CON_FN_DEF
 #endif
 

@@ -265,18 +265,17 @@ namespace kaguya
 			addOverloadedFunctions("new", typename ConstructorFunction<class_type, ArgTypes>::type()...);
 			return *this;
 		}
-#else
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>		
+#else	
 #define KAGUYA_SET_CON_TYPE_DEF(N) typename ConstructorFunction<class_type,KAGUYA_PP_CAT(A,N)>::type()
 #define KAGUYA_SET_CON_FN_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline UserdataMetatable& setConstructors()\
-	{\
-		addOverloadedFunctions("new",KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF));\
-		return *this;\
-	}
-		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_OVERLOADS, KAGUYA_SET_CON_FN_DEF)
-#undef KAGUYA_TEMPLATE_PARAMETER
+		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+		inline UserdataMetatable& setConstructors()\
+		{\
+			addOverloadedFunctions("new",KAGUYA_PP_REPEAT_ARG(N,KAGUYA_SET_CON_TYPE_DEF));\
+			return *this;\
+		}
+
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_OVERLOADS, KAGUYA_SET_CON_FN_DEF);
 #undef KAGUYA_SET_CON_FN_DEF
 #undef KAGUYA_SET_CON_TYPE_DEF
 
@@ -407,11 +406,8 @@ namespace kaguya
 		}
 #else
 
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
-#define KAGUYA_PP_FUNCS(N) KAGUYA_PP_CAT(a,N)
-#define KAGUYA_ADD_OVERLOAD_FUNCTION_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline UserdataMetatable& addOverloadedFunctions(const char* name,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+#define KAGUYA_ADD_OVERLOAD_FUNCTION_DEF(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+		inline UserdataMetatable& addOverloadedFunctions(const char* name,KAGUYA_PP_ARG_CR_DEF_REPEAT(N))\
 		{\
 			if (has_key(name))\
 			{\
@@ -421,10 +417,8 @@ namespace kaguya
 			member_map_[name] = AnyDataPusher(kaguya::overload(KAGUYA_PP_ARG_REPEAT(N)));\
 			return *this;\
 		}
-		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_OVERLOADS, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF)
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
-#undef KAGUYA_PP_FUNCS
+
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_OVERLOADS, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF);
 #undef KAGUYA_ADD_OVERLOAD_FUNCTION_DEF
 #endif
 
@@ -555,12 +549,11 @@ namespace kaguya
 		}
 
 #else
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>
 #define KAGUYA_GET_BASE_METATABLE(N) class_userdata::get_metatable<KAGUYA_PP_CAT(A,N)>(state);\
 		metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop())); \
 		pconverter.add_type_conversion<KAGUYA_PP_CAT(A,N),class_type>();
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
+		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
 		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
 		{\
 			PointerConverter& pconverter = PointerConverter::get(state);\
@@ -571,10 +564,8 @@ namespace kaguya
 		}\
 
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_TUPLE_SIZE, KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF)
-#undef KAGUYA_TEMPLATE_PARAMETER
 #undef KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF
 #undef KAGUYA_GET_BASE_METATABLE
-#undef KAGUYA_TYPE_CHECK_REP
 #endif
 
 		bool has_key(const std::string& key)
