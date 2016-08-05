@@ -147,7 +147,7 @@ namespace kaguya
 			{
 				if (!this_)
 				{
-					throw LuaTypeMismatch("type mismatch!!");
+					throw LuaTypeMismatch();
 				}
 				this_->*mptr = lua_type_traits<MemType>::get(state, 2);
 				return 0;
@@ -559,7 +559,7 @@ namespace kaguya
 			}
 			else
 			{
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return 0;
 		}
@@ -632,7 +632,7 @@ namespace kaguya
 			int32_t currentbestindex = -1;\
 			KAGUYA_PP_REPEAT(N, KAGUYA_FUNCTION_SCOREING);\
 			KAGUYA_PP_REPEAT(N, KAGUYA_FUNCTION_INVOKE);\
-			throw LuaTypeMismatch("type mismatch!!"); \
+			throw LuaTypeMismatch(); \
 		}\
 		KAGUYA_TEMPLATE_PARAMETER(N)\
 		void push_arg_typename_tuple(lua_State *state,standard::tuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>& tuple)\
@@ -743,8 +743,15 @@ namespace kaguya
 				try {
 					return detail::invoke_tuple(state, *t);
 				}
-				catch (LuaTypeMismatch &) {
-					util::traceBack(state, build_arg_error_message(state, "maybe...", t));
+				catch (LuaTypeMismatch &e) {
+					if (strcmp(e.what(), "type mismatch!!") == 0)
+					{
+						util::traceBack(state, build_arg_error_message(state, "maybe...", t));
+					}
+					else
+					{
+						util::traceBack(state, e.what());
+					}			
 				}
 				catch (std::exception & e) {
 					util::traceBack(state, e.what());

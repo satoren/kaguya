@@ -38,7 +38,7 @@ namespace kaguya
 		const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
 		if (!pointer)
 		{
-			throw LuaTypeMismatch("type mismatch!!");
+			throw LuaTypeMismatch();
 		}
 		return *pointer;
 	}
@@ -100,7 +100,7 @@ namespace kaguya
 			T* pointer = get_pointer(l, index, types::typetag<T>());
 			if (!pointer)
 			{
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return *pointer;
 		}
@@ -160,7 +160,7 @@ namespace kaguya
 			{
 				return 0;
 			}
-			throw LuaTypeMismatch("type mismatch!!");
+			throw LuaTypeMismatch();
 			return 0;
 		}
 		static int push(lua_State* l, push_type v)
@@ -348,7 +348,7 @@ namespace kaguya
 			type* pointer = get_pointer(l, index, types::typetag<type>());
 			if (!pointer)
 			{
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return *pointer;
 		}
@@ -386,7 +386,7 @@ namespace kaguya
 		static get_type get(lua_State* l, int index)
 		{
 			if (!lua_isnoneornil(l, index)) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return nullptr;
 		}
@@ -460,7 +460,7 @@ namespace kaguya
 			int isnum=0;
 			get_type num = static_cast<T>(lua_tonumberx(l,index,&isnum));
 			if (!isnum) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return num;
 		}
@@ -493,7 +493,7 @@ namespace kaguya
 			int isnum = 0;
 			get_type num = static_cast<T>(lua_tointegerx(l, index, &isnum));
 			if (!isnum) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return num;
 		}
@@ -569,7 +569,7 @@ namespace kaguya
 		{
 			const char* buffer = lua_tostring(l, index);
 			if (!buffer) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return buffer;
 		}
@@ -598,7 +598,7 @@ namespace kaguya
 		{
 			const char* buffer = lua_tostring(l, index);
 			if (!buffer) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return buffer;
 		}
@@ -631,7 +631,7 @@ namespace kaguya
 			size_t size = 0;
 			const char* buffer = lua_tolstring(l, index, &size);
 			if (!buffer) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return std::string(buffer, size);
 		}
@@ -693,7 +693,7 @@ namespace kaguya
 		static get_type get(lua_State* l, int index)
 		{
 			if (!checkType(l, index)) {
-				throw LuaTypeMismatch("type mismatch!!");
+				throw LuaTypeMismatch();
 			}
 			return NilValue();
 		}
