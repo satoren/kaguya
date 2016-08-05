@@ -12,7 +12,6 @@
 #if KAGUYA_USE_CPP11
 #include "kaguya/utility_cxx11.hpp"
 #else
-#include "kaguya/preprocess.hpp"
 #include "kaguya/utility_cxx03.hpp"
 #endif
 

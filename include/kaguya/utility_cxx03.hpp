@@ -7,6 +7,7 @@
 #include <string>
 
 #include "kaguya/config.hpp"
+#include "kaguya/preprocess.hpp"
 
 namespace kaguya
 {
