@@ -1401,4 +1401,26 @@ KAGUYA_TEST_FUNCTION_DEF(self_refcounted_object)(kaguya::State& )
 
 }
 
+int Base_a_getter(const Base* self)
+{
+	return self->a;
+}
+void Base_a_setter(Base* self,int v)
+{
+	self->a = v;
+}
+KAGUYA_TEST_FUNCTION_DEF(add_property_external)(kaguya::State& state)
+{
+
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("a", &Base_a_getter,&Base_a_setter)
+	);
+	Base base;
+	state["base"] = &base;
+	TEST_CHECK(state("base.a=1"));
+	TEST_CHECK(state("assert(1 == base.a)"));
+	TEST_EQUAL(base.a, 1);
+}
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)
