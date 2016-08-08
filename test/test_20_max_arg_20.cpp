@@ -1,4 +1,5 @@
 #define KAGUYA_FUNCTION_MAX_ARGS 20
+#define KAGUYA_FUNCTION_MAX_OVERLOADS 25
 #include "kaguya/another_binding_api.hpp"
 #include "test_util.hpp"
 
@@ -6,6 +7,7 @@ KAGUYA_TEST_GROUP_START(test_20_max_arg_20)
 using namespace kaguya_test_util;
 
 using namespace kaguya;
+
 
 void defargfn(int a1,int a2,int a3,int a4,int a5,int a6,int a7,int a8,int a9,int a10=10,int a11=11,int a12=12,int a13=13,int a14=14,int a15=15,int a16=16,int a17=17,int a18=18,int a19 = 19,int a20 = 20)
 {
@@ -53,4 +55,34 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 	state.dostring("defargfn(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19)");
 	state.dostring("defargfn(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)");
 }
+
+
+KAGUYA_TEST_FUNCTION_DEF(many_overloads)(kaguya::State& state)
+{
+	state["defargfn"] = kaguya::UserdataMetatable<TestClass>()
+		.setConstructors < TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass()
+		, TestClass() > ();
+}
+
 KAGUYA_TEST_GROUP_END(test_20_max_arg_20)

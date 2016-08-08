@@ -21,10 +21,12 @@
 
 namespace kaguya
 {
-	template<class A1, class A2 = void
-		, class A3 = void, class A4 = void, class A5 = void
-		, class A6 = void, class A7 = void, class A8 = void,
-		class A9 = void>struct MultipleBase {
+
+#define KAGUYA_PP_STRUCT_TDEF_REP(N) KAGUYA_PP_CAT(class A,N) = void
+#define KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_STRUCT_TDEF_REP)
+
+	template<KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(KAGUYA_CLASS_MAX_BASE_CLASSES)>
+	struct MultipleBase {
 	};
 }
 
@@ -565,7 +567,7 @@ namespace kaguya
 			set_multiple_base(state, metatable, metabases);\
 		}\
 
-		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_TUPLE_SIZE, KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF)
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_CLASS_MAX_BASE_CLASSES, KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF)
 #undef KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF
 #undef KAGUYA_GET_BASE_METATABLE
 #endif

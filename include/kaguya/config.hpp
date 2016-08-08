@@ -66,6 +66,9 @@ extern "C" {
 ///! this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_TUPLE_SIZE 9
 #endif
+#ifndef KAGUYA_CLASS_MAX_BASE_CLASSES
+#define KAGUYA_CLASS_MAX_BASE_CLASSES 9
+#endif
 #ifndef KAGUYA_FUNCTION_MAX_OVERLOADS
 ///! this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_OVERLOADS 9
