@@ -28,6 +28,8 @@ namespace kaguya
 	template<KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(KAGUYA_CLASS_MAX_BASE_CLASSES)>
 	struct MultipleBase {
 	};
+#undef KAGUYA_PP_STRUCT_TDEF_REP
+#undef KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT
 }
 
 #include "kaguya/deprecated_metatable.hpp"

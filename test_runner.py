@@ -67,7 +67,7 @@ def build_and_exec_test(compiler,lua_version,build_type,dir_opt):
             raise Exception("cmake error at"+buildpath)
         os.chdir("../../")
         return
-    ret = os.system('make -j')
+    ret = os.system('make -j 2')
     if ret != 0: raise Exception("build error at"+buildpath)
     ret = os.system('ctest --output-on-failure')
     if ret != 0: raise Exception("test error at"+buildpath)

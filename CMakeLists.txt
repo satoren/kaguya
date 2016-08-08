@@ -25,9 +25,13 @@ endif()
 
 if(NOT MSVC)#-Wall nonsense on MSVC
 add_definitions("-Wall")
-add_definitions ("-Wno-unused-local-typedefs")
 #add_definitions("-std=c++11")
 endif(NOT MSVC)
+
+
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+add_definitions ("-Wno-unused-local-typedefs")
+endif()
 
 if(KAGUYA_NO_USERDATA_TYPE_CHECK)
   add_definitions("-DKAGUYA_NO_USERDATA_TYPE_CHECK=1")
