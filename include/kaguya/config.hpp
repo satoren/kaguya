@@ -68,7 +68,7 @@ extern "C" {
 #endif
 #ifndef KAGUYA_FUNCTION_MAX_OVERLOADS
 ///! this define used C++03 only.
-#define KAGUYA_FUNCTION_MAX_OVERLOADS KAGUYA_FUNCTION_MAX_TUPLE_SIZE
+#define KAGUYA_FUNCTION_MAX_OVERLOADS 9
 #endif
 
 #ifndef KAGUYA_NOEXCEPT
