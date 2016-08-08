@@ -178,6 +178,8 @@ namespace kaguya
 		}
 	}
 
+
+	/// class binding interface.
 	template<typename class_type, typename base_class_type = void>
 	class UserdataMetatable
 	{

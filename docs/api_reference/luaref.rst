@@ -2,8 +2,8 @@
 LuaRef
 ==================================
 
-LuaRef is referenceto lua value.
-and retain reference count in Lua.It means not collect by gc.
+LuaRef has strong reference to lua value.
+It means not collect by gc.
 
 
 LuaRef has specialized 4 types.
@@ -26,7 +26,7 @@ example
   state.dostring("mytable.value = 6");//assign new value
   state.dostring("mytable=nil");//remove from global table
   state.dostring("collectgarbage()");//run fullgc
-  v = table["value"];//v is 6. 
+  v = table["value"];//v is 6.
 
 .. toctree::
   :maxdepth: 1

@@ -74,7 +74,7 @@ namespace kaguya
 		}
 	};
 
-	///@ lua_State wrap class
+	/// lua_State wrap class
 	class State
 	{
 		standard::shared_ptr<void> allocator_holder_;

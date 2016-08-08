@@ -10,7 +10,7 @@ Installation
 ----------------------------------
 add "kaguya/include" directory to "header search path" of your project.
 
-Or generate single header file and copy to your project.
+Or generate single header file and add it to your project.
 
 .. code-block:: bash
 
@@ -142,28 +142,28 @@ basic
 
 .. code-block:: c++
 
-  int ret = state["math"]["abs"](-32);//call math.abs of Lua function
+  int ret = state["math"]["abs"](-32);
   assert(ret == 32);
 
 Specified result type
 
 .. code-block:: c++
 
-  auto ret = state["math"]["abs"].call<int>(-32);//call math.abs of Lua function
+  auto ret = state["math"]["abs"].call<int>(-32);
   assert(ret == 32);
 
 Optional result value
 
 .. code-block:: c++
 
-  kaguya::optional<int> ret = state["math"]["abs"](-32);//call math.abs of Lua function
+  kaguya::optional<int> ret = state["math"]["abs"](-32);
   assert(ret && *ret == 32);
 
 Multiple results
 
 .. code-block:: c++
 
-  state("multresfun =function() return 1,2,4 end");//registering multiple results function
+  state("multresfun =function() return 1,2,4 end");
   int a, b, c;
   kaguya::tie(a, b, c) = state["multresfun"]();
   std::cout << a << "," << b << "," << c << std::endl;//1,2,4

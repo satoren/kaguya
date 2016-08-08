@@ -7,3 +7,4 @@ Getting Started
 
    requirements
    tutorial
+   class_bindings
