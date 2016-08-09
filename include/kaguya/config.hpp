@@ -59,8 +59,7 @@ extern "C" {
 #endif
 
 
-#if KAGUYA_USE_CPP11
-
+#if !KAGUYA_USE_CPP11
 #ifndef KAGUYA_FUNCTION_MAX_ARGS
 ///! max argumeent number for binding function. this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_ARGS 9
@@ -80,6 +79,12 @@ extern "C" {
 #ifndef KAGUYA_CLASS_MAX_BASE_CLASSES
 #define KAGUYA_CLASS_MAX_BASE_CLASSES 9
 #endif
+
+
+#ifndef KAGUYA_USE_CXX_ABI_DEMANGLE
+#define KAGUYA_USE_CXX_ABI_DEMANGLE defined(__GNUC__) || defined(__clang__)
+#endif
+
 
 #ifndef KAGUYA_NOEXCEPT
 # if KAGUYA_USE_CPP11 && (!defined(_MSC_VER) || _MSC_VER >= 1900)
