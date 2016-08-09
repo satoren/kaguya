@@ -16,6 +16,8 @@ namespace kaguya
 	{
 
 #if KAGUYA_USE_CPP11 && !defined(KAGUYA_FUNCTION_MAX_OVERLOADS)
+		// In Clang with libstdc++.
+		// std::tuple elements is limited to 16 for template depth limit
 		using std::tuple;
 		using std::get;
 		using std::tuple_element;
