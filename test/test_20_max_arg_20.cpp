@@ -75,7 +75,6 @@ KAGUYA_TEST_FUNCTION_DEF(many_overloads)(kaguya::State& state)
 		, TestClass()
 		, TestClass()
 		, TestClass()
-		, TestClass()
 		, TestClass() > ();
 }
 
