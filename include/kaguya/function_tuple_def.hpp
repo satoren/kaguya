@@ -8,13 +8,14 @@
 
 #include "kaguya/config.hpp"
 #include "kaguya/utility.hpp"
+#include "kaguya/preprocess.hpp"
 
 namespace kaguya
 {
 	namespace fntuple
 	{
 
-#if KAGUYA_USE_CPP11
+#if KAGUYA_USE_CPP11 && !defined(KAGUYA_FUNCTION_MAX_OVERLOADS)
 		using std::tuple;
 		using std::get;
 		using std::tuple_element;

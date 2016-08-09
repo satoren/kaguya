@@ -12,6 +12,7 @@ namespace kaguya
 {
 	namespace util
 	{
+		struct null_type {};
 
 		template<class... Args>
 		struct TypeTuple {

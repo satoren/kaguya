@@ -60,22 +60,13 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(many_overloads)(kaguya::State& state)
 {
 	state["defargfn"] = kaguya::UserdataMetatable<TestClass>()
-		.setConstructors < TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass()
-		, TestClass() > ();
+		.setConstructors <
+		  TestClass(), TestClass(), TestClass(), TestClass(), TestClass()
+		, TestClass(), TestClass(), TestClass(), TestClass(), TestClass()
+		, TestClass(), TestClass(), TestClass(), TestClass(), TestClass()
+		, TestClass(), TestClass(), TestClass(), TestClass(), TestClass()
+		, TestClass(), TestClass(), TestClass(), TestClass(), TestClass()
+		> ();
 }
 
 KAGUYA_TEST_GROUP_END(test_20_max_arg_20)

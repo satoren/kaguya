@@ -58,20 +58,27 @@ extern "C" {
 #define KAGUYA_NO_STD_MAP_TO_TABLE
 #endif
 
+
+#if KAGUYA_USE_CPP11
+
 #ifndef KAGUYA_FUNCTION_MAX_ARGS
 ///! max argumeent number for binding function. this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_ARGS 9
 #endif
+
 #ifndef KAGUYA_FUNCTION_MAX_TUPLE_SIZE
 ///! this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_TUPLE_SIZE 9
 #endif
+
+#ifndef KAGUYA_FUNCTION_MAX_OVERLOADS
+#define KAGUYA_FUNCTION_MAX_OVERLOADS 9
+#endif
+
+#endif
+
 #ifndef KAGUYA_CLASS_MAX_BASE_CLASSES
 #define KAGUYA_CLASS_MAX_BASE_CLASSES 9
-#endif
-#ifndef KAGUYA_FUNCTION_MAX_OVERLOADS
-///! this define used C++03 only.
-#define KAGUYA_FUNCTION_MAX_OVERLOADS 9
 #endif
 
 #ifndef KAGUYA_NOEXCEPT
