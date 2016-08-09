@@ -26,7 +26,7 @@ namespace kaguya
 				ObjectWrapperBase* object = object_wrapper(state, i);
 				if (object)
 				{
-					result += object->type().name();
+					result += util::pretty_name(object->type());
 				}
 				else
 				{

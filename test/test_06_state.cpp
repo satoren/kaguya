@@ -171,6 +171,7 @@ void foobar4(std::string) { throw 3; }
 
 KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 {
+	using kaguya::util::pretty_name;
 	state["foobar"] = kaguya::overload(foobar1, foobar2, foobar3, foobar4);
 	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>().setConstructors<Foo()>());
 	state.setErrorHandler(registerError);
@@ -181,11 +182,11 @@ KAGUYA_TEST_FUNCTION_DEF(errorThrowing)(kaguya::State& state)
 	lastMsg = lastMsg.substr(0, lastMsg.find("stack "));
 	std::vector<std::string> parts = remove_empty(split(lastMsg, '\n'));
 	TEST_EQUAL(parts.size(), 5);
-	std::string intName = typeid(int).name();
+	std::string intName = pretty_name(typeid(int));
 	TEST_CHECK(parts[1].find(intName) != std::string::npos);
 	TEST_CHECK(parts[2].find(intName + "," + intName) != std::string::npos);
-	TEST_CHECK(parts[3].find(intName + "," + typeid(Foo).name() + "," + intName) != std::string::npos);
-	TEST_CHECK(parts[4].find(typeid(std::string).name()) != std::string::npos);
+	TEST_CHECK(parts[3].find(intName + "," + pretty_name(typeid(Foo)) + "," + intName) != std::string::npos);
+	TEST_CHECK(parts[4].find(pretty_name(typeid(std::string))) != std::string::npos);
 
 	errorOccurred = false;
 	TEST_CHECK(!state("foobar(Foo.new(), 1, 1)"));

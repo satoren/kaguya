@@ -177,7 +177,14 @@ KAGUYA_TEST_FUNCTION_DEF(preprocessor)(kaguya::State& )
 	TEST_EQUAL(KAGUYA_PP_SUB(3, 3), 0);
 	TEST_EQUAL(KAGUYA_PP_SUB(3, 0), 3);
 }
+KAGUYA_TEST_FUNCTION_DEF(pretty_type_name)(kaguya::State&)
+{
+	using kaguya::util::pretty_name;
 
+	TEST_EQUAL(pretty_name(typeid(int)), "int");
+	TEST_EQUAL(pretty_name(typeid(long)), "long");
+
+}
 
 
 KAGUYA_TEST_GROUP_END(test_09_utility)

@@ -181,7 +181,7 @@ namespace kaguya
 		typename traits::enable_if<traits::is_object<MemType>::value, std::string>::type
 		argTypesName(MemType T::* mptr)
 		{
-			return std::string(typeid(T*).name()) + ",[OPT] " + typeid(MemType).name();
+			return util::pretty_name(typeid(T*)) + ",[OPT] " + util::pretty_name(typeid(MemType));
 		}
 		template<class MemType, class T>
 		typename traits::enable_if<traits::is_object<MemType>::value, int>::type

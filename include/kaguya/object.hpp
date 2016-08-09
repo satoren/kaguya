@@ -31,9 +31,9 @@ namespace kaguya
 		return typeid(typename traits::decay<T>::type);
 	}
 	template<typename T>
-	inline const char* metatableName()
+	inline std::string metatableName()
 	{
-		return metatableType<T>().name();
+		return util::pretty_name(metatableType<T>());
 	}
 
 	struct ObjectWrapperBase
@@ -624,7 +624,7 @@ namespace kaguya
 		}
 		template<typename T>bool newmetatable(lua_State* l)
 		{
-			return newmetatable(l, metatableType<T>(), metatableName<T>());
+			return newmetatable(l, metatableType<T>(), metatableName<T>().c_str());
 		}
 
 

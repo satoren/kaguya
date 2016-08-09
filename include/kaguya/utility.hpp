@@ -15,6 +15,10 @@
 #include "kaguya/utility_cxx03.hpp"
 #endif
 
+#if KAGUYA_USE_CXX_ABI_DEMANGLE
+#include <cxxabi.h>
+#endif
+
 namespace kaguya
 {
 	namespace util
@@ -236,5 +240,22 @@ namespace kaguya
 			return count != 0;
 		}
 #endif
+
+
+		inline std::string pretty_name(const std::type_info& t)
+		{
+#if KAGUYA_USE_CXX_ABI_DEMANGLE
+			int status = 0;
+			char* demangle_name = abi::__cxa_demangle(t.name(), 0, 0, &status);
+			struct deleter {
+				char* data;
+				deleter(char* d):data(d){}
+				~deleter(){ std::free(data); }
+			}d(demangle_name);
+			return demangle_name;
+#else
+			return t.name();
+#endif
+		}
 	}
 }

@@ -24,7 +24,7 @@ namespace kaguya
 
 #define KAGUYA_GET_REP(N) ,lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, N)
 #define KAGUYA_FUNC_DEF(N) const util::FunctionSignatureType<Ret KAGUYA_PP_TEMPLATE_ARG_REPEAT_CONCAT(N)>& fsig
-#define KAGUYA_TYPENAME_REP(N) + ((MAX_ARG - opt_count < N)?"[OPT]":"") + typeid(KAGUYA_PP_CAT(A,N)).name() + ","
+#define KAGUYA_TYPENAME_REP(N) + ((MAX_ARG - opt_count < N)?"[OPT]":"") + util::pretty_name(typeid(KAGUYA_PP_CAT(A,N))) + ","
 #define KAGUYA_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N) && lua_isnoneornil(state, N)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, N))
 #define KAGUYA_STRICT_TYPECHECK_REP(N) && (((MAX_ARG - opt_count < N) && lua_isnoneornil(state, N)) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, N))
 #define KAGUYA_CALL_FN_DEF(N) \
