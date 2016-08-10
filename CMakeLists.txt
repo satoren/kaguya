@@ -37,7 +37,16 @@ if(KAGUYA_NO_USERDATA_TYPE_CHECK)
   add_definitions("-DKAGUYA_NO_USERDATA_TYPE_CHECK=1")
 endif()
 
+
+if(EMSCRIPTEN)
+  set(DISABLE_ADDRESS_SANITIZER On)
+  include_directories("${EMSCRIPTEN_ROOT_PATH}/system/lib/libcxxabi/include/")
+  add_definitions("-std=c++11")
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif(EMSCRIPTEN)
+
 #check for address sanitizer support
+if(NOT DISABLE_ADDRESS_SANITIZER)
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER 4.8)
       set(HAVE_FLAG_SANITIZE_ADDRESS TRUE)
@@ -56,6 +65,7 @@ endif()
 if(CYGWIN OR WIN32)
       unset(HAVE_FLAG_SANITIZE_ADDRESS)
 endif()
+endif(NOT DISABLE_ADDRESS_SANITIZER)
 
 if(KAGUYA_BUILD_BENCHMARK)
 set(BENCHMARK_SRCS benchmark/benchmark.cpp benchmark/benchmark_function.cpp benchmark/benchmark_function.hpp)
@@ -78,10 +88,17 @@ file(GLOB TEST_SRCS files RELATIVE ${CMAKE_SOURCE_DIR} test/test_*.cpp)
 
 add_executable(test_runner ${TEST_SRCS}  ${KAGUYA_HEADER})
 target_link_libraries(test_runner ${LUA_LIBRARIES})
-if(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
+if(HAVE_FLAG_SANITIZE_ADDRESS)
 SET_TARGET_PROPERTIES(test_runner PROPERTIES COMPILE_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
 SET_TARGET_PROPERTIES(test_runner PROPERTIES LINK_FLAGS "-fsanitize=address")
-endif(HAVE_FLAG_SANITIZE_ADDRESS AND NOT DISABLE_ADDRESS_SANITIZER)
+endif(HAVE_FLAG_SANITIZE_ADDRESS)
+
+
+if(EMSCRIPTEN)
+  SET_TARGET_PROPERTIES(test_runner PROPERTIES LINK_FLAGS "-s DEMANGLE_SUPPORT=1 -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=0 --preload-file ${CMAKE_SOURCE_DIR}/test/lua@/lua")
+endif(EMSCRIPTEN)
+
+
 add_test(
   NAME test_runner
   COMMAND $<TARGET_FILE:test_runner>
