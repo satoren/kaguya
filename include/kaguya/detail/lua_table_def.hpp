@@ -452,5 +452,64 @@ namespace kaguya
 				return true;
 			}
 		};
+
+		template<typename Derived>
+		class LuaUserDataImpl
+		{
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+			int push_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->push(state);
+			}
+		public:
+			/// @brief is type test
+			template<typename T>
+			bool isType()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
+			}
+
+			template<typename T>
+			bool isConvertible()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::checkType(state, pushStackIndex_(state));
+			}
+
+			template<typename T>
+			bool typeTest()const
+			{
+				return isType<T>();
+			}
+			template<typename T>
+			bool weakTypeTest()const
+			{
+				return isConvertible<T>();
+			}
+
+			template<typename T>typename lua_type_traits<T>::get_type get()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
+			}
+
+			template<typename T>
+			operator T()const
+			{
+				return get<T>();
+			}
+		};
 	}
 }

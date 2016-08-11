@@ -13,7 +13,7 @@ KAGUYA_TEST_FUNCTION_DEF(lua_resume_test)(kaguya::State& s)
 
 	LuaThread t = s.newThread(s.loadstring("v={...}"));
 
-	lua_State* co = t.get<lua_State*>();
+	lua_State* co = t;
 	lua_pushnumber(co, 2);
 	lua_pushnumber(co, 3);
 

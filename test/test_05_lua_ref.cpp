@@ -151,6 +151,7 @@ KAGUYA_TEST_FUNCTION_DEF(test_operator_bool)(kaguya::State& state)
 	kaguya::LuaTable newTable2 = state.newTable();
 	kaguya::LuaTable tabl1_ref_copy = table1;
 	TEST_CHECK(newTable2 != table1);
+	TEST_CHECK(ob() != newTable2);
 	TEST_CHECK(!(newTable2 == table1));
 	TEST_CHECK(table1 == tabl1_ref_copy);
 }
@@ -615,21 +616,6 @@ void UserDataTestFunction2(int r)
 KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
-	{
-		last_error_message = "";
-		kaguya::LuaTable nottable = state.newThread();
-		TEST_COMPARE_NE(last_error_message, "");
-	}
-	{
-		last_error_message = "";
-		kaguya::LuaUserData notud = state.newThread();
-		TEST_COMPARE_NE(last_error_message, "");
-	}
-	{
-		last_error_message = "";
-		kaguya::LuaThread notud = state.newTable();
-		TEST_COMPARE_NE(last_error_message, "");
-	}
 
 	{
 		last_error_message = "";

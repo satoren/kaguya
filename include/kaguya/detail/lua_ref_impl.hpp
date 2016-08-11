@@ -127,10 +127,6 @@ namespace kaguya
 		/// @brief Reference to Lua value. Retain reference by LUA_REGISTRYINDEX
 		class RegistoryRef
 		{
-			typedef void (RegistoryRef::*bool_type)() const;
-			void this_type_does_not_support_comparisons() const {}
-
-
 		public:
 
 			RegistoryRef(const RegistoryRef& src) :state_(src.state_)

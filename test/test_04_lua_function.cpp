@@ -358,12 +358,6 @@ KAGUYA_TEST_FUNCTION_DEF(call_error)(kaguya::State& state)
 		kaguya::LuaFunction nilfn;
 		nilfn.call<void>();
 	}
-	{
-		last_error_message = "";
-		kaguya::LuaFunction notfn = state.newTable();
-		TEST_COMPARE_NE(last_error_message, "");
-		notfn.call<void>();
-	}
 }
 
 KAGUYA_TEST_FUNCTION_DEF(coroutine_error)(kaguya::State& state)

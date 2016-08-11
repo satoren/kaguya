@@ -73,6 +73,49 @@ namespace kaguya
 
 
 
+			template<typename T>typename lua_type_traits<T>::get_type get()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
+			}
+			template<typename T, typename U>typename lua_type_traits<T>::get_type value_or(U v)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<optional<T> >::get(state, state ? pushStackIndex_(state) : 0).value_or(v);
+			}
+
+			//deprecated. use get<kaguya::optional<T> >() instead;
+			template<typename T>
+			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int stackindex = pushStackIndex_(state);
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state, stackindex);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+				}
+				if (was_valid)
+				{
+					return lua_type_traits<T>::get(state, stackindex);
+				}
+				else
+				{
+					return T();
+				}
+			}
+			template<typename T>
+			operator T()const
+			{
+				return get<T>();
+			}
+
 #if KAGUYA_USE_CPP11
 			template<class...Args> FunctionResults operator()(Args&&... args);
 #else
@@ -82,7 +125,7 @@ namespace kaguya
 			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
 			inline FunctionResults operator()(KAGUYA_PP_ARG_CR_DEF_REPEAT(N));
 
-			
+
 			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OP_FN_DEF);
 #undef KAGUYA_OP_FN_DEF
 #endif

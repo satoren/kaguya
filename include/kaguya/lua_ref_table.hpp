@@ -341,6 +341,18 @@ namespace kaguya
 			return LuaTable(state, StackTop());
 		}
 
+
+		template<typename T>
+		void LuaThreadImpl<T>::setFunction(const LuaFunction& f)
+		{
+			lua_State* corstate = getthread();
+			if (corstate)
+			{
+				lua_settop(corstate, 0);
+				f.push(corstate);
+			}
+		}
+
 		template<typename T>
 		bool LuaTableOrUserDataImpl<T>::setMetatable(const LuaTable& table)
 		{

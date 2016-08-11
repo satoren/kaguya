@@ -19,6 +19,7 @@
 namespace kaguya
 {
 	class LuaTable;
+	class LuaFunction;
 
 	class FunctionResults;
 
@@ -317,13 +318,26 @@ namespace kaguya
 				return COSTAT_DEAD;
 
 			}
-
+			
 			/**
 			* @return if coroutine status is dead, return true. Otherwise return false
 			*/
 			bool isThreadDead()const
 			{
 				return costatus() == COSTAT_DEAD;
+			}
+
+
+			/// @brief set function for thread running.
+			void setFunction(const LuaFunction& f);
+
+			/// @brief get lua thread
+			lua_State* getthread()
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int corStackIndex = pushStackIndex_(state);
+				return lua_tothread(state, corStackIndex);
 			}
 		};
 	}

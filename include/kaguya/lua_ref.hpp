@@ -80,10 +80,6 @@ namespace kaguya
 	class LuaRef :public Ref::RegistoryRef, public detail::LuaVariantImpl<LuaRef>
 	{
 	private:
-		typedef void (LuaRef::*bool_type)() const;
-		void this_type_does_not_support_comparisons() const {}
-
-
 		static lua_State* toMainThread(lua_State* state)
 		{
 #if LUA_VERSION_NUM >= 502
@@ -309,6 +305,7 @@ namespace kaguya
 	/// @ingroup Lua_reference_types
 	/// @brief Reference to Lua userdata.
 	class  LuaUserData :public Ref::RegistoryRef
+		, public detail::LuaUserDataImpl<LuaUserData>
 		, public detail::LuaTableOrUserDataImpl<LuaUserData>
 		, public detail::LuaBasicTypeFunctions<LuaUserData>
 	{
@@ -336,25 +333,13 @@ namespace kaguya
 		{
 			typecheck();
 		}
-		LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NilValue())
+		explicit LuaUserData(lua_State* state) :Ref::RegistoryRef(state, NilValue())
 		{
 			typecheck();
 		}
 		LuaUserData()
 		{
 			typecheck();
-		}
-		template<typename T>
-		bool typeTest()const
-		{
-			util::ScopedSavedStack save(state());
-			return lua_type_traits<T>::strictCheckType(state(), pushStackIndex(state()));
-		}
-		template<typename T>
-		bool weakTypeTest()const
-		{
-			util::ScopedSavedStack save(state());
-			return lua_type_traits<T>::checkType(state(), pushStackIndex(state()));
 		}
 	};
 
@@ -418,7 +403,7 @@ namespace kaguya
 		{
 			typecheck();
 		}
-		LuaTable(lua_State* state) :Ref::RegistoryRef(state, NewTable())
+		explicit LuaTable(lua_State* state) :Ref::RegistoryRef(state, NewTable())
 		{
 			typecheck();
 		}
@@ -692,15 +677,10 @@ namespace kaguya
 		LuaThread()
 		{
 		}
-
-
-		/// @brief set function for thread running.
-		void setFunction(const LuaFunction& f)
+		/// @brief get lua thread
+		operator lua_State*()
 		{
-			typecheck();
-			lua_State* corstate = get<lua_State*>();
-			lua_settop(corstate, 0);
-			f.push(corstate);
+			return getthread();
 		}
 	};
 

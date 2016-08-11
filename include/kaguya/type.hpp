@@ -788,53 +788,21 @@ namespace kaguya
 				return lua_typename(state_(), type());
 			}
 
-
-			template<typename T>typename lua_type_traits<T>::get_type get()const
-			{
-				lua_State* state = state_();
-				util::ScopedSavedStack save(state);
-				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
-			}
-			template<typename T,typename U>typename lua_type_traits<T>::get_type value_or(U v)const
-			{
-				lua_State* state = state_();
-				util::ScopedSavedStack save(state);
-				return lua_type_traits<optional<T> >::get(state, state ? pushStackIndex_(state) : 0).value_or(v);
-			}
-
-			//deprecated. use get<kaguya::optional<T> >() instead;
-			template<typename T>
-			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
-			{
-				lua_State* state = state_();
-				util::ScopedSavedStack save(state);
-				int stackindex = pushStackIndex_(state);
-				if (allow_convertible)
-				{
-					was_valid = lua_type_traits<T>::checkType(state, stackindex);
-				}
-				else
-				{
-					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
-				}
-				if (was_valid)
-				{
-					return lua_type_traits<T>::get(state, stackindex);
-				}
-				else
-				{
-					return T();
-				}
-			}
-			template<typename T>
-			operator T()const
-			{
-				return get<T>();
-			}
-
 			operator bool_type() const
 			{
-				return (!isNilref_() && get<bool>() == true) ? &LuaBasicTypeFunctions::this_type_does_not_support_comparisons : 0;
+				lua_State* state = state_();
+				if (!state)
+				{
+					return 0;//hasn't lua_State
+				}
+				util::ScopedSavedStack save(state);
+				int stackindex = pushStackIndex_(state);
+				int t = lua_type(state, stackindex);
+				if (t == LUA_TNONE)
+				{
+					return 0;//none 
+				}
+				return lua_toboolean(state, stackindex) ? &LuaBasicTypeFunctions::this_type_does_not_support_comparisons : 0;
 			}
 
 
