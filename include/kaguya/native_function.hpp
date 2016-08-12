@@ -302,8 +302,7 @@ namespace kaguya
 				return this;
 			}
 		};
-        template<typename T_Value>
-		struct IteratorBase: public std::iterator<std::forward_iterator_tag, T_Value>
+		struct IteratorBase: public std::iterator<std::forward_iterator_tag, VarArgReference>
 		{
             IteratorBase(lua_State* state, int index) :state_(state), stack_index_(index)
 			{
@@ -323,13 +322,13 @@ namespace kaguya
 			}
             IteratorBase operator++(int)
 			{
-				return iterator(state_, stack_index_++);
+				return IteratorBase(state_, stack_index_++);
 			}
 
             IteratorBase operator+=(int n)
 			{
 				stack_index_ += n;
-				return iterator(state_, stack_index_);
+				return IteratorBase(state_, stack_index_);
 			}
 			/**
 			* @name relational operators
@@ -349,7 +348,7 @@ namespace kaguya
 			lua_State* state_;
 			int stack_index_;
 		};
-        typedef IteratorBase<const VarArgReference> iterator;
+        typedef IteratorBase iterator;
         typedef iterator const_iterator;
 
 		iterator begin()
