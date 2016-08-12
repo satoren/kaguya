@@ -291,41 +291,42 @@ namespace kaguya
 			return result;
 		}
 
-		struct reference :public Ref::StackRef, public detail::LuaVariantImpl<reference>
+		struct VarArgReference :public Ref::StackRef, public detail::LuaVariantImpl<VarArgReference>
 		{
-			reference(lua_State* s, int index) :Ref::StackRef(s, index, false)
+            VarArgReference(lua_State* s, int index) :Ref::StackRef(s, index, false)
 			{
 			}
 
-			const reference* operator->()const
+			const VarArgReference* operator->()const
 			{
 				return this;
 			}
 		};
-		struct iterator
+        template<typename T_Value>
+		struct IteratorBase: public std::iterator<std::forward_iterator_tag, T_Value>
 		{
-			iterator(lua_State* state, int index) :state_(state), stack_index_(index)
+            IteratorBase(lua_State* state, int index) :state_(state), stack_index_(index)
 			{
 			}
-			reference operator*()const
+            value_type operator*()const
 			{
-				return reference(state_, stack_index_);
+				return VarArgReference(state_, stack_index_);
 			}
-			reference operator->()const
+            value_type operator->()const
 			{
-				return reference(state_, stack_index_);
+				return VarArgReference(state_, stack_index_);
 			}
-			const iterator& operator++()
+			const IteratorBase& operator++()
 			{
 				stack_index_++;
 				return *this;
 			}
-			iterator operator++(int)
+            IteratorBase operator++(int)
 			{
 				return iterator(state_, stack_index_++);
 			}
 
-			iterator operator+=(int n)
+            IteratorBase operator+=(int n)
 			{
 				stack_index_ += n;
 				return iterator(state_, stack_index_);
@@ -335,11 +336,11 @@ namespace kaguya
 			* @brief
 			*/
 			//@{
-			bool operator==(const iterator& other)const
+			bool operator==(const IteratorBase& other)const
 			{
 				return state_ == other.state_ && stack_index_ == other.stack_index_;
 			}
-			bool operator!=(const iterator& other)const
+			bool operator!=(const IteratorBase& other)const
 			{
 				return !(*this == other);
 			}
@@ -348,8 +349,8 @@ namespace kaguya
 			lua_State* state_;
 			int stack_index_;
 		};
-		typedef iterator const_iterator;
-		typedef reference const_reference;
+        typedef IteratorBase<const VarArgReference> iterator;
+        typedef iterator const_iterator;
 
 		iterator begin()
 		{
@@ -379,23 +380,27 @@ namespace kaguya
 			return lua_type_traits<T>::get(state_, startIndex_ + static_cast<int>(index));
 		}
 
-		reference at(size_t index)const
+        VarArgReference at(size_t index)const
 		{
 			if (index >= size())
 			{
 				throw std::out_of_range("variadic arguments out of range");
 			}
-			return reference(state_, startIndex_ + static_cast<int>(index));
+			return VarArgReference(state_, startIndex_ + static_cast<int>(index));
 		}
 
-		reference operator[](size_t index)const
+        VarArgReference operator[](size_t index)const
 		{
-			return reference(state_, startIndex_ + static_cast<int>(index));
+			return VarArgReference(state_, startIndex_ + static_cast<int>(index));
 		}
 		size_t size()const
 		{
 			return endIndex_ - startIndex_;
 		}
+        bool empty() const
+        {
+            return startIndex_ == endIndex_;
+        }
 	private:
 		lua_State* state_;
 		int startIndex_;
