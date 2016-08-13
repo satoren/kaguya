@@ -302,16 +302,22 @@ namespace kaguya
 				return this;
 			}
 		};
-		struct IteratorBase: public std::iterator<std::forward_iterator_tag, VarArgReference>
+		struct IteratorBase
 		{
+            typedef std::forward_iterator_tag iterator_category;
+            typedef VarArgReference value_type;
+            typedef int difference_type;
+            typedef VarArgReference pointer;
+            typedef VarArgReference reference;
+
             IteratorBase(lua_State* state, int index) :state_(state), stack_index_(index)
 			{
 			}
-            value_type operator*()const
+            reference operator*()const
 			{
 				return VarArgReference(state_, stack_index_);
 			}
-            value_type operator->()const
+            reference operator->()const
 			{
 				return VarArgReference(state_, stack_index_);
 			}
