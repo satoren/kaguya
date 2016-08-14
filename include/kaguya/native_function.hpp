@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <iterator>
 
 #include "kaguya/config.hpp"
 #include "kaguya/utility.hpp"
@@ -302,8 +303,18 @@ namespace kaguya
 				return this;
 			}
 		};
+		
 		struct iterator
 		{
+			typedef std::random_access_iterator_tag iterator_category;
+			typedef VariadicArgType::reference reference;
+			typedef int difference_type;
+			typedef reference value_type;
+			typedef reference* pointer;
+
+			iterator() :state_(0), stack_index_(0)
+			{
+			}
 			iterator(lua_State* state, int index) :state_(state), stack_index_(index)
 			{
 			}
@@ -315,7 +326,7 @@ namespace kaguya
 			{
 				return reference(state_, stack_index_);
 			}
-			const iterator& operator++()
+			iterator& operator++()
 			{
 				stack_index_++;
 				return *this;
@@ -325,10 +336,41 @@ namespace kaguya
 				return iterator(state_, stack_index_++);
 			}
 
-			iterator operator+=(int n)
+			iterator& operator+=(int n)
 			{
 				stack_index_ += n;
-				return iterator(state_, stack_index_);
+				return *this;
+			}
+			iterator operator+(int n)const
+			{
+				return iterator(state_, stack_index_+n);
+			}
+			iterator& operator--()
+			{
+				stack_index_--;
+				return *this;
+			}
+			iterator operator--(int)
+			{
+				return iterator(state_, stack_index_--);
+			}
+			iterator& operator-=(int n)
+			{
+				stack_index_ -= n;
+				return *this;
+			}
+			iterator operator-(int n)const
+			{
+				return iterator(state_, stack_index_ - n);
+			}
+			difference_type operator-(const iterator& n)
+			{
+				return stack_index_ - n.stack_index_;
+			}
+
+			reference operator[](difference_type offset)const
+			{
+				return reference(state_, stack_index_ + offset);
 			}
 			/**
 			* @name relational operators
@@ -343,6 +385,22 @@ namespace kaguya
 			{
 				return !(*this == other);
 			}
+			bool operator<(const iterator& other)const
+			{
+				return stack_index_ < other.stack_index_;
+			}
+			bool operator>(const iterator& other)const
+			{
+				return other < *this;
+			}
+			bool operator<=(const iterator& other)const
+			{
+				return other >= *this;
+			}
+			bool operator>=(const iterator& other)const
+			{
+				return !(*this < other);
+			}
 			//@}
 		private:
 			lua_State* state_;
@@ -350,6 +408,7 @@ namespace kaguya
 		};
 		typedef iterator const_iterator;
 		typedef reference const_reference;
+		typedef reference value_type;
 
 		iterator begin()
 		{
@@ -396,11 +455,21 @@ namespace kaguya
 		{
 			return endIndex_ - startIndex_;
 		}
+		size_t empty()const
+		{
+			return endIndex_ == startIndex_;
+		}
 	private:
 		lua_State* state_;
 		int startIndex_;
 		int endIndex_;
 	};
+
+	inline VariadicArgType::iterator operator+(int n,const VariadicArgType::iterator& i)
+	{
+		return i + n;
+	}
+
 	/// @ingroup lua_type_traits
 	/// @brief lua_type_traits for VariadicArgType
 	template<> struct lua_type_traits<VariadicArgType>
