@@ -192,15 +192,76 @@ void corresult_to_main(kaguya::VariadicArgType args)
 	TEST_EQUAL(args[6], 7);
 	TEST_EQUAL(args[7], 8);
 	TEST_EQUAL(args[8], 9);
+	int s = std::distance(args.begin(), args.end());
+	TEST_EQUAL(s, 9);
+
+	//iterator requirements test 
+	//Forward iterator
+	kaguya::VariadicArgType::iterator it;//default constructible
+	it  = args.begin();//copy -assignable
+	kaguya::VariadicArgType::iterator it2 = it;//copy-constructible
+	kaguya::VariadicArgType::iterator empty_it;
+	TEST_CHECK(it2 == it);//compare 
+	TEST_CHECK(empty_it != it);//compare 
+	TEST_EQUAL(it->get<int>(), 1)//dereferenced 
+	TEST_EQUAL((*it).get<int>(), 1)//dereferenced 
+	TEST_EQUAL(*it++, 1);//incremented
+	TEST_EQUAL(*(++it), 3);//incremented
+	it++;
+	TEST_EQUAL(*it, 4);//incremented
+
+	//Bidirectional	iterator
+	it--;
+	TEST_EQUAL(*it--, 3);//decremented
+	TEST_EQUAL(*(--it), 1);//decremented
+
+	//Random access iterator
+	it = args.begin();
+	
+	TEST_EQUAL(*(it += 5),6);//compound assignment operations 
+	
+	TEST_EQUAL(*it, 6);
+	TEST_EQUAL(*(it - 5), 1);
+	TEST_EQUAL(*(it - 3), 3);
+
+	TEST_EQUAL(*(it -= 5), 1);//compound assignment operations 
+
+	TEST_EQUAL(*it, 1);
+	TEST_EQUAL(*(it + 5), 6);
+	TEST_EQUAL(*(it + 3), 4);
+	TEST_EQUAL(*(5+it), 6);
+	TEST_CHECK((5 + it) < (6 + it));
+	TEST_CHECK((5 + it) > (4 + it));
+	TEST_CHECK((5 + it) <= (5 + it));
+	TEST_CHECK((5 + it) >= (5 + it));
+	TEST_CHECK((5 + it) <= (6 + it));
+	TEST_CHECK((5 + it) >= (4 + it));
+
+	TEST_EQUAL(it[0], 1);//offset dereference operator 
+	TEST_EQUAL(it[6], 7);//offset dereference operator 
+	it += 5;
+	TEST_EQUAL(it[0], 6);//offset dereference operator 
+	TEST_EQUAL(it[-3], 3);//offset dereference operator 
+
+	it = args.begin();
+	//use std::advance
+	std::advance(it,5);
+	TEST_EQUAL(*it, 6);
+	std::advance(it, -2);
+	TEST_EQUAL(*it, 4);
 }
 void corresult_to_main2(kaguya::VariadicArgType args)
 {
 	TEST_EQUAL(args.size(), 1);
 	TEST_EQUAL(args[0], 6);
+	int s = std::distance(args.begin(), args.end());
+	TEST_EQUAL(s,1);
 }
 void corresult_to_main3(kaguya::VariadicArgType args)
 {
 	TEST_EQUAL(args.size(), 0);
+	int s = std::distance(args.begin(), args.end());
+	TEST_EQUAL(s, 0);
 }
 
 
