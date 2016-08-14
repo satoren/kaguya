@@ -304,8 +304,14 @@ namespace kaguya
 			}
 		};
 		
-		struct iterator : std::iterator<std::random_access_iterator_tag, reference,int, reference*, reference>
+		struct iterator
 		{
+			typedef std::random_access_iterator_tag iterator_category;
+			typedef VariadicArgType::reference reference;
+			typedef int difference_type;
+			typedef reference value_type;
+			typedef reference* pointer;
+
 			iterator() :state_(0), stack_index_(0)
 			{
 			}
