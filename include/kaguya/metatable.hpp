@@ -296,7 +296,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 			property_map_[name] = AnyDataPusher(kaguya::function(mem));
@@ -311,7 +311,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 			property_map_[name] = AnyDataPusher(kaguya::function(getter));
@@ -327,7 +327,7 @@ namespace kaguya
         {
             if (has_key(name))
             {
-                throw KaguyaException("already registered.");
+                throw KaguyaException(std::string(name) + " is already registered.");
                 return *this;
             }
             property_map_[name] = AnyDataPusher(function(getter));
@@ -343,7 +343,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 			property_map_[name] = AnyDataPusher(overload(getter, setter));
@@ -360,7 +360,7 @@ namespace kaguya
         {
             if (has_key(name))
             {
-                throw KaguyaException("already registered.");
+                throw KaguyaException(std::string(name) + " is already registered.");
                 return *this;
             }
             property_map_[name] = AnyDataPusher(overload(getter, setter));
@@ -375,7 +375,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 			member_map_[name] = AnyDataPusher(kaguya::function(f));
@@ -389,7 +389,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 
@@ -405,7 +405,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 			member_map_[name] = AnyDataPusher(d);
@@ -420,7 +420,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 
@@ -437,7 +437,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered.");
+				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
 			member_map_[name] = AnyDataPusher(std::move(d));
@@ -450,7 +450,7 @@ namespace kaguya
 		{\
 			if (has_key(name))\
 			{\
-				throw KaguyaException("already registered.");\
+				throw KaguyaException(std::string(name) + " is already registered.");\
 				return *this;\
 			}\
 			member_map_[name] = AnyDataPusher(kaguya::overload(KAGUYA_PP_ARG_REPEAT(N)));\
@@ -468,7 +468,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException(std::string(name) + " is already registered. To overload a function, use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = AnyDataPusher(kaguya::function(f));
@@ -483,7 +483,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException(std::string(name) + " is already registered. To overload a function, use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = AnyDataPusher(kaguya::function(f));
@@ -497,7 +497,7 @@ namespace kaguya
 		{
 			if (has_key(name))
 			{
-				throw KaguyaException("already registered. if you want function overload,use addOverloadedFunctions");
+				throw KaguyaException(std::string(name) + " is already registered. To overload a function, use addOverloadedFunctions");
 				return *this;
 			}
 			member_map_[name] = AnyDataPusher(kaguya::function(f));
