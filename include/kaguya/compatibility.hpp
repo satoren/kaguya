@@ -144,3 +144,4 @@ namespace kaguya
 
 	using namespace compat;
 }
+

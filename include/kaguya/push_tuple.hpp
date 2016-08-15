@@ -57,3 +57,4 @@ namespace kaguya
 #undef KAGUYA_PUSH_TUPLE_DEF
 #endif
 }
+
