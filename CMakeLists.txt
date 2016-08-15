@@ -24,8 +24,10 @@ include_directories(${ADDITIONAL_INCLUDE_PATH})
 endif()
 
 if(NOT MSVC)#-Wall nonsense on MSVC
-add_definitions("-Wall")
-#add_definitions("-std=c++11")
+  add_definitions(-Wall -Werror)
+  add_definitions(-pedantic)
+  add_definitions(-Wno-variadic-macros)
+  #add_definitions("-std=c++11")
 endif(NOT MSVC)
 
 

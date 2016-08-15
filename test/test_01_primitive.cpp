@@ -10,18 +10,18 @@ KAGUYA_TEST_FUNCTION_DEF(bool_get)(kaguya::State& state)
 {
 	state("value = true");
 	TEST_EQUAL(state["value"], true);
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(int_get)(kaguya::State& state)
 {
 	state("value = 3");
 	TEST_EQUAL(state["value"], int(3));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(string_get)(kaguya::State& state)
 {
 	state("value = 'test'");
 	TEST_EQUAL(state["value"], "test");
 	TEST_EQUAL(state["value"], std::string("test"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(table_get1)(kaguya::State& state)
 {
 	state("value = {1,32,'teststr'}");
@@ -29,7 +29,7 @@ KAGUYA_TEST_FUNCTION_DEF(table_get1)(kaguya::State& state)
 	TEST_EQUAL(state["value"][1], 1);
 	TEST_EQUAL(state["value"][2], 32);
 	TEST_EQUAL(state["value"][3], "teststr");
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(table_get2)(kaguya::State& state)
 {
 	state("value={out=32,str='gjgj'}");
@@ -39,7 +39,7 @@ KAGUYA_TEST_FUNCTION_DEF(table_get2)(kaguya::State& state)
 	TEST_EQUAL(value["str"], "gjgj");
 	TEST_EQUAL(value["in"], "test");
 	TEST_EQUAL(value["out"], "32");
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(bool_set)(kaguya::State& state)
 {
@@ -51,7 +51,7 @@ KAGUYA_TEST_FUNCTION_DEF(bool_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], false);
 	TEST_CHECK(!state["value"]);
 	TEST_CHECK(state("assert(value == false)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(int_set)(kaguya::State& state)
 {
 	state["value"] = 3;
@@ -62,7 +62,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], 0);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 0)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(short_set)(kaguya::State& state)
 {
 	state["value"] = short(3);
@@ -73,7 +73,7 @@ KAGUYA_TEST_FUNCTION_DEF(short_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], short(0));
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 0)"));
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(char_set)(kaguya::State& state)
 {
@@ -85,14 +85,14 @@ KAGUYA_TEST_FUNCTION_DEF(char_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], char(0));
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 0)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(float_set)(kaguya::State& state)
 {
 	state["value"] = 5.5f;
 	TEST_EQUAL(state["value"], 5.5f);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 5.5,value)"));
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(double_set)(kaguya::State& state)
 {
@@ -100,7 +100,7 @@ KAGUYA_TEST_FUNCTION_DEF(double_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], 5.5);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 5.5,value)"));
-};
+}
 
 
 KAGUYA_TEST_FUNCTION_DEF(string_set)(kaguya::State& state)
@@ -134,7 +134,7 @@ KAGUYA_TEST_FUNCTION_DEF(string_set)(kaguya::State& state)
 	state["value"] = "t\0est";
 	TEST_EQUAL(state["value"].size(), 5);
 	TEST_EQUAL(state["value"], std::string("t\0est",5));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(table_set)(kaguya::State& state)
 {
 	state["value"] = kaguya::NewTable();
@@ -142,7 +142,7 @@ KAGUYA_TEST_FUNCTION_DEF(table_set)(kaguya::State& state)
 	state["value"]["abc"]["def"] = 7;
 	state["value"]["abc"]["bbb"] = "test";
 	TEST_CHECK(state("assert(value.abc.def == 7 and value.abc.bbb == 'test')"));
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(nilAndNull)(kaguya::State& state)
 {
@@ -182,7 +182,7 @@ KAGUYA_TEST_FUNCTION_DEF(nilAndNull)(kaguya::State& state)
 #if KAGUYA_USE_CPP11
 	TEST_EQUAL(state["value"], nullptr);
 #endif
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
 {
@@ -232,11 +232,11 @@ KAGUYA_TEST_FUNCTION_DEF(optional_set)(kaguya::State& state)
 		kaguya::optional<std::string> v = state["value"].get<kaguya::optional<std::string> >();
 		TEST_CHECK(!v);
 	}
-};
+}
 enum testenum
 {
 	Foo = 0,
-	Bar = 1,
+	Bar = 1
 };
 
 KAGUYA_TEST_FUNCTION_DEF(enum_set)(kaguya::State& state)
@@ -245,14 +245,14 @@ KAGUYA_TEST_FUNCTION_DEF(enum_set)(kaguya::State& state)
 	TEST_EQUAL(state["value"], Foo);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 0)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(enum_get)(kaguya::State& state)
 {
 	state("value = 1");
 	TEST_EQUAL(state["value"], Bar);
 	TEST_CHECK(state["value"]);
 	TEST_CHECK(state("assert(value == 1)"));
-};
+}
 
 
 KAGUYA_TEST_FUNCTION_DEF(minmax_overflow_check)(kaguya::State& state)

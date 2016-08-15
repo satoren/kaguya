@@ -38,7 +38,7 @@ KAGUYA_TEST_FUNCTION_DEF(many_arg_fn)(kaguya::State& state)
 	state["f"] = kaguya::function(&defargfn);
 	state.dostring("f(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)");
 }
-KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 10, 20);
+KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 10, 20)
 
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 {

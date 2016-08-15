@@ -29,8 +29,8 @@ void defargfn2(int a, int b, int c = 1)
 	TEST_EQUAL(c, 1);
 }
 
-KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 0, 3);
-KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper2, defargfn2, 2, 3);
+KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 0, 3)
+KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper2, defargfn2, 2, 3)
 
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 {

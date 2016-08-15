@@ -37,7 +37,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 
 
 	TEST_CHECK(state("assert(test_bind.x == 1)"));
-};
+}
 
 
 
