@@ -25,12 +25,13 @@ if(NOT MSVC)#-Wall nonsense on MSVC
   add_definitions(-Wall -Werror)
   add_definitions(-pedantic)
   add_definitions(-Wno-variadic-macros)
+  add_definitions ("-Wno-unused-local-typedefs")
+  add_definitions ("-Wno-unknown-warning-option")
   #add_definitions("-std=c++11")
 endif(NOT MSVC)
 
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  add_definitions ("-Wno-unused-local-typedefs")
   add_definitions ("-fno-strict-overflow")
 endif()
 
