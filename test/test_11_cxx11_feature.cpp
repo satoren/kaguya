@@ -21,12 +21,12 @@ KAGUYA_TEST_FUNCTION_DEF(enum_class_set)(kaguya::State& state)
 {
 	state["value"] = testenumclass::Foo;
 	TEST_CHECK(state("assert(value == 0)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(enum_class_get)(kaguya::State& state)
 {
 	state("value = 1");
 	TEST_CHECK(state["value"] == testenumclass::Bar);
-};
+}
 
 
 
@@ -191,7 +191,7 @@ KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
 	TEST_CHECK(state["value"] == nullptr);
 	TEST_CHECK(!state["value"]);
 	TEST_CHECK(state("assert(value == nil)"));
-};
+}
 
 
 KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
