@@ -230,21 +230,22 @@ void corresult_to_main(kaguya::VariadicArgType args)
 	TEST_EQUAL(*(it + 5), 6);
 	TEST_EQUAL(*(it + 3), 4);
 	TEST_EQUAL(*(5+it), 6);
-	TEST_CHECK(!((5 + it) < (4 + it)));
-	TEST_CHECK(!((5 + it) < (5 + it)));
-	TEST_CHECK(((5 + it) < (6 + it)));
-	TEST_CHECK(((5 + it) > (4 + it)));
-	TEST_CHECK(!((5 + it) > (5 + it)));
-	TEST_CHECK(!((5 + it) > (6 + it)));
-	TEST_CHECK(!((5 + it) <= (4 + it)));
-	TEST_CHECK(((5 + it) <= (5 + it)));
-	TEST_CHECK(((5 + it) <= (6 + it)));
-	TEST_CHECK(((5 + it) >= (4 + it)));
-	TEST_CHECK(((5 + it) >= (5 + it)));
-	TEST_CHECK(!((5 + it) >= (6 + it)));
-	TEST_CHECK(!((5 + it) <= (4 + it)));
-	TEST_CHECK(((5 + it) <= (5 + it)));
-	TEST_CHECK(((5 + it) <= (6 + it)));
+	kaguya::VariadicArgType::iterator itp5 = 5 + it;
+	TEST_CHECK(!(itp5 < (4 + it)));
+	TEST_CHECK(!(itp5 < (5 + it)));
+	TEST_CHECK((itp5 < (6 + it)));
+	TEST_CHECK((itp5 > (4 + it)));
+	TEST_CHECK(!(itp5 > (5 + it)));
+	TEST_CHECK(!(itp5 > (6 + it)));
+	TEST_CHECK(!(itp5 <= (4 + it)));
+	TEST_CHECK((itp5 <= (5 + it)));
+	TEST_CHECK((itp5 <= (6 + it)));
+	TEST_CHECK((itp5 >= (4 + it)));
+	TEST_CHECK((itp5 >= (5 + it)));
+	TEST_CHECK(!(itp5 >= (6 + it)));
+	TEST_CHECK(!(itp5 <= (4 + it)));
+	TEST_CHECK((itp5 <= (5 + it)));
+	TEST_CHECK((itp5 <= (6 + it)));
 
 	TEST_EQUAL(it[0], 1);//offset dereference operator 
 	TEST_EQUAL(it[6], 7);//offset dereference operator 
