@@ -33,7 +33,6 @@ namespace kaguya
 		using standard::is_union;
 		using standard::is_class;
 		using standard::is_pointer;
-		using standard::is_member_object_pointer;
 		using standard::is_lvalue_reference;
 		using standard::is_const;
 		using standard::is_void;
@@ -42,6 +41,15 @@ namespace kaguya
 #else
 		template<bool B, class T = void> struct enable_if: boost::enable_if_c<B, T> {};
 #endif
+
+        class Helper{};
+        /// @brief Check if T_Mem is a member object of a type. That is true if it is not a member function
+        /// Required as MSVC throws a COMDAT error when using is_member_object_pointer
+        template<typename T_Mem>
+        struct is_object{
+            typedef typename standard::is_member_function_pointer<T_Mem Helper::*>::type NotResult;
+            enum{ value = !NotResult::value };
+        };
 
 		/// @brief Similar to std::decay but also removes const and volatile modifiers if T is neither an array nor a function
 		template< class T >
