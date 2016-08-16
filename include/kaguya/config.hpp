@@ -82,7 +82,11 @@ extern "C" {
 
 
 #ifndef KAGUYA_USE_CXX_ABI_DEMANGLE
-#define KAGUYA_USE_CXX_ABI_DEMANGLE defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
+#define KAGUYA_USE_CXX_ABI_DEMANGLE 1
+#else
+#define KAGUYA_USE_CXX_ABI_DEMANGLE 0
+#endif
 #endif
 
 
