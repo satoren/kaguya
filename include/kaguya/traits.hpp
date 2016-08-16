@@ -16,65 +16,62 @@ namespace kaguya
 	namespace traits
 	{
 		using standard::integral_constant;
-		using standard::is_lvalue_reference;
+		using standard::true_type;
+		using standard::false_type;
 		using standard::remove_reference;
 		using standard::remove_pointer;
+		using standard::remove_const;
+		using standard::remove_volatile;
+		using standard::remove_cv;
 		using standard::is_function;
 		using standard::is_floating_point;
 		using standard::is_integral;
 		using standard::is_enum;
 		using standard::is_convertible;
 		using standard::is_same;
-
 		using standard::is_arithmetic;
 		using standard::is_union;
 		using standard::is_class;
+		using standard::is_pointer;
+		using standard::is_lvalue_reference;
+		using standard::is_const;
+		using standard::is_void;
+#if KAGUYA_USE_CPP11
+		using std::enable_if;
+#else
+		template<bool B, class T = void> struct enable_if: boost::enable_if_c<B, T> {};
+#endif
 
-		/// @brief same std::enable_if
-		template<bool B, class T = void>struct enable_if {};
-		/// @brief same std::enable_if
-		template<class T>struct enable_if<true, T> {
-			///@	T (defined only if Cond is true)
-			typedef T type;
-		};
+        class Helper{};
+        /// @brief Check if T_Mem is a member object of a type. That is true if it is not a member function
+        /// Required as MSVC throws a COMDAT error when using is_member_object_pointer
+        template<typename T_Mem>
+        struct is_object{
+            typedef typename standard::is_member_function_pointer<T_Mem Helper::*>::type NotResult;
+            enum{ value = !NotResult::value };
+        };
 
-		/// @brief same std::is_void
-		template< typename T >
-		struct is_void :integral_constant<bool, false>
-		{
-		};
-		/// @brief same std::is_void
-		template<>
-		struct is_void<void> :integral_constant<bool, true>
-		{
-		};
-
-
-		/// @brief same std::decay
+		/// @brief Similar to std::decay but also removes const and volatile modifiers if T is neither an array nor a function
 		template< class T >
 		struct decay {
 		private:
+			///@ If T is a reference type, the type referrered to by T.	Otherwise, T.
 			typedef typename standard::remove_reference<T>::type U;
 		public:
-			///@ If T is a reference type, the type referrered to by T.	Otherwise, T.
 			typedef typename standard::conditional<
 				standard::is_array<U>::value,
 				typename standard::remove_extent<U>::type*,
 				typename standard::conditional<
-				is_function<U>::value,
-				typename standard::add_pointer<U>::type,
-				typename standard::remove_cv<U>::type
+				    is_function<U>::value,
+				    typename standard::add_pointer<U>::type,
+				    typename standard::remove_cv<U>::type
 				>::type
 			>::type type;
 		};
 
-		/// @brief same std::is_const
-		template<class T> struct is_const : integral_constant<bool, false> {};
-		template<class T> struct is_const<const T> : integral_constant<bool, true> {};
-
 		/// @brief Trait class that identifies whether T is a const reference type.
-		template<class T> struct is_const_reference : integral_constant<bool, false> {};
-		template<class T> struct is_const_reference<const T&> : integral_constant<bool, true> {};
+		template<class T> struct is_const_reference : false_type {};
+		template<class T> struct is_const_reference<const T&> : true_type {};
 
 		/// @brief Obtains the type T without top-level const and reference.
 		template< typename T >
@@ -115,38 +112,12 @@ namespace kaguya
 		};
 
 		/// @brief Trait class that identifies whether T is a std::vector type.
-		template<class T> struct is_std_vector : integral_constant<bool, false> {};
-		template<class T, class A> struct is_std_vector<std::vector<T, A> > : integral_constant<bool, true> {};
+		template<class T> struct is_std_vector : false_type {};
+		template<class T, class A> struct is_std_vector<std::vector<T, A> > : true_type {};
 
 		/// @brief Trait class that identifies whether T is a std::map type.
-		template<class T> struct is_std_map : integral_constant<bool, false> {};
-		template<class K, class V, class C, class A> struct is_std_map<std::map<K, V, C, A> > : integral_constant<bool, true> {};
-
-
-
-
-		//Until Boost 1.59.0 error:'value' is not a member of 'boost::is_pointer<int() const>' 
-		template< class T > struct remove_const { typedef T type; };
-		template< class T > struct remove_const<const T> { typedef T type; };
-		template< class T > struct remove_volatile { typedef T type; };
-		template< class T > struct remove_volatile<volatile T> { typedef T type; };
-		template< class T >
-		struct remove_cv {
-			typedef typename remove_volatile<typename remove_const<T>::type>::type type;
-		};
-
-		template< class T > struct is_pointer_helper : integral_constant<bool, false> {};
-		template< class T > struct is_pointer_helper<T*> : integral_constant<bool, true> {};
-		template< class T > struct is_pointer : is_pointer_helper<typename remove_cv<T>::type> {};
-
-		template< class T >
-		struct is_object : integral_constant<bool,
-			standard::is_arithmetic<T>::value ||
-			is_enum<T>::value ||
-			is_pointer<T>::value ||
-			standard::is_array<T>::value ||
-			standard::is_union<T>::value ||
-			standard::is_class<T>::value> {};
+		template<class T> struct is_std_map : false_type {};
+		template<class K, class V, class C, class A> struct is_std_map<std::map<K, V, C, A> > : true_type {};
 
 	}
 
@@ -178,9 +149,9 @@ namespace kaguya
 
 	/// @brief Trait class that identifies whether T is a userdata type.
 	template< typename T, typename Enable = void>
-	struct is_usertype : traits::integral_constant<bool, false> {};
+	struct is_usertype : traits::false_type {};
 	template< typename T>
-	struct is_usertype<T, typename lua_type_traits<T>::Registerable> : traits::integral_constant<bool, true> {};
+	struct is_usertype<T, typename lua_type_traits<T>::Registerable> : traits::true_type {};
 
 	/// @brief Trait class that identifies whether T is a registerable by UserdataMetatable.
 	template< typename T>
