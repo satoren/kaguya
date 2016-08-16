@@ -76,7 +76,7 @@ KAGUYA_TEST_FUNCTION_DEF(default_constructor)(kaguya::State& state)
 		);
 
 	TEST_CHECK(state("value = assert(ABC.new())"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -86,7 +86,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new(32))"));
 	TEST_CHECK(state("assert(value:getInt() == 32)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -96,7 +96,7 @@ KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
 	TEST_CHECK(state("assert(value:getString() == 'string_value')"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -123,7 +123,7 @@ KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value:setInt(33)"));
 	TEST_CHECK(state("assert(value:getInt() == 33)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::ClassMetatable<ABC>()
@@ -174,7 +174,7 @@ KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 	TEST_CHECK(state("assert(shared_object:getString() =='shared_object')"));
 
 
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(data_member_bind)(kaguya::State& state)
 {

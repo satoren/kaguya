@@ -330,7 +330,7 @@ int defargfn(int a = 3, int b = 2, int c = 1)
 	return a*b*c;
 }
 
-KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 0, 3);
+KAGUYA_FUNCTION_OVERLOADS(defargfn_wrapper, defargfn, 0, 3)
 
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 {
@@ -342,7 +342,7 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 	state.dostring("assert(defargfn(2,2,2) == 8)");
 }
 
-KAGUYA_MEMBER_FUNCTION_OVERLOADS(mem_defargfn_wrapper, TestClass, default_arg, 0, 3);
+KAGUYA_MEMBER_FUNCTION_OVERLOADS(mem_defargfn_wrapper, TestClass, default_arg, 0, 3)
 KAGUYA_TEST_FUNCTION_DEF(member_function_defaultarguments)(kaguya::State& state)
 {
 
@@ -367,7 +367,7 @@ TEST_EQUAL(b, 2);
 TEST_EQUAL(c, 1);
 }
 
-KAGUYA_FUNCTION_OVERLOADS(void_defargfn_wrapper, void_defargfn, 0, 3);
+KAGUYA_FUNCTION_OVERLOADS(void_defargfn_wrapper, void_defargfn, 0, 3)
 
 KAGUYA_TEST_FUNCTION_DEF(void_defaultarguments)(kaguya::State& state)
 {
@@ -379,7 +379,7 @@ KAGUYA_TEST_FUNCTION_DEF(void_defaultarguments)(kaguya::State& state)
 	state.dostring("defargfn(3,2,1)");
 }
 
-KAGUYA_MEMBER_FUNCTION_OVERLOADS(default_set_wrapper, TestClass, default_set, 0, 3);
+KAGUYA_MEMBER_FUNCTION_OVERLOADS(default_set_wrapper, TestClass, default_set, 0, 3)
 
 KAGUYA_TEST_FUNCTION_DEF(member_void_function_defaultarguments)(kaguya::State& state)
 {
@@ -406,7 +406,7 @@ std::string defargfn2(std::string a, std::string b = "b", std::string c = "c")
 
 
 
-KAGUYA_FUNCTION_OVERLOADS(defargfn2_wrapper, defargfn2, 1, 3);
+KAGUYA_FUNCTION_OVERLOADS(defargfn2_wrapper, defargfn2, 1, 3)
 
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments_overload)(kaguya::State& state)
 {
@@ -424,7 +424,7 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments_overload)(kaguya::State& state)
 }
 
 
-KAGUYA_FUNCTION_OVERLOADS_WITH_SIGNATURE(defargfn_wrapper_with_sig, defargfn, 0, 3,int(int,int,int));
+KAGUYA_FUNCTION_OVERLOADS_WITH_SIGNATURE(defargfn_wrapper_with_sig, defargfn, 0, 3,int(int,int,int))
 
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments_overload_with_sig)(kaguya::State& state)
 {
@@ -437,7 +437,7 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments_overload_with_sig)(kaguya::State& stat
 }
 
 
-KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(mem_defargfn_wrapper_with_sig, TestClass, default_arg, 0, 3,int(TestClass::*)(int,int,int));
+KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(mem_defargfn_wrapper_with_sig, TestClass, default_arg, 0, 3,int(TestClass::*)(int,int,int))
 
 KAGUYA_TEST_FUNCTION_DEF(member_function_defaultarguments_with_sig)(kaguya::State& state)
 {
@@ -455,8 +455,8 @@ KAGUYA_TEST_FUNCTION_DEF(member_function_defaultarguments_with_sig)(kaguya::Stat
 	state.dostring("assert(test:defargfn(2,2,2) == 8)");
 }
 
-KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(TestClass_default_set_overload_int, TestClass, default_set_overload, 1, 3, void(TestClass::*)(int, int, int));
-KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(TestClass_default_set_overload_str, TestClass, default_set_overload, 1, 3, void(TestClass::*)(std::string, std::string, std::string));
+KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(TestClass_default_set_overload_int, TestClass, default_set_overload, 1, 3, void(TestClass::*)(int, int, int))
+KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(TestClass_default_set_overload_str, TestClass, default_set_overload, 1, 3, void(TestClass::*)(std::string, std::string, std::string))
 
 KAGUYA_TEST_FUNCTION_DEF(member_function_different_type_overload)(kaguya::State& state)
 {
@@ -486,7 +486,7 @@ std::string defargfn3(const std::string& a, const std::string& b = "b", const st
 {
 	return a + b + c;
 }
-KAGUYA_FUNCTION_OVERLOADS(defargfn3_wrapper, defargfn3, 1, 3);
+KAGUYA_FUNCTION_OVERLOADS(defargfn3_wrapper, defargfn3, 1, 3)
 
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments_const_reference)(kaguya::State& state)
 {
@@ -504,7 +504,7 @@ std::string defargfn4(const std::string& a, const char* b = "b", const char* c =
 	return a + b + c;
 }
 
-KAGUYA_FUNCTION_OVERLOADS(defargfn4_wrapper, defargfn4, 1, 3);
+KAGUYA_FUNCTION_OVERLOADS(defargfn4_wrapper, defargfn4, 1, 3)
 KAGUYA_TEST_FUNCTION_DEF(defaultarguments_const_char)(kaguya::State& state)
 {
 	state["defargfn"] = kaguya::function(defargfn4_wrapper());

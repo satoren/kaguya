@@ -9,28 +9,30 @@ option(KAGUYA_BUILD_EXAMPLES "Build the Kaguya example programs" ON)
 option(KAGUYA_BUILD_BENCHMARK "Build the Kaguya benchmark programs" OFF)
 option(KAGUYA_BUILD_EXAMPLE_GLFW_BIND "Build the Kaguya example glfw bind" OFF)
 
-include_directories(${LUA_INCLUDE_DIRS})
+include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
-include_directories("include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 file(GLOB KAGUYA_HEADER RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   include/kaguya/*.hpp
   include/kaguya/detail/*.hpp)
 
-include_directories("./")
-
 if(ADDITIONAL_INCLUDE_PATH)
-include_directories(${ADDITIONAL_INCLUDE_PATH})
+  include_directories(SYSTEM ${ADDITIONAL_INCLUDE_PATH})
 endif()
 
 if(NOT MSVC)#-Wall nonsense on MSVC
-add_definitions("-Wall")
-#add_definitions("-std=c++11")
+  add_definitions(-Wall -Werror)
+  add_definitions(-pedantic)
+  add_definitions(-Wno-variadic-macros)
+  add_definitions ("-Wno-unused-local-typedefs")
+  add_definitions ("-Wno-unknown-warning-option")
+  #add_definitions("-std=c++11")
 endif(NOT MSVC)
 
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-add_definitions ("-Wno-unused-local-typedefs")
+  add_definitions ("-fno-strict-overflow")
 endif()
 
 if(KAGUYA_NO_USERDATA_TYPE_CHECK)
@@ -40,7 +42,7 @@ endif()
 
 if(EMSCRIPTEN)
   set(DISABLE_ADDRESS_SANITIZER On)
-  include_directories("${EMSCRIPTEN_ROOT_PATH}/system/lib/libcxxabi/include/")
+  include_directories(SYSTEM "${EMSCRIPTEN_ROOT_PATH}/system/lib/libcxxabi/include/")
   add_definitions("-std=c++11")
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
 endif(EMSCRIPTEN)
@@ -80,7 +82,7 @@ endif(KAGUYA_BUILD_EXAMPLES)
 enable_testing()
 if(COVERAGE)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -W -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
 endif(COVERAGE)
 

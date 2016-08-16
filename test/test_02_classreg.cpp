@@ -132,7 +132,7 @@ KAGUYA_TEST_FUNCTION_DEF(default_constructor)(kaguya::State& state)
 		);
 
 	TEST_CHECK(state("value = assert(ABC.new())"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -142,7 +142,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new(32))"));
 	TEST_CHECK(state("assert(value:getInt() == 32)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -152,7 +152,7 @@ KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
 	TEST_CHECK(state("assert(value:getString() == 'string_value')"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -175,7 +175,7 @@ KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value:setInt(33)"));
 	TEST_CHECK(state("assert(value:getInt() == 33)"));
-};
+}
 
 
 ABC createABC(int,int,int)
@@ -214,7 +214,7 @@ KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor2)(kaguya::State& state)
 
 	TEST_CHECK(state("value:setInt(33)"));
 	TEST_CHECK(state("assert(value:getInt() == 33)"));
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 {
@@ -276,7 +276,7 @@ KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 	TEST_CHECK(shared_wrapper->cget() == shared_wrapper->get());
 	TEST_CHECK(shared_wrapper->native_get() != shared_wrapper->get());
 	TEST_CHECK(shared_wrapper->native_get() != shared_wrapper->cget());
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(data_member_bind)(kaguya::State& state)
 {
@@ -1562,7 +1562,7 @@ KAGUYA_TEST_FUNCTION_DEF(call_constructor)(kaguya::State& state)
 	TEST_CHECK(state("base = assert(Base())"));
 	TEST_CHECK(state("assert(base.a == 0)"));
 	TEST_CHECK(state("base.a = 4 assert(base.a == 4) assert(base() == 4)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(int_call_constructor_manual)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -1575,7 +1575,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_call_constructor_manual)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC(32))"));
 	TEST_CHECK(state("assert(value:getInt() == 32)"));
-};
+}
 
 
 KAGUYA_TEST_FUNCTION_DEF(constructor_arg_type_mismatch_error)(kaguya::State& state)
@@ -1590,7 +1590,7 @@ KAGUYA_TEST_FUNCTION_DEF(constructor_arg_type_mismatch_error)(kaguya::State& sta
 	bool res = state("v = ABC.new('abc')");
 	TEST_CHECK(!res);
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
-};
+}
 
 KAGUYA_TEST_FUNCTION_DEF(arg_type_mismatch_error)(kaguya::State& state)
 {
@@ -1606,7 +1606,7 @@ KAGUYA_TEST_FUNCTION_DEF(arg_type_mismatch_error)(kaguya::State& state)
 	TEST_CHECK(!state("value:setInt('abc')"));
 
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
-};
+}
 int Base_a_getter(const Base* self)
 {
 	return self->a;
