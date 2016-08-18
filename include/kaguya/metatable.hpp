@@ -564,12 +564,8 @@ namespace kaguya
 		}
 #if KAGUYA_USE_CPP11
 
-		template<typename Base>
-		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
+		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<> >)const
 		{
-			class_userdata::get_metatable<Base>(state);
-			metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop()));
-			pvtreg.add_type_conversion<Base, class_type>();
 		}
 		template<typename Base, typename... Remain>
 		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
