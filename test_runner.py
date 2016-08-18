@@ -38,6 +38,8 @@ test_compilers = [
     ,('gcc-6','g++-6','-DCMAKE_CXX_FLAGS=-std=c++11',False)
     ,('gcc','g++','-DCMAKE_CXX_FLAGS=-std=c++03',True)
     ,('gcc','g++','-DCMAKE_CXX_FLAGS=-std=c++11',True)
+    ,('gcc','g++','-DCMAKE_CXX_FLAGS=-std=c++03 -DKAGUYA_SINGLE_HEADER_VERSION=1',True)
+    ,('gcc','g++','-DCMAKE_CXX_FLAGS=-std=c++11 -DKAGUYA_SINGLE_HEADER_VERSION=1',True)
     ,('clang','clang++','-DCMAKE_CXX_FLAGS=-std=c++03',True)
     ,('clang','clang++','-DCMAKE_CXX_FLAGS=-std=c++11',True)
     ,('clang-3.8','clang++-3.8','-DCMAKE_CXX_FLAGS=-std=c++03',False)

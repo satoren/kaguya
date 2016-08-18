@@ -11,7 +11,18 @@ option(KAGUYA_BUILD_EXAMPLE_GLFW_BIND "Build the Kaguya example glfw bind" OFF)
 
 include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
+
+if(KAGUYA_SINGLE_HEADER_VERSION)
+file(MAKE_DIRECTORY single_include/kaguya)
+file(COPY include/kaguya/another_binding_api.hpp DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/single_include/kaguya/)
+execute_process(
+  COMMAND python generate_one_header.py
+WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/utils OUTPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/single_include/kaguya/kaguya.hpp)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/single_include")
+
+else(KAGUYA_SINGLE_HEADER_VERSION)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+endif(KAGUYA_SINGLE_HEADER_VERSION)
 
 file(GLOB KAGUYA_HEADER RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   include/kaguya/*.hpp
