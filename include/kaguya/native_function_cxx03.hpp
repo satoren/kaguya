@@ -10,8 +10,6 @@
 #include "kaguya/utility.hpp"
 #include "kaguya/object.hpp"
 
-#include "kaguya/preprocess.hpp"
-
 namespace kaguya
 {
 	namespace nativefunction

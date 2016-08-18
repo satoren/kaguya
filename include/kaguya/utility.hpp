@@ -9,6 +9,8 @@
 #include "kaguya/compatibility.hpp"
 #include "kaguya/traits.hpp"
 
+#include "kaguya/preprocess.hpp"
+
 #if KAGUYA_USE_CPP11
 #include "kaguya/utility_cxx11.hpp"
 #else
