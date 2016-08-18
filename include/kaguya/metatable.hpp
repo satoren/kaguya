@@ -21,15 +21,19 @@
 
 namespace kaguya
 {
-
+#if KAGUYA_USE_CPP11
+	template<class... Args>
+	struct MultipleBase {
+	};
+#else
 #define KAGUYA_PP_STRUCT_TDEF_REP(N) KAGUYA_PP_CAT(class A,N) = void
 #define KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_STRUCT_TDEF_REP)
-
 	template<KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT(KAGUYA_CLASS_MAX_BASE_CLASSES)>
 	struct MultipleBase {
 	};
 #undef KAGUYA_PP_STRUCT_TDEF_REP
 #undef KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT
+#endif
 }
 
 #include "kaguya/deprecated_metatable.hpp"
