@@ -14,7 +14,7 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 * lua5.3,Visual C++2008～2012 with boost library,Visual C++2013,Visual C++2015
 [![Build status](https://ci.appveyor.com/api/projects/status/cwlu28s42leacidx/branch/master?svg=true)](https://ci.appveyor.com/project/satoren/kaguya)
 
-[![codecov.io](https://codecov.io/github/satoren/kaguya/coverage.svg?branch=master)](https://codecov.io/github/satoren/kaguya?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/satoren/kaguya/badge.svg?branch=master)](https://coveralls.io/github/satoren/kaguya?branch=master)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/8930/badge.svg)](https://scan.coverity.com/projects/satoren-kaguya)
 
 ## Introduction
