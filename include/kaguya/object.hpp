@@ -31,9 +31,9 @@ namespace kaguya
 		return typeid(typename traits::decay<T>::type);
 	}
 	template<typename T>
-	inline const char* metatableName()
+	inline std::string metatableName()
 	{
-		return metatableType<T>().name();
+		return util::pretty_name(metatableType<T>());
 	}
 
 	struct ObjectWrapperBase
@@ -64,25 +64,12 @@ namespace kaguya
 #else
 
 		ObjectWrapper() : object_() {}
-		template<class Arg1>
-		ObjectWrapper(const Arg1& v1) : object_(v1) {}
-		template<class Arg1, class Arg2>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2) : object_(v1, v2) {}
-		template<class Arg1, class Arg2, class Arg3>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3) : object_(v1, v2, v3) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4) : object_(v1, v2, v3, v4) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5) : object_(v1, v2, v3, v4, v5) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6) : object_(v1, v2, v3, v4, v5, v6) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7) : object_(v1, v2, v3, v4, v5, v6, v7) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8) : object_(v1, v2, v3, v4, v5, v6, v7, v8) {}
-		template<class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9>
-		ObjectWrapper(const Arg1& v1, const Arg2& v2, const Arg3& v3, const Arg4& v4, const Arg5& v5, const Arg6& v6, const Arg7& v7, const Arg8& v8, const Arg9& v9) : object_(v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
+#define KAGUYA_OBJECT_WRAPPER_CONSTRUCTOR_DEF(N) \
+		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+			ObjectWrapper(KAGUYA_PP_ARG_DEF_REPEAT(N)):object_(KAGUYA_PP_ARG_REPEAT(N)){}
 
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OBJECT_WRAPPER_CONSTRUCTOR_DEF)
+#undef KAGUYA_OBJECT_WRAPPER_CONSTRUCTOR_DEF
 #endif
 
 		virtual const std::type_info& type()
@@ -111,7 +98,7 @@ namespace kaguya
 #if KAGUYA_USE_RVALUE_REFERENCE
 		template<typename T>
 		ObjectSharedPointerWrapper(standard::shared_ptr<T>&& sptr) : object_(std::move(standard::const_pointer_cast<typename standard::remove_const<T>::type>(sptr))), type_(metatableType<T>()),
-			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value){}
+			shared_ptr_type_(metatableType<standard::shared_ptr<typename traits::decay<T>::type> >()), const_value_(traits::is_const<T>::value) {}
 #endif
 		virtual const std::type_info& type()
 		{
@@ -125,7 +112,7 @@ namespace kaguya
 		{
 			return object_.get();
 		}
-		standard::shared_ptr<void> object()const { return const_value_? standard::shared_ptr<void>():object_; }
+		standard::shared_ptr<void> object()const { return const_value_ ? standard::shared_ptr<void>() : object_; }
 		standard::shared_ptr<const void> const_object()const { return object_; }
 		const std::type_info& shared_ptr_type()const { return shared_ptr_type_; }
 
@@ -143,7 +130,7 @@ namespace kaguya
 		bool const_value_;
 	};
 
-	template<class T>
+	template<typename T, typename ElementType = typename T::element_type>
 	struct ObjectSmartPointerWrapper : ObjectWrapperBase
 	{
 		ObjectSmartPointerWrapper(const T& sptr) :object_(sptr) {}
@@ -152,17 +139,17 @@ namespace kaguya
 #endif
 		virtual const std::type_info& type()
 		{
-			return metatableType<typename T::element_type>();
+			return metatableType<ElementType>();
 		}
 		virtual void* get()
 		{
-			return object_.get();
+			return object_ ? &(*object_) : 0;
 		}
 		virtual const void* cget()
 		{
-			return object_.get();
+			return object_ ? &(*object_) : 0;
 		}
-		virtual const std::type_info& native_type() 
+		virtual const std::type_info& native_type()
 		{
 			return metatableType<T>();
 		}
@@ -195,8 +182,15 @@ namespace kaguya
 		~ObjectPointerWrapper()
 		{
 		}
-	private:
+	protected:
 		T* object_;
+	};
+
+	//Customizable for ObjectPointerWrapper
+	template<class T, class Enable = void>
+	struct ObjectPointerWrapperType
+	{
+		typedef ObjectPointerWrapper<T> type;
 	};
 
 	//for internal use
@@ -315,7 +309,7 @@ namespace kaguya
 			static char kaguya_ptrcvt_key_ptr;
 			util::ScopedSavedStack save(state);
 			lua_pushlightuserdata(state, &kaguya_ptrcvt_key_ptr);
-			lua_gettable(state, LUA_REGISTRYINDEX);
+			lua_rawget(state, LUA_REGISTRYINDEX);
 			if (lua_isuserdata(state, -1))
 			{
 				return *static_cast<PointerConverter*>(lua_touserdata(state, -1));
@@ -325,7 +319,7 @@ namespace kaguya
 				void* ptr = lua_newuserdata(state, sizeof(PointerConverter));//dummy data for gc call
 				PointerConverter* converter = new(ptr) PointerConverter();
 
-				lua_createtable(state, 0, 0);
+				lua_createtable(state, 0, 2);
 				lua_pushcclosure(state, &deleter, 0);
 				lua_setfield(state, -2, "__gc");
 				lua_pushvalue(state, -1);
@@ -333,7 +327,7 @@ namespace kaguya
 				lua_setmetatable(state, -2);//set to userdata
 				lua_pushlightuserdata(state, &kaguya_ptrcvt_key_ptr);
 				lua_pushvalue(state, -2);
-				lua_settable(state, LUA_REGISTRYINDEX);
+				lua_rawset(state, LUA_REGISTRYINDEX);
 				return *converter;
 			}
 		}
@@ -420,11 +414,9 @@ namespace kaguya
 #endif
 			if (lua_getmetatable(l, index))
 			{
-				lua_rawgetp(l, -1, metatable_name_key());
-				bool res = lua_isstring(l, -1) != 0;
-
+				int type = lua_rawgetp_rtype(l, -1, metatable_name_key());
 				lua_pop(l, 2);
-				return res;
+				return type == LUA_TSTRING;
 			}
 			return false;
 		}
@@ -531,9 +523,9 @@ namespace kaguya
 	template<class T>
 	const T* get_pointer(lua_State* l, int index, types::typetag<const T> tag)
 	{
-		return get_const_pointer<T>(l,index, types::typetag<T>());
+		return get_const_pointer<T>(l, index, types::typetag<T>());
 	}
-	
+
 	template<class T>
 	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> tag)
 	{
@@ -561,7 +553,7 @@ namespace kaguya
 	inline standard::shared_ptr<void> get_shared_pointer(lua_State* l, int index, types::typetag<void> tag)
 	{
 		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
-		if (ptr) 
+		if (ptr)
 		{
 			return ptr->object();
 		}
@@ -586,19 +578,22 @@ namespace kaguya
 				pointer->~T();
 			}
 		}
-		template<typename T>bool get_metatable(lua_State* l)
+		inline bool get_metatable(lua_State* l, const std::type_info& typeinfo)
 		{
-			lua_rawgetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
-			if (lua_isnil(l, -1))
+			int ttype = lua_rawgetp_rtype(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
+			if (ttype != LUA_TTABLE)
 			{
 				lua_newtable(l);
 				lua_rawsetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());
 				return false;
 			}
-			lua_rawgetp(l, -1, &metatableType<T>());
-			int type = lua_type(l, -1);
+			int type = lua_rawgetp_rtype(l, -1, &typeinfo);
 			lua_remove(l, -2);//remove metatable registry table
 			return type != LUA_TNIL;
+		}
+		template<typename T>bool get_metatable(lua_State* l)
+		{
+			return get_metatable(l, metatableType<T>());
 		}
 		template<typename T>bool available_metatable(lua_State* l)
 		{
@@ -606,26 +601,30 @@ namespace kaguya
 			return get_metatable<T>(l);
 		}
 
-		template<typename T>bool newmetatable(lua_State* l)
+		inline bool newmetatable(lua_State* l, const std::type_info& typeinfo, const char* name)
 		{
-			if (get_metatable<T>(l)) //already register
+			if (get_metatable(l, typeinfo)) //already register
 			{
 				return false;  //
 			}
 			lua_pop(l, 1);
-			lua_rawgetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
+			lua_rawgetp_rtype(l, LUA_REGISTRYINDEX, metatable_type_table_key());//get metatable registry table
 			int metaregindex = lua_absindex(l, -1);
 
 			lua_createtable(l, 0, 2);
-			lua_pushstring(l, metatableName<T>());
-			lua_pushvalue(l,-1);
+			lua_pushstring(l, name);
+			lua_pushvalue(l, -1);
 			lua_setfield(l, -3, "__name");  // metatable.__name = name
 			lua_rawsetp(l, -2, metatable_name_key());
 			lua_pushvalue(l, -1);
-			lua_rawsetp(l, metaregindex, &metatableType<T>());
+			lua_rawsetp(l, metaregindex, &typeinfo);
 			lua_remove(l, metaregindex);//remove metatable registry table
 
 			return true;
+		}
+		template<typename T>bool newmetatable(lua_State* l)
+		{
+			return newmetatable(l, metatableType<T>(), metatableName<T>().c_str());
 		}
 
 
@@ -636,10 +635,10 @@ namespace kaguya
 			return 0;
 		}
 		struct UnknownType {};
-		template<typename T>void setmetatable(lua_State* l)
+		inline void setmetatable(lua_State* l, const std::type_info& typeinfo)
 		{
 			//if not available metatable, set unknown class metatable
-			if (!get_metatable<T>(l))
+			if (!get_metatable(l, typeinfo))
 			{
 				lua_pop(l, 1);
 				if (!get_metatable<UnknownType>(l))
@@ -651,6 +650,37 @@ namespace kaguya
 				}
 			}
 			lua_setmetatable(l, -2);
+		}
+		template<typename T>void setmetatable(lua_State* l)
+		{
+			setmetatable(l, metatableType<T>());
+		}
+		namespace detail
+		{
+			inline int call_constructor_metamethod(lua_State* L)
+			{
+				//function(t,...) return t.new(...) end
+				lua_getfield(L,1,"new");
+				lua_replace(L, 1);
+				lua_call(L, lua_gettop(L) - 1, LUA_MULTRET);
+				return lua_gettop(L);
+			}
+		}
+		inline void get_call_constructor_metatable(lua_State* L)
+		{
+			static int key=0;
+
+			int ttype = lua_rawgetp_rtype(L, LUA_REGISTRYINDEX, &key);
+			if (ttype != LUA_TTABLE)
+			{
+				lua_pop(L,1);
+				lua_createtable(L, 0, 1);
+				lua_pushstring(L, "__call");
+				lua_pushcfunction(L, &detail::call_constructor_metamethod);
+				lua_rawset(L,-3);
+				lua_pushvalue(L, -1);
+				lua_rawsetp(L, LUA_REGISTRYINDEX, &key);
+			}		
 		}
 	}
 	template<typename T>

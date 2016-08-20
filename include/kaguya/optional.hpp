@@ -9,9 +9,13 @@
 
 namespace kaguya
 {
-
+	/// @addtogroup optional
+	///  @{
+	
 	struct bad_optional_access :std::exception {};
 	struct nullopt_t {};
+
+	/// @brief self implement for std::optional(C++17 feature).
 	template<class T>class optional
 	{
 		typedef void (optional::*bool_type)() const;
@@ -123,7 +127,7 @@ namespace kaguya
 		}
 #else
 		template< class U >
-		T value_or(U default_value)const
+		T value_or(const U& default_value)const
 		{
 			if (value_) { return *value_; }
 			return default_value;
@@ -148,6 +152,8 @@ namespace kaguya
 		T* value_;
 	};
 
+	/// @brief specialize optional for reference.
+	/// sizeof(optional<T&>) == sizeof(T*)
 	template<class T>class optional<T&>
 	{
 		typedef void (optional::*bool_type)() const;
@@ -192,15 +198,13 @@ namespace kaguya
 		}
 
 #if KAGUYA_USE_CPP11
-		template< class U >
-		T value_or(U&& default_value)  const
+		T& value_or(T& default_value)  const
 		{
 			if (value_) { return *value_; }
 			return default_value;
 		}
 #else
-		template< class U >
-		T value_or(U default_value)const
+		T& value_or(T& default_value)const
 		{
 			if (value_) { return *value_; }
 			return default_value;
@@ -215,6 +219,9 @@ namespace kaguya
 		T* value_;
 	};
 
+	/// @name relational operators
+	/// @brief
+	///@{
 	template< class T >
 	bool operator==(const optional<T>& lhs, const optional<T>& rhs)
 	{
@@ -249,4 +256,8 @@ namespace kaguya
 	{
 		return !(lhs < rhs);
 	}
+	/// @}
+
+	/// @}
 }
+

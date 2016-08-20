@@ -27,6 +27,7 @@ extern "C" {
 #include <utility>
 #include <type_traits>
 #include <initializer_list>
+#include <array>
 #else
 #include <boost/function.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -34,13 +35,7 @@ extern "C" {
 #include <boost/make_shared.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/static_assert.hpp>
-#include "kaguya/preprocess.hpp"
-#include "kaguya/preprocess.hpp"
-#endif
-
-
-#ifndef KAGUYA_ERROR_NO_THROW
-#define KAGUYA_ERROR_NO_THROW 1
+#include <boost/utility/result_of.hpp>
 #endif
 
 
@@ -64,10 +59,44 @@ extern "C" {
 #endif
 
 
-#ifndef KAGUYA_DETECT_USE_DEPRECATED_FEATURE
-#define KAGUYA_DETECT_USE_DEPRECATED_FEATURE 0
+#if !KAGUYA_USE_CPP11
+#ifndef KAGUYA_FUNCTION_MAX_ARGS
+///! max argumeent number for binding function. this define used C++03 only.
+#define KAGUYA_FUNCTION_MAX_ARGS 9
 #endif
 
+#ifndef KAGUYA_FUNCTION_MAX_TUPLE_SIZE
+///! this define used C++03 only.
+#define KAGUYA_FUNCTION_MAX_TUPLE_SIZE 9
+#endif
+
+#ifndef KAGUYA_FUNCTION_MAX_OVERLOADS
+#define KAGUYA_FUNCTION_MAX_OVERLOADS 9
+#endif
+
+#endif
+
+#ifndef KAGUYA_CLASS_MAX_BASE_CLASSES
+#define KAGUYA_CLASS_MAX_BASE_CLASSES 9
+#endif
+
+
+#ifndef KAGUYA_USE_CXX_ABI_DEMANGLE
+#if defined(__GNUC__) || defined(__clang__)
+#define KAGUYA_USE_CXX_ABI_DEMANGLE 1
+#else
+#define KAGUYA_USE_CXX_ABI_DEMANGLE 0
+#endif
+#endif
+
+
+#ifndef KAGUYA_NOEXCEPT
+# if KAGUYA_USE_CPP11 && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+#  define KAGUYA_NOEXCEPT noexcept
+# else
+#  define KAGUYA_NOEXCEPT throw()
+# endif
+#endif
 
 #ifndef KAGUYA_DEPRECATED_FEATURE
 #if __cplusplus >= 201402L && defined(__has_cpp_attribute)
@@ -82,7 +111,7 @@ extern "C" {
 //MSVC depecated
 #define KAGUYA_DEPRECATED_FEATURE(MSG) __declspec(deprecated(MSG)) 
 #elif defined(__GNUC__) || defined(__clang__)
-#define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated(MSG)))
+#define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated))
 #else
 #define KAGUYA_DEPRECATED_FEATURE(MSG)
 #endif

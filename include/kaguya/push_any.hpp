@@ -11,6 +11,7 @@
 
 namespace kaguya
 {
+	/// @brief any data holder class for push to lua
 	class AnyDataPusher
 	{
 	public:
@@ -94,6 +95,8 @@ namespace kaguya
 	};
 
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for AnyDataPusher
 	template<>	struct lua_type_traits<AnyDataPusher> {
 		static int push(lua_State* l, const AnyDataPusher& data)
 		{

@@ -30,6 +30,9 @@ namespace kaguya
 			return util::push_args(l, std::get<Indexes>(v)...);
 		}
 	}
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for std::tuple or boost::tuple
 	template<class... Args>
 	struct lua_type_traits<standard::tuple<Args...> >
 	{
@@ -49,8 +52,9 @@ namespace kaguya
 			return util::push_args(l, KAGUYA_PP_REPEAT_ARG(N, KAGUYA_PP_GET_DATA));\
 		}\
 	};
-	KAGUYA_PP_REPEAT_DEF(9, KAGUYA_PUSH_TUPLE_DEF)
+	KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_TUPLE_SIZE, KAGUYA_PUSH_TUPLE_DEF)
 #undef KAGUYA_PP_GET_DATA
 #undef KAGUYA_PUSH_TUPLE_DEF
 #endif
 }
+

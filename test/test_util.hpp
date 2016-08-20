@@ -18,6 +18,10 @@ namespace kaguya_test_util
 #endif
 		return buffer;
 	}
+	inline std::string to_string(size_t v)
+	{
+		return to_string(int(v));
+	}
 
 	inline std::vector<std::string> split(std::string s, const char delim)
 	{
@@ -124,7 +128,7 @@ namespace kaguya_test_util
 				std::cout << test_name << "  (" << testindex << "/" << testcount << ") ...";
 
 				std::string error_message = "";
-
+				std::cout << std::flush;
 				bool result = false;
 				try
 				{
@@ -188,7 +192,85 @@ namespace kaguya_test_util
 		}
 
 	};
+
+	//test target class
+	struct TestClass
+	{
+		int intmember;
+		std::string stringmember;
+		TestClass() :intmember(0) {}
+		TestClass(int a) :intmember(a) { }
+		TestClass(const char* a) :intmember(0), stringmember(a) { }
+		TestClass(std::string a) :intmember(0), stringmember(a) { }
+		TestClass(int intmem, const std::string& strmem) :intmember(intmem), stringmember(strmem) { }
+		TestClass(const std::string& strmem, int intmem) :intmember(intmem), stringmember(strmem) { }
+		TestClass(const TestClass&src) :intmember(src.intmember), stringmember(src.stringmember) {}
+
+		bool operator ==(const TestClass& rhs)const {
+			return intmember == rhs.intmember && stringmember == rhs.stringmember;
+		}
+		bool operator <(const TestClass& rhs)const {
+			return intmember < rhs.intmember || (intmember == rhs.intmember && stringmember < rhs.stringmember);
+		}
+		bool operator !=(const TestClass& rhs)const {
+			return !(*this == rhs);
+		}
+		bool operator >(const TestClass& rhs)const {
+			return (rhs < *this);
+		}
+		bool operator >=(const TestClass& rhs)const {
+			return !(*this < rhs);
+		}
+		bool operator <=(const TestClass& rhs)const {
+			return !(*this > rhs);
+		}
+		int getInt() const {
+			return intmember;
+		}
+		void setInt(const int& n) {
+			intmember = n;
+		}
+		std::string getString()const {
+			return stringmember;
+		}
+		void setString(std::string str) { stringmember = str; }
+
+		int default_arg(int a = 3, int b = 2, int c = 1)
+		{
+			return a*b*c;
+		}
+		void default_set(int a = 3, int b = 2, int c = 1)
+		{
+			setInt(a*b*c);
+		}
+		void default_set_overload(int a, int b = 2, int c = 1)
+		{
+			setInt(a*b*c);
+		}
+		void default_set_overload(std::string a, std::string b = "b", std::string c = "c")
+		{
+			setString(a+b+c);
+		}
+
+		TestClass copy()const { return *this; }
+		const TestClass& references()const { return *this; }
+		const TestClass& const_references()const { return *this; }
+		TestClass& references() { return *this; }
+		TestClass* pointer() { return this; }
+		const TestClass* const_pointer()const { return this; }
+		kaguya::standard::shared_ptr<TestClass> shared_copy() { return kaguya::standard::shared_ptr<TestClass>(new TestClass(*this)); }
+	};
+
+
+
 }
+
+#if KAGUYA_USE_CPP11
+inline std::ostream& operator << (std::ostream& os, std::nullptr_t)
+{
+	return os << "nullptr";
+}
+#endif
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya_test_util::to_string(__LINE__) + "\nCHECKCODE:" #B );
 

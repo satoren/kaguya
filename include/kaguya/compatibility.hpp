@@ -11,7 +11,26 @@ namespace kaguya
 	//for lua version compatibility
 	namespace compat
 	{
-#if LUA_VERSION_NUM < 502
+#if LUA_VERSION_NUM >= 503
+		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
+		{
+			return lua_rawgetp(L, idx, ptr);
+		}
+		inline int lua_getfield_rtype(lua_State *L, int idx, const char* k)
+		{
+			return lua_getfield(L, idx, k);
+		}
+		inline int lua_gettable_rtype(lua_State *L, int idx)
+		{
+			return lua_gettable(L, idx);
+		}
+#elif LUA_VERSION_NUM == 502
+		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
+		{
+			lua_rawgetp(L, idx, ptr);
+			return lua_type(L, -1);
+		}
+#elif LUA_VERSION_NUM < 502
 		enum LUA_OPEQ
 		{
 			LUA_OPEQ,
@@ -30,9 +49,9 @@ namespace kaguya
 				return lua_equal(L, index1, index2) || lua_lessthan(L, index1, index2);
 			default:
 				return 0;
-			}		
+			}
 		}
-		
+
 		inline void lua_pushglobaltable(lua_State *L)
 		{
 			lua_pushvalue(L, LUA_GLOBALSINDEX);
@@ -55,7 +74,7 @@ namespace kaguya
 		{
 			return (idx > 0 || (idx <= LUA_REGISTRYINDEX)) ? idx : lua_gettop(L) + 1 + idx;
 		}
-		inline int lua_rawgetp(lua_State *L, int idx, const void* ptr)
+		inline int lua_rawgetp_rtype(lua_State *L, int idx, const void* ptr)
 		{
 			int absidx = lua_absindex(L, idx);
 			lua_pushlightuserdata(L, (void*)ptr);
@@ -82,6 +101,11 @@ namespace kaguya
 				lua_setglobal(L, modname);
 			}
 		}
+		inline lua_Number lua_tonumberx(lua_State *L, int index, int *isnum)
+		{
+			if (isnum) { *isnum = lua_isnumber(L, index); }
+			return lua_tonumber(L, index);
+		}
 #endif
 #if LUA_VERSION_NUM < 503
 		inline void lua_seti(lua_State *L, int index, lua_Integer n)
@@ -99,8 +123,25 @@ namespace kaguya
 			lua_rawget(L, absidx);
 			return lua_type(L, -1);
 		}
+		inline int lua_getfield_rtype(lua_State *L, int idx, const char* k)
+		{
+			lua_getfield(L, idx, k);
+			return lua_type(L, -1);
+		}
+		inline int lua_gettable_rtype(lua_State *L, int idx)
+		{
+			lua_gettable(L, idx);
+			return lua_type(L, -1);
+		}
+#endif
+#if LUA_VERSION_NUM < 501
+		void lua_createtable(lua_State *L, int narr, int nrec)
+		{
+			lua_newtable(L);
+		}
 #endif
 	}
 
 	using namespace compat;
 }
+

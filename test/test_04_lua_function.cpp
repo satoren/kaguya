@@ -192,15 +192,85 @@ void corresult_to_main(kaguya::VariadicArgType args)
 	TEST_EQUAL(args[6], 7);
 	TEST_EQUAL(args[7], 8);
 	TEST_EQUAL(args[8], 9);
+	int s = std::distance(args.begin(), args.end());
+	TEST_EQUAL(s, 9);
+
+	//iterator requirements test 
+	//Forward iterator
+	kaguya::VariadicArgType::iterator it;//default constructible
+	it  = args.begin();//copy -assignable
+	kaguya::VariadicArgType::iterator it2 = it;//copy-constructible
+	kaguya::VariadicArgType::iterator empty_it;
+	TEST_CHECK(it2 == it);//compare 
+	TEST_CHECK(empty_it != it);//compare 
+	TEST_EQUAL(it->get<int>(), 1)//dereferenced 
+	TEST_EQUAL((*it).get<int>(), 1)//dereferenced 
+	TEST_EQUAL(*it++, 1);//incremented
+	TEST_EQUAL(*(++it), 3);//incremented
+	it++;
+	TEST_EQUAL(*it, 4);//incremented
+
+	//Bidirectional	iterator
+	it--;
+	TEST_EQUAL(*it--, 3);//decremented
+	TEST_EQUAL(*(--it), 1);//decremented
+
+	//Random access iterator
+	it = args.begin();
+	
+	TEST_EQUAL(*(it += 5),6);//compound assignment operations 
+	
+	TEST_EQUAL(*it, 6);
+	TEST_EQUAL(*(it - 5), 1);
+	TEST_EQUAL(*(it - 3), 3);
+
+	TEST_EQUAL(*(it -= 5), 1);//compound assignment operations 
+
+	TEST_EQUAL(*it, 1);
+	TEST_EQUAL(*(it + 5), 6);
+	TEST_EQUAL(*(it + 3), 4);
+	TEST_EQUAL(*(5+it), 6);
+	TEST_CHECK(!((5 + it) < (4 + it)));
+	TEST_CHECK(!((5 + it) < (5 + it)));
+	TEST_CHECK(((5 + it) < (6 + it)));
+	TEST_CHECK(((5 + it) > (4 + it)));
+	TEST_CHECK(!((5 + it) > (5 + it)));
+	TEST_CHECK(!((5 + it) > (6 + it)));
+	TEST_CHECK(!((5 + it) <= (4 + it)));
+	TEST_CHECK(((5 + it) <= (5 + it)));
+	TEST_CHECK(((5 + it) <= (6 + it)));
+	TEST_CHECK(((5 + it) >= (4 + it)));
+	TEST_CHECK(((5 + it) >= (5 + it)));
+	TEST_CHECK(!((5 + it) >= (6 + it)));
+	TEST_CHECK(!((5 + it) <= (4 + it)));
+	TEST_CHECK(((5 + it) <= (5 + it)));
+	TEST_CHECK(((5 + it) <= (6 + it)));
+
+	TEST_EQUAL(it[0], 1);//offset dereference operator 
+	TEST_EQUAL(it[6], 7);//offset dereference operator 
+	it += 5;
+	TEST_EQUAL(it[0], 6);//offset dereference operator 
+	TEST_EQUAL(it[-3], 3);//offset dereference operator 
+
+	it = args.begin();
+	//use std::advance
+	std::advance(it,5);
+	TEST_EQUAL(*it, 6);
+	std::advance(it, -2);
+	TEST_EQUAL(*it, 4);
 }
 void corresult_to_main2(kaguya::VariadicArgType args)
 {
 	TEST_EQUAL(args.size(), 1);
 	TEST_EQUAL(args[0], 6);
+	int s = std::distance(args.begin(), args.end());
+	TEST_EQUAL(s,1);
 }
 void corresult_to_main3(kaguya::VariadicArgType args)
 {
 	TEST_EQUAL(args.size(), 0);
+	int s = std::distance(args.begin(), args.end());
+	TEST_EQUAL(s, 0);
 }
 
 
@@ -328,22 +398,16 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine_stack)(kaguya::State& state)
 	TEST_EQUAL(state["value"], state["cor3"](state["corfun"], 10).getField<int>("value"));
 }
 
-#if (defined(_MSC_VER) && _MSC_VER < 1900)//for MSVC2013 bug
 void luacallback(const kaguya::standard::function<int(float)>& callback)
 {
-	callback(32.f);
+	int ret = callback(32.f);
+	TEST_EQUAL(ret,1);
 }
-#else
-void luacallback(const kaguya::standard::function<void(float)>& callback)
-{
-	callback(32.f);
-}
-#endif
 
 KAGUYA_TEST_FUNCTION_DEF(bind_to_std_function)(kaguya::State& state)
 {
 	state["luacallback"] = &luacallback;
-	state("luacallback(function(v) assert(32 == v) end)");
+	state("luacallback(function(v) assert(32 == v) return 1 end)");
 }
 
 
@@ -364,14 +428,30 @@ KAGUYA_TEST_FUNCTION_DEF(call_error)(kaguya::State& state)
 		kaguya::LuaFunction nilfn;
 		nilfn.call<void>();
 	}
-	{
-		last_error_message = "";
-		kaguya::LuaFunction notfn = state.newTable();
-		TEST_COMPARE_NE(last_error_message, "");
-		notfn.call<void>();
-	}
 }
 
+KAGUYA_TEST_FUNCTION_DEF(coroutine_error)(kaguya::State& state)
+{
+	state.setErrorHandler(ignore_error_fun);
+
+	{
+		last_error_message = "";
+		kaguya::LuaFunction nilfn = state["a"];
+		nilfn.call<void>();
+		TEST_CHECK(last_error_message.find("attempt to call a nil value") != std::string::npos);
+	}
+	{
+
+		TEST_CHECK(state("corfun = function(arg)"
+			"assert(false) "
+			" end"));
+		kaguya::LuaThread cor = state.newThread(state["corfun"]);
+
+		TEST_CHECK(!cor.isThreadDead());
+		cor();
+		TEST_CHECK(cor.isThreadDead());
+	}
+}
 
 KAGUYA_TEST_FUNCTION_DEF(function_result_for)(kaguya::State& state)
 {
@@ -475,4 +555,18 @@ KAGUYA_TEST_FUNCTION_DEF(to_standard_function)(kaguya::State& state)
 }
 
 
+KAGUYA_TEST_FUNCTION_DEF(return_luastackref)(kaguya::State& state)
+{
+	state("testfun = function() return 3232 end");
+	kaguya::LuaRef testfunref = state["testfun"];
+
+	{
+		kaguya::LuaStackRef ret = testfunref.call<kaguya::LuaStackRef>();
+		TEST_EQUAL(ret, 3232);
+	}
+	{
+		kaguya::LuaStackRef ret = testfunref();
+		TEST_EQUAL(ret, 3232);
+	}
+}
 KAGUYA_TEST_GROUP_END(test_04_lua_function)

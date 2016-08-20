@@ -14,7 +14,7 @@ namespace kaguya
 	class LuaRef;
 	class LuaTable;
 	template<typename KEY>
-	class TableKeyReference;
+	class TableKeyReferenceProxy;
 	class MemberFunctionBinder;
 
 	namespace detail {
@@ -39,15 +39,32 @@ namespace kaguya
 			using LuaBasicTypeFunctions<Derived>::type;
 			using LuaBasicTypeFunctions<Derived>::typeName;
 
+			/// @brief deprecated, use isType instead.
 			template<typename T>
 			bool typeTest()const
+			{
+				return isType<T>();
+			}
+
+
+			/// @brief deprecated, use isConvertible instead.
+			template<typename T>
+			bool weakTypeTest()const
+			{
+				return isConvertible<T>();
+			}
+
+			/// @brief is type test
+			template<typename T>
+			bool isType()const
 			{
 				lua_State* state = state_();
 				util::ScopedSavedStack save(state);
 				return lua_type_traits<T>::strictCheckType(state, pushStackIndex_(state));
 			}
+
 			template<typename T>
-			bool weakTypeTest()const
+			bool isConvertible()const
 			{
 				lua_State* state = state_();
 				util::ScopedSavedStack save(state);
@@ -56,36 +73,60 @@ namespace kaguya
 
 
 
+			template<typename T>typename lua_type_traits<T>::get_type get()const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<T>::get(state, state ? pushStackIndex_(state) : 0);
+			}
+			template<typename T, typename U>typename lua_type_traits<T>::get_type value_or(U v)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				return lua_type_traits<optional<T> >::get(state, state ? pushStackIndex_(state) : 0).value_or(v);
+			}
+
+			//deprecated. use get<kaguya::optional<T> >() instead;
+			template<typename T>
+			typename lua_type_traits<T>::get_type get(bool& was_valid, bool allow_convertible = true)const
+			{
+				lua_State* state = state_();
+				util::ScopedSavedStack save(state);
+				int stackindex = pushStackIndex_(state);
+				if (allow_convertible)
+				{
+					was_valid = lua_type_traits<T>::checkType(state, stackindex);
+				}
+				else
+				{
+					was_valid = lua_type_traits<T>::strictCheckType(state, stackindex);
+				}
+				if (was_valid)
+				{
+					return lua_type_traits<T>::get(state, stackindex);
+				}
+				else
+				{
+					return T();
+				}
+			}
+			template<typename T>
+			operator T()const
+			{
+				return get<T>();
+			}
+
 #if KAGUYA_USE_CPP11
 			template<class...Args> FunctionResults operator()(Args&&... args);
 #else
-#define KAGUYA_TEMPLATE_PARAMETER(N)
-#define KAGUYA_FUNCTION_ARGS_DEF(N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
+			inline FunctionResults operator()();
 
 #define KAGUYA_OP_FN_DEF(N) \
-	KAGUYA_TEMPLATE_PARAMETER(N)\
-	inline FunctionResults operator()(KAGUYA_FUNCTION_ARGS_DEF(N));
+			template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+			inline FunctionResults operator()(KAGUYA_PP_ARG_CR_DEF_REPEAT(N));
 
-			KAGUYA_OP_FN_DEF(0)
 
-#undef KAGUYA_TEMPLATE_PARAMETER
-#undef KAGUYA_FUNCTION_ARGS_DEF
-#define KAGUYA_TEMPLATE_PARAMETER(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>
-#define KAGUYA_FUNCTION_ARGS_DEF(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG)
-
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PUSH_ARG_DEF(N) KAGUYA_PP_CAT(a,N) 
-
-				KAGUYA_PP_REPEAT_DEF(9, KAGUYA_OP_FN_DEF)
-#undef KAGUYA_OP_FN_DEF
-#undef KAGUYA_TEMPLATE_PARAMETER
-
-#undef KAGUYA_FUNCTION_ARGS_DEF
-#undef KAGUYA_PUSH_ARG_DEF
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
-#undef KAGUYA_CALL_DEF
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_OP_FN_DEF)
 #undef KAGUYA_OP_FN_DEF
 #endif
 		};

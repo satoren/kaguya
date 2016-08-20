@@ -1,6 +1,73 @@
 #include "kaguya/kaguya.hpp"
 #include "test_util.hpp"
 
+
+namespace
+{
+	struct SelfRefCounted
+	{
+		static int all_object_count;//for simple leak check
+
+		SelfRefCounted() :refcount(0)
+		{
+			all_object_count++;
+		}
+		virtual ~SelfRefCounted() { all_object_count--; }
+
+		void AddRef() { refcount++; }
+		void ReleaseRef() { refcount--;
+			if (refcount == 0)
+			{
+				delete this;
+			}
+		}
+
+		int get_ref_count()const { return refcount; }
+
+		int refcount;
+	private:
+		SelfRefCounted(const SelfRefCounted&);
+		SelfRefCounted& operator=(const SelfRefCounted&);
+	};
+	int SelfRefCounted::all_object_count = 0;
+
+	struct RefObjectA : SelfRefCounted {};
+	struct RefObjectB : SelfRefCounted {};
+}
+
+namespace kaguya
+{
+	template<class T>
+	struct SelfRefCountedPtrWrapper : ObjectPointerWrapper<T>
+	{
+		SelfRefCountedPtrWrapper(T* ptr):ObjectPointerWrapper<T>(ptr)
+		{
+			if (ptr)
+			{
+				ptr->AddRef();
+			}
+		}
+		virtual ~SelfRefCountedPtrWrapper()
+		{
+			if (ObjectPointerWrapper<T>::object_)
+			{
+				ObjectPointerWrapper<T>::object_->ReleaseRef();
+			}
+		}
+	};
+
+	template<typename T>
+	struct isSelfCountedObjectPointer : kaguya::standard::conditional<
+		kaguya::standard::is_convertible<T*, SelfRefCounted*>::value,
+		kaguya::standard::true_type, kaguya::standard::false_type>::type {};
+
+	template<class T>
+	struct ObjectPointerWrapperType<T,typename traits::enable_if<isSelfCountedObjectPointer<T>::value>::type >
+	{
+		typedef SelfRefCountedPtrWrapper<typename traits::decay<T>::type> type;
+	};
+}
+
 KAGUYA_TEST_GROUP_START(test_02_classreg)
 
 using namespace kaguya_test_util;
@@ -65,7 +132,7 @@ KAGUYA_TEST_FUNCTION_DEF(default_constructor)(kaguya::State& state)
 		);
 
 	TEST_CHECK(state("value = assert(ABC.new())"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -75,7 +142,7 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new(32))"));
 	TEST_CHECK(state("assert(value:getInt() == 32)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -85,7 +152,7 @@ KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
 	TEST_CHECK(state("assert(value:getString() == 'string_value')"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -108,7 +175,47 @@ KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value:setInt(33)"));
 	TEST_CHECK(state("assert(value:getInt() == 33)"));
-};
+}
+
+
+ABC createABC(int,int,int)
+{
+	return ABC(324343);
+}
+KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor2)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.addOverloadedFunctions("new",
+			kaguya::ConstructorFunction<ABC()>::type(),
+			kaguya::ConstructorFunction<ABC(int)>::type(),
+			kaguya::ConstructorFunction<ABC(const char*)>::type(),
+			kaguya::ConstructorFunction<ABC(std::string)>::type(),
+			kaguya::ConstructorFunction<ABC(int, const std::string&)>::type(),
+			kaguya::ConstructorFunction<ABC(const std::string&, int)>::type(),
+			&createABC)
+		.addFunction("getString", &ABC::getString)
+		.addFunction("getInt", &ABC::getInt)
+		.addFunction("setInt", &ABC::setInt)
+	);
+
+	TEST_CHECK(state("value = assert(ABC.new(32))"));
+	TEST_CHECK(state("assert(value:getInt() == 32)"));
+	TEST_CHECK(state("value = assert(ABC.new('string_value'))"));
+	TEST_CHECK(state("assert(value:getString() == 'string_value')"));
+	TEST_CHECK(state("value = assert(ABC.new('string_value2',54))"));
+	TEST_CHECK(state("assert(value:getString() == 'string_value2')"));
+	TEST_CHECK(state("assert(value:getInt() == 54)"));
+	TEST_CHECK(state("value = assert(ABC.new(64,'string_value3'))"));
+	TEST_CHECK(state("assert(value:getString() == 'string_value3')"));
+	TEST_CHECK(state("assert(value:getInt() == 64)"));
+
+	TEST_CHECK(state("value = assert(ABC.new(1,2,3))"));//use createABC
+	TEST_CHECK(state("assert(value:getInt() == 324343)"));
+
+	TEST_CHECK(state("value:setInt(33)"));
+	TEST_CHECK(state("assert(value:getInt() == 33)"));
+}
+
 KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
@@ -155,8 +262,21 @@ KAGUYA_TEST_FUNCTION_DEF(copy_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state["value5"].weakTypeTest<kaguya::ObjectWrapperBase*>());
 	TEST_CHECK(state["value5"].typeTest<kaguya::ObjectWrapperBase*>());
-	
-};
+
+
+	kaguya::ObjectWrapperBase* wrapper = state["value2"];
+	TEST_CHECK(wrapper->get());
+	TEST_CHECK(wrapper->cget() == wrapper->get());
+	TEST_CHECK(wrapper->native_get() == wrapper->get());
+	TEST_CHECK(wrapper->native_get() == wrapper->cget());
+
+
+	kaguya::ObjectWrapperBase* shared_wrapper = state["value5"];
+	TEST_CHECK(shared_wrapper->get());
+	TEST_CHECK(shared_wrapper->cget() == shared_wrapper->get());
+	TEST_CHECK(shared_wrapper->native_get() != shared_wrapper->get());
+	TEST_CHECK(shared_wrapper->native_get() != shared_wrapper->cget());
+}
 
 KAGUYA_TEST_FUNCTION_DEF(data_member_bind)(kaguya::State& state)
 {
@@ -370,6 +490,7 @@ KAGUYA_TEST_FUNCTION_DEF(registering_object_instance)(kaguya::State& state)
 struct Member
 {
 	Member() :a(0) {};
+	Member(int i) :a(i) {};
 	int a;
 };
 struct Base
@@ -377,6 +498,13 @@ struct Base
 	Base() :a(0) {};
 	int a;
 	Member member;
+
+	void set(int d) { a = d; }
+	int get()const { return a; }
+
+
+	void member_set(const Member& d) { member = d; }
+	const Member& member_get()const { return member; }
 };
 struct Derived :Base
 {
@@ -451,6 +579,10 @@ int receive_base_shared_ptr_function_null(kaguya::standard::shared_ptr<Base> d) 
 	TEST_CHECK(!d);
 	return 4;
 }
+int receive_void_shared_ptr_function(kaguya::standard::shared_ptr<void> d) {
+	TEST_CHECK(d);
+	return 6;
+}
 KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 {
 	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
@@ -477,6 +609,7 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 
 
 	state["receive_shared_ptr_function_null"] = &receive_base_shared_ptr_function_null;
+	state["receive_void_shared_ptr_function"] = &receive_void_shared_ptr_function;
 	
 
 
@@ -494,6 +627,8 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 	TEST_CHECK(state("assert(2 == receive_base_shared_ptr_function(derived))"));
 	TEST_EQUAL(derived->a, 2);
 	TEST_CHECK(state("assert(4 == receive_shared_ptr_function_null(non_shared_base))"));
+	TEST_CHECK(state("assert(6 == receive_void_shared_ptr_function(base))"));
+	TEST_CHECK(state("assert(6 == receive_void_shared_ptr_function(derived))"));
 
 	TEST_EQUAL(derived->a, 2);
 	
@@ -520,9 +655,6 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 		TEST_CHECK(!(v = state["const_derived"]));
 	}
 	{
-		kaguya::standard::shared_ptr<Derived> d;
-		kaguya::standard::shared_ptr<Base> b;
-		kaguya::standard::shared_ptr<void> v;
 		kaguya::standard::shared_ptr<const Derived> cd;
 		kaguya::standard::shared_ptr<const Base> cb;
 		kaguya::standard::shared_ptr<const void> cv;
@@ -533,9 +665,10 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 		TEST_CHECK(cb = state["derived"]);
 		TEST_CHECK(cv = state["derived"]);
 
-		TEST_CHECK(!(d = state["non_shared_base"]));
-		TEST_CHECK(!(b = state["non_shared_base"]));
-		TEST_CHECK(!(v = state["non_shared_base"]));
+		TEST_CHECK(!(cd = state["non_shared_base"]));
+		TEST_CHECK(!(cb = state["non_shared_base"]));
+		TEST_CHECK(!(cv = state["non_shared_base"]));
+		TEST_CHECK(!(cv = state["non_shared_base"]));
 
 		TEST_CHECK(!(cd = state["const_base"]));
 		TEST_CHECK((cb = state["const_base"]));
@@ -544,6 +677,22 @@ KAGUYA_TEST_FUNCTION_DEF(registering_shared_ptr)(kaguya::State& state)
 		TEST_CHECK((cb = state["const_derived"]));
 		TEST_CHECK((cv = state["const_derived"]));
 	}
+
+#if !KAGUYA_NO_USERDATA_TYPE_CHECK
+	{
+		lua_newuserdata(state.state(), 100);
+		kaguya::LuaRef myuserdata(state.state(), kaguya::StackTop());
+		kaguya::standard::shared_ptr<const Derived> cd;
+		kaguya::standard::shared_ptr<const Base> cb;
+		kaguya::standard::shared_ptr<const void> cv;
+		state["nokaguya_udata"] = myuserdata;
+
+		TEST_CHECK(!(cd = state["nokaguya_udata"]));
+		TEST_CHECK(!(cb = state["nokaguya_udata"]));
+		TEST_CHECK(!(cv = state["nokaguya_udata"]));
+		TEST_CHECK(!(cv = state["nokaguya_udata"]));
+	}
+#endif
 
 
 	state["shared_ptr_function"] = kaguya::overload(&receive_shared_ptr_function, &receive_base_shared_ptr_function);
@@ -592,6 +741,8 @@ struct Base2
 	int test() { return 794; }
 	int consttest()const { return 794; }
 };
+
+struct Base3 {};
 struct MultipleInheritance :Base, Base2
 {
 	MultipleInheritance() :d(0) {};
@@ -599,6 +750,11 @@ struct MultipleInheritance :Base, Base2
 	int test() { return 1192; }
 	int test3() { return 710; }
 	int consttest2()const { return 1560; }
+};
+struct MultipleInheritance2 :MultipleInheritance, Base3
+{
+	MultipleInheritance2() :e(0) {};
+	int e;
 };
 
 
@@ -613,12 +769,17 @@ KAGUYA_TEST_FUNCTION_DEF(multiple_inheritance)(kaguya::State& state)
 		.addFunction("test2", &Base2::test2)
 		.addFunction("consttest", &Base2::consttest)
 		);
+	state["Base3"].setClass(kaguya::UserdataMetatable<Base3>()
+	);
 	state["MultipleInheritance"].setClass(kaguya::UserdataMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
 		.addFunction("d", &MultipleInheritance::d)
 		.addProperty("propd", &MultipleInheritance::d)
 		.addFunction("test", &MultipleInheritance::test)
 		.addFunction("consttest2", &MultipleInheritance::consttest2)
 		.addFunction("test3", &MultipleInheritance::test3));
+
+	state["MultipleInheritance2"].setClass(kaguya::UserdataMetatable<MultipleInheritance2, kaguya::MultipleBase<MultipleInheritance, Base3> >()
+		.addFunction("e", &MultipleInheritance2::e));
 
 	MultipleInheritance data;
 
@@ -647,6 +808,22 @@ KAGUYA_TEST_FUNCTION_DEF(multiple_inheritance)(kaguya::State& state)
 	TEST_EQUAL(data.b, 5);
 
 
+	{
+		MultipleInheritance test;
+		state["test"] = &test;
+		TEST_CHECK(state("test.b= 2"));
+		TEST_CHECK(state("assert(test.b == 2)"));
+		TEST_EQUAL(test.b, 2);
+	}
+	{
+		MultipleInheritance2 test;
+		state["test"] = &test;
+		TEST_CHECK(state("test.b= 4"));
+		TEST_CHECK(state("assert(test.b == 4)"));
+		TEST_EQUAL(test.b, 4);
+	}
+
+
 	state["constobj"] = static_cast<const MultipleInheritance*>(&data);
 	TEST_CHECK(state("assert(constobj:consttest()==794)"));
 	TEST_CHECK(state("assert(constobj:consttest2()==1560)"));
@@ -670,11 +847,16 @@ KAGUYA_TEST_FUNCTION_DEF(add_property)(kaguya::State& state)
 		.addProperty("b", &Derived::b)
 		);
 
+	state["Derived"]["test_value"] = 55;
+
 	Derived derived;
 	Base base;
 	const Base* constbase = &base;
 	state["base"] = &base;
 	state["derived"] = kaguya::standard::ref(derived);
+
+	TEST_CHECK(state("assert(55 == derived.test_value)"));
+
 	TEST_CHECK(state("base.a=1"));
 	TEST_CHECK(state("derived.a = 2"));
 	TEST_CHECK(state("derived.b=3"));
@@ -720,6 +902,35 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_case2)(kaguya::State& state)
 	TEST_CHECK(state("assert(2 == derived.a)"));
 	TEST_EQUAL(base.a, 1);
 	TEST_EQUAL(derived.a, 2);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(add_property_with_setter_getter)(kaguya::State& state)
+{
+	state["Member"].setClass(kaguya::UserdataMetatable<Member>()
+		.setConstructors<Member(), Member(int)>()
+		.addProperty("a", &Member::a)
+	);
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("prop", &Base::get, &Base::set)
+		.addProperty("class_prop", &Base::member_get, &Base::member_set)
+	);
+	Base base;
+	state["obj"] = &base;
+	TEST_CHECK(state("obj.prop=1"));
+	TEST_CHECK(state("assert(obj.prop==1)"));
+	TEST_EQUAL(base.a, 1);
+	TEST_CHECK(state("obj.prop=22"));
+	TEST_CHECK(state("assert(obj.prop==22)"));
+	TEST_EQUAL(base.a, 22);
+
+	TEST_CHECK(state("obj.class_prop=Member.new(5)"));//set
+	TEST_CHECK(state("assert(obj.class_prop.a==5)"));//get
+	TEST_EQUAL(base.member.a, 5);
+
+	TEST_CHECK(state("obj.class_prop=Member.new(33)"));//set
+	TEST_CHECK(state("assert(obj.class_prop.a==33)"));//get
+	TEST_EQUAL(base.member.a, 33);
 }
 
 struct Prop
@@ -1068,6 +1279,55 @@ KAGUYA_TEST_FUNCTION_DEF(duplicate_register_member_error_throw_test)(kaguya::Sta
 		catch_except = true;
 	}
 	TEST_CHECK(catch_except);
+	
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addOverloadedFunctions("a", &Base::a)
+			.addProperty("a", &Base::get)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+
+
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addOverloadedFunctions("a", &Base::a)
+			.addProperty("a", &Base::get, &Base::set)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
+
+	catch_except = false;
+	try
+	{
+		state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+			.addFunction("a", &Base::a)
+			.addFunction("a", &Base::get)
+		);
+	}
+	catch (const kaguya::KaguyaException& e)
+	{
+		std::string errormessage(e.what());
+		TEST_CHECK(errormessage.find("already registered") != std::string::npos);
+		catch_except = true;
+	}
+	TEST_CHECK(catch_except);
 
 
 	catch_except = false;
@@ -1159,18 +1419,18 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	state.setErrorHandler(ignore_error_fun);
 	
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
-		.setConstructors<ABC(int)>()
 		.addOverloadedFunctions("setmember", &ABC::intmember, &ABC::stringmember)
 		.addFunction("intdata", &ABC::intmember)
 		.addFunction("stringdata", &ABC::stringmember)
 		.addFunction("getInt", &ABC::getInt)
 		.addFunction("setInt", &ABC::setInt)
 		.addFunction("shared_copy", &ABC::shared_copy)
-		
-		
+		.addFunction("const_pointer", &ABC::const_pointer)
 	);
 
 	state["test"] = ABC();
+	state["other"] = Base();
+
 	TEST_CHECK(state("assert(test~=nil)"));
 	TEST_CHECK(state("test.setmember(test,'')"));
 
@@ -1194,6 +1454,179 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State& state)
 	state("test.shared_copy()");
 	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
 
+	last_error_message = "";
+	state("test.const_pointer(other)");
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(self_refcounted_object)(kaguya::State& )
+{
+	//test for self reference counted class
+	//see SelfRefCountedPtrWrapper and specialized ObjectPointerWrapperType for SelfRefCounted
+	TEST_EQUAL(SelfRefCounted::all_object_count,0);
+	
+	{
+		kaguya::State state;
+		state["RefObjectA"].setClass(kaguya::UserdataMetatable<RefObjectA>());
+		state["RefObjectA"].setClass(kaguya::UserdataMetatable<RefObjectB>());
+
+		state["a"] = new RefObjectA;
+		state["b"] = new RefObjectB;
+		TEST_EQUAL(SelfRefCounted::all_object_count, 2);
+
+		RefObjectA* ptr = state["a"];
+		state["c"] = ptr;
+		TEST_EQUAL(SelfRefCounted::all_object_count, 2);
+	}
+	TEST_EQUAL(SelfRefCounted::all_object_count, 0);
+
+}
+
+int testindexfn(ABC* self, int key)
+{
+	return self->intmember * key;
+}
+void testnewindexfn(ABC* self, int key,int value)
+{
+	TEST_EQUAL(key, 1);
+	TEST_EQUAL(value, 3);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(self_register_index_object)(kaguya::State& state)
+{
+
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.addStaticFunction("__index", &testindexfn)
+		.addStaticFunction("__newindex", &testnewindexfn));
+	ABC obj;
+	state["obj"] = ABC(3);
+	state("assert(obj[3]==9);");
+	state("obj[1]=3;");
+
+	{//other way
+		kaguya::State state;
+		state["ABC"].setClass(kaguya::UserdataMetatable<ABC>());
+
+		state["ABC"]["__index"] = kaguya::function(&testindexfn);
+		state["ABC"]["__newindex"] = kaguya::function(&testindexfn);
+
+		ABC obj;
+		state["obj"] = ABC(3);
+		state("assert(obj[3]==9);");
+		state("obj[1]=3;");
+	}
+}
+
+KAGUYA_TEST_FUNCTION_DEF(call_constructor)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("getInt", &ABC::getInt)
+	);
+
+	TEST_CHECK(state("value = assert(ABC(32))"));
+	TEST_CHECK(state("assert(value:getInt() == 32)"));
+
+	state["Foo"].setClass(kaguya::UserdataMetatable<Foo>()
+		.setConstructors<Foo()>()
+	);
+	TEST_CHECK(state("value = assert(Foo())"));
+	
+
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.addProperty("a", &Base::a)
+		.addFunction("__call", &Base::get)
+		.setConstructors<Base()>()
+	);
+	state["Base2"].setClass(kaguya::UserdataMetatable<Base2>()
+		.addProperty("b", &Base2::b)
+		.addFunction("__call", &Base2::test)
+		.setConstructors<Base2()>()
+	);
+	state["MultipleInheritance"].setClass(kaguya::UserdataMetatable<MultipleInheritance, kaguya::MultipleBase<Base, Base2> >()
+		.setConstructors<MultipleInheritance()>()
+		.addFunction("__call", &MultipleInheritance::test)
+		.addFunction("d", &MultipleInheritance::d)
+	);
+
+	TEST_CHECK(state("multiinheritance = assert(MultipleInheritance())"));
+	TEST_CHECK(state("assert(multiinheritance:d() == 0)"));
+	TEST_CHECK(state("assert(multiinheritance.a == 0)"));
+	TEST_CHECK(state("assert(multiinheritance.b == 0)"));
+	TEST_CHECK(state("assert(multiinheritance() == 1192)"));
+
+	TEST_CHECK(state("base2 = assert(Base2())"));
+	TEST_CHECK(state("assert(base2.b == 0)"));
+	TEST_CHECK(state("assert(base2() == 794)"));
+	TEST_CHECK(state("base = assert(Base())"));
+	TEST_CHECK(state("assert(base.a == 0)"));
+	TEST_CHECK(state("base.a = 4 assert(base.a == 4) assert(base() == 4)"));
+}
+KAGUYA_TEST_FUNCTION_DEF(int_call_constructor_manual)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("getInt", &ABC::getInt)
+	);
+	kaguya::LuaTable constructor_table = state.newTable();
+	constructor_table["__call"] = kaguya::LuaCodeChunkResult("return function(t,...) return t.new(...) end");
+	state["ABC"].setMetatable(constructor_table);
+
+	TEST_CHECK(state("value = assert(ABC(32))"));
+	TEST_CHECK(state("assert(value:getInt() == 32)"));
+}
+
+
+KAGUYA_TEST_FUNCTION_DEF(constructor_arg_type_mismatch_error)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("getInt", &ABC::getInt)
+	);
+	state.setErrorHandler(ignore_error_fun);
+	
+	last_error_message = "";
+	bool res = state("v = ABC.new('abc')");
+	TEST_CHECK(!res);
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(arg_type_mismatch_error)(kaguya::State& state)
+{
+	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
+		.setConstructors<ABC(int)>()
+		.addFunction("setInt", &ABC::setInt)
+	);
+	state.setErrorHandler(ignore_error_fun);
+
+	last_error_message = "";
+	TEST_CHECK(state("value = assert(ABC.new(32))"));
+
+	TEST_CHECK(!state("value:setInt('abc')"));
+
+	TEST_CHECK(last_error_message.find("mismatch") != std::string::npos);
+}
+int Base_a_getter(const Base* self)
+{
+	return self->a;
+}
+void Base_a_setter(Base* self,int v)
+{
+	self->a = v;
+}
+KAGUYA_TEST_FUNCTION_DEF(add_property_external)(kaguya::State& state)
+{
+
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("a", &Base_a_getter,&Base_a_setter)
+	);
+	Base base;
+	state["base"] = &base;
+	TEST_CHECK(state("base.a=1"));
+	TEST_CHECK(state("assert(1 == base.a)"));
+	TEST_EQUAL(base.a, 1);
 }
 
 KAGUYA_TEST_GROUP_END(test_02_classreg)

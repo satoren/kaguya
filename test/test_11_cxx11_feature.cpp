@@ -1,8 +1,10 @@
 #include "kaguya/kaguya.hpp"
 #include "test_util.hpp"
 
-#if KAGUYA_USE_CPP11
 
+
+#if KAGUYA_USE_CPP11
+#include <array>
 
 KAGUYA_TEST_GROUP_START(test_11_cxx11_feature)
 
@@ -19,12 +21,12 @@ KAGUYA_TEST_FUNCTION_DEF(enum_class_set)(kaguya::State& state)
 {
 	state["value"] = testenumclass::Foo;
 	TEST_CHECK(state("assert(value == 0)"));
-};
+}
 KAGUYA_TEST_FUNCTION_DEF(enum_class_get)(kaguya::State& state)
 {
 	state("value = 1");
 	TEST_CHECK(state["value"] == testenumclass::Bar);
-};
+}
 
 
 
@@ -44,7 +46,7 @@ KAGUYA_TEST_FUNCTION_DEF(movable_class_test)(kaguya::State& state)
 	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
 		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
-		);
+	);
 
 	state["moveonly"] = MoveOnlyClass(2);
 
@@ -111,6 +113,8 @@ KAGUYA_TEST_FUNCTION_DEF(lambdafun)(kaguya::State& state)
 	state("assert(overload('2') == 2)");//string version
 	state("assert(overload() == 3)");//no argument version
 
+	state["lamda2"] = kaguya::function([]()mutable {return 12; });//mutable functor
+	state("assert(lamda2() == 12)");
 }
 
 KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
@@ -118,7 +122,7 @@ KAGUYA_TEST_FUNCTION_DEF(put_unique_ptr)(kaguya::State& state)
 	state["MoveOnlyClass"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>()
 		.setConstructors<MoveOnlyClass(int)>()
 		.addProperty("member", &MoveOnlyClass::member)
-		);
+	);
 
 	state["uniqueptr"] = std::unique_ptr<MoveOnlyClass>(new MoveOnlyClass(2));
 
@@ -187,14 +191,14 @@ KAGUYA_TEST_FUNCTION_DEF(nullptr_set)(kaguya::State& state)
 	TEST_CHECK(state["value"] == nullptr);
 	TEST_CHECK(!state["value"]);
 	TEST_CHECK(state("assert(value == nil)"));
-};
+}
 
 
 KAGUYA_TEST_FUNCTION_DEF(null_unique_ptr)(kaguya::State& state)
 {
 	state["Base"].setClass(kaguya::UserdataMetatable<MoveOnlyClass>());
 
-	state["test"] =std::unique_ptr<MoveOnlyClass>();
+	state["test"] = std::unique_ptr<MoveOnlyClass>();
 	TEST_CHECK(state("assert(test==nil)"));
 }
 
@@ -238,7 +242,7 @@ KAGUYA_TEST_FUNCTION_DEF(result_range_based_for)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 {
 	state["table"] = kaguya::TableData{ 23,"test",{"key","value"},
-	{ "childtable",kaguya::TableData{3} }};
+	{ "childtable",kaguya::TableData{3} } };
 	kaguya::LuaTable tbl = state["table"];
 
 
@@ -251,6 +255,78 @@ KAGUYA_TEST_FUNCTION_DEF(initializer_list)(kaguya::State& state)
 	TEST_EQUAL(tbl["key"], "value");
 	TEST_EQUAL(tbl["childtable"][1], 3);
 }
+
+KAGUYA_TEST_FUNCTION_DEF(std_array)(kaguya::State& state)
+{
+	std::array<int, 3> arr{{ 2,3,4 }};
+	state["value"] = arr;
+
+
+	state("assert(value[1] == 2)");
+	state("assert(value[2] == 3)");
+	state("assert(value[3] == 4)");
+	std::array<int, 3> get = state["value"];
+	TEST_EQUAL(get[0], 2);
+	TEST_EQUAL(get[1], 3);
+	TEST_EQUAL(get[2], 4);
+	bool v = state["value"].weakTypeTest<std::array<int, 3> >();
+	TEST_CHECK(v);
+}
+
+
+int self_refcounted_object_count = 0;
+struct self_refcounted_object
+{
+	self_refcounted_object() :refcount(0)
+	{
+		self_refcounted_object_count++;
+	}
+	virtual ~self_refcounted_object() { self_refcounted_object_count--; }
+
+	int get_ref_count()const { return refcount; }
+
+	int refcount;
+private:
+	self_refcounted_object(const self_refcounted_object&) = delete;
+	self_refcounted_object& operator=(const self_refcounted_object&) = delete;
+};
+struct self_refcounted_object_deleter
+{
+	void operator()(self_refcounted_object* d)
+	{
+		d->refcount--;
+		if (d->refcount <= 0)
+		{
+			delete d;
+		}
+	}
+};
+
+std::unique_ptr<self_refcounted_object, self_refcounted_object_deleter> self_refcounted_object_construct()
+{
+	self_refcounted_object* ptr = new self_refcounted_object();
+	ptr->refcount++;
+	return std::unique_ptr<self_refcounted_object, self_refcounted_object_deleter>(ptr);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(self_refcount_object)(kaguya::State&)
+{
+	TEST_EQUAL(self_refcounted_object_count, 0);
+	{
+		kaguya::State state;
+		state["self_refcount_object"].setClass(kaguya::UserdataMetatable<self_refcounted_object>()
+			.addStaticFunction("new", &self_refcounted_object_construct)
+			.addProperty("ref_count", &self_refcounted_object::get_ref_count)
+		);
+
+		TEST_CHECK(state.dostring("a = self_refcount_object.new();assert(a.ref_count == 1)"));
+
+		TEST_EQUAL(self_refcounted_object_count, 1);//available 1 object
+	}
+
+	TEST_EQUAL(self_refcounted_object_count, 0);//destructed
+}
+
 
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
 

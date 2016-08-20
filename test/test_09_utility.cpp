@@ -10,14 +10,14 @@ KAGUYA_TEST_FUNCTION_DEF(lua_resume_test)(kaguya::State& s)
 {
 	using namespace kaguya;
 
-	
+
 	LuaThread t = s.newThread(s.loadstring("v={...}"));
 
-	lua_State* co = t.get<lua_State*>();
+	lua_State* co = t;
 	lua_pushnumber(co, 2);
 	lua_pushnumber(co, 3);
 
-	lua_resume(co,s.state(),2);
+	lua_resume(co, s.state(), 2);
 
 	TEST_EQUAL(s["v"][1], 2);
 	TEST_EQUAL(s["v"][2], 3);
@@ -67,9 +67,9 @@ KAGUYA_TEST_FUNCTION_DEF(luaL_requiref_test)(kaguya::State& s)
 {
 	using namespace kaguya;
 
-	luaL_requiref(s.state(),"mylib", lua_mylibf,false);
-	kaguya::LuaStackRef ref(s.state(), -1,true);
-	TEST_EQUAL(ref["value"],111);
+	luaL_requiref(s.state(), "mylib", lua_mylibf, false);
+	kaguya::LuaStackRef ref(s.state(), -1, true);
+	TEST_EQUAL(ref["value"], 111);
 	TEST_CHECK(s("assert(mylib == nil)"));
 }
 
@@ -91,23 +91,22 @@ KAGUYA_TEST_FUNCTION_DEF(lua_rawlen_test)(kaguya::State& s)
 	TEST_EQUAL(lua_rawlen(s.state(), -1), 6);
 
 	LuaTable tbl = s.newTable();
-	tbl["2"] = 3;tbl["1"] = 3;
+	tbl["2"] = 3; tbl["1"] = 3;
 	s.pushToStack(tbl);
 	TEST_EQUAL(lua_rawlen(s.state(), -1), 0);
 
 	s.pushToStack(A());
 	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), sizeof(A));
 
-
-	s.pushToStack(A());
-	TEST_COMPARE_GE(lua_rawlen(s.state(), -1), sizeof(A));
-
 	A a;
 	s.pushToStack(&a);
-	TEST_EQUAL(lua_type(s.state(), -1) , LUA_TLIGHTUSERDATA);
+	TEST_EQUAL(lua_type(s.state(), -1), LUA_TLIGHTUSERDATA);
 	TEST_COMPARE_EQ(lua_rawlen(s.state(), -1), 0);
 
-	lua_settop(s.state(),0);
+	s.pushToStack(2);
+	TEST_EQUAL(lua_rawlen(s.state(), -1), 0);
+
+	lua_settop(s.state(), 0);
 }
 
 
@@ -115,6 +114,18 @@ void checkf()
 {
 }
 
+template<typename F>void function_argcount_check(F f, size_t count)
+{
+	TEST_EQUAL(kaguya::util::FunctionSignature<F>::type::argument_count, count);
+}
+
+template<typename RET, typename F>void function_return_type_check(F f)
+{
+	bool ret = kaguya::standard::is_same<
+		typename kaguya::util::FunctionSignature<F>::type::result_type
+		, RET>::value;
+	TEST_CHECK(ret);
+}
 KAGUYA_TEST_FUNCTION_DEF(check_function_signature)(kaguya::State& s)
 {
 	using namespace kaguya;
@@ -123,18 +134,57 @@ KAGUYA_TEST_FUNCTION_DEF(check_function_signature)(kaguya::State& s)
 
 	TEST_CHECK(nativefunction::checkArgTypes(s.state(), checkf));
 	TEST_CHECK(nativefunction::strictCheckArgTypes(s.state(), checkf));
-	TEST_EQUAL(nativefunction::argTypesName(checkf),std::string(""));
-	TEST_EQUAL(nativefunction::argCount(checkf), 0);
+	TEST_EQUAL(nativefunction::argTypesName(checkf), std::string(""));
+	TEST_EQUAL(nativefunction::minArgCount(checkf), 0);
+	TEST_EQUAL(nativefunction::maxArgCount(checkf), 0);
 
 	TEST_CHECK(nativefunction::checkArgTypes(s.state(), &checkf));
 	TEST_CHECK(nativefunction::strictCheckArgTypes(s.state(), &checkf));
 	TEST_EQUAL(nativefunction::argTypesName(&checkf), std::string(""));
-	TEST_EQUAL(nativefunction::argCount(&checkf), 0);
+	TEST_EQUAL(nativefunction::minArgCount(&checkf), 0);
+	TEST_EQUAL(nativefunction::maxArgCount(&checkf), 0);
 
 	TEST_CHECK(nativefunction::checkArgTypes(s.state(), stdfn));
 	TEST_CHECK(nativefunction::strictCheckArgTypes(s.state(), stdfn));
 	TEST_EQUAL(nativefunction::argTypesName(stdfn), std::string(""));
-	TEST_EQUAL(nativefunction::argCount(stdfn), 0);
+	TEST_EQUAL(nativefunction::minArgCount(stdfn), 0);
+	TEST_EQUAL(nativefunction::maxArgCount(stdfn), 0);
+
+	bool ret = traits::is_same<int, int>::value;
+	TEST_CHECK(ret);
+	ret = traits::is_same<int, util::ArgumentType<0, void(int, int)>::type>::value;
+	TEST_CHECK(ret);
+	ret = traits::is_same<std::string, util::ArgumentType < 1, void(int, std::string) > ::type>::value;
+	TEST_CHECK(ret);
+
+
+	function_argcount_check(checkf, 0);
+	function_argcount_check(&TestClass::default_arg, 4);
+	function_argcount_check(stdfn, 0);
+
+	function_return_type_check<void>(checkf);
+	function_return_type_check<int>(&TestClass::default_arg);
+	function_return_type_check<void>(stdfn);
 }
+
+
+KAGUYA_TEST_FUNCTION_DEF(preprocessor)(kaguya::State& )
+{
+	TEST_EQUAL(KAGUYA_PP_INC(1), 2);
+	TEST_EQUAL(KAGUYA_PP_INC(2), 3);
+	TEST_EQUAL(KAGUYA_PP_ADD(1, 2), 3);
+	TEST_EQUAL(KAGUYA_PP_SUB(3, 2), 1);
+	TEST_EQUAL(KAGUYA_PP_SUB(3, 3), 0);
+	TEST_EQUAL(KAGUYA_PP_SUB(3, 0), 3);
+}
+KAGUYA_TEST_FUNCTION_DEF(pretty_type_name)(kaguya::State&)
+{
+	using kaguya::util::pretty_name;
+
+	TEST_EQUAL(pretty_name(typeid(int)), "int");
+	TEST_EQUAL(pretty_name(typeid(long)), "long");
+
+}
+
 
 KAGUYA_TEST_GROUP_END(test_09_utility)

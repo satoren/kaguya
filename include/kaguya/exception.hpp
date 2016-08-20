@@ -6,6 +6,8 @@
 #pragma once
 
 #include <exception>
+#include <stdexcept>
+
 
 #include "kaguya/utility.hpp"
 
@@ -38,6 +40,7 @@ namespace kaguya
 	};
 	class LuaTypeMismatch :public LuaException {
 	public:
+		LuaTypeMismatch()throw():LuaException(0, "type mismatch!!") {}
 		LuaTypeMismatch(const char* what)throw() :LuaException(0, what) {}
 		LuaTypeMismatch(const std::string& what) :LuaException(0, what) {}
 	};

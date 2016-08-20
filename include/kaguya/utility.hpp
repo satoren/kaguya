@@ -7,26 +7,47 @@
 
 #include "kaguya/config.hpp"
 #include "kaguya/compatibility.hpp"
+#include "kaguya/traits.hpp"
+
+#include "kaguya/preprocess.hpp"
+
+#if KAGUYA_USE_CPP11
+#include "kaguya/utility_cxx11.hpp"
+#else
+#include "kaguya/utility_cxx03.hpp"
+#endif
+
+#if KAGUYA_USE_CXX_ABI_DEMANGLE
+#include <cxxabi.h>
+#endif
 
 namespace kaguya
 {
 	namespace util
 	{
+		/// @brief save stack count and restore on destructor
 		class ScopedSavedStack {
 			lua_State * state_;
 			int saved_top_index_;
 
 		public:
+			/// @brief save stack count
+			/// @param state
 			explicit ScopedSavedStack(lua_State * state)
 				: state_(state),
 				saved_top_index_(state_ ? lua_gettop(state_):0)
 			{
 			}
+
+			/// @brief save stack count
+			/// @param state
+			/// @param count stack count
 			explicit ScopedSavedStack(lua_State * state, int count)
 				: state_(state),
 				saved_top_index_(count)
 			{}
 
+			/// @brief restore stack count
 			~ScopedSavedStack() {
 				if (state_) {
 					lua_settop(state_, saved_top_index_);
@@ -190,19 +211,15 @@ namespace kaguya
 			return 0;
 		}
 
-#define KAGUYA_PP_TEMPLATE(N) KAGUYA_PP_CAT(typename A,N)
-#define KAGUYA_PP_FARG(N) const KAGUYA_PP_CAT(A,N)& KAGUYA_PP_CAT(a,N)
 #define KAGUYA_PUSH_DEF(N) c+=lua_type_traits<KAGUYA_PP_CAT(A,N) >::push(l, KAGUYA_PP_CAT(a,N)); 
-#define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_TEMPLATE)>\
-		inline int push_args(lua_State *l,KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_FARG))\
+#define KAGUYA_PUSH_ARG_DEF(N) template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+		inline int push_args(lua_State *l,KAGUYA_PP_ARG_CR_DEF_REPEAT(N))\
 		{\
 			int c =0;\
 			KAGUYA_PP_REPEAT(N,KAGUYA_PUSH_DEF)\
 			return c;\
 		}
-		KAGUYA_PP_REPEAT_DEF(9, KAGUYA_PUSH_ARG_DEF)
-#undef KAGUYA_PP_TEMPLATE
-#undef KAGUYA_PP_FARG
+		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_PUSH_ARG_DEF)
 #undef KAGUYA_PUSH_DEF
 #undef KAGUYA_PUSH_ARG_DEF
 #endif
@@ -225,5 +242,22 @@ namespace kaguya
 			return count != 0;
 		}
 #endif
+
+
+		inline std::string pretty_name(const std::type_info& t)
+		{
+#if KAGUYA_USE_CXX_ABI_DEMANGLE
+			int status = 0;
+			char* demangle_name = abi::__cxa_demangle(t.name(), 0, 0, &status);
+			struct deleter {
+				char* data;
+				deleter(char* d):data(d){}
+				~deleter(){ std::free(data); }
+			}d(demangle_name);
+			return demangle_name;
+#else
+			return t.name();
+#endif
+		}
 	}
 }

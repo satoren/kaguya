@@ -26,7 +26,7 @@ namespace kaguya
 				ObjectWrapperBase* object = object_wrapper(state, i);
 				if (object)
 				{
-					result += object->type().name();
+					result += util::pretty_name(object->type());
 				}
 				else
 				{
@@ -77,7 +77,7 @@ namespace kaguya
 			template<typename F>
 			static base_ptr_ create(F fun)
 			{
-				KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::decay<F>::type>::value, "argument need callable");
+//				KAGUYA_STATIC_ASSERT(nativefunction::is_callable<typename traits::decay<F>::type>::value, "argument need callable");
 
 				typedef FunInvoker<F> InvokerType;
 				return base_ptr_(new InvokerType(fun));
@@ -189,7 +189,8 @@ namespace kaguya
 	typedef std::vector<FunctorType> FunctorOverloadType;
 
 
-	//!deperecated
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctorType(deprecated)
 	template<> struct lua_type_traits<FunctorType> {
 		typedef FunctorType get_type;
 		typedef FunctorType push_type;
@@ -215,8 +216,13 @@ namespace kaguya
 #endif
 	};
 
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctorType(deprecated)
 	template<>	struct lua_type_traits<const FunctorType&> :lua_type_traits<FunctorType> {};
 
+
+	/// @ingroup lua_type_traits
+	/// @brief lua_type_traits for FunctorOverloadType(deprecated)
 	template<>	struct lua_type_traits<FunctorOverloadType> {
 		typedef const FunctorOverloadType& push_type;
 

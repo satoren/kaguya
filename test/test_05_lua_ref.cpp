@@ -151,6 +151,7 @@ KAGUYA_TEST_FUNCTION_DEF(test_operator_bool)(kaguya::State& state)
 	kaguya::LuaTable newTable2 = state.newTable();
 	kaguya::LuaTable tabl1_ref_copy = table1;
 	TEST_CHECK(newTable2 != table1);
+	TEST_CHECK(ob() != newTable2);
 	TEST_CHECK(!(newTable2 == table1));
 	TEST_CHECK(table1 == tabl1_ref_copy);
 }
@@ -464,6 +465,8 @@ KAGUYA_TEST_FUNCTION_DEF(get_field)(kaguya::State& state)
 	TEST_EQUAL(const_table[1], 32);
 	TEST_EQUAL(const_table.getField(1), 32);
 	TEST_EQUAL(const_table.getField<int>(state.newRef(1)),32);
+	TEST_EQUAL(const_table.getRawField(1), 32);
+	TEST_EQUAL(const_table.getRawField<int>(state.newRef(1)), 32);
 }
 
 
@@ -548,6 +551,13 @@ KAGUYA_TEST_FUNCTION_DEF(nostate_ref_error)(kaguya::State& state)
 	TEST_CHECK(!v.setField(kaguya::NilValue(), kaguya::NilValue()));
 
 
+	TEST_CHECK(!v.setRawField("s", 2));
+	TEST_CHECK(!v.setRawField("s", "a"));
+	TEST_CHECK(!v.setRawField("s", std::string("a")));
+	TEST_CHECK(!v.setRawField("s", table));
+	TEST_CHECK(!v.setRawField("s", kaguya::NilValue()));
+	TEST_CHECK(!v.setRawField(kaguya::NilValue(), kaguya::NilValue()));
+
 	TEST_CHECK(!table.getFunctionEnv());
 	TEST_CHECK(!thread.getMetatable());
 
@@ -606,21 +616,6 @@ void UserDataTestFunction2(int r)
 KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
-	{
-		last_error_message = "";
-		kaguya::LuaTable nottable = state.newThread();
-		TEST_COMPARE_NE(last_error_message, "");
-	}
-	{
-		last_error_message = "";
-		kaguya::LuaUserData notud = state.newThread();
-		TEST_COMPARE_NE(last_error_message, "");
-	}
-	{
-		last_error_message = "";
-		kaguya::LuaThread notud = state.newTable();
-		TEST_COMPARE_NE(last_error_message, "");
-	}
 
 	{
 		last_error_message = "";

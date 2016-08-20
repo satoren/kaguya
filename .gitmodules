@@ -1,9 +1,0 @@
-[submodule "samples/glfw_nanovg_bind/glfw"]
-	path = samples/glfw_nanovg_bind/glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "samples/glfw_nanovg_bind/nanovg"]
-	path = samples/glfw_nanovg_bind/nanovg
-	url = https://github.com/memononen/nanovg.git
-[submodule "samples/glfw_nanovg_bind/glad"]
-	path = samples/glfw_nanovg_bind/glad
-	url = https://github.com/Dav1dde/glad.git
