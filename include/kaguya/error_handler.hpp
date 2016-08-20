@@ -195,10 +195,8 @@ namespace kaguya
 		{
 			if (status != 0 && status != LUA_YIELD)
 			{
-				if (ErrorHandler::handle(status, state))
-				{
-					return false;
-				}
+				ErrorHandler::handle(status, state);
+
 				return false;
 			}
 			return true;

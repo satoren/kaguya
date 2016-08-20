@@ -274,6 +274,8 @@ inline std::ostream& operator << (std::ostream& os, std::nullptr_t)
 
 #define TEST_CHECK(B) if(!(B)) throw std::runtime_error( std::string("failed.\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya_test_util::to_string(__LINE__) + "\nCHECKCODE:" #B );
 
+#define TEST_CHECK_M(B,M) if(!(B)) throw std::runtime_error(M + std::string("\nfunction:") +__FUNCTION__  + std::string("\nline:") + kaguya_test_util::to_string(__LINE__) + "\nCHECKCODE:" #B );
+
 #define TEST_COMPARE(A,B,OP)  if(!((A) OP (B)))\
 {\
 std::stringstream ss;\
