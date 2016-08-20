@@ -45,5 +45,5 @@ after_success: |
     export GCOV="gcov"
   fi
   if [ -n "$GCOV" ]; then
-    coveralls --gcov ${GCOV} --exclude test --exclude example --exclude CMakeFiles --exclude benchmark --exclude single_include --gcov-options '\-lp'
+    coveralls --gcov ${GCOV} --exclude test --exclude examples --exclude benchmark --exclude single_include --gcov-options '\-lp'
   fi
