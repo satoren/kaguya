@@ -38,12 +38,15 @@ KAGUYA_TEST_FUNCTION_DEF(defaultarguments)(kaguya::State& state)
 	state["defargfn"] = kaguya::function(defargfn_wrapper());
 	state["defargfn2"] = kaguya::function(defargfn_wrapper2());
 
-	state.dostring("defargfn('abc')");
-	last_error_message.find("[OPT]int,[OPT]int,[OPT]int");
+	std::string intname = kaguya::util::pretty_name(typeid(int));
 
-
-	state.dostring("defargfn2('abc')");
-	last_error_message.find("int,int,[OPT]int");
+	if (intname == "int")
+	{
+		state.dostring("defargfn('abc')");
+		TEST_CHECK_M(last_error_message.find("[OPT]int,[OPT]int,[OPT]int") != std::string::npos, last_error_message);
+		state.dostring("defargfn2('abc',3)");
+		TEST_CHECK_M(last_error_message.find("int,int,[OPT]int") != std::string::npos, last_error_message);
+	}
 }
 
 
