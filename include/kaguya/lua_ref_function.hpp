@@ -39,12 +39,12 @@ namespace kaguya
 		{
 		}
 #if KAGUYA_USE_CPP11
-		FunctionResults(FunctionResults&&src) : Ref::StackRef(std::move(src)), state_(src.state_), resultStatus_(0), resultCount_(src.resultCount_)
+		FunctionResults(FunctionResults&&src) : Ref::StackRef(std::move(src)), state_(src.state_), resultStatus_(src.resultStatus_), resultCount_(src.resultCount_)
 		{
 			src.state_ = 0;
 		}
 #else
-		FunctionResults(const FunctionResults&src) : Ref::StackRef(src), state_(src.state_), resultCount_(src.resultCount_)
+		FunctionResults(const FunctionResults&src) : Ref::StackRef(src), state_(src.state_), resultStatus_(src.resultStatus_), resultCount_(src.resultCount_)
 		{
 			src.state_ = 0;
 		}

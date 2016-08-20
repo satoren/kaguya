@@ -84,7 +84,7 @@ namespace kaguya
 				lua_State* state = state_();
 				if (!state)
 				{
-					except::typeMismatchError(state, "is nil");
+					except::typeMismatchError(state, "nil");
 					return Result();
 				}
 				int argstart = lua_gettop(state) + 1;
@@ -105,7 +105,7 @@ namespace kaguya
 				lua_State* state = state_();\
 				if (!state)\
 				{\
-					except::typeMismatchError(state, "is nil");\
+					except::typeMismatchError(state, "attempt to call nil value");\
 					return Result();\
 				}\
 				int argstart = lua_gettop(state) + 1;\
@@ -167,7 +167,7 @@ namespace kaguya
 				lua_State* state = state_();
 				if (!state)
 				{
-					except::typeMismatchError(state, "is nil");
+					except::typeMismatchError(state, "attempt to call nil value");
 					return Result();
 				}
 				util::ScopedSavedStack save(state);
@@ -200,7 +200,7 @@ namespace kaguya
 				lua_State* state = state_();\
 				if (!state)\
 				{\
-					except::typeMismatchError(state, "is nil");\
+					except::typeMismatchError(state, "attempt to call nil value");\
 					return Result();\
 				}\
 				util::ScopedSavedStack save(state);\
@@ -249,7 +249,7 @@ namespace kaguya
 				lua_State* state = state_();
 				if (!state)
 				{
-					except::typeMismatchError(state, "is nil");
+					except::typeMismatchError(state, "attempt to call nil value");
 					return LUA_ERRRUN;
 				}
 				util::ScopedSavedStack save(state);
@@ -258,7 +258,7 @@ namespace kaguya
 
 				if (!thread)
 				{
-					except::typeMismatchError(state, "is not thread");
+					except::typeMismatchError(state, "not thread");
 					return LUA_ERRRUN;
 				}
 				return lua_status(thread);
@@ -287,7 +287,7 @@ namespace kaguya
 
 				if (!thread)
 				{
-					except::typeMismatchError(state, "is not thread");
+					except::typeMismatchError(state, "not thread");
 					return COSTAT_DEAD;
 				}
 				else if (thread == l)
