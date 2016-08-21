@@ -52,6 +52,15 @@ KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State& state)
 	abctable.setField("a", 22);
 	TEST_CHECK(abctable["a"] == 22);
 
+
+	kaguya::LuaTable v = state.newTable();
+	TEST_CHECK(v.setRawField("s", 2));
+	TEST_CHECK(v.setRawField("s", "a"));
+	TEST_CHECK(v.setRawField("s", std::string("a")));
+	TEST_CHECK(v.setRawField("s", abctable));
+	TEST_CHECK(v.setRawField("s", kaguya::NilValue()));
+
+
 	kaguya::LuaStackRef a;
 }
 KAGUYA_TEST_FUNCTION_DEF(refcopy)(kaguya::State& state)
@@ -616,6 +625,22 @@ void UserDataTestFunction2(int r)
 KAGUYA_TEST_FUNCTION_DEF(typecheck_ref_error)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
+
+	{
+		last_error_message = "";
+		kaguya::LuaTable nottable = kaguya::LuaRef(state.newThread());
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaUserData notud = kaguya::LuaRef(state.newThread());
+		TEST_COMPARE_NE(last_error_message, "");
+	}
+	{
+		last_error_message = "";
+		kaguya::LuaThread notud = kaguya::LuaRef(state.newTable());
+		TEST_COMPARE_NE(last_error_message, "");
+	}
 
 	{
 		last_error_message = "";
