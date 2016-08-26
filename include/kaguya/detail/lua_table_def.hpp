@@ -201,12 +201,10 @@ namespace kaguya
 				lua_pushnil(state);
 				while (lua_next(state, stackIndex) != 0)
 				{
-					lua_pushvalue(state, -2);//backup key
-					lua_insert(state, -3);
+					//backup key
+					lua_pushvalue(state, -2);
 
-					typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
-					typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
-					f(key, value);
+					f(lua_type_traits<K>::get(state, -1), lua_type_traits<V>::get(state, -2));
 					lua_pop(state, 2);//pop key and value
 				}
 			}
@@ -226,11 +224,8 @@ namespace kaguya
 				while (lua_next(state, stackIndex) != 0)
 				{
 					lua_pushvalue(state, -2);//backup key
-					lua_insert(state, -3);
 
-					typename lua_type_traits<V>::get_type value = lua_type_traits<V>::get(state, -1);
-					typename lua_type_traits<K>::get_type key = lua_type_traits<K>::get(state, -2);
-					bool cont = f(key, value);
+					bool cont = f(lua_type_traits<K>::get(state, -1), lua_type_traits<V>::get(state, -2));
 					lua_pop(state, 2);//pop key and value
 					if (!cont)
 					{
