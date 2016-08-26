@@ -609,7 +609,7 @@ namespace kaguyaapi
 		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
-			std::vector<double> r = lua_table;
+			std::vector<double> r = lua_table.values < double > ();
 		}
 	}
 	void table_to_vector_with_typecheck(kaguya::State& state)
@@ -618,7 +618,7 @@ namespace kaguyaapi
 		kaguya::LuaTable lua_table = state["lua_table"];
 		for (int i = 0; i < KAGUYA_BENCHMARK_COUNT; i++)
 		{
-			std::vector<double> r = lua_table.get<std::vector<double> >();
+			std::vector<double> r = lua_table.values<double>();
 		}
 	}
 	void vector_to_table(kaguya::State& state)
