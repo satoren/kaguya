@@ -367,6 +367,36 @@ namespace kaguya
             return *this;
         }
 
+		/// @brief add member property with getter function.(experimental)
+		/// @param name function name for lua
+		/// @param getter getter function
+		template<typename GetterType>
+		UserdataMetatable& addPropertyAny(const char* name, GetterType getter)
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException(std::string(name) + " is already registered.");
+				return *this;
+			}
+			property_map_[name] = AnyDataPusher(function(getter));
+			return *this;
+		}
+		/// @brief add member property with setter, getter functions.(experimental)
+		/// @param name function name for lua
+		/// @param getter getter function
+		/// @param setter setter function
+		template<typename GetterType, typename SetterType>
+		UserdataMetatable& addPropertyAny(const char* name, GetterType getter, SetterType setter)
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException(std::string(name) + " is already registered.");
+				return *this;
+			}
+			property_map_[name] = AnyDataPusher(overload(getter, setter));
+			return *this;
+		}
+
 		/// @brief add non member function
 		/// @param name function name for lua
 		/// @param f function

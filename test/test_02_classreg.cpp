@@ -1628,5 +1628,18 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_external)(kaguya::State& state)
 	TEST_CHECK(state("assert(1 == base.a)"));
 	TEST_EQUAL(base.a, 1);
 }
+KAGUYA_TEST_FUNCTION_DEF(add_property_any)(kaguya::State& state)
+{
+
+	state["Base"].setClass(kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addPropertyAny("a", &Base_a_getter, &Base_a_setter)
+	);
+	Base base;
+	state["base"] = &base;
+	TEST_CHECK(state("base.a=1"));
+	TEST_CHECK(state("assert(1 == base.a)"));
+	TEST_EQUAL(base.a, 1);
+}
 
 KAGUYA_TEST_GROUP_END(test_02_classreg)
