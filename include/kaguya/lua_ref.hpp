@@ -142,39 +142,7 @@ namespace kaguya
 		LuaRef(lua_State* state, const T& v, Ref::NoMainCheck) : Ref::RegistoryRef(state, v, Ref::NoMainCheck()) {}
 		template<typename T>
 		LuaRef(lua_State* state, const T& v) : Ref::RegistoryRef(state, v) {}
-
-		bool isNilref()const { return state() == 0 || ref_ == LUA_REFNIL; }
-
-
-
-		//push to Lua stack
-		int push()const
-		{
-			return push(state());
-		}
-		int push(lua_State* s)const
-		{
-			if (isNilref())
-			{
-				lua_pushnil(s);
-				return 1;
-			}
-#if LUA_VERSION_NUM >= 502
-			if (s != state())
-			{//state check
-				assert(toMainThread(s) == toMainThread(state()));
-			}
-#endif
-			lua_rawgeti(s, LUA_REGISTRYINDEX, ref_);
-			return 1;
-		}
-		int pushStackIndex(lua_State* state)const
-		{
-			push(state);
-			return lua_gettop(state);
-		}
-
-
+		
 
 		const void* native_pointer()const
 		{
@@ -316,7 +284,7 @@ namespace kaguya
 			if (t != TYPE_USERDATA && t != TYPE_LIGHTUSERDATA &&t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not user data");
-				Ref::RegistoryRef::unref();
+				unref();
 			}
 		}
 	public:
@@ -387,7 +355,7 @@ namespace kaguya
 			if (t != TYPE_TABLE && t != TYPE_NIL && t != TYPE_NONE)
 			{
 				except::typeMismatchError(state(), "not table");
-				Ref::RegistoryRef::unref();
+				unref();
 			}
 		}
 	public:

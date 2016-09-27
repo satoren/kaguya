@@ -271,11 +271,11 @@ namespace kaguya
 
 			bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
 
-		protected:
+		private:
 			lua_State *state_;
 			int ref_;
 
-
+		protected:
 			void unref()
 			{
 				if (!isNilref())
