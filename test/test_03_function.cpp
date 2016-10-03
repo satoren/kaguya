@@ -548,14 +548,17 @@ void two_string_fn(std::string a, std::string b)
 	TEST_EQUAL(a, "test1");
 	TEST_EQUAL(b, "test2");
 }
+void two_cr_string_fn(const std::string& a, const std::string& b)
+{
+	TEST_EQUAL(a, "test1");
+	TEST_EQUAL(b, "test2");
+}
 
 KAGUYA_TEST_FUNCTION_DEF(none_to_string)(kaguya::State& state)
 {
 	state.setErrorHandler(ignore_error_fun);
 	state["two_string_fn"] = kaguya::function(two_string_fn);
-
-	std::string strname = kaguya::util::pretty_name(typeid(std::string));
-
+	state["two_cr_string_fn"] = kaguya::function(two_cr_string_fn);
 
 	last_error_message = "";
 	TEST_CHECK(state.dostring("two_string_fn('test1','test2')"));
@@ -563,6 +566,14 @@ KAGUYA_TEST_FUNCTION_DEF(none_to_string)(kaguya::State& state)
 
 	last_error_message = "";
 	TEST_CHECK(!state.dostring("two_string_fn('error_test')"));
+	TEST_CHECK(last_error_message != "");
+
+	last_error_message = "";
+	TEST_CHECK(state.dostring("two_cr_string_fn('test1','test2')"));
+	TEST_CHECK(last_error_message == "");
+
+	last_error_message = "";
+	TEST_CHECK(!state.dostring("two_cr_string_fn('error_test')"));
 	TEST_CHECK(last_error_message != "");
 }
 
