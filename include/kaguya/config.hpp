@@ -90,6 +90,12 @@ extern "C" {
 #endif
 
 
+#ifndef KAGUYA_USE_SHARED_LUAREF
+#define KAGUYA_USE_SHARED_LUAREF 0
+#endif
+
+
+
 #ifndef KAGUYA_NOEXCEPT
 # if KAGUYA_USE_CPP11 && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 #  define KAGUYA_NOEXCEPT noexcept

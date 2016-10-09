@@ -81,7 +81,7 @@ namespace kaguya
 			{
 				if (state_ && pop_)
 				{
-					if (lua_gettop(state_) >= stack_index_ )
+					if (lua_gettop(state_) >= stack_index_)
 					{
 						lua_settop(state_, stack_index_ - 1);
 					}
@@ -128,39 +128,155 @@ namespace kaguya
 		class RegistoryRef
 		{
 		public:
-
-			RegistoryRef(const RegistoryRef& src) :state_(src.state_)
+#if KAGUYA_USE_SHARED_LUAREF
+			struct RefHolder
 			{
-				if (!src.isNilref())
+				struct RefDeleter
 				{
-					src.push(state_);
-					ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
-				}
-				else
-				{
-					ref_ = LUA_REFNIL;
-				}
-			}
-			RegistoryRef& operator =(const RegistoryRef& src)
-			{
-				if (this != &src)
-				{
-					unref();
-					state_ = src.state_;
-					if (!src.isNilref())
+					RefDeleter(lua_State* L) : state_(L)
 					{
-						src.push(state_);
+					}
+					void operator()(int* ref)
+					{
+						luaL_unref(state_, LUA_REGISTRYINDEX, *ref);
+						delete ref;
+					}
+					lua_State* state_;
+				};
+				RefHolder(lua_State* L, int ref) : state_(L), ref_(new int(ref), RefDeleter(L))
+				{
+				}
+
+				RefHolder(const RefHolder& src) :state_(src.state_), ref_(src.ref_) {}
+				RefHolder& operator =(const RefHolder& src) {
+					state_ = src.state_;
+					ref_ = src.ref_;
+					return *this;
+				}
+#if KAGUYA_USE_RVALUE_REFERENCE
+				RefHolder(RefHolder&& src) :state_(0), ref_()
+				{
+					swap(src);
+				}
+				RefHolder& operator =(RefHolder&& src)throw()
+				{
+					swap(src);
+					return *this;
+				}
+#endif
+				void swap(RefHolder& other)throw()
+				{
+					std::swap(state_, other.state_);
+					std::swap(ref_, other.ref_);
+				}
+				int ref()const
+				{
+					if (state_ && ref_) { return *ref_; }
+					return LUA_REFNIL;
+				}
+				void reset()
+				{
+					ref_.reset();
+				}
+				lua_State* state()const { return state_; }
+			private:
+				lua_State* state_;
+				standard::shared_ptr<int> ref_;
+			};
+#else
+			struct RefHolder
+			{
+				RefHolder(lua_State* L, int ref) : state_(L), ref_(ref)
+				{
+				}
+				RefHolder(const RefHolder& src) :state_(src.state_), ref_(LUA_REFNIL)
+				{
+					if (state_)
+					{
+						lua_rawgeti(state_, LUA_REGISTRYINDEX, src.ref_);
+						ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+					}
+				}
+				RefHolder& operator =(const RefHolder& src)
+				{
+					reset();
+					state_ = src.state_;
+					if (state_)
+					{
+						lua_rawgeti(state_, LUA_REGISTRYINDEX, src.ref_);
 						ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 					}
 					else
 					{
 						ref_ = LUA_REFNIL;
 					}
+					return *this;
+				}
+#if KAGUYA_USE_RVALUE_REFERENCE
+				RefHolder(RefHolder&& src) throw() :state_(src.state_), ref_(src.ref_)
+				{
+					src.ref_ = LUA_REFNIL;
+				}
+				RefHolder& operator =(RefHolder&& src)throw()
+				{
+					swap(src);
+					return *this;
+				}
+#endif
+				void swap(RefHolder& other)throw()
+				{
+					std::swap(state_, other.state_);
+					std::swap(ref_, other.ref_);
+				}
+				int ref()const
+				{
+					if (state_) { return ref_; }
+					return LUA_REFNIL;
+				}
+				void reset()
+				{
+					if (ref_ != LUA_REFNIL && state_)
+					{
+						luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
+						ref_ = LUA_REFNIL;
+					}
+				}
+				~RefHolder()
+				{
+					reset();
+				}
+
+				lua_State* state()const { return state_; }
+			private:
+				lua_State* state_;
+				int ref_;
+			};
+#endif
+			RegistoryRef(const RegistoryRef& src) : ref_(src.ref_)
+			{
+			}
+			RegistoryRef& operator =(const RegistoryRef& src)
+			{
+				if (this != &src)
+				{
+					ref_ = src.ref_;
 				}
 				return *this;
 			}
+
+			static int ref_from_stacktop(lua_State* state)
+			{
+				if (state)
+				{
+					return luaL_ref(state, LUA_REGISTRYINDEX);
+				}
+				else
+				{
+					return LUA_REFNIL;
+				}
+			}
 #if KAGUYA_USE_RVALUE_REFERENCE
-			RegistoryRef(RegistoryRef&& src)throw() :state_(0), ref_(LUA_REFNIL)
+			RegistoryRef(RegistoryRef&& src)throw() : ref_(0, LUA_REFNIL)
 			{
 				swap(src);
 			}
@@ -171,63 +287,55 @@ namespace kaguya
 			}
 #endif
 
-			RegistoryRef() :state_(0), ref_(LUA_REFNIL) {}
-			RegistoryRef(lua_State* state) :state_(state), ref_(LUA_REFNIL) {}
+			RegistoryRef() : ref_(0, LUA_REFNIL) {}
+			RegistoryRef(lua_State* state) : ref_(state, LUA_REFNIL) {}
 
 
-			RegistoryRef(lua_State* state, StackTop, NoMainCheck) :state_(state), ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, StackTop, NoMainCheck) :ref_(state, ref_from_stacktop(state))
 			{
-				if (!state_) { return; }
-				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
 			}
 
-			RegistoryRef(lua_State* state, StackTop) :state_(state), ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, StackTop) : ref_(util::toMainThread(state), ref_from_stacktop(state))
 			{
-				if (!state_) { return; }
-				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
-				state_ = util::toMainThread(state_);
 			}
 
 			void swap(RegistoryRef& other)throw()
 			{
-				std::swap(state_, other.state_);
-				std::swap(ref_, other.ref_);
+				ref_.swap(other.ref_);
 			}
 
 			template<typename T>
-			RegistoryRef(lua_State* state, const T& v, NoMainCheck) : state_(state), ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, const T& v, NoMainCheck) : ref_(0, LUA_REFNIL)
 			{
-				if (!state_) { return; }
-				util::ScopedSavedStack save(state_);
-				util::one_push(state_, v);
-				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				if (!state) { return; }
+				util::ScopedSavedStack save(state);
+				util::one_push(state, v);
+				ref_ = RefHolder(state, ref_from_stacktop(state));
 			}
 			template<typename T>
-			RegistoryRef(lua_State* state, const T& v) : state_(state), ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, const T& v) : ref_(0, LUA_REFNIL)
 			{
-				if (!state_) { return; }
-				util::ScopedSavedStack save(state_);
-				util::one_push(state_, v);
-				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
-				state_ = util::toMainThread(state_);
+				if (!state) { return; }
+				util::ScopedSavedStack save(state);
+				util::one_push(state, v);
+				ref_ = RefHolder(util::toMainThread(state), ref_from_stacktop(state));
 			}
 #if KAGUYA_USE_CPP11
 			template<typename T>
-			RegistoryRef(lua_State* state, T&& v, NoMainCheck) : state_(state), ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, T&& v, NoMainCheck) : ref_(LUA_REFNIL)
 			{
-				if (!state_) { return; }
-				util::ScopedSavedStack save(state_);
-				util::one_push(state_, standard::forward<T>(v));
-				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
+				if (!state) { return; }
+				util::ScopedSavedStack save(state);
+				util::one_push(state, standard::forward<T>(v));
+				ref_ = RefHolder(state, ref_from_stacktop(state));
 			}
 			template<typename T>
-			RegistoryRef(lua_State* state, T&& v) : state_(state), ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, T&& v) : ref_(0, LUA_REFNIL)
 			{
-				if (!state_) { return; }
-				util::ScopedSavedStack save(state_);
-				util::one_push(state_, standard::forward<T>(v));
-				ref_ = luaL_ref(state_, LUA_REGISTRYINDEX);
-				state_ = util::toMainThread(state_);
+				if (!state) { return; }
+				util::ScopedSavedStack save(state);
+				util::one_push(state, standard::forward<T>(v));
+				ref_ = RefHolder(util::toMainThread(state), ref_from_stacktop(state));
 			}
 #endif
 			~RegistoryRef()
@@ -242,7 +350,7 @@ namespace kaguya
 			/// @brief push to Lua stack
 			int push()const
 			{
-				return push(state_);
+				return push(ref_.state());
 			}
 			/// @brief push to Lua stack
 			int push(lua_State* state)const
@@ -253,12 +361,12 @@ namespace kaguya
 					return 1;
 				}
 #if LUA_VERSION_NUM >= 502
-				if (state != state_)
+				if (state != ref_.state())
 				{//state check
-					assert(util::toMainThread(state) == util::toMainThread(state_));
+					assert(util::toMainThread(state) == util::toMainThread(ref_.state()));
 				}
 #endif
-				lua_rawgeti(state, LUA_REGISTRYINDEX, ref_);
+				lua_rawgeti(state, LUA_REGISTRYINDEX, ref_.ref());
 				return 1;
 			}
 
@@ -267,23 +375,16 @@ namespace kaguya
 				push(state);
 				return lua_gettop(state);
 			}
-			lua_State *state()const { return state_; }
+			lua_State *state()const { return ref_.state(); }
 
-			bool isNilref()const { return state_ == 0 || ref_ == LUA_REFNIL; }
+			bool isNilref()const { return ref_.ref() == LUA_REFNIL; }
 
-		private:
-			lua_State *state_;
-			int ref_;
-
-		protected:
 			void unref()
 			{
-				if (!isNilref())
-				{
-					luaL_unref(state_, LUA_REGISTRYINDEX, ref_);
-					ref_ = LUA_REFNIL;
-				}
+				ref_.reset();
 			}
+		private:
+			RefHolder ref_;
 		};
 
 	}

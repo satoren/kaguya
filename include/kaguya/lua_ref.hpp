@@ -113,7 +113,7 @@ namespace kaguya
 
 #if KAGUYA_USE_CPP11
 
-		LuaRef(LuaRef&& src)throw() :Ref::RegistoryRef(std::move(src)) {}
+		LuaRef(LuaRef&& src) :Ref::RegistoryRef(std::move(src)) {}
 
 		LuaRef& operator =(LuaRef&& src)throw()
 		{
