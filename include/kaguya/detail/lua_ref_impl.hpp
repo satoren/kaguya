@@ -322,7 +322,7 @@ namespace kaguya
 			}
 #if KAGUYA_USE_CPP11
 			template<typename T>
-			RegistoryRef(lua_State* state, T&& v, NoMainCheck) : ref_(LUA_REFNIL)
+			RegistoryRef(lua_State* state, T&& v, NoMainCheck) : ref_(0, LUA_REFNIL)
 			{
 				if (!state) { return; }
 				util::ScopedSavedStack save(state);
