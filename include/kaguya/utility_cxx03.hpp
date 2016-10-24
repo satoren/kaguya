@@ -165,6 +165,83 @@ namespace kaguya
 
 #undef KAGUYA_PP_STRUCT_TDEF_REP
 #undef KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT
+
+		namespace conv_helper_detail
+		{
+#define KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP(N) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)
+#define KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP(N) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, index)
+#define KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
+#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
+
+			template<typename To>
+			bool checkType(lua_State* state, int index, TypeTuple<> t)
+			{
+				return false;
+			}
+#define KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF(N)\
+			template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+			bool checkType(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
+			{\
+				return false KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP);\
+			}
+
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF)
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF
+			template<typename To>
+			bool strictCheckType(lua_State* state, int index, TypeTuple<> t)
+			{
+				return false;
+			}
+#define KAGUYA_CONVERTIBLE_REG_HELPER_ST_CHECK_TYPE_DEF(N)\
+			template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+			bool strictCheckType(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
+			{\
+				return false KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP);\
+			}
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_ST_CHECK_TYPE_DEF)
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_ST_CHECK_TYPE_DEF
+#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF(N)\
+			template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+			To get(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
+			{\
+				KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP);\
+				KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP);\
+				throw LuaTypeMismatch();\
+			}
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF)
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF
+
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP
+		}
+
+#define KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP(N) KAGUYA_PP_CAT(typename A,N) = null_type
+#define KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP)
+
+		template<typename To, KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
+		struct ConvertibleRegisterHelper {
+			typedef To get_type;
+
+			typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)> conv_types;
+
+			static bool checkType(lua_State* state, int index)
+			{
+				return conv_helper_detail::checkType<To>(state, index, conv_types());
+			}
+			static bool strictCheckType(lua_State* state, int index)
+			{
+				return conv_helper_detail::strictCheckType<To>(state, index, conv_types());
+			}
+			static get_type get(lua_State* state, int index)
+			{
+				return conv_helper_detail::get<To>(state, index, conv_types());
+			}
+		};
+#undef KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP
+#undef KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT
+
 	}
 
 }

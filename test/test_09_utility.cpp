@@ -1,6 +1,29 @@
 #include "kaguya/kaguya.hpp"
 #include "test_util.hpp"
 
+
+namespace
+{
+	struct ProxyClassTest
+	{
+		ProxyClassTest(const std::string& v) :str(v), num(0) {}
+		ProxyClassTest(const int& v) :str(), num(v) {}
+
+		std::string str;
+		int num;
+	};
+}
+
+namespace kaguya
+{
+	template<>
+	struct lua_type_traits<ProxyClassTest>
+		: util::ConvertibleRegisterHelper<ProxyClassTest, std::string, int>
+	{
+	};
+}
+
+
 KAGUYA_TEST_GROUP_START(test_09_utility)
 
 using namespace kaguya_test_util;
@@ -187,4 +210,21 @@ KAGUYA_TEST_FUNCTION_DEF(pretty_type_name)(kaguya::State&)
 }
 
 
+
+void proxy_class_test_func(ProxyClassTest t)
+{
+	TEST_EQUAL(t.str, "test");
+}
+void proxy_class_test_func2(const ProxyClassTest& t)
+{
+	TEST_EQUAL(t.num, 5);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(proxy_class_test)(kaguya::State& state)
+{
+	state["testf"] = &proxy_class_test_func;
+	state("testf('test')");
+	state["testf2"] = &proxy_class_test_func2;
+	state("testf2(5)");
+}
 KAGUYA_TEST_GROUP_END(test_09_utility)

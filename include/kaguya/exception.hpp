@@ -9,7 +9,6 @@
 #include <stdexcept>
 
 
-#include "kaguya/utility.hpp"
 
 
 namespace kaguya

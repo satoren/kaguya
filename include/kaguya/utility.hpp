@@ -8,8 +8,8 @@
 #include "kaguya/config.hpp"
 #include "kaguya/compatibility.hpp"
 #include "kaguya/traits.hpp"
-
 #include "kaguya/preprocess.hpp"
+#include "kaguya/exception.hpp"
 
 #if KAGUYA_USE_CPP11
 #include "kaguya/utility_cxx11.hpp"
