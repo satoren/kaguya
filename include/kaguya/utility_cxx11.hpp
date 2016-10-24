@@ -216,7 +216,7 @@ namespace kaguya
 				}
 				else
 				{
-					throw LuaTypeMismatch();
+					return get<To>(l, index);
 				}
 			}
 		}

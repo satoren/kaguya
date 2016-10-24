@@ -28,6 +28,11 @@ KAGUYA_TEST_GROUP_START(test_09_utility)
 
 using namespace kaguya_test_util;
 
+std::string last_error_message;
+void ignore_error_fun(int status, const char* message)
+{
+	last_error_message = message ? message : "";
+}
 
 KAGUYA_TEST_FUNCTION_DEF(lua_resume_test)(kaguya::State& s)
 {
@@ -226,5 +231,14 @@ KAGUYA_TEST_FUNCTION_DEF(proxy_class_test)(kaguya::State& state)
 	state("testf('test')");
 	state["testf2"] = &proxy_class_test_func2;
 	state("testf2(5)");
+
+	state.setErrorHandler(ignore_error_fun);
+	TEST_CHECK(!state("testf2()"));
+
+	state["testover"] = kaguya::overload(&proxy_class_test_func,&proxy_class_test_func2);
+
+	state("testover('test')");
+	state("testover(5)");
+	TEST_CHECK(!state("testover()"));
 }
 KAGUYA_TEST_GROUP_END(test_09_utility)
