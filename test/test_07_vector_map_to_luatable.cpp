@@ -39,7 +39,15 @@ KAGUYA_TEST_FUNCTION_DEF(map_from_table)(kaguya::State& state)
 	TEST_EQUAL(m["a"], 32);
 	TEST_EQUAL(m["b"], 1);
 	TEST_EQUAL(m["c"], 2);
-	TEST_CHECK(!state["tablefn"]().typeTest<std::vector<int> >());
+
+	kaguya::LuaRef t = state["tablefn"]();
+	TEST_CHECK(!t.isType<std::vector<int> >());
+	bool r = t.isType<std::map<std::string, int> >();
+	TEST_CHECK(r);
+	r = t.isType<std::map<std::string, int> >();
+	TEST_CHECK(r);
+	r = t.isConvertible<std::map<std::string, int> >();
+	TEST_CHECK(r);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(map_to_table)(kaguya::State& state)
