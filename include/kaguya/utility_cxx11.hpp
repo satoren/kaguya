@@ -164,6 +164,82 @@ namespace kaguya
 			return detail::invoke_helper(f, std::forward<Args>(args)...);
 		}
 
+		namespace conv_helper_detail
+		{
+			template<class To>
+			bool checkType(lua_State* l, int index)
+			{
+				return false;
+			}
+			template<class To, class From, class... Remain>
+			bool checkType(lua_State* l, int index)
+			{
+				return lua_type_traits<From>::checkType(l, index)
+					|| checkType<To, Remain...>(l, index);
+			}
+			template<class To>
+			bool strictCheckType(lua_State* l, int index)
+			{
+				return false;
+			}
+			template<class To, class From, class... Remain>
+			bool strictCheckType(lua_State* l, int index)
+			{
+				return lua_type_traits<From>::strictCheckType(l, index)
+					|| strictCheckType<To, Remain...>(l, index);
+				;
+			}
+
+			template<class To>
+			To get(lua_State* l, int index)
+			{
+				throw LuaTypeMismatch();
+			}
+			template<class To, class From, class... Remain>
+			To get(lua_State* l, int index)
+			{
+				if (lua_type_traits<From>::strictCheckType(l, index))
+				{
+					return lua_type_traits<From>::get(l, index);
+				}
+				else if (strictCheckType<To, Remain...>(l, index))
+				{
+					return get<To, Remain...>(l, index);
+				}
+				else if (lua_type_traits<From>::checkType(l, index))
+				{
+					return lua_type_traits<From>::get(l, index);
+				}
+				else if (checkType<To, Remain...>(l, index))
+				{
+					return get<To, Remain...>(l, index);
+				}
+				else
+				{
+					return get<To>(l, index);
+				}
+			}
+		}
+
+		template<class To, class From, class... Remain>
+		struct ConvertibleRegisterHelper
+		{
+			typedef To get_type;
+
+			static bool checkType(lua_State* l, int index)
+			{
+				return conv_helper_detail::checkType<To, From, Remain...>(l, index);
+			}
+			static bool strictCheckType(lua_State* l, int index)
+			{
+				return conv_helper_detail::strictCheckType<To, From, Remain...>(l, index);
+			}
+
+			static get_type get(lua_State* l, int index)
+			{
+				return conv_helper_detail::get<To, From, Remain...>(l, index);
+			}
+		};
 	}
 
 }
