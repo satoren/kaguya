@@ -94,6 +94,8 @@ if(KAGUYA_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(KAGUYA_BUILD_EXAMPLES)
 
+find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
+set( MEMORYCHECK_COMMAND_OPTIONS "--error-exitcode=1 --trace-children=yes --leak-check=full" )
 enable_testing()
 if(COVERAGE)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
