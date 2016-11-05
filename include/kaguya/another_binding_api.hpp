@@ -159,7 +159,7 @@ namespace kaguya
 	template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
 	class_& constructors() { this->template setConstructors<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>(); return *this; }
 
-	KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_ADD_CON_FN_DEF)
+	KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_ADD_CONS_FN_DEF)
 #undef KAGUYA_ADD_CONS_FN_DEF
 #endif
 
