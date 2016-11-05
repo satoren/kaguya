@@ -7,22 +7,18 @@ using namespace kaguya_test_util;
 
 
 int error_count = 0;
-void error_fun(int status, const char* message)
-{
-	error_count++;
-}
-
-
 std::string last_error_message;
 void ignore_error_fun(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	last_error_message = message ? message : "";
+	error_count++;
 }
 
 KAGUYA_TEST_FUNCTION_DEF(set_error_function)(kaguya::State& state)
 {
 	error_count = 0;
-	state.setErrorHandler(error_fun);
+	state.setErrorHandler(ignore_error_fun);
 	TEST_CHECK(!state("awdorgkwl;gw"));
 
 	TEST_CHECK(error_count == 1);
@@ -32,9 +28,9 @@ KAGUYA_TEST_FUNCTION_DEF(set_error_function)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(function_call_error)(kaguya::State& state)
 {
 	error_count = 0;
-	state.setErrorHandler(error_fun);
+	state.setErrorHandler(ignore_error_fun);
 
-	state["errofun"] = kaguya::function(error_fun);
+	state["errofun"] = kaguya::function(ignore_error_fun);
 	state["errofun"](33);
 
 	TEST_CHECK(error_count == 1);
@@ -46,7 +42,7 @@ KAGUYA_TEST_FUNCTION_DEF(function_call_error)(kaguya::State& state)
 	TEST_COMPARE_EQ(state.newRef(1).threadStatus(), LUA_ERRRUN);
 }
 
-KAGUYA_TEST_FUNCTION_DEF(other_state)(kaguya::State& unused)
+KAGUYA_TEST_FUNCTION_DEF(other_state)(kaguya::State&)
 {
 	lua_State* L = luaL_newstate();
 
@@ -156,6 +152,7 @@ bool errorOccurred = false;
 std::string lastMsg;
 void registerError(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	if (errorOccurred)
 		throw std::runtime_error("Should have reset errorOccurred");
 	errorOccurred = true;
@@ -332,6 +329,7 @@ struct CountLimitAllocator
 	}
 	void deallocate(pointer p, size_type n)
 	{
+		KAGUYA_UNUSED(n);
 		if (p)
 		{
 			allocated_count--;
@@ -450,6 +448,8 @@ KAGUYA_TEST_FUNCTION_DEF(running_error_throw_test)(kaguya::State& state)
 
 void throwUnknownError(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
+	KAGUYA_UNUSED(message);
 	kaguya::ErrorHandler::throwDefaultError(32323232, "unknown error");
 }
 KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
@@ -471,10 +471,14 @@ KAGUYA_TEST_FUNCTION_DEF(unknown_error_throw_test)(kaguya::State& state)
 
 void throwErrorRunningError(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
+	KAGUYA_UNUSED(message);
 	throw kaguya::LuaErrorRunningError(LUA_ERRERR, "error handler error");
 }
 void throwErrorRunningError2(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
+	KAGUYA_UNUSED(message);
 	throw kaguya::LuaErrorRunningError(LUA_ERRERR, std::string("error handler error"));
 }
 KAGUYA_TEST_FUNCTION_DEF(errorrunning_error_throw_test)(kaguya::State& state)

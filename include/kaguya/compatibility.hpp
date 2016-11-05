@@ -68,6 +68,7 @@ namespace kaguya
 
 		inline int lua_resume(lua_State *L, lua_State* from, int nargs)
 		{
+			KAGUYA_UNUSED(from);
 			return ::lua_resume(L, nargs);
 		}
 		inline int lua_absindex(lua_State *L, int idx)

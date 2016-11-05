@@ -124,6 +124,8 @@ extern "C" {
 
 #endif
 
+#define KAGUYA_UNUSED(V) (void)(V)
+
 namespace kaguya
 {
 #if defined(_MSC_VER) && _MSC_VER <= 1500

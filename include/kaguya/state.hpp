@@ -70,6 +70,7 @@ namespace kaguya
 		}
 		void deallocate(pointer p, size_type n)
 		{
+			KAGUYA_UNUSED(n);
 			std::free(p);
 		}
 	};
@@ -102,6 +103,7 @@ namespace kaguya
 		}
 		static void stderror_out(int status, const char* message)
 		{
+			KAGUYA_UNUSED(status);
 			std::cerr << message << std::endl;
 		}
 

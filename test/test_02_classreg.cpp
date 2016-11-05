@@ -1191,6 +1191,7 @@ KAGUYA_TEST_FUNCTION_DEF(not_registered_object)(kaguya::State&)
 std::string last_error_message;
 void ignore_error_fun(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	last_error_message = message ? message : "";
 }
 
@@ -1501,6 +1502,7 @@ int testindexfn(ABC* self, int key)
 }
 void testnewindexfn(ABC* self, int key,int value)
 {
+	TEST_CHECK(self);
 	TEST_EQUAL(key, 1);
 	TEST_EQUAL(value, 3);
 }

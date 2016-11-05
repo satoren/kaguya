@@ -10,7 +10,7 @@ int main(int argc,const char* argv[])
 {
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
-	if (luaL_dofile(L, argv[1]))
+	if (argc > 1 && luaL_dofile(L, argv[1]))
 	{
 		std::cerr << lua_tostring(L,-1) << std::endl;
 	}

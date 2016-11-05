@@ -231,7 +231,7 @@ namespace kaguya
 
 	private:
 
-		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<void>)const
+		void set_base_metatable(lua_State* , LuaTable& , types::typetag<void>)const
 		{
 		}
 		template<class Base>
@@ -297,7 +297,7 @@ namespace kaguya
 		pconverter.add_type_conversion<KAGUYA_PP_CAT(A,N),class_type>();
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
 	KAGUYA_TEMPLATE_PARAMETER(N)\
-		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
+		void set_base_metatable(lua_State* state, LuaTable& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> >)const\
 		{\
 			PointerConverter& pconverter = PointerConverter::get(state);\
 			LuaTable metabases(state, NewTable(N, 0));\

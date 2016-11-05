@@ -37,6 +37,7 @@ namespace kaguya
 		template<class F, class... Args, size_t... Indexes>
 		int _call_apply(lua_State* state, F&& f, index_tuple<Indexes...>, util::FunctionSignatureType<void, Args...>)
 		{
+			KAGUYA_UNUSED(state);
 			util::invoke(f, lua_type_traits<Args>::get(state, Indexes)...);
 			return 0;
 		}
@@ -52,6 +53,8 @@ namespace kaguya
 
 		inline void join(std::string& result, const char* delim)
 		{
+			KAGUYA_UNUSED(result);
+			KAGUYA_UNUSED(delim);
 		}
 		template<class Arg, class...Args>void join(std::string& result, const char* delim, const Arg& str, const Args&... args)
 		{
@@ -87,11 +90,15 @@ namespace kaguya
 		template<class R, class... Args, size_t... Indexes>
 		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
 		{
+			KAGUYA_UNUSED(state);
+			KAGUYA_UNUSED(opt_count);
 			return all_true(_wcheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 		template<class R, class... Args, size_t... Indexes>
 		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
 		{
+			KAGUYA_UNUSED(state);
+			KAGUYA_UNUSED(opt_count);
 			return all_true(_scheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 
@@ -99,6 +106,7 @@ namespace kaguya
 		template<class R, class... Args, size_t... Indexes>
 		std::string _type_name_apply(index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
 		{
+			KAGUYA_UNUSED(opt_count);
 			std::string result;
 			const int max_arg = sizeof...(Args);
 			join(result, ",",(((max_arg -opt_count < int(Indexes))? std::string("[OPT]") :std::string(""))  + util::pretty_name(typeid(Args)))...);
@@ -114,7 +122,7 @@ namespace kaguya
 			return _call_apply(state, f, index(), fsigtype());
 		}
 		template<class F>
-		bool checkArgTypes(lua_State* state, const F& f, int opt_count = 0)
+		bool checkArgTypes(lua_State* state, const F& , int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
@@ -122,7 +130,7 @@ namespace kaguya
 			return _ctype_apply(state, index(), fsigtype(), opt_count);
 		}
 		template<class F>
-		bool strictCheckArgTypes(lua_State* state, const F& f, int opt_count = 0)
+		bool strictCheckArgTypes(lua_State* state, const F& , int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
@@ -132,7 +140,7 @@ namespace kaguya
 		}
 
 		template<class F>
-		std::string argTypesName(const F& f, int opt_count = 0)
+		std::string argTypesName(const F& , int opt_count = 0)
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
@@ -140,14 +148,14 @@ namespace kaguya
 			return _type_name_apply(index(),fsigtype(), opt_count);
 		}
 		template<class F>
-		int minArgCount(const F& f)
+		int minArgCount(const F& )
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
 			return fsigtype::argument_count;
 		}
 		template<class F>
-		int maxArgCount(const F& f)
+		int maxArgCount(const F& )
 		{
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;

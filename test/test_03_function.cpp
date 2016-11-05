@@ -57,6 +57,7 @@ void const_pointerfun(const void* pointer)
 std::string last_error_message;
 void ignore_error_fun(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	last_error_message = message ? message : "";
 }
 KAGUYA_TEST_FUNCTION_DEF(nil_to_nullpointer)(kaguya::State& state)
@@ -147,18 +148,18 @@ int overload3(int)
 }
 
 #ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
-int overload4(const std::vector<int>& a)
+int overload4(const std::vector<int>& )
 {
 	return 4;
 }
 #endif
 #ifndef KAGUYA_NO_STD_MAP_TO_TABLE
-int overload5(const std::map<std::string, std::string>& a)
+int overload5(const std::map<std::string, std::string>& )
 {
 	return 5;
 }
 // This function after the first to trigger weak type test
-int overload6(const std::map<std::string, std::string>& a, int b)
+int overload6(const std::map<std::string, std::string>& , int b)
 {
 	return b;
 }

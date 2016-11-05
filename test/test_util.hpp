@@ -74,7 +74,7 @@ namespace kaguya_test_util
 			static TestRunner ins;
 			return ins;
 		}
-		static void test_error_handler(int status, const char* message)
+		static void test_error_handler(int , const char* message)
 		{
 			throw std::runtime_error(std::string(message));
 		}

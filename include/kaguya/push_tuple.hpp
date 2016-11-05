@@ -25,7 +25,7 @@ namespace kaguya
 		{};
 
 		template<std::size_t... Indexes,class... Args>
-		int push_tuple(lua_State* l, index_tuple<Indexes...> index, std::tuple<Args...>&& v)
+		int push_tuple(lua_State* l, index_tuple<Indexes...> , std::tuple<Args...>&& v)
 		{
 			return util::push_args(l, std::get<Indexes>(v)...);
 		}

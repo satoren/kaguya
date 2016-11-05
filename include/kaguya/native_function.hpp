@@ -100,12 +100,12 @@ namespace kaguya
 			return con.argTypesName();
 		}
 		template<class T>
-		int minArgCount(const ConstructorFunctor<T>& con)
+		int minArgCount(const ConstructorFunctor<T>& )
 		{
 			return ConstructorFunctor<T>::signature_type::argument_count;
 		}
 		template<class T>
-		int maxArgCount(const ConstructorFunctor<T>& con)
+		int maxArgCount(const ConstructorFunctor<T>& )
 		{
 			return ConstructorFunctor<T>::signature_type::argument_count;
 		}
@@ -156,8 +156,9 @@ namespace kaguya
 		}
 		template<class MemType, class T>
 		typename traits::enable_if<traits::is_object<MemType>::value, bool>::type
-		checkArgTypes(lua_State* state, MemType T::* mptr, int opt_count = 0)
+		checkArgTypes(lua_State* state, MemType T::* , int opt_count = 0)
 		{
+			KAGUYA_UNUSED(opt_count);
 			if (lua_gettop(state) >= 2)
 			{
 				//setter typecheck
@@ -168,8 +169,9 @@ namespace kaguya
 		}
 		template<class MemType, class T>
 		typename traits::enable_if<traits::is_object<MemType>::value, bool>::type
-		 strictCheckArgTypes(lua_State* state, MemType T::* mptr, int opt_count = 0)
+		 strictCheckArgTypes(lua_State* state, MemType T::* , int opt_count = 0)
 		{
+			KAGUYA_UNUSED(opt_count);
 			if (lua_gettop(state) == 2)
 			{
 				//setter typecheck
@@ -180,19 +182,19 @@ namespace kaguya
 		}
 		template<class MemType, class T>
 		typename traits::enable_if<traits::is_object<MemType>::value, std::string>::type
-		argTypesName(MemType T::* mptr)
+		argTypesName(MemType T::* )
 		{
 			return util::pretty_name(typeid(T*)) + ",[OPT] " + util::pretty_name(typeid(MemType));
 		}
 		template<class MemType, class T>
 		typename traits::enable_if<traits::is_object<MemType>::value, int>::type
-		minArgCount(MemType T::* mptr)
+		minArgCount(MemType T::* )
 		{
 			return 1;
 		}
 		template<class MemType, class T>
 		typename traits::enable_if<traits::is_object<MemType>::value, int>::type
-		maxArgCount(MemType T::* mptr)
+		maxArgCount(MemType T::* )
 		{
 			return 2;
 		}
@@ -478,10 +480,14 @@ namespace kaguya
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return true;
 		}
 		static bool checkType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return true;
 		}
 		static get_type get(lua_State* l, int index)
@@ -599,6 +605,8 @@ namespace kaguya
 		}
 		template<typename Fn> int invoke_index(lua_State* state, int index, int current_index, Fn&& fn)
 		{
+			KAGUYA_UNUSED(index);
+			KAGUYA_UNUSED(current_index);
 			return nativefunction::call(state, fn);
 		}
 		template<typename Fn, typename... Functions> int invoke_index(lua_State* state, int index, int current_index, Fn&& fn, Functions&&... fns)
@@ -718,6 +726,8 @@ namespace kaguya
 
 			template<typename TupleType> int invoke_tuple(lua_State* state, TupleType& tuple)
 		{
+			KAGUYA_UNUSED(state);
+			KAGUYA_UNUSED(tuple);
 			return 0;
 		}
 	}
@@ -974,7 +984,7 @@ struct GENERATE_NAME\
 		virtual int minArgCount()const { return MINARG;	}\
 		virtual int maxArgCount()const { return MAXARG; }\
 	};\
-	template<typename F> kaguya::PolymorphicInvoker::holder_type create(F f)\
+	template<typename F> kaguya::PolymorphicInvoker::holder_type create(F)\
 	{\
 		kaguya::OverloadFunctionImpl<F>* ptr = new Function<F>();\
 		return kaguya::PolymorphicInvoker::holder_type(ptr);\
@@ -1011,6 +1021,7 @@ struct GENERATE_NAME\
 	};\
 	template<typename F> kaguya::PolymorphicMemberInvoker::holder_type create(F f)\
 	{\
+		KAGUYA_UNUSED(f);\
 		kaguya::OverloadFunctionImpl<F>* ptr = new Function<F>();\
 		return kaguya::PolymorphicMemberInvoker::holder_type(ptr);\
 	}\

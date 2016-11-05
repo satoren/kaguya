@@ -563,7 +563,7 @@ namespace kaguya
 
 	private:
 
-		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<void>)const
+		void set_base_metatable(lua_State* , LuaStackRef& , types::typetag<void>)const
 		{
 		}
 		template<class Base>
@@ -625,6 +625,7 @@ namespace kaguya
 		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
 		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
 		{\
+			KAGUYA_UNUSED(metatypes);\
 			PointerConverter& pconverter = PointerConverter::get(state);\
 			util::one_push(state, NewTable(N,0));\
 			LuaStackRef metabases(state,-1, true);\

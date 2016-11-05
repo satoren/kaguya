@@ -167,7 +167,7 @@ namespace kaguya
 		namespace conv_helper_detail
 		{
 			template<class To>
-			bool checkType(lua_State* l, int index)
+			bool checkType(lua_State* , int )
 			{
 				return false;
 			}
@@ -178,7 +178,7 @@ namespace kaguya
 					|| checkType<To, Remain...>(l, index);
 			}
 			template<class To>
-			bool strictCheckType(lua_State* l, int index)
+			bool strictCheckType(lua_State* , int )
 			{
 				return false;
 			}
@@ -191,7 +191,7 @@ namespace kaguya
 			}
 
 			template<class To>
-			To get(lua_State* l, int index)
+			To get(lua_State* , int )
 			{
 				throw LuaTypeMismatch();
 			}

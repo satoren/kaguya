@@ -29,12 +29,12 @@ namespace kaguya
 			return lua_type_traits<Result>::get(l, startindex);
 		}
 #if KAGUYA_USE_CPP11
-		inline standard::tuple<> get_result_tuple_impl(lua_State* l, int index, types::typetag<standard::tuple<> > tag)
+		inline standard::tuple<> get_result_tuple_impl(lua_State* , int , types::typetag<standard::tuple<> > )
 		{
 			return standard::tuple<>();
 		}
 		template<typename T, typename... TYPES>
-		inline standard::tuple<T, TYPES...> get_result_tuple_impl(lua_State* l, int index, types::typetag<standard::tuple<T, TYPES...> > tag)
+		inline standard::tuple<T, TYPES...> get_result_tuple_impl(lua_State* l, int index, types::typetag<standard::tuple<T, TYPES...> > )
 		{
 			return standard::tuple_cat(standard::tuple<T>(lua_type_traits<T>::get(l, index)),
 				get_result_tuple_impl(l, index + 1, types::typetag<standard::tuple<TYPES...> >()));
@@ -46,8 +46,10 @@ namespace kaguya
 		}
 #else
 
-		inline standard::tuple<> get_result_impl(lua_State *l, int startindex, types::typetag<standard::tuple<> > tag)
+		inline standard::tuple<> get_result_impl(lua_State *l, int startindex, types::typetag<standard::tuple<> > )
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(startindex);
 			return standard::tuple<>();
 		}
 		
@@ -68,7 +70,7 @@ namespace kaguya
 			return get_result_impl(l, startindex, types::typetag<Result>());
 		}
 		template<>
-		inline void get_result<void>(lua_State* l, int startindex)
+		inline void get_result<void>(lua_State* , int )
 		{
 		}
 	}
@@ -170,10 +172,14 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return true;
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return false;
 		}
 
@@ -250,10 +256,14 @@ namespace kaguya
 
 		static bool checkType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return true;
 		}
 		static bool strictCheckType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return false;
 		}
 

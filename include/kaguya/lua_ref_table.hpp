@@ -311,7 +311,7 @@ namespace kaguya
 			return true;
 		}
 		template<typename T>
-		inline bool LuaFunctionImpl<T>::setFunctionEnv(NewTable env)
+		inline bool LuaFunctionImpl<T>::setFunctionEnv(NewTable)
 		{
 			return setFunctionEnv(LuaTable(state_()));
 		}

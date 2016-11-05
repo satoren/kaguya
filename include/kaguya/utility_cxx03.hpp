@@ -174,7 +174,7 @@ namespace kaguya
 #define KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
 
 			template<typename To>
-			bool checkType(lua_State* state, int index, TypeTuple<> t)
+			bool checkType(lua_State* , int , TypeTuple<> )
 			{
 				return false;
 			}
@@ -188,7 +188,7 @@ namespace kaguya
 			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF)
 #undef KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF
 			template<typename To>
-			bool strictCheckType(lua_State* state, int index, TypeTuple<> t)
+			bool strictCheckType(lua_State* , int , TypeTuple<> )
 			{
 				return false;
 			}
@@ -204,9 +204,9 @@ namespace kaguya
 			template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
 			To get(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
 			{\
-				KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP);\
-				KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP);\
-				throw LuaTypeMismatch();\
+				KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP)\
+				KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP)\
+				{throw LuaTypeMismatch();}\
 			}
 			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF)
 #undef KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF
