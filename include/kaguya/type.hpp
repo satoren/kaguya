@@ -196,6 +196,8 @@ namespace kaguya
 		}
 		static bool checkType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return true;
 		}
 		static bool get(lua_State* l, int index)
@@ -215,19 +217,19 @@ namespace kaguya
 		typedef void* get_type;
 		typedef void* push_type;
 
-		static bool strictCheckType(lua_State* l, int index)
+		static bool strictCheckType(lua_State* , int )
 		{
 			return true;
 		}
-		static bool checkType(lua_State* l, int index)
+		static bool checkType(lua_State* , int )
 		{
 			return true;
 		}
-		static get_type get(lua_State* l, int index)
+		static get_type get(lua_State* , int )
 		{
 			return 0;
 		}
-		static int push(lua_State* l, push_type s)
+		static int push(lua_State* , push_type )
 		{
 			return 0;
 		}
@@ -391,7 +393,7 @@ namespace kaguya
 			return nullptr;
 		}
 
-		static int push(lua_State* l, const std::nullptr_t& v)
+		static int push(lua_State* l, const std::nullptr_t& )
 		{
 			lua_pushnil(l);
 			return 1;

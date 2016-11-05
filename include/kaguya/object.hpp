@@ -281,7 +281,7 @@ namespace kaguya
 		}
 
 		template<class T>
-		T* get_pointer(ObjectWrapperBase* from, types::typetag<T> tag)
+		T* get_pointer(ObjectWrapperBase* from, types::typetag<T> )
 		{
 			return get_pointer<T>(from);
 		}
@@ -433,7 +433,7 @@ namespace kaguya
 	}
 
 	template<typename RequireType>
-	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, bool convert = true, types::typetag<RequireType> type = types::typetag<RequireType>())
+	inline ObjectWrapperBase* object_wrapper(lua_State* l, int index, bool convert = true, types::typetag<RequireType>  = types::typetag<RequireType>())
 	{
 		if (detail::object_wrapper_type_check(l, index))
 		{
@@ -454,7 +454,7 @@ namespace kaguya
 	}
 
 	template<class T>
-	T* get_pointer(lua_State* l, int index, types::typetag<T> tag)
+	T* get_pointer(lua_State* l, int index, types::typetag<T> )
 	{
 		int type = lua_type(l, index);
 
@@ -490,7 +490,7 @@ namespace kaguya
 		return 0;
 	}
 	template<class T>
-	const T* get_const_pointer(lua_State* l, int index, types::typetag<T> tag)
+	const T* get_const_pointer(lua_State* l, int index, types::typetag<T> )
 	{
 		int type = lua_type(l, index);
 
@@ -521,13 +521,13 @@ namespace kaguya
 		return 0;
 	}
 	template<class T>
-	const T* get_pointer(lua_State* l, int index, types::typetag<const T> tag)
+	const T* get_pointer(lua_State* l, int index, types::typetag<const T> )
 	{
 		return get_const_pointer<T>(l, index, types::typetag<T>());
 	}
 
 	template<class T>
-	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> tag)
+	standard::shared_ptr<T> get_shared_pointer(lua_State* l, int index, types::typetag<T> )
 	{
 		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
 		if (ptr)
@@ -550,7 +550,7 @@ namespace kaguya
 		}
 		return standard::shared_ptr<T>();
 	}
-	inline standard::shared_ptr<void> get_shared_pointer(lua_State* l, int index, types::typetag<void> tag)
+	inline standard::shared_ptr<void> get_shared_pointer(lua_State* l, int index, types::typetag<void> )
 	{
 		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
 		if (ptr)
@@ -559,7 +559,7 @@ namespace kaguya
 		}
 		return standard::shared_ptr<void>();
 	}
-	inline standard::shared_ptr<const void> get_shared_pointer(lua_State* l, int index, types::typetag<const void> tag)
+	inline standard::shared_ptr<const void> get_shared_pointer(lua_State* l, int index, types::typetag<const void> )
 	{
 		ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(object_wrapper(l, index));
 		if (ptr)
@@ -684,7 +684,7 @@ namespace kaguya
 		}
 	}
 	template<typename T>
-	bool available_metatable(lua_State* l, types::typetag<T> type = types::typetag<T>())
+	bool available_metatable(lua_State* l, types::typetag<T>  = types::typetag<T>())
 	{
 		return class_userdata::available_metatable<T>(l);
 	}

@@ -8,6 +8,7 @@ include(cmake/FindLua.cmake)
 option(KAGUYA_BUILD_EXAMPLES "Build the Kaguya example programs" ON)
 option(KAGUYA_BUILD_BENCHMARK "Build the Kaguya benchmark programs" OFF)
 option(KAGUYA_BUILD_EXAMPLE_GLFW_BIND "Build the Kaguya example glfw bind" OFF)
+option(KAGUYA_SINGLE_HEADER_VERSION "generate single header" OFF)
 
 include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
@@ -33,7 +34,7 @@ if(ADDITIONAL_INCLUDE_PATH)
 endif()
 
 if(NOT MSVC)#-Wall nonsense on MSVC
-  add_definitions(-Wall -Werror)
+  add_definitions(-Wall -W -Werror)
   add_definitions(-pedantic)
   add_definitions(-Wno-variadic-macros)
   add_definitions ("-Wno-unused-local-typedefs")

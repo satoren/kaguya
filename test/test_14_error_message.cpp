@@ -10,6 +10,7 @@ using namespace kaguya;
 std::string last_error_message;
 void error_fun(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	last_error_message = message ? message : "unknown error";
 }
 

@@ -8,6 +8,7 @@ using namespace kaguya_test_util;
 std::string last_error_message;
 void ignore_error_fun(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	last_error_message = message ? message : "";
 }
 
@@ -617,7 +618,7 @@ UserDataTest& UserDataTestFunction(UserDataTest& r)
 	r.m = 5;
 	return r;
 }
-void UserDataTestFunction2(int r)
+void UserDataTestFunction2(int )
 {
 }
 

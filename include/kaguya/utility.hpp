@@ -63,6 +63,7 @@ namespace kaguya
 #if LUA_VERSION_NUM >= 502
 			luaL_traceback(state, state, message, level);
 #else
+			KAGUYA_UNUSED(level);
 			lua_pushstring(state, message);
 #endif
 		}
@@ -189,7 +190,7 @@ namespace kaguya
 		}
 
 #if KAGUYA_USE_CPP11
-		inline int push_args(lua_State *l)
+		inline int push_args(lua_State *)
 		{
 			return 0;
 		}
@@ -206,7 +207,7 @@ namespace kaguya
 			return c + push_args(l, std::forward<Args>(args)...);
 		}
 #else
-		inline int push_args(lua_State *l)
+		inline int push_args(lua_State *)
 		{
 			return 0;
 		}

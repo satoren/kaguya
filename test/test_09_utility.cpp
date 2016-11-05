@@ -31,6 +31,7 @@ using namespace kaguya_test_util;
 std::string last_error_message;
 void ignore_error_fun(int status, const char* message)
 {
+	KAGUYA_UNUSED(status);
 	last_error_message = message ? message : "";
 }
 
@@ -142,12 +143,12 @@ void checkf()
 {
 }
 
-template<typename F>void function_argcount_check(F f, size_t count)
+template<typename F>void function_argcount_check(F , size_t count)
 {
 	TEST_EQUAL(kaguya::util::FunctionSignature<F>::type::argument_count, count);
 }
 
-template<typename RET, typename F>void function_return_type_check(F f)
+template<typename RET, typename F>void function_return_type_check(F)
 {
 	bool ret = kaguya::standard::is_same<
 		typename kaguya::util::FunctionSignature<F>::type::result_type

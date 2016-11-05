@@ -151,11 +151,11 @@ namespace kaguya
 
 
 		template<class Result>
-		Result get_result(types::typetag<Result> tag= types::typetag<Result>())const
+		Result get_result(types::typetag<Result> = types::typetag<Result>())const
 		{
 			return util::get_result<Result>(state_, stack_index_);
 		}
-		LuaStackRef get_result(types::typetag<LuaStackRef> tag)const
+		LuaStackRef get_result(types::typetag<LuaStackRef> )const
 		{
 			pop_ = 0;
 			return LuaStackRef(state_, stack_index_, true);
@@ -206,16 +206,17 @@ namespace kaguya
 	namespace detail
 	{
 		template<typename RetType>
-		inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<RetType> tag)
+		inline RetType FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<RetType> )
 		{
 			return FunctionResults(state, return_status, retindex).get_result(types::typetag<RetType>());
 		}
-		inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<FunctionResults> tag)
+		inline FunctionResults FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<FunctionResults> )
 		{
 			return FunctionResults(state, return_status, retindex);
 		}
-		inline void FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<void> tag)
+		inline void FunctionResultProxy::ReturnValue(lua_State* state, int return_status, int retindex, types::typetag<void> )
 		{
+			KAGUYA_UNUSED(return_status);
 			lua_settop(state, retindex - 1);
 		}
 
