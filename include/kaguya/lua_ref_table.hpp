@@ -18,9 +18,6 @@ namespace kaguya
 {
 	class State;
 
-
-
-
 	/**
 	* This class is the type returned by members of non-const LuaRef(Table) when directly accessing its elements.
 	*/
@@ -52,7 +49,6 @@ namespace kaguya
 		TableKeyReferenceProxy& operator=(const T& src)
 		{
 			detail::table_proxy::set(state_, table_index_, key_, src);
-
 			return *this;
 		}
 #if KAGUYA_USE_CPP11
@@ -177,13 +173,11 @@ namespace kaguya
 		TableKeyReferenceProxy(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			util::one_push(state_, table);
-			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 		}
 		TableKeyReferenceProxy(const LuaRef& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			util::one_push(state_, table);
-			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 			int t = lua_type(state_, table_index_);
 			if (t != LUA_TTABLE)
@@ -342,7 +336,7 @@ namespace kaguya
 			return LuaStackRef(state, -1, true);
 		}
 		template<typename T> template <typename KEY>
-		LuaStackRef LuaTableOrUserDataImpl<T>::getRawField(const KEY& key)const
+		LuaStackRef LuaTableImpl<T>::getRawField(const KEY& key)const
 		{
 			lua_State* state = state_();
 			if (!state)

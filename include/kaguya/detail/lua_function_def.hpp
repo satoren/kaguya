@@ -45,8 +45,6 @@ namespace kaguya
 			static void ReturnValue(lua_State* state, int restatus, int retindex, types::typetag<void> tag);
 		};
 
-
-
 		template<typename Derived>
 		class LuaFunctionImpl
 		{
@@ -241,10 +239,10 @@ namespace kaguya
 #endif
 
 
-		/**
-		* @return state status
-		*/
-				int threadStatus()const
+			//!
+			//! @return state status
+			//!
+			int threadStatus()const
 			{
 				lua_State* state = state_();
 				if (!state)
@@ -271,9 +269,9 @@ namespace kaguya
 			}
 
 
-			/**
-			* @return coroutine status
-			*/
+			//!
+			//! @return coroutine status
+			//!
 			coroutine_status costatus(lua_State *l = 0)const
 			{
 				lua_State* state = state_();
@@ -319,9 +317,9 @@ namespace kaguya
 
 			}
 			
-			/**
-			* @return if coroutine status is dead, return true. Otherwise return false
-			*/
+			//!
+			//! @return if coroutine status is dead, return true. Otherwise return false
+			//!
 			bool isThreadDead()const
 			{
 				return costatus() == COSTAT_DEAD;

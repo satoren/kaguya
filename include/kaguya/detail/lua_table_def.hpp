@@ -254,31 +254,6 @@ namespace kaguya
 			template<typename KEY>
 			LuaStackRef getField(const KEY& key)const;
 
-			/// @brief value = rawget(table,key);
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename T, typename KEY>
-			typename lua_type_traits<T>::get_type getRawField(const KEY& key)const
-			{
-				lua_State* state = state_();
-				typedef typename lua_type_traits<T>::get_type get_type;
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return get_type();
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-
-				table_proxy::rawget(state, stackIndex, key);
-
-				return lua_type_traits<T>::get(state, -1);
-			}
-			/// @brief value = rawget(table,key);
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename KEY>
-			LuaStackRef getRawField(const KEY& key)const;
 			
 
 			/// @brief foreach table fields
@@ -427,6 +402,10 @@ namespace kaguya
 			{
 				return static_cast<const Derived*>(this)->pushStackIndex(state);
 			}
+			int push_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->push(state);
+			}
 		public:
 
 
@@ -500,6 +479,31 @@ namespace kaguya
 				return true;
 			}
 #endif
+			/// @brief value = rawget(table,key);
+			/// @param key key of table
+			/// @return reference of field value
+			template<typename T, typename KEY>
+			typename lua_type_traits<T>::get_type getRawField(const KEY& key)const
+			{
+				lua_State* state = state_();
+				typedef typename lua_type_traits<T>::get_type get_type;
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return get_type();
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+
+				table_proxy::rawget(state, stackIndex, key);
+
+				return lua_type_traits<T>::get(state, -1);
+			}
+			/// @brief value = rawget(table,key);
+			/// @param key key of table
+			/// @return reference of field value
+			template<typename KEY>
+			LuaStackRef getRawField(const KEY& key)const;
 		};
 
 		template<typename Derived>

@@ -72,8 +72,13 @@ namespace kaguya
 		}
 	};
 
-	namespace detail
+
+	namespace Metatable
 	{
+		typedef std::map<std::string, AnyDataPusher> PropMapType;
+		typedef std::map<std::string, AnyDataPusher> MemberMapType;
+
+
 		inline bool is_property_key(const char* keyname)
 		{
 			return keyname && strncmp(keyname, KAGUYA_PROPERTY_PREFIX, sizeof(KAGUYA_PROPERTY_PREFIX) - 1) != 0;
@@ -180,15 +185,80 @@ namespace kaguya
 			}
 			return 0;
 		}
-	}
 
+
+		inline int call_constructor_function(lua_State* L)
+		{
+			//function(t,...) return t.new(...) end
+			lua_getfield(L, 1, "new");
+			lua_replace(L, 1);
+			lua_call(L, lua_gettop(L) - 1, LUA_MULTRET);
+			return lua_gettop(L);
+		}
+		inline void get_call_constructor_metatable(lua_State* L)
+		{
+			static int key = 0;
+
+			int ttype = lua_rawgetp_rtype(L, LUA_REGISTRYINDEX, &key);
+			if (ttype != LUA_TTABLE)
+			{
+				lua_pop(L, 1);
+				lua_createtable(L, 0, 1);
+				lua_pushstring(L, "__call");
+				lua_pushcfunction(L, &call_constructor_function);
+				lua_rawset(L, -3);
+				lua_pushvalue(L, -1);
+				lua_rawsetp(L, LUA_REGISTRYINDEX, &key);
+			}
+		}
+
+		inline void setMembers(lua_State* state, int metatable_index, const MemberMapType& member_map, const PropMapType& property_map)
+		{
+			for (typename MemberMapType::const_iterator it = member_map.begin(); it != member_map.end(); ++it)
+			{
+				util::one_push(state,it->first);
+				util::one_push(state,it->second);
+				lua_rawset(state, metatable_index);
+			}
+			for (typename PropMapType::const_iterator it = property_map.begin(); it != property_map.end(); ++it)
+			{
+				util::one_push(state, KAGUYA_PROPERTY_PREFIX + it->first);
+				util::one_push(state, it->second);
+				lua_rawset(state, metatable_index);
+			}
+		}
+
+		inline void setPropertyIndexMetamethod(lua_State* state, int metatable_index)
+		{
+			lua_pushstring(state, "__index");
+			lua_pushvalue(state, metatable_index);
+			lua_pushcclosure(state, &property_index_function, 1);
+			lua_rawset(state, metatable_index);
+		}
+
+		inline void setPropertyNewIndexMetamethod(lua_State* state, int metatable_index)
+		{
+			lua_pushstring(state, "__newindex");
+			lua_pushvalue(state, metatable_index);
+			lua_pushcclosure(state, &property_newindex_function, 1);
+			lua_rawset(state, metatable_index);
+		}
+		inline void setMultipleBase(lua_State* state, int metatable_index, int metabase_array_index)
+		{
+			lua_createtable(state,0,1);
+			int newmetaindex = lua_gettop(state);
+			lua_pushstring(state, "__index");
+			lua_pushvalue(state, metabase_array_index);//bind metabase_array to multiple_base_index_function
+			lua_pushcclosure(state, &multiple_base_index_function, 1);
+			lua_rawset(state, newmetaindex);//newmeta["__index"] = multiple_base_index_function
+			lua_setmetatable(state, metatable_index); // metatable.setMetatable(newmeta);
+		}
+	}
 
 	/// class binding interface.
 	template<typename class_type, typename base_class_type = void>
 	class UserdataMetatable
 	{
-		typedef std::map<std::string, AnyDataPusher> PropMapType;
-		typedef std::map<std::string, AnyDataPusher> MemberMapType;
 	public:
 
 		UserdataMetatable()
@@ -214,53 +284,46 @@ namespace kaguya
 				except::OtherError(state, typeid(class_type*).name() + std::string(" is already registered"));
 				return LuaTable();
 			}
-			LuaStackRef metatable(state, -1);
-			registerMember(state);
+			int metatable_index = lua_gettop(state);
+			Metatable::setMembers(state, metatable_index,member_map_,property_map_);
 
 			if (!traits::is_same<base_class_type, void>::value || !property_map_.empty())//if base class has property and derived class hasnt property. need property access metamethod
 			{
-
 				if (member_map_.count("__index") == 0)
 				{
-					metatable.push(state);
-					lua_pushcclosure(state, &detail::property_index_function, 1);
-					LuaStackRef indexfun(state, -1);
-					metatable.setRawField("__index", indexfun);
+					Metatable::setPropertyIndexMetamethod(state, metatable_index);
 				}
-
-
 
 				if (member_map_.count("__newindex") == 0)
 				{
-					metatable.push(state);
-					lua_pushcclosure(state, &detail::property_newindex_function, 1);
-					LuaStackRef newindexfun(state, -1);
-					metatable.setRawField("__newindex", newindexfun);
+					Metatable::setPropertyNewIndexMetamethod(state, metatable_index);
 				}
 			}
 			else
 			{
 				if (member_map_.count("__index") == 0)
 				{
-					metatable.setRawField("__index", metatable);
+					lua_pushstring(state, "__index");
+					lua_pushvalue(state, metatable_index);
+					lua_rawset(state, metatable_index);
 				}
 			}
 
-			set_base_metatable(state, metatable, types::typetag<base_class_type>());
+			set_base_metatable(state, metatable_index, types::typetag<base_class_type>());
 
-			class_userdata::get_call_constructor_metatable(state);
-			LuaStackRef call_construct_table(state, -1, true);
-			LuaTable basemetatable = metatable.getMetatable();
-			if (basemetatable)
+			if (lua_getmetatable(state, metatable_index))//get base_metatable
 			{
-				basemetatable.setRawField("__call", call_construct_table.getRawField("__call"));
+				lua_pushstring(state, "__call");
+				lua_pushcfunction(state, &Metatable::call_constructor_function);
+				lua_rawset(state,-3);//base_metatable["__call"] = Metatable::call_constructor_function
 			}
 			else
 			{
-				metatable.setMetatable(call_construct_table);
+				Metatable::get_call_constructor_metatable(state);
+				lua_setmetatable(state, metatable_index);
 			}
 
-			return metatable;
+			return LuaStackRef(state, metatable_index);
 		}
 
 
@@ -538,17 +601,17 @@ namespace kaguya
 #if defined(_MSC_VER) && _MSC_VER <= 1800
 		//can not use add at MSVC2013
 #else
-		template<typename Data>
-		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
-			UserdataMetatable& add(const char* name, const Data& d)
-		{
-			return addStaticField(name, d);
-		}
-
 #if KAGUYA_USE_CPP11
 		template<typename Data>
 		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
 			UserdataMetatable& add(const char* name, Data&& d)
+		{
+			return addStaticField(name, std::forward<Data>(d));
+		}
+#else
+		template<typename Data>
+		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
+			UserdataMetatable& add(const char* name, const Data& d)
 		{
 			return addStaticField(name, d);
 		}
@@ -563,74 +626,60 @@ namespace kaguya
 
 	private:
 
-		void set_base_metatable(lua_State* , LuaStackRef& , types::typetag<void>)const
+		void set_base_metatable(lua_State* , int , types::typetag<void>)const
 		{
 		}
 		template<class Base>
-		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<Base>)const
+		void set_base_metatable(lua_State* state, int metatable_index, types::typetag<Base>)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			metatable.setMetatable(LuaTable(state, StackTop()));
-
+			lua_setmetatable(state, metatable_index); // metatable.setMetatable(newmeta);
 			PointerConverter& pconverter = PointerConverter::get(state);
 			pconverter.add_type_conversion<Base, class_type>();
 		}
 
-		void set_multiple_base(lua_State* state, LuaStackRef& metatable, const LuaTable& metabases)const
-		{
-			LuaTable newmeta(state, NewTable());
-
-			metabases.push(state);
-			lua_pushcclosure(state, &detail::multiple_base_index_function, 1);
-			LuaStackRef indexfun(state, -1);
-			newmeta.setField("__index", indexfun);
-
-			metatable.setMetatable(newmeta);
-
-		}
 #if KAGUYA_USE_CPP11
 
 		template<typename Base>
-		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
+		void metatables(lua_State* state, int metabase_array_index, PointerConverter& pvtreg, types::typetag<MultipleBase<Base> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop()));
+			lua_rawseti(state, metabase_array_index, lua_rawlen(state, metabase_array_index) + 1);
 			pvtreg.add_type_conversion<Base, class_type>();
 		}
 		template<typename Base, typename... Remain>
-		void metatables(lua_State* state, LuaStackRef& metabases, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
+		void metatables(lua_State* state, int metabase_array_index, PointerConverter& pvtreg, types::typetag<MultipleBase<Base, Remain...> >)const
 		{
 			class_userdata::get_metatable<Base>(state);
-			metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop()));
+			lua_rawseti(state, metabase_array_index, lua_rawlen(state, metabase_array_index) + 1);
 			pvtreg.add_type_conversion<Base, class_type>();
-			metatables(state, metabases, pvtreg, types::typetag<MultipleBase<Remain...> >());
+			metatables(state, metabase_array_index, pvtreg, types::typetag<MultipleBase<Remain...> >());
 		}
 
 		template<typename... Bases>
-		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<MultipleBase<Bases...> > metatypes)const
+		void set_base_metatable(lua_State* state, int metatable_index, types::typetag<MultipleBase<Bases...> > metatypes)const
 		{
 			PointerConverter& pconverter = PointerConverter::get(state);
 
-			util::one_push(state, NewTable(sizeof...(Bases), 0));
-			LuaStackRef metabases(state, -1, true);
-			metatables(state, metabases, pconverter, metatypes);
-			set_multiple_base(state, metatable, metabases);
+			lua_createtable(state, sizeof...(Bases), 0);
+			int metabase_array_index = lua_gettop(state);
+			metatables(state, metabase_array_index, pconverter, metatypes);
+			Metatable::setMultipleBase(state, metatable_index, metabase_array_index);
 		}
 
 #else
 #define KAGUYA_GET_BASE_METATABLE(N) class_userdata::get_metatable<KAGUYA_PP_CAT(A,N)>(state);\
-		metabases.setRawField(metabases.size() + 1, LuaTable(state, StackTop())); \
+		lua_rawseti(state, metabase_array_index, lua_rawlen(state, metabase_array_index) + 1); \
 		pconverter.add_type_conversion<KAGUYA_PP_CAT(A,N),class_type>();
 #define KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF(N) \
 		template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
-		void set_base_metatable(lua_State* state, LuaStackRef& metatable, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > metatypes)const\
+		void set_base_metatable(lua_State* state, int metatable_index, types::typetag<MultipleBase<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)> > )const\
 		{\
-			KAGUYA_UNUSED(metatypes);\
 			PointerConverter& pconverter = PointerConverter::get(state);\
-			util::one_push(state, NewTable(N,0));\
-			LuaStackRef metabases(state,-1, true);\
+			lua_createtable(state, N, 0);\
+			int metabase_array_index = lua_gettop(state);\
 			KAGUYA_PP_REPEAT(N, KAGUYA_GET_BASE_METATABLE); \
-			set_multiple_base(state, metatable, metabases);\
+			Metatable::setMultipleBase(state, metatable_index, metabase_array_index);\
 		}\
 
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_CLASS_MAX_BASE_CLASSES, KAGUYA_MULTIPLE_INHERITANCE_SETBASE_DEF)
@@ -655,33 +704,9 @@ namespace kaguya
 			}
 			return false;
 		}
-		void registerField(lua_State* state, const char* name, const AnyDataPusher& value)const
-		{
-			int count = value.pushToLua(state);
-			if (count > 1)
-			{
-				lua_pop(state, count - 1);
-				count = 1;
-			}
-			if (count == 1)
-			{
-				lua_setfield(state, -2, name);
-			}
-		}
-		void registerMember(lua_State* state)const
-		{
-			for (typename MemberMapType::const_iterator it = member_map_.begin(); it != member_map_.end(); ++it)
-			{
-				registerField(state, it->first.c_str(), it->second);
-			}
-			for (typename PropMapType::const_iterator it = property_map_.begin(); it != property_map_.end(); ++it)
-			{
-				registerField(state, (KAGUYA_PROPERTY_PREFIX + it->first).c_str(), it->second);
-			}
-		}
 
-		PropMapType property_map_;
-		MemberMapType member_map_;
+		Metatable::PropMapType property_map_;
+		Metatable::MemberMapType member_map_;
 	};
 
 	/// @ingroup lua_type_traits
