@@ -1658,6 +1658,27 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_any)(kaguya::State& state)
 KAGUYA_MEMBER_FUNCTION_OVERLOADS(PureVirtualBase_defarg_test, PureVirtualBase, default_arg, 0, 1)
 KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(PureVirtualBase_const_defarg_test, PureVirtualBase, const_default_arg, 0, 1, void(PureVirtualBase::*)(int)const)
 
+struct PureVirtualDerived : PureVirtualBase
+{
+	PureVirtualDerived(int& t) :v(t) {};
+	virtual ~PureVirtualDerived() {};
+
+	virtual void test() {
+		v = 1;
+	};
+	virtual void default_arg(int a = 0) {
+		v = a;
+	}
+	virtual void const_test()const {
+		v = 2;
+	};
+	virtual void const_default_arg(int a = 0) const
+	{
+		v = a;
+	}
+
+	int& v;
+};
 KAGUYA_TEST_FUNCTION_DEF(pure_virtual_test)(kaguya::State& state)
 {
 
@@ -1668,27 +1689,6 @@ KAGUYA_TEST_FUNCTION_DEF(pure_virtual_test)(kaguya::State& state)
 		.addFunction("const_default_arg", PureVirtualBase_const_defarg_test())
 	);
 
-	struct PureVirtualDerived : PureVirtualBase
-	{
-		PureVirtualDerived(int& t):v(t) {};
-		virtual ~PureVirtualDerived() {};
-
-		virtual void test() {
-			v = 1;
-		};
-		virtual void default_arg(int a = 0) {
-			v = a;
-		}
-		virtual void const_test()const {
-			v = 2;
-		};
-		virtual void const_default_arg(int a = 0) const
-		{
-			v = a;
-		}
-
-		int& v;
-	};
 	state["PureVirtualDerived"].setClass(kaguya::UserdataMetatable<PureVirtualDerived,PureVirtualBase>()
 		.addFunction("test", &PureVirtualDerived::test)
 	);
