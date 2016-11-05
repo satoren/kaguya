@@ -214,21 +214,18 @@ namespace kaguya
 		std::string name_;
 	};
 
+
 	template<typename EnumType>
 	struct enum_
 	{
-		enum_(const std::string& name) :name_(name) {
+		enum_(const std::string& name) :enum_scope_table_(scope(name).table()) {
 		}
 		enum_& value(const char* name, EnumType data) { 
-			LuaTable scope = detail::scope_stack::instance().current_scope();
-			if (scope)
-			{
-				scope[name_] = data;
-			}
+			enum_scope_table_[name] = data;
 			return *this; 
 		}
 	private:
-		std::string name_;
+		LuaTable enum_scope_table_;
 	};
 
 	/// @ingroup another_binding_api
