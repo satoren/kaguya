@@ -490,20 +490,6 @@ namespace kaguya
 			return *this;
 		}
 
-		/// @brief assign data by argument value. 
-		/// @param name name for lua
-		/// @param d data
-		template<typename Data>
-		UserdataMetatable& addStaticField(const char* name, const Data& d)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException(std::string(name) + " is already registered.");
-				return *this;
-			}
-			member_map_[name] = AnyDataPusher(d);
-			return *this;
-		}
 #if KAGUYA_USE_CPP11
 		/// @brief assign overloaded from functions. 
 		/// @param name name for lua
@@ -533,7 +519,7 @@ namespace kaguya
 				throw KaguyaException(std::string(name) + " is already registered.");
 				return *this;
 			}
-			member_map_[name] = AnyDataPusher(std::move(d));
+			member_map_[name] = AnyDataPusher(std::forward<Data>(d));
 			return *this;
 		}
 #else
@@ -552,6 +538,21 @@ namespace kaguya
 
 		KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_OVERLOADS, KAGUYA_ADD_OVERLOAD_FUNCTION_DEF)
 #undef KAGUYA_ADD_OVERLOAD_FUNCTION_DEF
+
+		/// @brief assign data by argument value. 
+		/// @param name name for lua
+		/// @param d data
+		template<typename Data>
+		UserdataMetatable& addStaticField(const char* name, const Data& d)
+		{
+			if (has_key(name))
+			{
+				throw KaguyaException(std::string(name) + " is already registered.");
+				return *this;
+			}
+			member_map_[name] = AnyDataPusher(d);
+			return *this;
+		}
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER <= 1800
