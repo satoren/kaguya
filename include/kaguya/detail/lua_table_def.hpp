@@ -25,6 +25,138 @@ namespace kaguya
 
 	namespace detail
 	{
+
+		struct table_proxy
+		{
+
+#if KAGUYA_USE_CPP11
+			template<typename V, typename KEY>
+			static void set(lua_State* state, int table_index, KEY&& key, V&& value)
+			{
+				util::one_push(state, std::forward<KEY>(key));
+				util::one_push(state, std::forward<V>(value));
+				lua_settable(state, table_index);
+			}
+			template<typename V>
+			static void set(lua_State* state, int table_index, const char* key, V&& value)
+			{
+				util::one_push(state, std::forward<V>(value));
+				lua_setfield(state, table_index, key);
+			}
+			template<typename V>
+			static void set(lua_State* state, int table_index, const std::string& key, V&& value)
+			{
+				set(state, table_index, key.c_str(), std::forward<V>(value));
+			}
+
+			template<typename V>
+			static void set(lua_State* state, int table_index, luaInt key, V&& value)
+			{
+				util::one_push(state, std::forward<V>(value));
+				lua_seti(state, table_index, key);
+			}
+			template<typename V, typename KEY>
+			static void rawset(lua_State* state, int table_index, KEY&& key, V&& value)
+			{
+				util::one_push(state, std::forward<KEY>(key));
+				util::one_push(state, std::forward<V>(value));
+				lua_rawset(state, table_index);
+			}
+			template<typename V>
+			static void rawset(lua_State* state, int table_index, luaInt key, V&& value)
+			{
+				util::one_push(state, std::forward<V>(value));
+				lua_rawseti(state, table_index, key);
+			}
+#else
+			template<typename V, typename KEY>
+			static void set(lua_State* state, int table_index, const KEY& key, const V& value)
+			{
+				util::one_push(state, key);
+				util::one_push(state, value);
+				lua_settable(state, table_index);
+			}
+			template<typename V>
+			static void set(lua_State* state, int table_index, const char* key, const V& value)
+			{
+				util::one_push(state, value);
+				lua_setfield(state, table_index, key);
+			}
+			template<typename V>
+			static void set(lua_State* state, int table_index, const std::string& key, const V& value)
+			{
+				util::one_push(state, value);
+				lua_setfield(state, table_index, key.c_str());
+			}
+
+			template<typename V>
+			static void set(lua_State* state, int table_index, luaInt key, const V& value)
+			{
+				util::one_push(state, value);
+				lua_seti(state, table_index, key);
+			}
+
+			template<typename V, typename KEY>
+			static void rawset(lua_State* state, int table_index,const KEY& key,const V& value)
+			{
+				util::one_push(state, key);
+				util::one_push(state, value);
+				lua_rawset(state, table_index);
+			}
+			template<typename V>
+			static void rawset(lua_State* state, int table_index, luaInt key, const V& value)
+			{
+				util::one_push(state, value);
+				lua_rawseti(state, table_index, key);
+			}
+#endif
+
+#if KAGUYA_USE_CPP11
+			template<typename KEY>
+			static void get(lua_State* state, int table_index, KEY&& key)
+			{
+				util::one_push(state, std::forward<KEY>(key));
+				lua_gettable(state, table_index);
+			}
+#endif
+			template<typename KEY>
+			static void get(lua_State* state, int table_index, const KEY& key)
+			{
+				util::one_push(state, key);
+				lua_gettable(state, table_index);
+			}
+			static void get(lua_State* state, int table_index, const char* key)
+			{
+				lua_getfield(state, table_index, key);
+			}
+			static void get(lua_State* state, int table_index, const std::string& key)
+			{
+				lua_getfield(state, table_index, key.c_str());
+			}
+			static void get(lua_State* state, int table_index, luaInt key)
+			{
+				lua_geti(state, table_index, key);
+			}
+#if KAGUYA_USE_CPP11
+			template<typename KEY>
+			static void rawget(lua_State* state, int table_index, KEY&& key)
+			{
+				util::one_push(state, std::forward<KEY>(key));
+				lua_rawget(state, table_index);
+			}
+#endif
+			template<typename KEY>
+			static void rawget(lua_State* state, int table_index, const KEY& key)
+			{
+				util::one_push(state, key);
+				lua_rawget(state, table_index);
+			}
+			static void rawget(lua_State* state, int table_index, luaInt key)
+			{
+				lua_rawgeti(state, table_index, key);
+			}
+		};
+
 		template<typename Derived>
 		class LuaTableOrUserDataImpl
 		{
@@ -109,35 +241,12 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, key);
-				lua_gettable(state, stackIndex);
-				return lua_type_traits<T>::get(state, -1);
-			}
-			/// @brief value = table[key];
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename T>
-			typename lua_type_traits<T>::get_type getField(const char* key)const
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return typename lua_type_traits<T>::get_type();
-				}
-				util::ScopedSavedStack save(state);
-				lua_getfield(state, pushStackIndex_(state), key);
+
+				table_proxy::get(state, stackIndex, key);
+
 				return lua_type_traits<T>::get(state, -1);
 			}
 
-			/// @brief value = table[key];
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename T>
-			typename lua_type_traits<T>::get_type getField(const std::string& key)const
-			{
-				return getField(key.c_str());
-			}
 
 			/// @brief value = table[key];
 			/// @param key key of table
@@ -160,8 +269,9 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, key);
-				lua_rawget(state, stackIndex);
+
+				table_proxy::rawget(state, stackIndex, key);
+
 				return lua_type_traits<T>::get(state, -1);
 			}
 			/// @brief value = rawget(table,key);
@@ -170,22 +280,6 @@ namespace kaguya
 			template<typename KEY>
 			LuaStackRef getRawField(const KEY& key)const;
 			
-			/// @brief value = rawget(table,key);
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename T>
-			typename lua_type_traits<T>::get_type getRawField(luaInt key)const
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return typename lua_type_traits<T>::get_type();
-				}
-				util::ScopedSavedStack save(state);
-				lua_rawgeti(state, pushStackIndex_(state), key);
-				return lua_type_traits<T>::get(state, -1);
-			}
 
 			/// @brief foreach table fields
 			template < class K, class V, class Fun> void foreach_table(Fun f)const
@@ -335,47 +429,7 @@ namespace kaguya
 			}
 		public:
 
-			/// @brief table[key] = value;
-			template<typename K, typename V>
-			bool setField(const K& key, const V& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, key);//push table key
-				util::one_push(state, value);//push value
-				lua_settable(state, stackIndex);//thistable[key] = value
-				return true;
-			}
 
-			/// @brief table[key] = value;
-			template<typename V>
-			bool setField(const char* key, const V& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, value);//push value
-				lua_setfield(state, stackIndex, key);//thistable[key] = value
-				return true;
-			}
-
-			/// @brief table[key] = value;
-			template<typename V>
-			bool setField(const std::string& key, const V& value)
-			{
-				return setField(key.c_str(), value);
-			}
 #if KAGUYA_USE_CPP11
 			/// @brief table[key] = value;
 			template<typename K, typename V>
@@ -389,27 +443,11 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, std::forward<K>(key));//push table key
-				util::one_push(state, std::forward<V>(value));//push value
-				lua_settable(state, stackIndex);//thistable[key] = value
+
+				table_proxy::set(state, stackIndex, std::forward<K>(key), std::forward<V>(value));
 				return true;
 			}
-			/// @brief table[key] = value;
-			template<typename V>
-			bool setField(const char* key, V&& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, std::forward<V>(value));//push value
-				lua_setfield(state, stackIndex, key);//thistable[key] = value
-				return true;
-			}
+
 			/// @brief rawset(table,key,value)
 			template<typename K, typename V>
 			bool setRawField(K&& key, V&& value)
@@ -422,12 +460,29 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, key);//push table key
-				util::one_push(state, value);//push value
-				lua_rawset(state, stackIndex);//thistable[key] = value
+
+				table_proxy::rawset(state, stackIndex, std::forward<K>(key), std::forward<V>(value));
+
 				return true;
 			}
-#endif
+#else
+			/// @brief table[key] = value;
+			template<typename K, typename V>
+			bool setField(const K& key, const V& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+
+				table_proxy::set(state, stackIndex, key, value);
+
+				return true;
+			}
 
 			/// @brief rawset(table,key,value)
 			template<typename K, typename V>
@@ -441,11 +496,10 @@ namespace kaguya
 				}
 				util::ScopedSavedStack save(state);
 				int stackIndex = pushStackIndex_(state);
-				util::one_push(state, key);//push table key
-				util::one_push(state, value);//push value
-				lua_rawset(state, stackIndex);//thistable[key] = value
+				table_proxy::rawset(state, stackIndex, key, value);
 				return true;
 			}
+#endif
 		};
 
 		template<typename Derived>
