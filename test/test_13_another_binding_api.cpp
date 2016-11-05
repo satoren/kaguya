@@ -8,6 +8,12 @@ using namespace kaguya;
 
 int squared(int a) { return a * a; }
 
+enum ENUM_TEST_TYPE
+{
+	ENUM_TEST_A = 2,
+	ENUM_TEST_B = 4
+};
+
 KAGUYA_BINDINGS(test_bind){
 	class_<TestClass>("TestClass")
 		.constructor<int>()
@@ -23,6 +29,10 @@ KAGUYA_BINDINGS(test_bind){
 	}
 	function("squared", &squared);
 	scope().attr("x") = 1;
+
+	enum_<ENUM_TEST_TYPE>("ENUM_TEST_TYPE")
+		.value("ENUM_TEST_A", ENUM_TEST_A)
+		.value("ENUM_TEST_B", ENUM_TEST_B);
 }
 
 KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
@@ -36,7 +46,9 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 	TEST_CHECK(state("assert(test_bind.submodule.submodule.squared3(6) == 36)"));
 
 
-	TEST_CHECK(state("assert(test_bind.x == 1)"));
+	TEST_CHECK(state("assert(test_bind.x == 1)"))
+	TEST_CHECK(state("assert(test_bind.ENUM_TEST_TYPE.ENUM_TEST_A == 2)"));
+	TEST_CHECK(state("assert(test_bind.ENUM_TEST_TYPE.ENUM_TEST_B == 4)"));
 }
 
 
