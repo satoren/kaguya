@@ -199,7 +199,7 @@ namespace kaguya
 		{
 			typedef ConstructorFunctor<util::FunctionSignatureType<ClassType, Args...> > type;
 		};
-		template<typename ClassType, typename... Args> struct ConstructorFunction<ClassType, ClassType(Args...) >//class type check version
+		template<typename ClassType, typename RetType, typename... Args> struct ConstructorFunction<ClassType, RetType(Args...) >//class type check version
 		{
 			typedef ConstructorFunctor<util::FunctionSignatureType<ClassType, Args...> > type;
 		};
