@@ -726,6 +726,8 @@ namespace kaguya
 
 			template<typename TupleType> int invoke_tuple(lua_State* state, TupleType& tuple)
 		{
+			KAGUYA_UNUSED(state);
+			KAGUYA_UNUSED(tuple);
 			return 0;
 		}
 	}

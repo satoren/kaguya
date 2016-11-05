@@ -286,7 +286,7 @@ namespace kaguya
 			return get_pointer<T>(from);
 		}
 		template<class T>
-		standard::shared_ptr<T> get_pointer(ObjectWrapperBase* from, types::typetag<standard::shared_ptr<T> > tag)
+		standard::shared_ptr<T> get_pointer(ObjectWrapperBase* from, types::typetag<standard::shared_ptr<T> >)
 		{
 			ObjectSharedPointerWrapper* ptr = dynamic_cast<ObjectSharedPointerWrapper*>(from);
 			if (ptr)

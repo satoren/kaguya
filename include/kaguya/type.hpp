@@ -260,6 +260,8 @@ namespace kaguya
 		}
 		static bool checkType(lua_State* l, int index)
 		{
+			KAGUYA_UNUSED(l);
+			KAGUYA_UNUSED(index);
 			return true;
 		}
 		static get_type get(lua_State* l, int index)KAGUYA_NOEXCEPT
