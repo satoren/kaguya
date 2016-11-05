@@ -214,13 +214,13 @@ namespace kaguya
 
 		inline void setMembers(lua_State* state, int metatable_index, const MemberMapType& member_map, const PropMapType& property_map)
 		{
-			for (typename MemberMapType::const_iterator it = member_map.begin(); it != member_map.end(); ++it)
+			for (MemberMapType::const_iterator it = member_map.begin(); it != member_map.end(); ++it)
 			{
 				util::one_push(state,it->first);
 				util::one_push(state,it->second);
 				lua_rawset(state, metatable_index);
 			}
-			for (typename PropMapType::const_iterator it = property_map.begin(); it != property_map.end(); ++it)
+			for (PropMapType::const_iterator it = property_map.begin(); it != property_map.end(); ++it)
 			{
 				util::one_push(state, KAGUYA_PROPERTY_PREFIX + it->first);
 				util::one_push(state, it->second);
