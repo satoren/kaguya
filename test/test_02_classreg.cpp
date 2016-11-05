@@ -156,7 +156,7 @@ KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 {
 	state["ABC"].setClass(kaguya::UserdataMetatable<ABC>()
-		.setConstructors<ABC(const char*), ABC(int), ABC(std::string), ABC(int, const std::string&), ABC(const std::string&, int)>()
+		.setConstructors<void(const char*), ABC(int), ABC(std::string), ABC(int, const std::string&), ABC(const std::string&, int)>()
 		.addFunction("getString", &ABC::getString)
 		.addFunction("getInt", &ABC::getInt)
 		.addFunction("setInt", &ABC::setInt)
@@ -515,6 +515,18 @@ struct Derived2 :Derived
 {
 	Derived2() :c(0) {};
 	int c;
+};
+
+
+struct PureVirtualBase
+{
+	PureVirtualBase() {};
+	virtual ~PureVirtualBase() {};
+
+	virtual void test() = 0;
+	virtual void default_arg(int a = 0) = 0;
+	virtual void const_test() const = 0;
+	virtual void const_default_arg(int a = 0) const = 0;
 };
 
 int base_function(Base* b) {
@@ -1642,4 +1654,74 @@ KAGUYA_TEST_FUNCTION_DEF(add_property_any)(kaguya::State& state)
 	TEST_EQUAL(base.a, 1);
 }
 
+
+KAGUYA_MEMBER_FUNCTION_OVERLOADS(PureVirtualBase_defarg_test, PureVirtualBase, default_arg, 0, 1)
+KAGUYA_MEMBER_FUNCTION_OVERLOADS_WITH_SIGNATURE(PureVirtualBase_const_defarg_test, PureVirtualBase, const_default_arg, 0, 1, void(PureVirtualBase::*)(int)const)
+
+struct PureVirtualDerived : PureVirtualBase
+{
+	PureVirtualDerived(int& t) :v(t) {};
+	virtual ~PureVirtualDerived() {};
+
+	virtual void test() {
+		v = 1;
+	};
+	virtual void default_arg(int a = 0) {
+		v = a;
+	}
+	virtual void const_test()const {
+		v = 2;
+	};
+	virtual void const_default_arg(int a = 0) const
+	{
+		v = a;
+	}
+
+	int& v;
+};
+KAGUYA_TEST_FUNCTION_DEF(pure_virtual_test)(kaguya::State& state)
+{
+
+	state["PureVirtualBase"].setClass(kaguya::UserdataMetatable<PureVirtualBase>()
+		.addFunction("test", &PureVirtualBase::test)
+		.addFunction("const_test", &PureVirtualBase::const_test)
+		.addFunction("default_arg", PureVirtualBase_defarg_test())
+		.addFunction("const_default_arg", PureVirtualBase_const_defarg_test())
+	);
+
+	state["PureVirtualDerived"].setClass(kaguya::UserdataMetatable<PureVirtualDerived,PureVirtualBase>()
+		.addFunction("test", &PureVirtualDerived::test)
+	);
+	int test = 0;
+	PureVirtualDerived virtual_test(test);
+	state["test"] = &virtual_test;
+	TEST_CHECK(state("test:test()"));
+	TEST_EQUAL(test, 1);
+	TEST_CHECK(state("test:const_test()"));
+	TEST_EQUAL(test, 2);
+	TEST_CHECK(state("test:default_arg()"));
+	TEST_EQUAL(test, 0);
+	TEST_CHECK(state("test:default_arg(6)"));
+	TEST_EQUAL(test, 6);
+	TEST_CHECK(state("test:const_default_arg()"));
+	TEST_EQUAL(test, 0);
+	TEST_CHECK(state("test:const_default_arg(6)"));
+	TEST_EQUAL(test, 6);
+
+	test = 0;
+	PureVirtualBase* pure_virtual_test = &virtual_test;
+	state["test"] = pure_virtual_test;
+	TEST_CHECK(state("test:test()"));
+	TEST_EQUAL(test, 1);
+	TEST_CHECK(state("test:const_test()"));
+	TEST_EQUAL(test, 2);
+	TEST_CHECK(state("test:default_arg()"));
+	TEST_EQUAL(test, 0);
+	TEST_CHECK(state("test:default_arg(6)"));
+	TEST_EQUAL(test, 6);
+	TEST_CHECK(state("test:const_default_arg()"));
+	TEST_EQUAL(test, 0);
+	TEST_CHECK(state("test:const_default_arg(6)"));
+	TEST_EQUAL(test, 6);
+}
 KAGUYA_TEST_GROUP_END(test_02_classreg)

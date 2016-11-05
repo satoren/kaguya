@@ -155,8 +155,8 @@ namespace kaguya
 		{\
 			typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
 		};\
-		template<typename ClassType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
-		struct ConstructorFunction<ClassType,ClassType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
+		template<typename ClassType,typename RetType KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>\
+		struct ConstructorFunction<ClassType,RetType(KAGUYA_PP_TEMPLATE_ARG_REPEAT(N))>\
 		{\
 			typedef KAGUYA_F_TO_CONSIG_TYPE_DEF(N) type;\
 		};
