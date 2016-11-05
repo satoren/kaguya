@@ -140,6 +140,9 @@ namespace kaguya
 #if KAGUYA_USE_CPP11
 		template<typename... Args>
 		class_& constructor() { this->template setConstructors<ClassType(Args...)>(); return *this; }
+
+		template<typename... Constructors>
+		class_& constructors() { this->template setConstructors<Constructors...>(); return *this; }
 #else
 		class_& constructor() { this->template setConstructors<ClassType()>(); return *this; }
 
@@ -149,6 +152,15 @@ namespace kaguya
 
 			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_ADD_CON_FN_DEF)
 #undef KAGUYA_ADD_CON_FN_DEF
+
+	class_& constructors() { this->template setConstructors<ClassType()>(); return *this; }
+
+#define KAGUYA_ADD_CONS_FN_DEF(N) \
+	template<KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)>\
+	class_& constructors() { this->template setConstructors<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>(); return *this; }
+
+	KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_ADD_CON_FN_DEF)
+#undef KAGUYA_ADD_CONS_FN_DEF
 #endif
 
 		/// @ingroup another_binding_api
@@ -156,6 +168,8 @@ namespace kaguya
 		template<typename F>
 		class_& function(const char* name, F f) { this-> addFunction(name, f); return *this; }
 
+		template<typename F>
+		class_& function(const char* name, FunctionInvokerType<F> f) { this-> addStaticField(name, f); return *this; }
 
 		/// @ingroup another_binding_api
 		/// @brief property binding 
@@ -170,6 +184,9 @@ namespace kaguya
 		/// @brief class function binding
 		template<typename F>
 		class_& class_function(const char* name, F f) { this->addStaticFunction(name, f); return *this; }
+
+		template<typename F>
+		class_& class_function(const char* name, FunctionInvokerType<F> f) { this-> addStaticField(name, f); return *this; }
 
 
 		/// @ingroup another_binding_api
@@ -197,6 +214,23 @@ namespace kaguya
 		std::string name_;
 	};
 
+	template<typename EnumType>
+	struct enum_
+	{
+		enum_(const std::string& name) :name_(name) {
+		}
+		enum_& value(const char* name, EnumType data) { 
+			LuaTable scope = detail::scope_stack::instance().current_scope();
+			if (scope)
+			{
+				scope[name_] = data;
+			}
+			return *this; 
+		}
+	private:
+		std::string name_;
+	};
+
 	/// @ingroup another_binding_api
 	/// @brief function binding 
 	template<typename F>
@@ -207,11 +241,32 @@ namespace kaguya
 			scope[name] = kaguya::function(f);
 		}
 	}
+	template<typename F>
+	void function(const char* name, FunctionInvokerType<F> f) {
+		LuaTable scope = detail::scope_stack::instance().current_scope();
+		if (scope)
+		{
+			scope[name] = f;
+		}
+	}
 
 	/// @ingroup another_binding_api
 	/// @brief function binding 
 	template<typename F>
 	void def(const char* name, F f) { kaguya::function(name, f); }
+
+	/// @ingroup another_binding_api
+	/// @brief function binding 
+	template<typename T>
+	void constant(const char* name, T v)
+	{
+		LuaTable scope = detail::scope_stack::instance().current_scope();
+		if (scope)
+		{
+			scope[name] = v;
+		}
+	}
+
 }
 /// @}
 
