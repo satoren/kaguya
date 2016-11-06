@@ -18,86 +18,6 @@ namespace kaguya
 {
 	class State;
 
-
-	struct table_proxy
-	{
-
-#if KAGUYA_USE_CPP11
-		template<typename V, typename KEY>
-		static void set(lua_State* state, int table_index, const KEY& key, V&& value)
-		{
-			util::one_push(state, key);
-			util::one_push(state, std::forward<V>(value));
-			lua_settable(state, table_index);
-		}
-		template<typename V>
-		static void set(lua_State* state, int table_index, const char* key, V&& value)
-		{
-			util::one_push(state, std::forward<V>(value));
-			lua_setfield(state, table_index, key);
-		}
-		template<typename V>
-		static void set(lua_State* state, int table_index, const std::string& key, V&& value)
-		{
-			util::one_push(state, std::forward<V>(value));
-			lua_setfield(state, table_index, key.c_str());
-		}
-
-		template<typename V>
-		static void set(lua_State* state, int table_index, const luaInt& key, V&& value)
-		{
-			util::one_push(state, std::forward<V>(value));
-			lua_seti(state, table_index, key);
-		}
-#endif
-		template<typename V, typename KEY>
-		static void set(lua_State* state, int table_index, const KEY& key, const V& value)
-		{
-			util::one_push(state, key);
-			util::one_push(state, value);
-			lua_settable(state, table_index);
-		}
-		template<typename V>
-		static void set(lua_State* state, int table_index, const char* key, const V& value)
-		{
-			util::one_push(state, value);
-			lua_setfield(state, table_index, key);
-		}
-		template<typename V>
-		static void set(lua_State* state, int table_index, const std::string& key, const V& value)
-		{
-			util::one_push(state, value);
-			lua_setfield(state, table_index, key.c_str());
-		}
-
-		template<typename V>
-		static void set(lua_State* state, int table_index, const luaInt& key, const V& value)
-		{
-			util::one_push(state, value);
-			lua_seti(state, table_index, key);
-		}
-
-		template<typename KEY>
-		static void get(lua_State* state, int table_index, const KEY& key)
-		{
-			util::one_push(state, key);
-			lua_gettable(state, table_index);
-		}
-		static void get(lua_State* state, int table_index, const char* key)
-		{
-			lua_getfield(state, table_index, key);
-		}
-		static void get(lua_State* state, int table_index, const std::string& key)
-		{
-			lua_getfield(state, table_index, key.c_str());
-		}
-		static void get(lua_State* state, int table_index, luaInt key)
-		{
-			lua_geti(state, table_index, key);
-		}
-	};
-
-
 	/**
 	* This class is the type returned by members of non-const LuaRef(Table) when directly accessing its elements.
 	*/
@@ -119,7 +39,7 @@ namespace kaguya
 		//! this is not copy.same assign from referenced value.
 		TableKeyReferenceProxy& operator=(const TableKeyReferenceProxy& src)
 		{
-			table_proxy::set(state_, table_index_, key_, src);
+			detail::table_proxy::set(state_, table_index_, key_, src);
 			return *this;
 		}
 
@@ -128,15 +48,14 @@ namespace kaguya
 		template<typename T>
 		TableKeyReferenceProxy& operator=(const T& src)
 		{
-			table_proxy::set(state_, table_index_, key_, src);
-
+			detail::table_proxy::set(state_, table_index_, key_, src);
 			return *this;
 		}
 #if KAGUYA_USE_CPP11
 		template<typename T>
 		TableKeyReferenceProxy& operator=(T&& src)
 		{
-			table_proxy::set(state_, table_index_, key_, std::forward<T>(src));
+			detail::table_proxy::set(state_, table_index_, key_, std::forward<T>(src));
 			return *this;
 		}
 #endif
@@ -169,7 +88,7 @@ namespace kaguya
 		template<typename T>
 		void setFunction(T f)
 		{
-			table_proxy::set(state_, table_index_, key_, kaguya::function(f));
+			detail::table_proxy::set(state_, table_index_, key_, kaguya::function(f));
 		}
 
 		//deprecated
@@ -189,7 +108,7 @@ namespace kaguya
 				return 1;
 			}
 
-			table_proxy::get(state_, table_index_, key_);
+			detail::table_proxy::get(state_, table_index_, key_);
 
 			if (state_ != state)
 			{
@@ -242,7 +161,7 @@ namespace kaguya
 		template<typename T, typename P>
 		void set_class(const UserdataMetatable<T, P>& reg)
 		{
-			table_proxy::set(state_, table_index_, key_, reg.createMatatable(state_));
+			detail::table_proxy::set(state_, table_index_, key_, reg.createMatatable(state_));
 		}
 
 
@@ -254,13 +173,11 @@ namespace kaguya
 		TableKeyReferenceProxy(const LuaTable& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			util::one_push(state_, table);
-			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 		}
 		TableKeyReferenceProxy(const LuaRef& table, const KEY& key) : state_(table.state()), stack_top_(lua_gettop(state_)), key_(key)
 		{
 			util::one_push(state_, table);
-			util::one_push(state_, key);
 			table_index_ = stack_top_ + 1;
 			int t = lua_type(state_, table_index_);
 			if (t != LUA_TTABLE)
@@ -414,13 +331,12 @@ namespace kaguya
 				return LuaStackRef();
 			}
 			push_(state);
-			util::one_push(state, key);//push key
-			lua_gettable(state, -2);//get table[key]
+			detail::table_proxy::get(state,lua_gettop(state), key);
 			lua_remove(state, -2);//remove table
 			return LuaStackRef(state, -1, true);
 		}
 		template<typename T> template <typename KEY>
-		LuaStackRef LuaTableOrUserDataImpl<T>::getRawField(const KEY& key)const
+		LuaStackRef LuaTableImpl<T>::getRawField(const KEY& key)const
 		{
 			lua_State* state = state_();
 			if (!state)
@@ -429,8 +345,7 @@ namespace kaguya
 				return LuaStackRef();
 			}
 			push_(state);
-			util::one_push(state, key);//push key
-			lua_rawget(state, -2);//get table[key]
+			detail::table_proxy::rawget(state, lua_gettop(state) , key);
 			lua_remove(state, -2);//remove table
 			return LuaStackRef(state, -1, true);
 		}

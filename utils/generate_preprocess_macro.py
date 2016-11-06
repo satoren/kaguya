@@ -70,6 +70,4 @@ if __name__ == "__main__":
     out.write('\n\n')
     KAGUYA_PP_INC(out,args.count)
     out.write('\n\n')
-    KAGUYA_PP_INC(out,args.count)
-    out.write('\n\n')
     KAGUYA_PP_DEC(out,args.count)
