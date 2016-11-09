@@ -847,32 +847,31 @@ namespace kaguya
 		template<typename To, KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
 		struct ConvertibleRegisterHelper {
 			typedef To get_type;
-
 			typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)> conv_types;
 
-			static bool checkType(lua_State* state, int index)
+			static bool checkType(lua_State* l, int index)
 			{
 				if (object_checkType<To>(l, index))
 				{
 					return true;
 				}
-				return conv_helper_detail::checkType<To>(state, index, conv_types());
+				return conv_helper_detail::checkType<To>(l, index, conv_types());
 			}
-			static bool strictCheckType(lua_State* state, int index)
+			static bool strictCheckType(lua_State* l, int index)
 			{
 				if (object_strictCheckType<To>(l, index))
 				{
 					return true;
 				}
-				return conv_helper_detail::strictCheckType<To>(state, index, conv_types());
+				return conv_helper_detail::strictCheckType<To>(l, index, conv_types());
 			}
-			static get_type get(lua_State* state, int index)
+			static get_type get(lua_State* l, int index)
 			{
 				if (object_checkType<To>(l, index))
 				{
 					return object_get<To>(l, index);
 				}
-				return conv_helper_detail::get<To>(state, index, conv_types());
+				return conv_helper_detail::get<To>(l, index, conv_types());
 			}
 		};
 #undef KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP
