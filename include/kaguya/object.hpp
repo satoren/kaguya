@@ -661,43 +661,222 @@ namespace kaguya
 		return class_userdata::available_metatable<T>(l);
 	}
 
-	template<typename T>inline bool object_checkType(lua_State* l, int index)
+	namespace util
 	{
-		return object_wrapper<T>(l, index) != 0;
-	}
-	template<typename T>inline bool object_strictCheckType(lua_State* l, int index)
-	{
-		return object_wrapper<T>(l, index, false) != 0;
-	}
-
-
-	template<typename T>inline T object_get(lua_State* l, int index)
-	{
-		const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
-		if (!pointer)
+		template<typename T>inline bool object_checkType(lua_State* l, int index)
 		{
-			throw LuaTypeMismatch();
+			return object_wrapper<T>(l, index) != 0;
 		}
-		return *pointer;
-	}
+		template<typename T>inline bool object_strictCheckType(lua_State* l, int index)
+		{
+			return object_wrapper<T>(l, index, false) != 0;
+		}
+
+
+		template<typename T>inline T object_get(lua_State* l, int index)
+		{
+			const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
+			if (!pointer)
+			{
+				throw LuaTypeMismatch();
+			}
+			return *pointer;
+		}
 
 #if KAGUYA_USE_CPP11
-	template<typename T>inline int object_push(lua_State* l, T&& v)
-	{
-		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(std::forward<T>(v));
-		class_userdata::setmetatable<T>(l);
-		return 1;
-	}
+		template<typename T>inline int object_push(lua_State* l, T&& v)
+		{
+			typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
+			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+			new(storage) wrapper_type(std::forward<T>(v));
+			class_userdata::setmetatable<T>(l);
+			return 1;
+		}
+
+		namespace conv_helper_detail
+		{
+			template<class To>
+			bool checkType(lua_State*, int)
+			{
+				return false;
+			}
+			template<class To, class From, class... Remain>
+			bool checkType(lua_State* l, int index)
+			{
+				return lua_type_traits<From>::checkType(l, index)
+					|| checkType<To, Remain...>(l, index);
+			}
+			template<class To>
+			bool strictCheckType(lua_State*, int)
+			{
+				return false;
+			}
+			template<class To, class From, class... Remain>
+			bool strictCheckType(lua_State* l, int index)
+			{
+				return lua_type_traits<From>::strictCheckType(l, index)
+					|| strictCheckType<To, Remain...>(l, index);
+				;
+			}
+
+			template<class To>
+			To get(lua_State*, int)
+			{
+				throw LuaTypeMismatch();
+			}
+			template<class To, class From, class... Remain>
+			To get(lua_State* l, int index)
+			{
+				if (lua_type_traits<From>::strictCheckType(l, index))
+				{
+					return lua_type_traits<From>::get(l, index);
+				}
+				else if (strictCheckType<To, Remain...>(l, index))
+				{
+					return get<To, Remain...>(l, index);
+				}
+				else if (lua_type_traits<From>::checkType(l, index))
+				{
+					return lua_type_traits<From>::get(l, index);
+				}
+				else if (checkType<To, Remain...>(l, index))
+				{
+					return get<To, Remain...>(l, index);
+				}
+				else
+				{
+					return get<To>(l, index);
+				}
+			}
+		}
+
+		template<class To, class From, class... Remain>
+		struct ConvertibleRegisterHelper
+		{
+			typedef To get_type;
+
+			static bool checkType(lua_State* l, int index)
+			{
+				if (object_checkType<To>(l, index))
+				{
+					return true;
+				}
+				return conv_helper_detail::checkType<To, From, Remain...>(l, index);
+			}
+			static bool strictCheckType(lua_State* l, int index)
+			{
+				if (object_strictCheckType<To>(l, index))
+				{
+					return true;
+				}
+				return conv_helper_detail::strictCheckType<To, From, Remain...>(l, index);
+			}
+
+			static get_type get(lua_State* l, int index)
+			{
+				if (object_checkType<To>(l, index))
+				{
+					return object_get<To>(l, index);
+				}
+				return conv_helper_detail::get<To, From, Remain...>(l, index);
+			}
+		};
 #else
-	template<typename T>inline int object_push(lua_State* l, T v)
-	{
-		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(v);
-		class_userdata::setmetatable<T>(l);
-		return 1;
+		template<typename T>inline int object_push(lua_State* l, T v)
+		{
+			typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
+			void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+			new(storage) wrapper_type(v);
+			class_userdata::setmetatable<T>(l);
+			return 1;
+		}
+		namespace conv_helper_detail
+		{
+#define KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP(N) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)
+#define KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP(N) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, index)
+#define KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
+#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
+
+			template<typename To>
+			bool checkType(lua_State*, int, TypeTuple<>)
+			{
+				return false;
+			}
+	#define KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF(N)\
+				template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+				bool checkType(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
+				{\
+					return false KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP);\
+				}
+
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF)
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_DEF
+				template<typename To>
+			bool strictCheckType(lua_State*, int, TypeTuple<>)
+			{
+				return false;
+			}
+#define KAGUYA_CONVERTIBLE_REG_HELPER_ST_CHECK_TYPE_DEF(N)\
+				template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+				bool strictCheckType(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
+				{\
+					return false KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP);\
+				}
+			KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_ST_CHECK_TYPE_DEF)
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_ST_CHECK_TYPE_DEF
+#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF(N)\
+				template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
+				To get(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
+				{\
+					KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP)\
+					KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP)\
+					{throw LuaTypeMismatch();}\
+				}
+				KAGUYA_PP_REPEAT_DEF(KAGUYA_FUNCTION_MAX_ARGS, KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF)
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_GET_DEF
+
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP
+#undef KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP
+		}
+
+#define KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP(N) KAGUYA_PP_CAT(typename A,N) = null_type
+#define KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(N) KAGUYA_PP_REPEAT_ARG(N,KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP)
+
+		template<typename To, KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
+		struct ConvertibleRegisterHelper {
+			typedef To get_type;
+
+			typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)> conv_types;
+
+			static bool checkType(lua_State* state, int index)
+			{
+				if (object_checkType<To>(l, index))
+				{
+					return true;
+				}
+				return conv_helper_detail::checkType<To>(state, index, conv_types());
+			}
+			static bool strictCheckType(lua_State* state, int index)
+			{
+				if (object_strictCheckType<To>(l, index))
+				{
+					return true;
+				}
+				return conv_helper_detail::strictCheckType<To>(state, index, conv_types());
+			}
+			static get_type get(lua_State* state, int index)
+			{
+				if (object_checkType<To>(l, index))
+				{
+					return object_get<To>(l, index);
+				}
+				return conv_helper_detail::get<To>(state, index, conv_types());
+			}
+		};
+#undef KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP
+#undef KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT
+#endif	
 	}
-#endif
 }

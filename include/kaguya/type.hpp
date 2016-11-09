@@ -45,7 +45,7 @@ namespace kaguya
 	template<typename T, typename Enable>
 	int lua_type_traits<T, Enable>::push(lua_State* l, push_type v)
 	{
-		return object_push(l, v);
+		return util::object_push(l, v);
 	}
 
 #if KAGUYA_USE_RVALUE_REFERENCE
@@ -53,7 +53,7 @@ namespace kaguya
 	template<typename T, typename Enable>
 	int lua_type_traits<T, Enable>::push(lua_State* l, NCRT&& v)
 	{
-		return object_push(l,std::forward<NCRT>(v));
+		return util::object_push(l,std::forward<NCRT>(v));
 	}
 #endif
 
