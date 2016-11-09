@@ -89,26 +89,6 @@ namespace kaguya
 		T object_;
 	};
 
-#if KAGUYA_USE_CPP11
-	template<typename T>inline int object_push(lua_State* l , T&& v)
-	{
-		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(std::forward<T>(v));
-		class_userdata::setmetatable<T>(l);
-		return 1;
-	}
-#else
-	template<typename T>inline int object_push(lua_State* l, T v)
-	{
-		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(v);
-		class_userdata::setmetatable<T>(l);
-		return 1;
-	}
-#endif
-
 	struct ObjectSharedPointerWrapper : ObjectWrapperBase
 	{
 		template<typename T>
@@ -680,4 +660,25 @@ namespace kaguya
 	{
 		return class_userdata::available_metatable<T>(l);
 	}
+
+
+#if KAGUYA_USE_CPP11
+	template<typename T>inline int object_push(lua_State* l, T&& v)
+	{
+		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
+		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+		new(storage) wrapper_type(std::forward<T>(v));
+		class_userdata::setmetatable<T>(l);
+		return 1;
+	}
+#else
+	template<typename T>inline int object_push(lua_State* l, T v)
+	{
+		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
+		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
+		new(storage) wrapper_type(v);
+		class_userdata::setmetatable<T>(l);
+		return 1;
+	}
+#endif
 }
