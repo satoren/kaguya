@@ -661,6 +661,25 @@ namespace kaguya
 		return class_userdata::available_metatable<T>(l);
 	}
 
+	template<typename T>inline bool object_checkType(lua_State* l, int index)
+	{
+		return object_wrapper<T>(l, index) != 0;
+	}
+	template<typename T>inline bool object_strictCheckType(lua_State* l, int index)
+	{
+		return object_wrapper<T>(l, index, false) != 0;
+	}
+
+
+	template<typename T>inline T object_get(lua_State* l, int index)
+	{
+		const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
+		if (!pointer)
+		{
+			throw LuaTypeMismatch();
+		}
+		return *pointer;
+	}
 
 #if KAGUYA_USE_CPP11
 	template<typename T>inline int object_push(lua_State* l, T&& v)

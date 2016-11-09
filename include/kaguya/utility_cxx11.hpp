@@ -228,15 +228,27 @@ namespace kaguya
 
 			static bool checkType(lua_State* l, int index)
 			{
+				if (object_checkType<To>(l, index))
+				{
+					return true;
+				}
 				return conv_helper_detail::checkType<To, From, Remain...>(l, index);
 			}
 			static bool strictCheckType(lua_State* l, int index)
 			{
+				if (object_strictCheckType<To>(l, index))
+				{
+					return true;
+				}
 				return conv_helper_detail::strictCheckType<To, From, Remain...>(l, index);
 			}
 
 			static get_type get(lua_State* l, int index)
 			{
+				if (object_checkType<To>(l, index))
+				{
+					return object_get<To>(l, index);
+				}
 				return conv_helper_detail::get<To, From, Remain...>(l, index);
 			}
 		};
