@@ -45,11 +45,7 @@ namespace kaguya
 	template<typename T, typename Enable>
 	int lua_type_traits<T, Enable>::push(lua_State* l, push_type v)
 	{
-		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(v);
-		class_userdata::setmetatable<T>(l);
-		return 1;
+		return util::object_push(l, v);
 	}
 
 #if KAGUYA_USE_RVALUE_REFERENCE
@@ -57,11 +53,7 @@ namespace kaguya
 	template<typename T, typename Enable>
 	int lua_type_traits<T, Enable>::push(lua_State* l, NCRT&& v)
 	{
-		typedef ObjectWrapper<typename traits::remove_const_and_reference<T>::type> wrapper_type;
-		void *storage = lua_newuserdata(l, sizeof(wrapper_type));
-		new(storage) wrapper_type(std::forward<NCRT>(v));
-		class_userdata::setmetatable<T>(l);
-		return 1;
+		return util::object_push(l,std::forward<NCRT>(v));
 	}
 #endif
 
