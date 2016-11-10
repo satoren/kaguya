@@ -686,15 +686,9 @@ namespace kaguya
 		template<typename To>
 		struct ConvertibleRegisterHelperProxy
 		{
-#if KAGUYA_USE_CPP11
-			template < typename DataType >
-			ConvertibleRegisterHelperProxy(DataType&& v)
-				: holder_(new DataHolder<DataType>(std::forward<DataType>(v))) { }
-#else
 			template < typename DataType >
 			ConvertibleRegisterHelperProxy(DataType v)
 				: holder_(new DataHolder<DataType>(v)) { }
-#endif
 			operator To()
 			{
 				return holder_->get();
@@ -703,7 +697,6 @@ namespace kaguya
 			struct DataHolderBase
 			{
 				virtual To get()const = 0;
-				//			virtual DataHolderBase * clone(void) = 0;
 				virtual ~DataHolderBase() {}
 			};
 			template < typename Type >
@@ -711,24 +704,13 @@ namespace kaguya
 			{
 				typedef typename traits::decay<Type>::type DataType;
 			public:
-#if KAGUYA_USE_CPP11
-				explicit DataHolder(DataType&& v) : data_(std::forward<DataType>(v)) { }
-#else
-				explicit DataHolder(const DataType& v) : data_(v) { }
-#endif
+				explicit DataHolder(DataType v) : data_(v) { }
 				virtual To get()const
 				{
 					return To(data_);
 				}
 			private:
 				DataType data_;
-			};
-			//specialize for string literal
-			template<int N>	struct DataHolder<const char[N]> :DataHolder<std::string> {
-				explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
-			};
-			template<int N>	struct DataHolder<char[N]> :DataHolder<std::string> {
-				explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
 			};
 			standard::shared_ptr<DataHolderBase> holder_;
 		};
