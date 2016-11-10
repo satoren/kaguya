@@ -683,6 +683,56 @@ namespace kaguya
 			return *pointer;
 		}
 
+		template<typename To>
+		struct ConvertibleRegisterHelperProxy
+		{
+#if KAGUYA_USE_CPP11
+			template < typename DataType >
+			ConvertibleRegisterHelperProxy(DataType&& v)
+				: holder_(new DataHolder<DataType>(std::forward<DataType>(v))) { }
+#else
+			template < typename DataType >
+			ConvertibleRegisterHelperProxy(DataType v)
+				: holder_(new DataHolder<DataType>(v)) { }
+#endif
+			operator To()
+			{
+				return holder_->get();
+			}
+		private:
+			struct DataHolderBase
+			{
+				virtual To get()const = 0;
+				//			virtual DataHolderBase * clone(void) = 0;
+				virtual ~DataHolderBase() {}
+			};
+			template < typename Type >
+			class DataHolder : public DataHolderBase
+			{
+				typedef typename traits::decay<Type>::type DataType;
+			public:
+#if KAGUYA_USE_CPP11
+				explicit DataHolder(DataType&& v) : data_(std::forward<DataType>(v)) { }
+#else
+				explicit DataHolder(const DataType& v) : data_(v) { }
+#endif
+				virtual To get()const
+				{
+					return To(data_);
+				}
+			private:
+				DataType data_;
+			};
+			//specialize for string literal
+			template<int N>	struct DataHolder<const char[N]> :DataHolder<std::string> {
+				explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
+			};
+			template<int N>	struct DataHolder<char[N]> :DataHolder<std::string> {
+				explicit DataHolder(const char* v) : DataHolder<std::string>(std::string(v, v[N - 1] != '\0' ? v + N : v + N - 1)) {}
+			};
+			standard::shared_ptr<DataHolderBase> holder_;
+		};
+
 #if KAGUYA_USE_CPP11
 		template<typename T>inline int object_push(lua_State* l, T&& v)
 		{
@@ -753,7 +803,7 @@ namespace kaguya
 		template<class To, class From, class... Remain>
 		struct ConvertibleRegisterHelper
 		{
-			typedef To get_type;
+			typedef ConvertibleRegisterHelperProxy<To> get_type;
 
 			static bool checkType(lua_State* l, int index)
 			{
@@ -778,7 +828,7 @@ namespace kaguya
 				{
 					return object_get<To>(l, index);
 				}
-				return conv_helper_detail::get<To, From, Remain...>(l, index);
+				return conv_helper_detail::get<get_type, From, Remain...>(l, index);
 			}
 		};
 #else
@@ -846,7 +896,7 @@ namespace kaguya
 
 		template<typename To, KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
 		struct ConvertibleRegisterHelper {
-			typedef To get_type;
+			typedef ConvertibleRegisterHelperProxy<To> get_type;
 			typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)> conv_types;
 
 			static bool checkType(lua_State* l, int index)
@@ -871,7 +921,7 @@ namespace kaguya
 				{
 					return object_get<To>(l, index);
 				}
-				return conv_helper_detail::get<To>(l, index, conv_types());
+				return conv_helper_detail::get<get_type>(l, index, conv_types());
 			}
 		};
 #undef KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REP
