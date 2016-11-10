@@ -6,11 +6,18 @@ namespace
 {
 	struct ProxyClassTest
 	{
-		ProxyClassTest(const std::string& v) :str(v), num(0) {}
-		ProxyClassTest(const int& v) :str(), num(v) {}
+		ProxyClassTest(const std::string& v) :str(v), num(0), object(0), vec_ptr(0) {}
+		ProxyClassTest(const int& v) :str(), num(v), object(0), vec_ptr(0) {}
+
+		ProxyClassTest(kaguya_test_util::TestClass* v) :str(), num(0), object(v), vec_ptr(0) {}
+
+		ProxyClassTest(const std::vector<int>& v) :str(), num(0), object(0), vec_ptr(&v){}
+
 
 		std::string str;
 		int num;
+		kaguya_test_util::TestClass* object;
+		const std::vector<int>* vec_ptr;
 	};
 }
 
@@ -18,7 +25,7 @@ namespace kaguya
 {
 	template<>
 	struct lua_type_traits<ProxyClassTest>
-		: util::ConvertibleRegisterHelper<ProxyClassTest, std::string, int>
+		: util::ConvertibleRegisterHelper<ProxyClassTest, std::string, int, kaguya_test_util::TestClass*,const std::vector<int>&>
 	{
 	};
 }
@@ -225,21 +232,43 @@ void proxy_class_test_func2(const ProxyClassTest& t)
 {
 	TEST_EQUAL(t.num, 5);
 }
+void proxy_class_test_func3(const ProxyClassTest& t)
+{
+	TEST_EQUAL(t.object->stringmember, "test");
+}
+void proxy_class_test_func_array(const ProxyClassTest& t)
+{
+	std::vector<int> v;
+	v.push_back(0);
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	TEST_CHECK(*t.vec_ptr == v);
+}
 
 KAGUYA_TEST_FUNCTION_DEF(proxy_class_test)(kaguya::State& state)
 {
 	state["testf"] = &proxy_class_test_func;
-	state("testf('test')");
+	TEST_CHECK(state("testf('test')"));
 	state["testf2"] = &proxy_class_test_func2;
-	state("testf2(5)");
+	TEST_CHECK(state("testf2(5)"));
 
 	state.setErrorHandler(ignore_error_fun);
 	TEST_CHECK(!state("testf2()"));
+	
+	state["TestClass"].setClass(kaguya::UserdataMetatable<TestClass>()
+		.setConstructors < TestClass(std::string) > ()
+	);
+	state["testf3"] = &proxy_class_test_func3;
 
-	state["testover"] = kaguya::overload(&proxy_class_test_func,&proxy_class_test_func2);
+	TEST_CHECK(state("testf3(TestClass.new('test'))"));
 
-	state("testover('test')");
-	state("testover(5)");
-	TEST_CHECK(!state("testover()"));
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+	state["testf4"] = &proxy_class_test_func_array;
+	TEST_CHECK(state("testf4({0,1,2,3})"));
+#endif
 }
+
+
+
 KAGUYA_TEST_GROUP_END(test_09_utility)
