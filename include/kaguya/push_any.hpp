@@ -73,12 +73,6 @@ namespace kaguya
 #endif
 			virtual int pushToLua(lua_State* state)const
 			{
-#if KAGUYA_USE_CPP11
-				if (!standard::is_copy_constructible<DataType>::value)
-				{
-					return util::push_args(state, std::move(data_));
-				}
-#endif
 				return util::push_args(state, data_);
 			}
 		private:
