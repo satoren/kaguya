@@ -10,6 +10,7 @@
 #include <map>
 
 #include "kaguya/config.hpp"
+#include "kaguya/optional.hpp"
 
 namespace kaguya
 {
@@ -134,12 +135,14 @@ namespace kaguya
 
 		typedef typename traits::decay<T>::type NCRT;
 		typedef const NCRT& get_type;
+		typedef optional<get_type> opt_type;
 		typedef const NCRT& push_type;
 
 		static bool checkType(lua_State* l, int index);
 		static bool strictCheckType(lua_State* l, int index);
 
 		static get_type get(lua_State* l, int index);
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT;
 		static int push(lua_State* l, push_type v);
 #if KAGUYA_USE_RVALUE_REFERENCE
 		static int push(lua_State* l, NCRT&& v);

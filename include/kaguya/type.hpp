@@ -33,6 +33,16 @@ namespace kaguya
 		return object_wrapper<T>(l, index, false) != 0;
 	}
 	template<typename T, typename Enable>
+	typename lua_type_traits<T, Enable>::opt_type lua_type_traits<T, Enable>::opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+	{
+		const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
+		if (!pointer)
+		{
+			return opt_type();
+		}
+		return *pointer;
+	}
+	template<typename T, typename Enable>
 	typename lua_type_traits<T, Enable>::get_type lua_type_traits<T, Enable>::get(lua_State* l, int index)
 	{
 		const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
@@ -72,6 +82,7 @@ namespace kaguya
 		typedef void Registerable;
 
 		typedef REF get_type;
+		typedef optional<get_type> opt_type;
 		typedef REF push_type;
 		typedef typename traits::remove_reference<REF>::type T;
 
@@ -95,6 +106,15 @@ namespace kaguya
 				throw LuaTypeMismatch();
 			}
 			return *pointer;
+		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			T* pointer = get_pointer(l, index, types::typetag<T>());
+			if (!pointer)
+			{
+				return opt_type();
+			}
+			return opt_type(*pointer);
 		}
 		static int push(lua_State* l, push_type v)
 		{
@@ -121,6 +141,7 @@ namespace kaguya
 		typedef void Registerable;
 
 		typedef PTR get_type;
+		typedef optional<get_type> opt_type;
 		typedef PTR push_type;
 		typedef typename traits::remove_pointer<PTR>::type T;
 
@@ -155,6 +176,20 @@ namespace kaguya
 			throw LuaTypeMismatch();
 			return 0;
 		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			int type = lua_type(l, index);
+			if (type == LUA_TUSERDATA || type == LUA_TLIGHTUSERDATA)
+			{
+				return get_pointer(l, index, types::typetag<T>());
+			}
+			if (type == LUA_TNIL
+				|| type == LUA_TNONE)
+			{
+				return opt_type(0);
+			}
+			return opt_type();
+		}
 		static int push(lua_State* l, push_type v)
 		{
 			if (!v)
@@ -180,6 +215,7 @@ namespace kaguya
 	/// @brief lua_type_traits for bool
 	template<>	struct lua_type_traits<bool> {
 		typedef bool get_type;
+		typedef optional<get_type> opt_type;
 		typedef bool push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -195,6 +231,17 @@ namespace kaguya
 		static bool get(lua_State* l, int index)
 		{
 			return l && lua_toboolean(l, index) != 0;
+		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			if (l)
+			{
+				return opt_type(lua_toboolean(l, index) != 0);
+			}
+			else
+			{
+				return opt_type();
+			}
 		}
 		static int push(lua_State* l, bool s)
 		{
@@ -239,12 +286,44 @@ namespace kaguya
 		}
 	};
 
+	namespace detail
+	{
+		
+		template< typename T, typename Enable = void>
+		struct has_optional_get : traits::false_type {};
+		template< typename T>
+		struct has_optional_get<T,
+			typename traits::enable_if<!traits::is_same<void,typename lua_type_traits<T>::opt_type>::value>::type
+		> : traits::true_type {};
+
+
+		template<typename T>
+		typename traits::enable_if<has_optional_get<T>::value, optional<T> >::type
+			opt_helper(lua_State* state, int index)KAGUYA_NOEXCEPT
+		{
+			return lua_type_traits<T>::opt(state, index);
+		}
+		template<typename T>
+		typename traits::enable_if<!has_optional_get<T>::value, optional<T> >::type
+			opt_helper(lua_State* state, int index)
+		{
+			try
+			{
+				return lua_type_traits<T>::get(state, index);
+			}
+			catch (...)
+			{
+				return optional<T>();
+			}
+		}
+	}
 
 	/// @ingroup lua_type_traits
 	/// @brief lua_type_traits for optional
 	template<typename T> struct lua_type_traits<optional<T> > {
 		typedef const optional<T>& push_type;
 		typedef optional<T> get_type;
+
 
 		static bool strictCheckType(lua_State* l, int index)
 		{
@@ -258,14 +337,7 @@ namespace kaguya
 		}
 		static get_type get(lua_State* l, int index)KAGUYA_NOEXCEPT
 		{
-			try
-			{
-				return lua_type_traits<T>::get(l, index);
-			}
-			catch (...)
-			{
-				return get_type();
-			}
+			return detail::opt_helper<T>(l,index);
 		}
 
 		static int push(lua_State* l, push_type v)KAGUYA_NOEXCEPT
@@ -370,6 +442,7 @@ namespace kaguya
 	template<>	struct lua_type_traits<std::nullptr_t> {
 		typedef const std::nullptr_t& push_type;
 		typedef std::nullptr_t get_type;
+		typedef optional<get_type> opt_type;
 
 		static bool checkType(lua_State* l, int index)
 		{
@@ -378,6 +451,13 @@ namespace kaguya
 		static bool strictCheckType(lua_State* l, int index)
 		{
 			return lua_isnil(l, index);
+		}
+		static opt_type opt(lua_State* l, int index)
+		{
+			if (!lua_isnoneornil(l, index)) {
+				return opt_type();
+			}
+			return nullptr;
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -441,6 +521,7 @@ namespace kaguya
 		, typename traits::enable_if<traits::is_floating_point<T>::value>::type >
 	{
 		typedef typename traits::remove_const_reference<T>::type get_type;
+		typedef optional<get_type> opt_type;
 		typedef lua_Number push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -450,6 +531,15 @@ namespace kaguya
 		static bool checkType(lua_State* l, int index)
 		{
 			return lua_isnumber(l, index) != 0;
+		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			int isnum = 0;
+			get_type num = static_cast<T>(lua_tonumberx(l, index, &isnum));
+			if (!isnum) {
+				return opt_type();
+			}
+			return num;
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -473,6 +563,7 @@ namespace kaguya
 		, typename traits::enable_if<traits::is_integral<T>::value>::type>
 	{
 		typedef typename traits::remove_const_reference<T>::type get_type;
+		typedef optional<get_type> opt_type;
 #if LUA_VERSION_NUM >= 503
 		typedef lua_Integer push_type;
 
@@ -483,6 +574,15 @@ namespace kaguya
 		static bool checkType(lua_State* l, int index)
 		{
 			return lua_isnumber(l, index) != 0;
+		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			int isnum = 0;
+			get_type num = static_cast<T>(lua_tointegerx(l, index, &isnum));
+			if (!isnum) {
+				return opt_type();
+			}
+			return num;
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -526,6 +626,7 @@ namespace kaguya
 		, typename traits::enable_if<traits::is_enum<T>::value>::type>
 	{
 		typedef typename traits::remove_const_reference<T>::type get_type;
+		typedef optional<get_type> opt_type;
 		typedef typename traits::remove_const_reference<T>::type push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -535,6 +636,14 @@ namespace kaguya
 		static bool checkType(lua_State* l, int index)
 		{
 			return lua_type_traits<luaInt>::checkType(l, index);
+		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			if (lua_type_traits<luaInt>::opt_type t = lua_type_traits<luaInt>::opt(l, index))
+			{
+				return opt_type(static_cast<get_type>(*t));
+			}
+			return opt_type();
 		}
 		static get_type get(lua_State* l, int index)
 		{
@@ -551,6 +660,7 @@ namespace kaguya
 	/// @brief lua_type_traits for cstring
 	template<>	struct lua_type_traits<const char*> {
 		typedef const char* get_type;
+		typedef optional<get_type> opt_type;
 		typedef const char* push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -561,11 +671,19 @@ namespace kaguya
 		{
 			return lua_isstring(l, index) != 0;
 		}
-		static const char* get(lua_State* l, int index)
+		static get_type get(lua_State* l, int index)
 		{
 			const char* buffer = lua_tostring(l, index);
 			if (!buffer) {
 				throw LuaTypeMismatch();
+			}
+			return buffer;
+		}
+		static opt_type opt(lua_State* l, int index)
+		{
+			const char* buffer = lua_tostring(l, index);
+			if (!buffer) {
+				return opt_type();
 			}
 			return buffer;
 		}
@@ -612,6 +730,7 @@ namespace kaguya
 	/// @brief lua_type_traits for std::string
 	template<>	struct lua_type_traits<std::string> {
 		typedef std::string get_type;
+		typedef optional<get_type> opt_type;
 		typedef const std::string& push_type;
 
 		static bool strictCheckType(lua_State* l, int index)
@@ -622,14 +741,22 @@ namespace kaguya
 		{
 			return lua_isstring(l, index) != 0;
 		}
-		static get_type get(lua_State* l, int index)
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
 		{
 			size_t size = 0;
 			const char* buffer = lua_tolstring(l, index, &size);
 			if (!buffer) {
-				throw LuaTypeMismatch();
+				return opt_type();
 			}
 			return std::string(buffer, size);
+		}
+		static get_type get(lua_State* l, int index)
+		{
+			if (opt_type o = opt(l, index))
+			{
+				return *o;
+			}
+			throw LuaTypeMismatch();
 		}
 		static int push(lua_State* l, const std::string& s)
 		{
@@ -675,6 +802,7 @@ namespace kaguya
 	/// If you using C++11, recommend use nullptr instead.
 	template<>	struct lua_type_traits<NilValue> {
 		typedef NilValue get_type;
+		typedef optional<get_type> opt_type;
 		typedef NilValue push_type;
 
 		static bool checkType(lua_State* l, int index)
@@ -685,7 +813,14 @@ namespace kaguya
 		{
 			return lua_isnil(l, index);
 		}
-		
+
+		static opt_type opt(lua_State* l, int index)
+		{
+			if (!checkType(l, index)) {
+				return opt_type();
+			}
+			return NilValue();
+		}
 		static get_type get(lua_State* l, int index)
 		{
 			if (!checkType(l, index)) {
