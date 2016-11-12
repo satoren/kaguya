@@ -613,6 +613,14 @@ namespace kaguya
 		{
 			return static_cast<get_type>(lua_type_traits<lua_Number>::get(l, index));
 		}
+		static opt_type opt(lua_State* l, int index)KAGUYA_NOEXCEPT
+		{
+			lua_type_traits<lua_Number>::opt_type v = lua_type_traits<lua_Number>::opt(l, index);
+			if (!v) {
+				return opt_type();
+			}
+			return static_cast<get_type>(*v);
+		}
 		static int push(lua_State* l, push_type s)
 		{
 			return util::push_args(l, s);
