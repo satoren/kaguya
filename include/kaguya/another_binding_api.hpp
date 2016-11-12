@@ -25,9 +25,9 @@
 
 /// @brief start define binding 
 #define KAGUYA_BINDINGS(MODULE_NAME)\
-void KAGUYA_PP_CAT(kaguya_bind_internal_,MODULE_NAME)();\
+void KAGUYA_PP_CAT(kaguya_bind_internal_,MODULE_NAME)(kaguya::State& L);\
 KAGUYA_EXPORT int KAGUYA_PP_CAT(luaopen_, MODULE_NAME)(lua_State* L) { return kaguya::detail::bind_internal(L,&KAGUYA_PP_CAT(kaguya_bind_internal_, MODULE_NAME)); }\
-void KAGUYA_PP_CAT(kaguya_bind_internal_, MODULE_NAME)()
+void KAGUYA_PP_CAT(kaguya_bind_internal_, MODULE_NAME)(kaguya::State& L)
 
 namespace kaguya
 {
@@ -111,13 +111,13 @@ namespace kaguya
 
 	namespace detail
 	{
-		inline int bind_internal(lua_State* L, void(*bindfn)()) {
+		inline int bind_internal(lua_State* L, void(*bindfn)(State&)) {
 			int count = lua_gettop(L);
 			kaguya::State state(L);
 			LuaTable l = state.newTable();
 			l.push();
 			scope scope(l);
-			bindfn();
+			bindfn(state);
 			return lua_gettop(L) - count;
 		}
 	}

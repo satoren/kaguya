@@ -5,3 +5,4 @@ lua-*
 LuaJIT-*
 docs/doxygen/
 docs/_build/
+single_include/kaguya/kaguya.hpp
