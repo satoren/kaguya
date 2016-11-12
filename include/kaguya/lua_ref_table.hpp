@@ -102,7 +102,9 @@ namespace kaguya
 
 		int push(lua_State* state)const
 		{
-			if (lua_type(state_, table_index_) != LUA_TTABLE)
+			int type = lua_type(state_, table_index_);
+			if (type != LUA_TTABLE
+				&& type != LUA_TUSERDATA)
 			{
 				lua_pushnil(state);
 				return 1;

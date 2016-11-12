@@ -254,7 +254,44 @@ namespace kaguya
 			template<typename KEY>
 			LuaStackRef getField(const KEY& key)const;
 
-			
+
+
+#if KAGUYA_USE_CPP11
+			/// @brief table[key] = value;
+			template<typename K, typename V>
+			bool setField(K&& key, V&& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+
+				table_proxy::set(state, stackIndex, std::forward<K>(key), std::forward<V>(value));
+				return true;
+			}
+#else
+			/// @brief table[key] = value;
+			template<typename K, typename V>
+			bool setField(const K& key, const V& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+
+				table_proxy::set(state, stackIndex, key, value);
+
+				return true;
+			}
+#endif
 
 			/// @brief foreach table fields
 			template < class K, class V, class Fun> void foreach_table(Fun f)const
@@ -410,23 +447,6 @@ namespace kaguya
 
 
 #if KAGUYA_USE_CPP11
-			/// @brief table[key] = value;
-			template<typename K, typename V>
-			bool setField(K&& key, V&& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-
-				table_proxy::set(state, stackIndex, std::forward<K>(key), std::forward<V>(value));
-				return true;
-			}
-
 			/// @brief rawset(table,key,value)
 			template<typename K, typename V>
 			bool setRawField(K&& key, V&& value)
@@ -445,24 +465,6 @@ namespace kaguya
 				return true;
 			}
 #else
-			/// @brief table[key] = value;
-			template<typename K, typename V>
-			bool setField(const K& key, const V& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-
-				table_proxy::set(state, stackIndex, key, value);
-
-				return true;
-			}
-
 			/// @brief rawset(table,key,value)
 			template<typename K, typename V>
 			bool setRawField(const K& key, const V& value)

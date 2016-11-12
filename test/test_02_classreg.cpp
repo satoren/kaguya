@@ -142,6 +142,8 @@ KAGUYA_TEST_FUNCTION_DEF(int_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value = assert(ABC.new(32))"));
 	TEST_CHECK(state("assert(value:getInt() == 32)"));
+	TEST_EQUAL(state["value"]["getInt"](state["value"]), 32);
+	TEST_EQUAL((state["value"]->*"getInt")(), 32);
 }
 KAGUYA_TEST_FUNCTION_DEF(string_constructor)(kaguya::State& state)
 {
@@ -175,6 +177,8 @@ KAGUYA_TEST_FUNCTION_DEF(overloaded_constructor)(kaguya::State& state)
 
 	TEST_CHECK(state("value:setInt(33)"));
 	TEST_CHECK(state("assert(value:getInt() == 33)"));
+	TEST_EQUAL(state["value"]["getInt"](state["value"]), 33);
+	TEST_EQUAL((state["value"]->*"getInt")(), 33);
 }
 
 
