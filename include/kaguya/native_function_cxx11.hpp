@@ -87,15 +87,15 @@ namespace kaguya
 			}
 		};
 
-		template<class R, class... Args, size_t... Indexes>
-		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
+		template<class... Args, size_t... Indexes>
+		bool _ctype_apply(lua_State* state, index_tuple<Indexes...>, util::TypeTuple<Args...>, int opt_count)
 		{
 			KAGUYA_UNUSED(state);
 			KAGUYA_UNUSED(opt_count);
 			return all_true(_wcheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
-		template<class R, class... Args, size_t... Indexes>
-		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
+		template<class... Args, size_t... Indexes>
+		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, util::TypeTuple<Args...>, int opt_count)
 		{
 			KAGUYA_UNUSED(state);
 			KAGUYA_UNUSED(opt_count);
@@ -103,8 +103,8 @@ namespace kaguya
 		}
 
 		
-		template<class R, class... Args, size_t... Indexes>
-		std::string _type_name_apply(index_tuple<Indexes...>, util::FunctionSignatureType<R, Args...>, int opt_count)
+		template<class... Args, size_t... Indexes>
+		std::string _type_name_apply(index_tuple<Indexes...>, util::TypeTuple<Args...>, int opt_count)
 		{
 			KAGUYA_UNUSED(opt_count);
 			std::string result;
@@ -127,7 +127,8 @@ namespace kaguya
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
 			typedef typename index_range<1, fsigtype::argument_count + 1>::type index;
-			return _ctype_apply(state, index(), fsigtype(), opt_count);
+			typedef typename fsigtype::argument_type_tuple argument_type_tuple;
+			return _ctype_apply(state, index(), argument_type_tuple(), opt_count);
 		}
 		template<class F>
 		bool strictCheckArgTypes(lua_State* state, const F& , int opt_count = 0)
@@ -135,8 +136,8 @@ namespace kaguya
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
 			typedef typename index_range<1, fsigtype::argument_count +1>::type index;
-
-			return _sctype_apply(state, index(), fsigtype(), opt_count);
+			typedef typename fsigtype::argument_type_tuple argument_type_tuple;
+			return _sctype_apply(state, index(), argument_type_tuple(), opt_count);
 		}
 
 		template<class F>
@@ -145,7 +146,8 @@ namespace kaguya
 			typedef typename traits::decay<F>::type ftype;
 			typedef typename util::FunctionSignature<ftype>::type fsigtype;
 			typedef typename index_range<1, fsigtype::argument_count + 1>::type index;
-			return _type_name_apply(index(),fsigtype(), opt_count);
+			typedef typename fsigtype::argument_type_tuple argument_type_tuple;
+			return _type_name_apply(index(), argument_type_tuple(), opt_count);
 		}
 		template<class F>
 		int minArgCount(const F& )
@@ -190,15 +192,15 @@ namespace kaguya
 
 			bool checkArgTypes(lua_State* L,int opt_count = 0)const
 			{
-				return _ctype_apply(L, get_index(), signature_type(), opt_count);
+				return _ctype_apply(L, get_index(), typename signature_type::argument_type_tuple(), opt_count);
 			}
 			bool strictCheckArgTypes(lua_State* L, int opt_count = 0)const
 			{
-				return _sctype_apply(L, get_index(), signature_type(), opt_count);
+				return _sctype_apply(L, get_index(), typename signature_type::argument_type_tuple(), opt_count);
 			}
 			std::string argTypesName(int opt_count = 0)const
 			{
-				return _type_name_apply(get_index(), signature_type(), opt_count);
+				return _type_name_apply(get_index(),typename signature_type::argument_type_tuple(), opt_count);
 			}
 		};
 
@@ -211,7 +213,6 @@ namespace kaguya
 		{
 			typedef ConstructorFunctor<util::FunctionSignatureType<ClassType, Args...> > type;
 		};
-
 	}
 	using nativefunction::ConstructorFunction;
 }

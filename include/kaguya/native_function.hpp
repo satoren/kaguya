@@ -27,7 +27,7 @@ namespace kaguya
 	struct FunctionImpl
 	{
 		virtual int invoke(lua_State *state) = 0;
-		virtual std::string argTypeNames()const = 0;
+		virtual std::string argTypesName()const = 0;
 		virtual bool checkArgTypes(lua_State* state)const = 0;
 		virtual bool strictCheckArgTypes(lua_State* state)const = 0;
 		virtual int minArgCount()const=0;
@@ -39,7 +39,7 @@ namespace kaguya
 		typedef standard::shared_ptr<FunctionImpl> holder_type;
 		PolymorphicInvoker(const holder_type& fptr) :fnc(fptr) {}
 		int invoke(lua_State *state)const { return fnc->invoke(state); }
-		std::string argTypeNames()const { return fnc->argTypeNames(); }
+		std::string argTypesName()const { return fnc->argTypesName(); }
 		bool checkArgTypes(lua_State* state)const { return fnc->checkArgTypes(state); }
 		bool strictCheckArgTypes(lua_State* state)const { return fnc->strictCheckArgTypes(state); }
 		int minArgCount()const { return fnc->minArgCount(); }
@@ -218,7 +218,7 @@ namespace kaguya
 		}
 		inline std::string argTypesName(const PolymorphicInvoker& f)
 		{
-			return f.argTypeNames();
+			return f.argTypesName();
 		}
 		inline int minArgCount(const PolymorphicInvoker& f)
 		{
@@ -252,7 +252,7 @@ namespace kaguya
 		}
 		inline std::string argTypesName(const PolymorphicMemberInvoker& f)
 		{
-			return f.argTypeNames();
+			return f.argTypesName();
 		}
 		inline int minArgCount(const PolymorphicMemberInvoker& f)
 		{
@@ -938,7 +938,7 @@ namespace kaguya
 		{
 			return util::push_args(state, invoke_type(state));
 		}
-		virtual std::string argTypeNames()const { return nativefunction::argTypesName(c_function_type(0), maxArgCount() - minArgCount()); }
+		virtual std::string argTypesName()const { return nativefunction::argTypesName(c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool checkArgTypes(lua_State* state)const { return kaguya::nativefunction::checkArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool strictCheckArgTypes(lua_State* state)const { return kaguya::nativefunction::strictCheckArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 	};
@@ -956,7 +956,7 @@ namespace kaguya
 			invoke_type(state);
 			return 0;
 		}
-		virtual std::string argTypeNames()const { return nativefunction::argTypesName(c_function_type(0), maxArgCount() - minArgCount()); }
+		virtual std::string argTypesName()const { return nativefunction::argTypesName(c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool checkArgTypes(lua_State* state)const { return kaguya::nativefunction::checkArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 		virtual bool strictCheckArgTypes(lua_State* state)const { return kaguya::nativefunction::strictCheckArgTypes(state, c_function_type(0), maxArgCount() - minArgCount()); }
 	};
