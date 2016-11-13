@@ -51,8 +51,10 @@ namespace kaguya
 			return all_true(args...) && bool(f);
 		}
 
-		inline void join(std::string& , const char* )
+		inline void join(std::string& result, const char* delim)
 		{
+			KAGUYA_UNUSED(result);
+			KAGUYA_UNUSED(delim);
 		}
 		template<class Arg, class...Args>void join(std::string& result, const char* delim, const Arg& str, const Args&... args)
 		{
@@ -61,29 +63,27 @@ namespace kaguya
 			join(result, delim, args...);
 		}
 
-		template<typename T>
+		template<typename T, size_t Index>
 		struct _wcheckeval
 		{
-			_wcheckeval(lua_State* s,int i, bool opt) :state(s), index(i), opt_arg(opt) {}
+			_wcheckeval(lua_State* s, bool opt) :state(s), opt_arg(opt) {}
 			lua_State* state;
-			int index;
 			bool opt_arg;
 			operator bool()
 			{
-				return (opt_arg && lua_isnoneornil(state, index) )|| lua_type_traits<T>::checkType(state, index);
+				return (opt_arg && lua_isnoneornil(state, Index) )|| lua_type_traits<T>::checkType(state, Index);
 			}
 		};
 
-		template<typename T>
+		template<typename T, size_t Index>
 		struct _scheckeval
 		{
-			_scheckeval(lua_State* s, int i, bool opt) :state(s), index(i), opt_arg(opt) {}
+			_scheckeval(lua_State* s, bool opt) :state(s), opt_arg(opt) {}
 			lua_State* state;
-			int index;
 			bool opt_arg;
 			operator bool()
 			{
-				return (opt_arg && lua_isnoneornil(state, index)) || lua_type_traits<T>::strictCheckType(state, index);
+				return (opt_arg && lua_isnoneornil(state, Index)) || lua_type_traits<T>::strictCheckType(state, Index);
 			}
 		};
 
@@ -92,14 +92,14 @@ namespace kaguya
 		{
 			KAGUYA_UNUSED(state);
 			KAGUYA_UNUSED(opt_count);
-			return all_true(_wcheckeval<Args>(state, Indexes, sizeof...(Indexes)-opt_count < Indexes)...);
+			return all_true(_wcheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 		template<class... Args, size_t... Indexes>
 		bool _sctype_apply(lua_State* state, index_tuple<Indexes...>, util::TypeTuple<Args...>, int opt_count)
 		{
 			KAGUYA_UNUSED(state);
 			KAGUYA_UNUSED(opt_count);
-			return all_true(_scheckeval<Args>(state, Indexes, sizeof...(Indexes)-opt_count < Indexes)...);
+			return all_true(_scheckeval<Args, Indexes>(state, sizeof...(Indexes)-opt_count < Indexes)...);
 		}
 
 		
