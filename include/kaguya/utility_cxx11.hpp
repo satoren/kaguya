@@ -153,7 +153,7 @@ namespace kaguya
 #endif
 
 			template<class F, class... Args>
-			auto invoke_helper(F&& f, Args&&... args) -> decltype(f(std::forward<Args>(args)...))
+			typename FunctionResultType<typename traits::decay<F>::type>::type invoke_helper(F&& f, Args&&... args)
 			{
 				return f(std::forward<Args>(args)...);
 			}
