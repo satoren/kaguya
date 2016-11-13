@@ -116,44 +116,14 @@ namespace kaguya
 
 		namespace detail
 		{
-			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke_helper(Res(ThisType::*f)(FArgs...), ThisType& this_, Args&&... args)
+			template<class F, class ThisType, class... Args>
+			auto invoke_helper(F&& f, ThisType&& this_, Args&&... args) -> decltype((std::forward<ThisType>(this_).*f)(std::forward<Args>(args)...))
 			{
-				return (this_.*f)(std::forward<Args>(args)...);
+				return (std::forward<ThisType>(this_).*f)(std::forward<Args>(args)...);
 			}
-
-			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke_helper(Res(ThisType::*f)(FArgs...)const, const ThisType& this_, Args&&... args)
-			{
-				return (this_.*f)(std::forward<Args>(args)...);
-			}
-#if defined(_MSC_VER) && _MSC_VER >= 1900 || defined(__cpp_ref_qualifiers)
-			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke_helper(Res(ThisType::*f)(FArgs...) &, ThisType& this_, Args&&... args)
-			{
-				return (this_.*f)(std::forward<Args>(args)...);
-			}
-
-			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke_helper(Res(ThisType::*f)(FArgs...)const &, const ThisType& this_, Args&&... args)
-			{
-				return (this_.*f)(std::forward<Args>(args)...);
-			}
-			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke_helper(Res(ThisType::*f)(FArgs...) && , ThisType&& this_, Args&&... args)
-			{
-				return (this_.*f)(std::forward<Args>(args)...);
-			}
-
-			template<class ThisType, class Res, class... FArgs, class... Args>
-			Res invoke_helper(Res(ThisType::*f)(FArgs...)const &&, const ThisType& this_, Args&&... args)
-			{
-				return (this_.*f)(std::forward<Args>(args)...);
-			}
-#endif
 
 			template<class F, class... Args>
-			typename FunctionResultType<typename traits::decay<F>::type>::type invoke_helper(F&& f, Args&&... args)
+			auto invoke_helper(F&& f, Args&&... args) -> decltype(f(std::forward<Args>(args)...))
 			{
 				return f(std::forward<Args>(args)...);
 			}

@@ -328,6 +328,19 @@ KAGUYA_TEST_FUNCTION_DEF(self_refcount_object)(kaguya::State&)
 }
 
 
+
+KAGUYA_TEST_FUNCTION_DEF(invoke_test)(kaguya::State&)
+{
+	TestClass c(2);
+	TEST_EQUAL(c.getInt(), 2);
+	kaguya::util::invoke(&TestClass::setInt, c, 4);
+	TEST_EQUAL(c.getInt(), 4);
+	int a = kaguya::util::invoke(&TestClass::getInt, c);
+
+	TEST_EQUAL(a, 4);
+}
+
+
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
 
 
