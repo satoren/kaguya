@@ -32,7 +32,6 @@ namespace kaguya
 #undef KAGUYA_PP_STRUCT_TEMPLATE_DEF_REPEAT
 }
 
-#include "kaguya/deprecated_metatable.hpp"
 
 namespace kaguya
 {
@@ -506,21 +505,6 @@ namespace kaguya
 			return *this;
 		}
 
-		/// @brief assign data by return value from evaluate code chunk. 
-		/// this function is deprecated.  use addStaticField(kaguya::LuaCodeChunkResult(\"luacode\")).
-		KAGUYA_DEPRECATED_FEATURE("addCodeChunkResult is deprecated. use addStaticField(kaguya::LuaCodeChunkResult(\"luacode\")).")
-		UserdataMetatable& addCodeChunkResult(const char* name, const std::string& lua_code_chunk)
-		{
-			if (has_key(name))
-			{
-				throw KaguyaException(std::string(name) + " is already registered.");
-				return *this;
-			}
-
-			member_map_[name] = AnyDataPusher(LuaCodeChunkResult(lua_code_chunk));
-			return *this;
-		}
-
 #if KAGUYA_USE_CPP11
 		/// @brief assign overloaded from functions. 
 		/// @param name name for lua
@@ -628,34 +612,6 @@ namespace kaguya
 			member_map_[name] = AnyDataPusher(kaguya::function(f));
 			return *this;
 		}
-
-
-#if defined(_MSC_VER) && _MSC_VER <= 1800
-		//can not use add at MSVC2013
-#else
-#if KAGUYA_USE_CPP11
-		template<typename Data>
-		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
-			UserdataMetatable& add(const char* name, Data&& d)
-		{
-			return addStaticField(name, std::forward<Data>(d));
-		}
-#else
-		template<typename Data>
-		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addStaticField instead.")
-			UserdataMetatable& add(const char* name, const Data& d)
-		{
-			return addStaticField(name, d);
-		}
-#endif
-		template<typename Ret>
-		KAGUYA_DEPRECATED_FEATURE("add is deprecated. use addFunction instead.")
-		UserdataMetatable& add(const char* name, Ret class_type::* f)
-		{
-			return addFunction(name, f);
-		}
-#endif
-
 	private:
 
 		void set_base_metatable(lua_State* , int , types::typetag<void>)const

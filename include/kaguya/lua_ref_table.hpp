@@ -72,13 +72,6 @@ namespace kaguya
 
 		//! register class metatable to lua and set to table
 		template<typename T, typename P>
-		void setClass(const ClassMetatable<T, P>& reg)
-		{
-			set_class(reg);
-		}
-
-		//! register class metatable to lua and set to table
-		template<typename T, typename P>
 		void setClass(const UserdataMetatable<T, P>& reg)
 		{
 			set_class(reg);
@@ -90,15 +83,7 @@ namespace kaguya
 		{
 			detail::table_proxy::set(state_, table_index_, key_, kaguya::function(f));
 		}
-
-		//deprecated
-		LuaRef getValue()const
-		{
-			util::ScopedSavedStack save(state_);
-			push(state_);
-			return lua_type_traits<LuaRef>::get(state_, -1);
-		}
-
+		
 
 		int push(lua_State* state)const
 		{
@@ -151,15 +136,6 @@ namespace kaguya
 		{
 		}
 	private:
-		template<typename T, typename P>
-		void set_class(const ClassMetatable<T, P>& reg)
-		{
-			nativefunction::reg_functor_destructor(state_);
-			LuaRef table(state_, NewTable());
-			table.setMetatable(reg.registerClass(state_));
-			*this = table;
-		}
-
 		template<typename T, typename P>
 		void set_class(const UserdataMetatable<T, P>& reg)
 		{
