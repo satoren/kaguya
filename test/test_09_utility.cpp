@@ -25,7 +25,7 @@ namespace kaguya
 {
 	template<>
 	struct lua_type_traits<ProxyClassTest>
-		: util::ConvertibleRegisterHelper<ProxyClassTest, std::string, int, kaguya_test_util::TestClass*,const std::vector<int>&>
+		: util::ConvertibleRegisterHelper<util::ConvertibleRegisterHelperProxy<ProxyClassTest>,  int, std::string, kaguya_test_util::TestClass*,const std::vector<int>&>
 	{
 	};
 }
