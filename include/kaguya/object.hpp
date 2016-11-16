@@ -768,7 +768,7 @@ namespace kaguya
 			template<class To, class From, class... Remain>
 			To get(lua_State* l, int index)
 			{
-				typedef optional<lua_type_traits<From>::get_type> opt_type;
+				typedef optional<typename lua_type_traits<From>::get_type> opt_type;
 				if (auto opt = lua_type_traits<opt_type>::get(l, index))
 				{
 					return *opt;
