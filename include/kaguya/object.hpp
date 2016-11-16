@@ -672,6 +672,15 @@ namespace kaguya
 			return object_wrapper<T>(l, index, false) != 0;
 		}
 
+		template<typename T>inline optional<T> object_getopt(lua_State* l, int index)
+		{
+			const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
+			if (!pointer)
+			{
+				return optional<T>();
+			}
+			return *pointer;
+		}
 
 		template<typename T>inline T object_get(lua_State* l, int index)
 		{
@@ -759,33 +768,19 @@ namespace kaguya
 			template<class To, class From, class... Remain>
 			To get(lua_State* l, int index)
 			{
-				if (lua_type_traits<From>::strictCheckType(l, index))
+				typedef optional<typename lua_type_traits<From>::get_type> opt_type;
+				if (auto opt = lua_type_traits<opt_type>::get(l, index))
 				{
-					return lua_type_traits<From>::get(l, index);
+					return *opt;
 				}
-				else if (strictCheckType<To, Remain...>(l, index))
-				{
-					return get<To, Remain...>(l, index);
-				}
-				else if (lua_type_traits<From>::checkType(l, index))
-				{
-					return lua_type_traits<From>::get(l, index);
-				}
-				else if (checkType<To, Remain...>(l, index))
-				{
-					return get<To, Remain...>(l, index);
-				}
-				else
-				{
-					return get<To>(l, index);
-				}
+				return get<To, Remain...>(l, index);
 			}
 		}
 
-		template<class To, class From, class... Remain>
+		template<class To, class... From>
 		struct ConvertibleRegisterHelper
 		{
-			typedef ConvertibleRegisterHelperProxy<To> get_type;
+			typedef To get_type;
 
 			static bool checkType(lua_State* l, int index)
 			{
@@ -793,7 +788,7 @@ namespace kaguya
 				{
 					return true;
 				}
-				return conv_helper_detail::checkType<To, From, Remain...>(l, index);
+				return conv_helper_detail::checkType<To, From...>(l, index);
 			}
 			static bool strictCheckType(lua_State* l, int index)
 			{
@@ -801,16 +796,16 @@ namespace kaguya
 				{
 					return true;
 				}
-				return conv_helper_detail::strictCheckType<To, From, Remain...>(l, index);
+				return conv_helper_detail::strictCheckType<To, From...>(l, index);
 			}
 
 			static get_type get(lua_State* l, int index)
 			{
-				if (object_checkType<To>(l, index))
+				if (auto opt = object_getopt<To>(l, index))
 				{
-					return object_get<To>(l, index);
+					return *opt;
 				}
-				return conv_helper_detail::get<get_type, From, Remain...>(l, index);
+				return conv_helper_detail::get<get_type, From...>(l, index);
 			}
 		};
 #else
@@ -826,8 +821,8 @@ namespace kaguya
 		{
 #define KAGUYA_CONVERTIBLE_REG_HELPER_CHECK_TYPE_REP(N) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)
 #define KAGUYA_CONVERTIBLE_REG_HELPER_STRICT_CHECK_TYPE_REP(N) || lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, index)
-#define KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::strictCheckType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
-#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP(N) if (lua_type_traits<KAGUYA_PP_CAT(A,N)>::checkType(state, index)){ return lua_type_traits<KAGUYA_PP_CAT(A,N)>::get(state, index);}else
+#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_OPT_TYPEDEF(N) typedef optional<typename lua_type_traits<KAGUYA_PP_CAT(A, N)>::get_type> KAGUYA_PP_CAT(opt_type, N);
+#define KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP(N) if (KAGUYA_PP_CAT(opt_type, N) opt = lua_type_traits<KAGUYA_PP_CAT(opt_type, N)>::get(state, index)){return *opt;}else
 
 			template<typename To>
 			bool checkType(lua_State*, int, TypeTuple<>)
@@ -860,7 +855,7 @@ namespace kaguya
 				template<typename To,KAGUYA_PP_TEMPLATE_DEF_REPEAT(N)> \
 				To get(lua_State* state, int index, TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(N)>)\
 				{\
-					KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_ST_GET_REP)\
+					KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_GET_OPT_TYPEDEF)\
 					KAGUYA_PP_REPEAT(N, KAGUYA_CONVERTIBLE_REG_HELPER_GET_REP)\
 					{throw LuaTypeMismatch();}\
 				}
@@ -878,7 +873,7 @@ namespace kaguya
 
 		template<typename To, KAGUYA_PP_CONVERTIBLE_REG_HELPER_DEF_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)>
 		struct ConvertibleRegisterHelper {
-			typedef ConvertibleRegisterHelperProxy<To> get_type;
+			typedef To get_type;
 			typedef TypeTuple<KAGUYA_PP_TEMPLATE_ARG_REPEAT(KAGUYA_FUNCTION_MAX_ARGS)> conv_types;
 
 			static bool checkType(lua_State* l, int index)
@@ -899,9 +894,9 @@ namespace kaguya
 			}
 			static get_type get(lua_State* l, int index)
 			{
-				if (object_checkType<To>(l, index))
+				if (optional<To> opt = object_getopt<To>(l, index))
 				{
-					return object_get<To>(l, index);
+					return *opt;
 				}
 				return conv_helper_detail::get<get_type>(l, index, conv_types());
 			}
