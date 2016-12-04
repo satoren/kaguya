@@ -37,7 +37,7 @@ python generate_one_header.py > ../kaguya.hpp
 int main()
 {
   kaguya::State state;
-  state.dofile("/path/to/script.lua")
+  state.dofile("/path/to/script.lua");
 }
 ```
 
@@ -86,11 +86,11 @@ You can use it for holding a Lua-value in native code.
 ```c++
 kaguya::State state;
 state["a"] = "test";
-LuaRef a = state["a"];
+kaguya::LuaRef a = state["a"];
 assert(a == "test");
 
 state["tbl"] = kaguya::NewTable();//tbl ={};
-LuaTable tbl = state["tbl"];//holding Lua Table
+kaguya::LuaTable tbl = state["tbl"];//holding Lua Table
 tbl["value"] = 1;//tbl.value = 1 in lua
 state("assert(tbl.value == 1)");
 ```
@@ -121,12 +121,12 @@ TEST_EQUAL(std::get<2>(result_tuple), 4);
 ```c++
 struct ABC
 {
-	ABC():v(0) {}
-	ABC(int value) :v(value) {}
-	int value()const { return v; }
+	ABC():v_(0) {}
+	ABC(int value) :v_(value) {}
+	int value()const { return v_; }
 	void setValue(int v) { v_ = v; }
-	void overload1() {std::cout << "call overload1"<<std::endl }
-	void overload2(int) {std::cout << "call overload2"<<std::endl }
+	void overload1() {std::cout << "call overload1"<<std::endl; }
+	void overload2(int) {std::cout << "call overload2"<<std::endl; }
 private:
 	int v_;
 };
@@ -226,7 +226,7 @@ state["b"] = static_cast<Base const&>(base);
 ```
 ### Registering function
 ```c++
-void c_free_standing_function(int v){std::cout <<"c_free_standing_function called:" << v << std::endl}
+void c_free_standing_function(int v){std::cout <<"c_free_standing_function called:" << v << std::endl;}
 state["fun"] = &c_free_standing_function;
 state["fun"](54); //c_free_standing_function called:54
 state("fun(22)");//c_free_standing_function called:22
@@ -268,8 +268,8 @@ struct TestClass
 	{
 		return a*b*c;
 	}
-}
-KAGUYA_MEMBER_FUNCTION_OVERLOADS(defargfn_wrapper, TestClass, default_arg, 0, 3)
+};
+KAGUYA_MEMBER_FUNCTION_OVERLOADS(defargfn_wrapper, TestClass, defargfn, 0, 3)
 state["TestClass"].setClass(kaguya::UserdataMetatable<TestClass>()
 	.setConstructors<TestClass()>()
 	.addFunction("defarg", defargfn_wrapper())
