@@ -335,17 +335,17 @@ namespace kaguya
 		}
 
 		template<typename T>
-		std::vector<LuaRef> LuaTableOrUserDataImpl<T>::values()const
+		std::vector<LuaRef> LuaTableImpl<T>::values()const
 		{
 			return values<LuaRef>();
 		}
 		template<typename T>
-		std::vector<LuaRef> LuaTableOrUserDataImpl<T>::keys()const
+		std::vector<LuaRef> LuaTableImpl<T>::keys()const
 		{
 			return keys<LuaRef>();
 		}
 		template<typename T>
-		std::map<LuaRef, LuaRef> LuaTableOrUserDataImpl<T>::map()const
+		std::map<LuaRef, LuaRef> LuaTableImpl<T>::map()const
 		{
 			return map<LuaRef, LuaRef>();
 		}

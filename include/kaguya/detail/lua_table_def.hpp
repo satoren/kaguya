@@ -173,45 +173,6 @@ namespace kaguya
 			{
 				return static_cast<const Derived*>(this)->push(state);
 			}
-
-			template<typename K, typename A>
-			struct gettablekey
-			{
-				typedef K key_type;
-				typedef void value_type;
-				std::vector<K, A>& v_;
-				gettablekey(std::vector<K, A>&v) :v_(v) {}
-				void operator ()(K key, const void*)
-				{
-					v_.push_back(key);
-				}
-			};
-			template<typename V, typename A>
-			struct gettablevalue
-			{
-				typedef void key_type;
-				typedef V value_type;
-				std::vector<V, A>& v_;
-				gettablevalue(std::vector<V, A>&v) :v_(v) {}
-				void operator ()(const void*, V value)
-				{
-					v_.push_back(value);
-				}
-			};
-			template<typename K, typename V, typename C, typename A>
-			struct gettablemap
-			{
-				typedef K key_type;
-				typedef V value_type;
-				std::map<K, V, C, A>& m_;
-				gettablemap(std::map<K, V, C, A>& m) :m_(m) {}
-				void operator ()(K key, V value)
-				{
-					m_[key] = value;
-				}
-			};
-
-
 		public:
 
 			/// @brief set metatable
@@ -292,6 +253,139 @@ namespace kaguya
 				return true;
 			}
 #endif
+
+
+			/// @brief value = table[key];
+			/// @param key key of table
+			/// @return reference of field value
+			template<typename K>
+			LuaStackRef operator[](K key)const;
+
+
+			/// @brief value = table[key];or table[key] = value;
+			/// @param key key of table
+			/// @return reference of field value
+			template<typename K>
+			TableKeyReferenceProxy<K> operator[](K key);
+		};
+
+		template<typename Derived>
+		class LuaTableImpl
+		{
+		private:
+			lua_State* state_()const
+			{
+				return static_cast<const Derived*>(this)->state();
+			}
+			int pushStackIndex_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->pushStackIndex(state);
+			}
+			int push_(lua_State* state)const
+			{
+				return static_cast<const Derived*>(this)->push(state);
+			}
+
+			template<typename K, typename A>
+			struct gettablekey
+			{
+				typedef K key_type;
+				typedef void value_type;
+				std::vector<K, A>& v_;
+				gettablekey(std::vector<K, A>&v) :v_(v) {}
+				void operator ()(K key, const void*)
+				{
+					v_.push_back(key);
+				}
+			};
+			template<typename V, typename A>
+			struct gettablevalue
+			{
+				typedef void key_type;
+				typedef V value_type;
+				std::vector<V, A>& v_;
+				gettablevalue(std::vector<V, A>&v) :v_(v) {}
+				void operator ()(const void*, V value)
+				{
+					v_.push_back(value);
+				}
+			};
+			template<typename K, typename V, typename C, typename A>
+			struct gettablemap
+			{
+				typedef K key_type;
+				typedef V value_type;
+				std::map<K, V, C, A>& m_;
+				gettablemap(std::map<K, V, C, A>& m) :m_(m) {}
+				void operator ()(K key, V value)
+				{
+					m_[key] = value;
+				}
+			};
+		public:
+
+
+#if KAGUYA_USE_CPP11
+			/// @brief rawset(table,key,value)
+			template<typename K, typename V>
+			bool setRawField(K&& key, V&& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+
+				table_proxy::rawset(state, stackIndex, std::forward<K>(key), std::forward<V>(value));
+
+				return true;
+			}
+#else
+			/// @brief rawset(table,key,value)
+			template<typename K, typename V>
+			bool setRawField(const K& key, const V& value)
+			{
+				lua_State* state = state_();
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return false;
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+				table_proxy::rawset(state, stackIndex, key, value);
+				return true;
+			}
+#endif
+			/// @brief value = rawget(table,key);
+			/// @param key key of table
+			/// @return reference of field value
+			template<typename T, typename KEY>
+			typename lua_type_traits<T>::get_type getRawField(const KEY& key)const
+			{
+				lua_State* state = state_();
+				typedef typename lua_type_traits<T>::get_type get_type;
+				if (!state)
+				{
+					except::typeMismatchError(state, "is nil");
+					return get_type();
+				}
+				util::ScopedSavedStack save(state);
+				int stackIndex = pushStackIndex_(state);
+
+				table_proxy::rawget(state, stackIndex, key);
+
+				return lua_type_traits<T>::get(state, -1);
+			}
+			/// @brief value = rawget(table,key);
+			/// @param key key of table
+			/// @return reference of field value
+			template<typename KEY>
+			LuaStackRef getRawField(const KEY& key)const;
+
 
 			/// @brief foreach table fields
 			template < class K, class V, class Fun> void foreach_table(Fun f)const
@@ -412,100 +506,6 @@ namespace kaguya
 				return map<K, V, std::less<K> >();
 			}
 			std::map<LuaRef, LuaRef> map()const;
-
-			/// @brief value = table[key];
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename K>
-			LuaStackRef operator[](K key)const;
-
-
-			/// @brief value = table[key];or table[key] = value;
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename K>
-			TableKeyReferenceProxy<K> operator[](K key);
-		};
-
-		template<typename Derived>
-		class LuaTableImpl
-		{
-		private:
-			lua_State* state_()const
-			{
-				return static_cast<const Derived*>(this)->state();
-			}
-			int pushStackIndex_(lua_State* state)const
-			{
-				return static_cast<const Derived*>(this)->pushStackIndex(state);
-			}
-			int push_(lua_State* state)const
-			{
-				return static_cast<const Derived*>(this)->push(state);
-			}
-		public:
-
-
-#if KAGUYA_USE_CPP11
-			/// @brief rawset(table,key,value)
-			template<typename K, typename V>
-			bool setRawField(K&& key, V&& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-
-				table_proxy::rawset(state, stackIndex, std::forward<K>(key), std::forward<V>(value));
-
-				return true;
-			}
-#else
-			/// @brief rawset(table,key,value)
-			template<typename K, typename V>
-			bool setRawField(const K& key, const V& value)
-			{
-				lua_State* state = state_();
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return false;
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-				table_proxy::rawset(state, stackIndex, key, value);
-				return true;
-			}
-#endif
-			/// @brief value = rawget(table,key);
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename T, typename KEY>
-			typename lua_type_traits<T>::get_type getRawField(const KEY& key)const
-			{
-				lua_State* state = state_();
-				typedef typename lua_type_traits<T>::get_type get_type;
-				if (!state)
-				{
-					except::typeMismatchError(state, "is nil");
-					return get_type();
-				}
-				util::ScopedSavedStack save(state);
-				int stackIndex = pushStackIndex_(state);
-
-				table_proxy::rawget(state, stackIndex, key);
-
-				return lua_type_traits<T>::get(state, -1);
-			}
-			/// @brief value = rawget(table,key);
-			/// @param key key of table
-			/// @return reference of field value
-			template<typename KEY>
-			LuaStackRef getRawField(const KEY& key)const;
 		};
 
 		template<typename Derived>
