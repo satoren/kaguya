@@ -34,7 +34,6 @@ test_compilers = [
     ,('gcc-4.5','g++-4.5','',False)
     ,('gcc-4.6','g++-4.6','-DCMAKE_CXX_FLAGS=-std=c++03',False)
     ,('gcc-4.7','g++-4.7','-DCMAKE_CXX_FLAGS=-std=c++03',False)
-    ,('gcc-4.7','g++-4.7','-DCMAKE_CXX_FLAGS=-std=c++11',False)
     ,('gcc-4.8','g++-4.8','-DCMAKE_CXX_FLAGS=-std=c++03',False)
     ,('gcc-4.8','g++-4.8','-DCMAKE_CXX_FLAGS=-std=c++11',False)
     ,('gcc-4.9','g++-4.9','-DCMAKE_CXX_FLAGS=-std=c++03',False)

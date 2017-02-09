@@ -131,7 +131,7 @@ namespace kaguya
 		template<class F, class... Args>
 		typename FunctionResultType<typename traits::decay<F>::type>::type invoke(F&& f, Args&&... args)
 		{
-			return detail::invoke_helper(f, std::forward<Args>(args)...);
+			return detail::invoke_helper(std::forward<F>(f), std::forward<Args>(args)...);
 		}
 
 	}
