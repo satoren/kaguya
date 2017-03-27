@@ -53,6 +53,10 @@ namespace kaguya
 					lua_settop(state_, saved_top_index_);
 				}
 			}
+            
+            void release(){
+                state_ = 0;
+            }
 
 		private:
 			ScopedSavedStack(ScopedSavedStack const &);
@@ -260,5 +264,5 @@ namespace kaguya
 			return t.name();
 #endif
 		}
-	}
+    }
 }

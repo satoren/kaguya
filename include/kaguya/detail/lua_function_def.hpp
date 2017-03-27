@@ -88,7 +88,7 @@ namespace kaguya
 				int argstart = lua_gettop(state) + 1;
 				push_(state);
 				int argnum = util::push_args(state, std::forward<Args>(args)...);
-				int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);
+				int result = lua_pcall(state, argnum, LUA_MULTRET, 0);
 				except::checkErrorAndThrow(result, state);
 				return detail::FunctionResultProxy::ReturnValue(state, result, argstart, types::typetag<Result>());
 			}
@@ -109,7 +109,7 @@ namespace kaguya
 				int argstart = lua_gettop(state) + 1;\
 				push_(state);\
 				int argnum = util::push_args(state KAGUYA_PP_ARG_REPEAT_CONCAT(N));\
-				int result = lua_pcall_wrap(state, argnum, LUA_MULTRET);\
+				int result = lua_pcall(state, argnum, LUA_MULTRET, 0);\
 				except::checkErrorAndThrow(result, state);\
 				return detail::FunctionResultProxy::ReturnValue(state,result, argstart, types::typetag<Result>());\
 			}

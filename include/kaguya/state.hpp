@@ -323,7 +323,7 @@ namespace kaguya
 #endif
 			}
 
-			status = lua_pcall_wrap(state_, 0, LUA_MULTRET);
+			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
 			{
 				ErrorHandler::handle(status, state_);
@@ -356,7 +356,7 @@ namespace kaguya
 				lua_setfenv(state_, -2);
 #endif
 			}
-			status = lua_pcall_wrap(state_, 0, LUA_MULTRET);
+			status = lua_pcall(state_, 0, LUA_MULTRET, 0);
 			if (status)
 			{
 				ErrorHandler::handle(status, state_);

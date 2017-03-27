@@ -65,7 +65,7 @@ namespace kaguya
 		{
 			int status = luaL_loadbuffer(state, ref.code_.c_str(), ref.code_.size(), ref.chunk_name_.empty()? ref.code_.c_str(): ref.chunk_name_.c_str());
 			if (!except::checkErrorAndThrow(status, state)) { return 0; }
-			status = lua_pcall_wrap(state, 0, 1);
+			status = lua_pcall(state, 0, 1, 0);
 			if (!except::checkErrorAndThrow(status, state)) { return 0; }
 			return 1;
 		}
@@ -186,7 +186,7 @@ namespace kaguya
 		}
 
 
-		inline int call_constructor_function(lua_State* L)
+		KAGUYA_NOINLINE inline int call_constructor_function(lua_State* L)
 		{
 			//function(t,...) return t.new(...) end
 			lua_getfield(L, 1, "new");
@@ -194,7 +194,7 @@ namespace kaguya
 			lua_call(L, lua_gettop(L) - 1, LUA_MULTRET);
 			return lua_gettop(L);
 		}
-		inline void get_call_constructor_metatable(lua_State* L)
+		KAGUYA_NOINLINE inline void get_call_constructor_metatable(lua_State* L)
 		{
 			static int key = 0;
 
@@ -211,7 +211,7 @@ namespace kaguya
 			}
 		}
 
-		inline void setMembers(lua_State* state, int metatable_index, const MemberMapType& member_map, const PropMapType& property_map)
+		KAGUYA_NOINLINE inline void setMembers(lua_State* state, int metatable_index, const MemberMapType& member_map, const PropMapType& property_map)
 		{
 			for (MemberMapType::const_iterator it = member_map.begin(); it != member_map.end(); ++it)
 			{
@@ -227,7 +227,7 @@ namespace kaguya
 			}
 		}
 
-		inline void setPropertyIndexMetamethod(lua_State* state, int metatable_index)
+		KAGUYA_NOINLINE inline void setPropertyIndexMetamethod(lua_State* state, int metatable_index)
 		{
 			lua_pushstring(state, "__index");
 			lua_pushvalue(state, metatable_index);
@@ -235,14 +235,14 @@ namespace kaguya
 			lua_rawset(state, metatable_index);
 		}
 
-		inline void setPropertyNewIndexMetamethod(lua_State* state, int metatable_index)
+		KAGUYA_NOINLINE inline void setPropertyNewIndexMetamethod(lua_State* state, int metatable_index)
 		{
 			lua_pushstring(state, "__newindex");
 			lua_pushvalue(state, metatable_index);
 			lua_pushcclosure(state, &property_newindex_function, 1);
 			lua_rawset(state, metatable_index);
 		}
-		inline void setMultipleBase(lua_State* state, int metatable_index, int metabase_array_index)
+		KAGUYA_NOINLINE inline void setMultipleBase(lua_State* state, int metatable_index, int metabase_array_index)
 		{
 			lua_createtable(state,0,1);
 			int newmetaindex = lua_gettop(state);

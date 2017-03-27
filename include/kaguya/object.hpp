@@ -682,16 +682,6 @@ namespace kaguya
 			return *pointer;
 		}
 
-		template<typename T>inline T object_get(lua_State* l, int index)
-		{
-			const typename traits::remove_reference<T>::type* pointer = get_const_pointer(l, index, types::typetag<typename traits::remove_reference<T>::type>());
-			if (!pointer)
-			{
-				throw LuaTypeMismatch();
-			}
-			return *pointer;
-		}
-
 		template<typename To>
 		struct ConvertibleRegisterHelperProxy
 		{

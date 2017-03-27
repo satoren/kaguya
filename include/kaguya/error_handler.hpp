@@ -13,7 +13,7 @@
 namespace kaguya
 {
 
-	inline const char* get_error_message(lua_State *state)
+	KAGUYA_NOINLINE inline const char* get_error_message(lua_State *state)
 	{
 		if (lua_type(state, -1) == LUA_TSTRING)
 		{
@@ -25,18 +25,13 @@ namespace kaguya
 			return "unknown error";
 		}
 	}
-	inline int lua_pcall_wrap(lua_State* state, int argnum, int retnum)
-	{
-		int result = lua_pcall(state, argnum, retnum, 0);
-		return result;
-	}
 
 	struct ErrorHandler
 	{
 		typedef standard::function<void(int, const char*)> function_type;
 
 
-		static bool handle(const char* message, lua_State *state)
+		KAGUYA_NOINLINE static bool handle(const char* message, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
@@ -46,7 +41,7 @@ namespace kaguya
 			}
 			return false;
 		}
-		static bool handle(int status_code, const char* message, lua_State *state)
+		KAGUYA_NOINLINE static bool handle(int status_code, const char* message, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
@@ -56,7 +51,7 @@ namespace kaguya
 			}
 			return false;
 		}
-		static bool handle(int status_code, lua_State *state)
+		KAGUYA_NOINLINE static bool handle(int status_code, lua_State *state)
 		{
 			function_type handler = getHandler(state);
 			if (handler)
@@ -78,7 +73,7 @@ namespace kaguya
 		}
 
 
-		static void unregisterHandler(lua_State* state)
+		KAGUYA_NOINLINE static void unregisterHandler(lua_State* state)
 		{
 			if (state)
 			{
@@ -89,7 +84,7 @@ namespace kaguya
 				}
 			}
 		}
-		static void registerHandler(lua_State* state, function_type f)
+		KAGUYA_NOINLINE static void registerHandler(lua_State* state, function_type f)
 		{
 			if (state)
 			{
@@ -115,7 +110,7 @@ namespace kaguya
 			}
 		}
 		
-		static void throwDefaultError(int status, const char* message=0)
+		KAGUYA_NOINLINE static void throwDefaultError(int status, const char* message=0)
 		{
 			switch (status)
 			{
@@ -170,28 +165,28 @@ namespace kaguya
 
 	namespace except
 	{
-		inline void OtherError(lua_State *state, const std::string& message)
+		KAGUYA_NOINLINE inline void OtherError(lua_State *state, const std::string& message)
 		{
 			if (ErrorHandler::handle(message.c_str(), state))
 			{
 				return;
 			}
 		}
-		inline void typeMismatchError(lua_State *state, const std::string& message)
+		KAGUYA_NOINLINE inline void typeMismatchError(lua_State *state, const std::string& message)
 		{
 			if(ErrorHandler::handle(message.c_str(), state))
 			{
 				return;
 			}
 		}
-		inline void memoryError(lua_State *state, const char* message)
+		KAGUYA_NOINLINE inline void memoryError(lua_State *state, const char* message)
 		{
 			if (ErrorHandler::handle(message, state))
 			{
 				return;
 			}
 		}
-		inline bool checkErrorAndThrow(int status, lua_State *state)
+		KAGUYA_NOINLINE inline bool checkErrorAndThrow(int status, lua_State *state)
 		{
 			if (status != 0 && status != LUA_YIELD)
 			{

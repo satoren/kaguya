@@ -95,12 +95,26 @@ extern "C" {
 #endif
 
 
+#ifndef KAGUYA_NOEXCEPTIONS
+#  define KAGUYA_NOEXCEPTIONS 0
+#endif
 
 #ifndef KAGUYA_NOEXCEPT
 # if KAGUYA_USE_CPP11 && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 #  define KAGUYA_NOEXCEPT noexcept
 # else
 #  define KAGUYA_NOEXCEPT throw()
+# endif
+#endif
+
+
+#ifndef KAGUYA_NOINLINE
+# if defined(_MSC_VER)
+#  define KAGUYA_NOINLINE __declspec(noinline)
+#elif defined(__GNUC__) || defined(__clang__)
+#  define KAGUYA_NOINLINE __attribute__((noinline))
+# else
+#  define KAGUYA_NOINLINE 
 # endif
 #endif
 
