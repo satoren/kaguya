@@ -24,7 +24,26 @@ KAGUYA_TEST_FUNCTION_DEF(vector_to_table)(kaguya::State& state)
 	std::vector<double> v; v.push_back(3); v.push_back(13); v.push_back(2); v.push_back(99);
 	state["v"] = v;
 	TEST_CHECK(state("assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)"));
+}
+KAGUYA_TEST_FUNCTION_DEF(vector_bool_from_table)(kaguya::State& state)
+{
+	state("arraytablefn =function() return {true,false,false,true,false,true} end");
+	std::vector<bool> b = state["arraytablefn"]();
+	TEST_EQUAL(b.size(), 6);
+	TEST_EQUAL(b[0], true);
+	TEST_EQUAL(b[1], false);
+	TEST_EQUAL(b[2], false);
+	TEST_EQUAL(b[3], true);
+	TEST_EQUAL(b[4], false);
+	TEST_EQUAL(b[5], true);
+	TEST_CHECK(state["arraytablefn"]().typeTest<std::vector<bool> >());
+}
 
+KAGUYA_TEST_FUNCTION_DEF(vector_bool_to_table)(kaguya::State& state)
+{
+	std::vector<bool> v; v.push_back(true); v.push_back(false); v.push_back(false); v.push_back(true);
+	state["v"] = v;
+	TEST_CHECK(state("assert(v[1] == true and v[2] == false and v[3] == false and v[4] == true)"));
 }
 #endif
 

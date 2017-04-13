@@ -341,6 +341,17 @@ KAGUYA_TEST_FUNCTION_DEF(invoke_test)(kaguya::State&)
 }
 
 
+
+#ifndef KAGUYA_NO_STD_VECTOR_TO_TABLE
+
+KAGUYA_TEST_FUNCTION_DEF(vector_to_table_with_move)(kaguya::State& state)
+{
+	std::vector<double> v; v.push_back(3); v.push_back(13); v.push_back(2); v.push_back(99);
+	state["v"] = std::move(v);
+	TEST_CHECK(state("assert(v[1] == 3 and v[2] == 13 and v[3] == 2 and v[4] == 99)"));
+}
+#endif
+
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
 
 
