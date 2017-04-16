@@ -13,6 +13,13 @@ option(KAGUYA_SINGLE_HEADER_VERSION "generate single header" OFF)
 include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
 
+
+find_package(Boost)
+if(Boost_INCLUDE_DIR)
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+endif(Boost_INCLUDE_DIR)
+
+
 if(KAGUYA_SINGLE_HEADER_VERSION)
 file(MAKE_DIRECTORY single_include/kaguya)
 file(COPY include/kaguya/another_binding_api.hpp DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/single_include/kaguya/)
