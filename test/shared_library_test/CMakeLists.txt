@@ -1,9 +1,10 @@
 
-
+if(LUA_BUILD)
 add_custom_target(copy_lua_shared_lib
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${LUA_SHARED_LIBRARIES}> ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${LUA_SHARED_LIBRARIES}
 )
+endif(LUA_BUILD)
 
 add_definitions(-DKAGUYA_SUPPORT_MULTIPLE_SHARED_LIBRARY=1)
 
