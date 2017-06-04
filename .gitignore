@@ -1,4 +1,7 @@
 build*
+_build/
+single_include
+.vscode
 lua-*
 *.exe
 *.dll

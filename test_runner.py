@@ -77,8 +77,7 @@ def build_and_exec_test(compiler,lua_version,build_type,dir_opt):
     cxxcompiler = compiler[1]
     addopt = compiler[2]
     if os.system(cxxcompiler+' -v 2> /dev/null')!=0: return
-
-    buildpath = "_build/"+compiler[0]+"_"+lua_version+"_"+build_type+"_"+dir_opt
+    buildpath = os.path.join('_build',compiler[0]+"_"+lua_version+"_"+build_type+"_"+dir_opt)
     if not os.path.exists(buildpath):
         os.makedirs(buildpath)
     os.chdir(buildpath)
@@ -103,7 +102,7 @@ def build_with_target_compiler(lua_version):
             build_and_exec_test(compiler,lua_version,"Release",str(i))
 
 def build_msvc_and_exec_test(msvcver,lua_version,build_type):
-    buildpath = '_build/'+msvcver[0]+'_'+lua_version
+    buildpath = os.path.join('_build',msvcver[0]+'_'+lua_version)
     if not os.path.exists(buildpath):
         os.makedirs(buildpath)
     os.chdir(buildpath)
