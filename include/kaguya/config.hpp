@@ -43,7 +43,7 @@ extern "C" {
 #endif
 
 //If you want use registered class by kaguya between multiple shared library,
-//Please switch to 1 for KAGUYA_SUPPORT_MULTIPLE_SHARED_LIBRARY and KAGUYA_NAME_BASED_TYPE_CHECK
+//please switch to 1 for KAGUYA_SUPPORT_MULTIPLE_SHARED_LIBRARY and KAGUYA_NAME_BASED_TYPE_CHECK
 #ifndef KAGUYA_SUPPORT_MULTIPLE_SHARED_LIBRARY
 #define KAGUYA_SUPPORT_MULTIPLE_SHARED_LIBRARY 0
 #endif

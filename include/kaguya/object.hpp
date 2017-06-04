@@ -596,7 +596,7 @@ inline bool newmetatable(lua_State *l, const std::type_info &typeinfo,
 #if KAGUYA_SUPPORT_MULTIPLE_SHARED_LIBRARY
   lua_getfield(l, LUA_REGISTRYINDEX, metatable_type_table_key());
 #else
-  lua_rawgetp(l, LUA_REGISTRYINDEX, metatable_type_table_key());
+  lua_rawgetp_rtype(l, LUA_REGISTRYINDEX, metatable_type_table_key());
 #endif
 
   int metaregindex = lua_absindex(l, -1);
