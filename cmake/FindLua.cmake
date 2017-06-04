@@ -14,6 +14,9 @@ if(LOCAL_LUA_DIRECTORY)
       set(LUA_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${LOCAL_LUA_DIRECTORY}/include)
     endif()
    set(LUA_LIBRARIES liblua)
+   if(NOT EMSCRIPTEN)
+    set(LUA_SHARED_LIBRARIES liblua_shared)
+   endif(NOT EMSCRIPTEN)
   endif()
 endif()
 
@@ -23,6 +26,8 @@ if(NOT LUA_INCLUDE_DIRS)
   foreach(modulename ${LUA_SEARCHVERS})
     pkg_search_module(LUA ${modulename})
   endforeach(modulename)
+  # maybe system library is shared library
+  set(LUA_SHARED_LIBRARIES ${LUA_LIBRARIES})
 endif(NOT LUA_INCLUDE_DIRS)
 
 if(NOT LUA_INCLUDE_DIRS)
