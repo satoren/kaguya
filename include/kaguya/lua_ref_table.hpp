@@ -116,8 +116,7 @@ public:
 private:
   template <typename T, typename P>
   void set_class(const UserdataMetatable<T, P> &reg) {
-    detail::table_proxy::set(state_, table_index_, key_,
-                             reg.createMatatable(state_));
+    detail::table_proxy::set(state_, table_index_, key_,reg);
   }
 
   ///!constructs the reference. Accessible only to kaguya::LuaRef itself
