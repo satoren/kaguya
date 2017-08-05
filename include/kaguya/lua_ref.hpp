@@ -82,20 +82,6 @@ template <> inline void get_result<void>(lua_State *, int) {}
 /// @brief Reference to any Lua data.
 class LuaRef : public Ref::RegistoryRef, public detail::LuaVariantImpl<LuaRef> {
 private:
-  static lua_State *toMainThread(lua_State *state) {
-#if LUA_VERSION_NUM >= 502
-    if (state) {
-      lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
-      lua_State *mainthread = lua_tothread(state, -1);
-      lua_pop(state, 1);
-      if (mainthread) {
-        return mainthread;
-      }
-    }
-#endif
-    return state;
-  }
-
 public:
   LuaRef(const Ref::RegistoryRef &src) : Ref::RegistoryRef(src) {}
   LuaRef(const LuaRef &src) : Ref::RegistoryRef(src) {}
