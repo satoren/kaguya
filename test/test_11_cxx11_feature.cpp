@@ -312,6 +312,31 @@ KAGUYA_TEST_FUNCTION_DEF(vector_to_table_with_move)(kaguya::State &state) {
 }
 #endif
 
+KAGUYA_TEST_FUNCTION_DEF(register_luafunction)(kaguya::State &state) {
+  std::function<int(void)> func;
+  state["reg_lua_func"] =
+      kaguya::function([&](const std::function<int(void)> &f) { func = f; });
+
+  state("reg_lua_func(function() return 123 end) "
+        "");
+
+  TEST_CHECK(func() == 123);
+}
+
+KAGUYA_TEST_FUNCTION_DEF(register_luafunction_from_coroutine)
+(kaguya::State &state) {
+  std::function<int(void)> func;
+  state["reg_lua_func"] =
+      kaguya::function([&](const std::function<int(void)> &f) { func = f; });
+
+  state("local corf = coroutine.wrap( function() "
+        "reg_lua_func(function() return 123 end) "
+        "end) "
+        "corf()");
+
+  TEST_CHECK(func() == 123);
+}
+
 KAGUYA_TEST_GROUP_END(test_11_cxx11_feature)
 
 #endif

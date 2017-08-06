@@ -94,6 +94,7 @@ class State {
         if (!ErrorHandler::getHandler(state_)) {
           setErrorHandler(&stderror_out);
         }
+        registerMainThreadIfNeeded();
         openlibs(lib);
         lua_atpanic(state_, &default_panic);
       } catch (const LuaException &) {
@@ -101,6 +102,14 @@ class State {
         state_ = 0;
       }
     }
+  }
+
+  void registerMainThreadIfNeeded() {
+#if LUA_VERSION_NUM < 502
+    if (state_) {
+      util::registerMainThread(state_);
+    }
+#endif
   }
 
 public:
@@ -150,6 +159,7 @@ public:
   /// @param lua created lua_State. It is not call lua_close() in this class
   State(lua_State *lua) : state_(lua), created_(false) {
     if (state_) {
+      registerMainThreadIfNeeded();
       if (!ErrorHandler::getHandler(state_)) {
         setErrorHandler(&stderror_out);
       }

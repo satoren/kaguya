@@ -152,8 +152,8 @@ inline void stackValueDump(std::ostream &os, lua_State *state, int stackIndex,
   }
 }
 
-inline lua_State *toMainThread(lua_State *state) {
 #if LUA_VERSION_NUM >= 502
+inline lua_State *toMainThread(lua_State *state) {
   if (state) {
     lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
     lua_State *mainthread = lua_tothread(state, -1);
@@ -162,9 +162,37 @@ inline lua_State *toMainThread(lua_State *state) {
       return mainthread;
     }
   }
-#endif
   return state;
 }
+
+#else
+inline lua_State *toMainThread(lua_State *state) {
+  if (state) {
+    // lua_pushthread return 1 if state is main thread
+    bool state_is_main = lua_pushthread(state) == 1;
+	lua_pop(state, 1);
+    if (state_is_main) {
+      return state;
+    }
+    lua_getfield(state, LUA_REGISTRYINDEX, "KAGUYA_REG_MAINTHREAD");
+    lua_State *mainthread = lua_tothread(state, -1);
+    lua_pop(state, 1);
+    if (mainthread) {
+      return mainthread;
+    }
+  }
+  return state;
+}
+inline bool registerMainThread(lua_State *state) {
+  if (lua_pushthread(state)) {
+    lua_setfield(state, LUA_REGISTRYINDEX, "KAGUYA_REG_MAINTHREAD");
+    return true;
+  } else {
+    lua_pop(state, 1);
+    return false;
+  }
+}
+#endif
 
 #if KAGUYA_USE_CPP11
 inline int push_args(lua_State *) { return 0; }
