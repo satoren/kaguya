@@ -28,25 +28,25 @@ struct ErrorHandler {
   typedef standard::function<void(int, const char *)> function_type;
 
   static bool handle(const char *message, lua_State *state) {
-    function_type handler = getHandler(state);
+	  function_type *handler = getFunctionPointer(state);
     if (handler) {
-      handler(0, message);
+		(*handler)(0, message);
       return true;
     }
     return false;
   }
   static bool handle(int status_code, const char *message, lua_State *state) {
-    function_type handler = getHandler(state);
+	  function_type *handler = getFunctionPointer(state);
     if (handler) {
-      handler(status_code, message);
+		(*handler)(status_code, message);
       return true;
     }
     return false;
   }
   static bool handle(int status_code, lua_State *state) {
-    function_type handler = getHandler(state);
+    function_type *handler = getFunctionPointer(state);
     if (handler) {
-      handler(status_code, get_error_message(state));
+      (*handler)(status_code, get_error_message(state));
       return true;
     }
     return false;

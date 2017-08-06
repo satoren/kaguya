@@ -282,13 +282,12 @@ public:
                          "class. e.g. std::tuple");
   }
 
-  LuaTable createMatatable(lua_State *state) const {
-    util::ScopedSavedStack save(state);
+  bool pushCreateMatatable(lua_State *state) const {
     if (!class_userdata::newmetatable<class_type>(state)) {
       except::OtherError(state,
                          typeid(class_type *).name() +
                              std::string(" is already registered"));
-      return LuaTable();
+      return false;
     }
     int metatable_index = lua_gettop(state);
     Metatable::setMembers(state, metatable_index, member_map_, property_map_);
@@ -326,8 +325,15 @@ public:
       Metatable::get_call_constructor_metatable(state);
       lua_setmetatable(state, metatable_index);
     }
-
-    return LuaStackRef(state, metatable_index);
+    lua_settop(state, metatable_index);
+    return true;
+  }
+  LuaTable createMatatable(lua_State *state) const {
+    util::ScopedSavedStack save(state);
+    if (!pushCreateMatatable(state)) {
+      return LuaTable();
+    }
+    return LuaStackRef(state, -1);
   }
 
 #if KAGUYA_USE_CPP11
@@ -700,7 +706,8 @@ struct lua_type_traits<UserdataMetatable<T, Base> > {
   typedef const UserdataMetatable<T, Base> &push_type;
 
   static int push(lua_State *l, push_type ref) {
-    return ref.createMatatable(l).push(l);
+    ref.pushCreateMatatable(l);
+    return 1;
   }
 };
 }
