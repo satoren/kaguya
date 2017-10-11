@@ -140,6 +140,8 @@ inline int property_newindex_function(lua_State *L) {
       lua_pushvalue(L, value);
       lua_call(L, 2, 0);
       return 0;
+    } else if (type == LUA_TNIL) {
+      return luaL_error(L, "setting unknown property (%s) to userdata.", strkey);
     }
   }
   lua_pushvalue(L, key);
