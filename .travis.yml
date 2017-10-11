@@ -9,18 +9,14 @@ before_install:
   - pip install --user cpp-coveralls
 install:
   - if [ "$CXX" = "g++" ]; then export COVERAGE=$COV; fi
-  - if [ "$CXX" = "g++" ] && [ "$CXX_FLAGS" = "-std=c++11" ]; then export CXX="g++-4.8"; fi
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - kalakris-cmake
     packages:
     - liblua5.2-dev
     - libluajit-5.1-dev
     - libboost-all-dev
-    - g++-4.8
-    - llvm-gcc-4.6
     - cmake
     - libffi-dev
     - libssl-dev
@@ -39,9 +35,7 @@ script:
   - cmake . -DCOVERAGE=${COVERAGE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DLUA_SEARCH_LIB_NAME=${LUALIB} -DKAGUYA_NO_USERDATA_TYPE_CHECK=${KAGUYA_NO_USERDATA_TYPE_CHECK} -DKAGUYA_SINGLE_HEADER_VERSION=${KAGUYA_SINGLE_HEADER_VERSION} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 after_success: |
 
-  if [ "$CXX" = "g++-4.8" ]; then
-    export GCOV="gcov-4.8"
-  elif [ "$CXX" = "g++" ]; then
+  if [ "$CXX" = "g++" ]; then
     export GCOV="gcov"
   fi
   if [ -n "$GCOV" ] && [ -n "$COVERAGE" ]; then
