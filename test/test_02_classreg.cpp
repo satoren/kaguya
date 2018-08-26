@@ -1531,4 +1531,23 @@ KAGUYA_TEST_FUNCTION_DEF(pure_virtual_test)(kaguya::State &state) {
   TEST_CHECK(state("test:const_default_arg(6)"));
   TEST_EQUAL(test, 6);
 }
+
+
+KAGUYA_TEST_FUNCTION_DEF(unregistered_property)(kaguya::State &state) {
+
+	state["Base"].setClass(
+		kaguya::UserdataMetatable<Base>()
+		.setConstructors<Base()>()
+		.addProperty("a", &Base::a));
+
+	state.setErrorHandler(ignore_error_fun);
+	last_error_message = "";
+
+	Base base;
+	state["base"] = &base;
+	TEST_CHECK(state("assert(base.c==nil)"));
+	TEST_CHECK(!state("base.c=1"));
+}
+
+
 KAGUYA_TEST_GROUP_END(test_02_classreg)
