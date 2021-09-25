@@ -9,13 +9,7 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 - C++03 compiler with boost library or C++11 compiler(gcc 4.8+,clang 3.4+,MSVC2015) without boost.
 
 ### Tested Environment
-* luajit,lua5.2,clang 3.4,gcc4.8,-std=c++03 with boost library,-std=c++11
-[![Build Status](https://travis-ci.org/satoren/kaguya.svg?branch=master)](https://travis-ci.org/satoren/kaguya)
-* lua5.3,Visual C++2008～2012 with boost library,Visual C++2013,Visual C++2015
-[![Build status](https://ci.appveyor.com/api/projects/status/cwlu28s42leacidx/branch/master?svg=true)](https://ci.appveyor.com/project/satoren/kaguya)
-
-[![Coverage Status](https://coveralls.io/repos/github/satoren/kaguya/badge.svg?branch=master)](https://coveralls.io/github/satoren/kaguya?branch=master)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/8930/badge.svg)](https://scan.coverity.com/projects/satoren-kaguya)
+[![test](https://github.com/satoren/kaguya/actions/workflows/test.yml/badge.svg)](https://github.com/satoren/kaguya/actions/workflows/cmake.yml)
 
 ## Introduction
 Kaguya is a Lua binding library for C++
