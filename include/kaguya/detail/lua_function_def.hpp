@@ -162,14 +162,14 @@ public:
     if (argnum < 0) {
       argnum = 0;
     }
-    int result = lua_resume(thread, state, argnum);
+    int nresult = 1;
+    int result = lua_resume(thread, state, argnum, &nresult);
     except::checkErrorAndThrow(result, thread);
-    return detail::FunctionResultProxy::ReturnValue(thread, result, 1,
+    return detail::FunctionResultProxy::ReturnValue(thread, result, nresult - (lua_gettop(state) + 1),
                                                     types::typetag<Result>());
   }
   template <class... Args> FunctionResults operator()(Args &&... args);
 #else
-
 #define KAGUYA_RESUME_DEF(N)                                                   \
   template <class Result KAGUYA_PP_TEMPLATE_DEF_REPEAT_CONCAT(N)>              \
   Result resume(KAGUYA_PP_ARG_CR_DEF_REPEAT(N)) {                              \
@@ -194,9 +194,10 @@ public:
     if (argnum < 0) {                                                          \
       argnum = 0;                                                              \
     }                                                                          \
-    int result = lua_resume(thread, state, argnum);                            \
+    int nresult = 1;                                                           \
+    int result = lua_resume(thread, state, argnum, &nresult);                  \
     except::checkErrorAndThrow(result, thread);                                \
-    return detail::FunctionResultProxy::ReturnValue(thread, result, 1,         \
+    return detail::FunctionResultProxy::ReturnValue(thread, result, nresult - (lua_gettop(state) + 1),  \
                                                     types::typetag<Result>()); \
   }
 
