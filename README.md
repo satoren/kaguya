@@ -41,12 +41,12 @@ extern "C" int luaopen_modulename(lua_State *L)
 {
 	kaguya::State state(l);
 	kaguya::LuaTable module = state.newTable();
-	module["function"] = kaguya::funtion(somefunction);
+	module["function"] = kaguya::function(somefunction);
 	return module.push();//number of return lib
 }
 ```
 
-### Runnig Lua code
+### Running Lua code
 ```c++
 kaguya::State state;
 state("a = 'test'");//load and execute from string
@@ -322,7 +322,7 @@ state("corfun = function(arg)"
 
 kaguya::LuaFunction corfun = state["corfun"];//lua function get
 
-//exec coroutine with function and argment
+//exec coroutine with function and argument
 std::cout << int(cor(corfun, 3)) << std::endl;//3
 std::cout << int(cor()) << std::endl;//6
 //resume template argument is result type
@@ -410,7 +410,7 @@ void HandleError(int errCode, const char * szError)
 }
 kaguya::State l;
 l.setErrorHandler(HandleError);
-l.dofile("./scripts/custom.lua"); // eg. accesing a non-existing file will invoke HandleError above
+l.dofile("./scripts/custom.lua"); // eg. accessing a non-existing file will invoke HandleError above
 ```
 
 ## run test

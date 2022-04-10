@@ -25,26 +25,26 @@ This option must be same between translation units.
 
      .. code-block:: lua
 
-       --io.stdin is created by lua standard libray.
+       --io.stdin is created by lua standard library.
        kaguya_binded_receive_userdata_fn(io.stdin) -- Error not detected. this is undefined behavior.
 
 |
 
 * KAGUYA_NO_VECTOR_AND_MAP_TO_TABLE
 
-  If difined, std::map and std::vector will not be converted to a lua-table
+  If defined, std::map and std::vector will not be converted to a lua-table
 
 |
 
 * KAGUYA_NO_STD_VECTOR_TO_TABLE
 
-  If difined, std::vector will not be converted to a lua-table
+  If defined, std::vector will not be converted to a lua-table
 
 |
 
 * KAGUYA_NO_STD_MAP_TO_TABLE
 
-  If difined, std::map will not be converted to a lua-table
+  If defined, std::map will not be converted to a lua-table
 
 |
 

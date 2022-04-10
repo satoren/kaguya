@@ -67,7 +67,7 @@ extern "C" {
 
 #if !KAGUYA_USE_CPP11
 #ifndef KAGUYA_FUNCTION_MAX_ARGS
-///! max argumeent number for binding function. this define used C++03 only.
+///! max argument number for binding function. this define used C++03 only.
 #define KAGUYA_FUNCTION_MAX_ARGS 9
 #endif
 
@@ -109,14 +109,14 @@ extern "C" {
 #ifndef KAGUYA_DEPRECATED_FEATURE
 #if __cplusplus >= 201402L && defined(__has_cpp_attribute)
 #if __has_cpp_attribute(deprecated)
-// C++ standard depecated
+// C++ standard deprecated
 #define KAGUYA_DEPRECATED_FEATURE(MSG) [[deprecated(MSG)]]
 #endif
 #endif
 #endif
 #ifndef KAGUYA_DEPRECATED_FEATURE
 #if defined(_MSC_VER)
-// MSVC depecated
+// MSVC deprecated
 #define KAGUYA_DEPRECATED_FEATURE(MSG) __declspec(deprecated(MSG))
 #elif defined(__GNUC__) || defined(__clang__)
 #define KAGUYA_DEPRECATED_FEATURE(MSG) __attribute__((deprecated))

@@ -23,7 +23,7 @@ Hello world
 
 Create Lua context, and execute Lua code.
 
-kaguya is automaticaly load all standard libraries.
+kaguya is automatically load all standard libraries.
 
 .. code-block:: c++
 
@@ -90,7 +90,7 @@ Initialize State
 
 
 
-Runnig Lua code
+Running Lua code
 ----------------------------------
 
 1. from string
@@ -281,4 +281,4 @@ Lua error encountered will write to the console by default, and it is customizab
   }
   kaguya::State l;
   l.setErrorHandler(HandleError);
-  l.dofile("./scripts/custom.lua"); // eg. accesing a file not existed will invoke HandleError above
+  l.dofile("./scripts/custom.lua"); // eg. accessing a file not existed will invoke HandleError above
