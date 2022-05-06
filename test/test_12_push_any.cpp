@@ -21,7 +21,6 @@ KAGUYA_TEST_FUNCTION_DEF(push_any_type)(kaguya::State &state) {
   AnyDataPusher a("d");
   AnyDataPusher b(4);
   a = b;
-  a = a;
   AnyDataPusher c;
   TEST_COMPARE_EQ(state.newRef(a), 4);
   TEST_COMPARE_EQ(state.newRef(b), 4);
