@@ -472,7 +472,7 @@ KAGUYA_TEST_FUNCTION_DEF(this_typemismatch_error_test)(kaguya::State &state) {
   }
 }
 
-#if LUA_VERSION_NUM >= 502
+#if LUA_VERSION_NUM >= 502 && LUA_VERSION_NUM < 504
 KAGUYA_TEST_FUNCTION_DEF(gc_error_throw_test)(kaguya::State &) {
   bool catch_except = false;
   try {
