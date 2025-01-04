@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        luaversion: [lua-5.1.5,lua-5.2.4,lua-5.3.6,lua-5.4.3]
+        luaversion: [lua-5.1.5,lua-5.2.4,lua-5.3.6,lua-5.4.3,lua-5.4.7]
       fail-fast: false
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
