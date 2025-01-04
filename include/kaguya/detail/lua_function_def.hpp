@@ -165,8 +165,7 @@ public:
     int nresult = 1;
     int result = lua_resume(thread, state, argnum, &nresult);
     except::checkErrorAndThrow(result, thread);
-    return detail::FunctionResultProxy::ReturnValue(thread, result, nresult - (lua_gettop(state) + 1),
-                                                    types::typetag<Result>());
+    return detail::FunctionResultProxy::ReturnValue(thread, result, 1, types::typetag<Result>());
   }
   template <class... Args> FunctionResults operator()(Args &&... args);
 #else
@@ -197,8 +196,7 @@ public:
     int nresult = 1;                                                           \
     int result = lua_resume(thread, state, argnum, &nresult);                  \
     except::checkErrorAndThrow(result, thread);                                \
-    return detail::FunctionResultProxy::ReturnValue(thread, result, nresult - (lua_gettop(state) + 1),  \
-                                                    types::typetag<Result>()); \
+    return detail::FunctionResultProxy::ReturnValue(thread, result, 1, types::typetag<Result>()); \
   }
 
   KAGUYA_RESUME_DEF(0)
