@@ -9,6 +9,19 @@
 namespace kaguya {
 // for lua version compatibility
 namespace compat {
+#if LUA_VERSION_NUM >= 504
+#elif LUA_VERSION_NUM < 502
+inline int lua_resume(lua_State *L, lua_State *from, int nargs, int* nresults) {
+  KAGUYA_UNUSED(from);
+  *nresults = 1;
+  return ::lua_resume(L, nargs);
+}
+#else
+inline int lua_resume(lua_State *L, lua_State *from, int nargs, int* nresults) {
+  *nresults = 1;
+  return ::lua_resume(L, from, nargs);
+}
+#endif
 #if LUA_VERSION_NUM >= 503
 inline int lua_rawgetp_rtype(lua_State *L, int idx, const void *ptr) {
   return lua_rawgetp(L, idx, ptr);
@@ -54,10 +67,6 @@ inline size_t lua_rawlen(lua_State *L, int index) {
   return lua_objlen(L, index);
 }
 
-inline int lua_resume(lua_State *L, lua_State *from, int nargs) {
-  KAGUYA_UNUSED(from);
-  return ::lua_resume(L, nargs);
-}
 inline int lua_absindex(lua_State *L, int idx) {
   return (idx > 0 || (idx <= LUA_REGISTRYINDEX)) ? idx
                                                  : lua_gettop(L) + 1 + idx;

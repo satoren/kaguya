@@ -13,7 +13,6 @@ void ignore_error_fun(int status, const char *message) {
 KAGUYA_TEST_FUNCTION_DEF(access)(kaguya::State &state) {
   kaguya::LuaRef ref(state.state(), "abc");
   TEST_EQUAL(ref.get<std::string>(), "abc");
-  ref = ref;
 
   state("abc={d =1,e=3,f=64,g='sss'}");
   kaguya::LuaRef abctable = state["abc"];

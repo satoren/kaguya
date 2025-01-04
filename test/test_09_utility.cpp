@@ -48,7 +48,8 @@ KAGUYA_TEST_FUNCTION_DEF(lua_resume_test)(kaguya::State &s) {
   lua_pushnumber(co, 2);
   lua_pushnumber(co, 3);
 
-  lua_resume(co, s.state(), 2);
+  int nres;
+  lua_resume(co, s.state(), 2, &nres);
 
   TEST_EQUAL(s["v"][1], 2);
   TEST_EQUAL(s["v"][2], 3);

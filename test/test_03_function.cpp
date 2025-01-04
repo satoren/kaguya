@@ -235,7 +235,8 @@ int cfunction(lua_State *L) {
 
 int coroutinefn(lua_State *cor) {
   using namespace kaguya;
-  lua_resume(cor, 0, 0);
+  int nresult = 0;
+  lua_resume(cor, 0, 0, &nresult);
   return static_cast<int>(lua_tointeger(cor, 1));
 }
 
