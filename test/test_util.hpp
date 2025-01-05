@@ -216,7 +216,7 @@ struct TestClass {
 };
 }
 
-#if KAGUYA_USE_CPP11
+#if KAGUYA_USE_CPP11 && (__cplusplus < 201703L)
 inline std::ostream &operator<<(std::ostream &os, std::nullptr_t) {
   return os << "nullptr";
 }

@@ -121,7 +121,6 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine)(kaguya::State &state) {
     cor2.resume<void>(corfun, 3);
   }
   {
-
     state["cor2"] = kaguya::NewThread();
     kaguya::LuaRef cor2 = state["cor2"];
     TEST_CHECK(state("corfun = function(arg)"
@@ -134,6 +133,40 @@ KAGUYA_TEST_FUNCTION_DEF(coroutine)(kaguya::State &state) {
     int yieldnum = 0;
     while (cor2.threadStatus() == LUA_YIELD) {
       cor2();
+      yieldnum++;
+    }
+
+    TEST_EQUAL(yieldnum, 10);
+  }
+  {
+    // Mix yielding and receiving params
+    state["cor3"] = kaguya::NewThread();
+    kaguya::LuaRef cor2 = state["cor3"];
+    TEST_CHECK(state("corfun = function(arg)"
+                     "for i = 1,arg do "
+                     "j, j1 = coroutine.yield() "
+                     "k = coroutine.yield(j) "
+                     "coroutine.yield(k, j1) "
+                     "end "
+                     "end"));
+    kaguya::LuaRef corfun = state["corfun"];
+    kaguya::FunctionResults res0 = cor2(corfun, 10);
+    TEST_EQUAL(res0.size(), 0u); // 1st yield
+    int yieldnum = 0;
+    while (cor2.threadStatus() == LUA_YIELD) {
+      const int j = yieldnum * 2 + 3;
+      const int j1 = j + 7;
+      int res_j = cor2(j, j1);
+      TEST_EQUAL(res_j, j)
+      const int k = j + 5;
+      const kaguya::FunctionResults res_k_j1 = cor2(k);
+      TEST_EQUAL(res_k_j1.result_size(), 2);
+      const int res_k = res_k_j1.result_at(0);
+      const int res_j1 = res_k_j1.result_at(1);
+      TEST_EQUAL(res_k, k);
+      TEST_EQUAL(res_j1, j1);
+      kaguya::FunctionResults res_empty = cor2(); // First in loop or end
+      TEST_EQUAL(res_empty.size(), 0u);
       yieldnum++;
     }
 
