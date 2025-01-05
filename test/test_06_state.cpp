@@ -366,6 +366,13 @@ KAGUYA_TEST_FUNCTION_DEF(allocation_error_test)(kaguya::State &) {
     } catch (const kaguya::LuaMemoryError &) {
       continue;
     }
+#if LUA_VERSION_RELEASE_NUM >= 50404
+    // In Lua 5.4.4+ we don't get a specific error status for Lua panics
+    catch (const kaguya::LuaUnknownError & e) {
+      if (std::string(e.what()).find("memory") != std::string::npos)
+        continue;
+    }
+#endif
     TEST_CHECK(false);
   }
 }
