@@ -1,5 +1,5 @@
 #include "kaguya/kaguya.hpp"
-
+#include <limits>
 #include "benchmark_function.hpp"
 
 
