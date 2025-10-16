@@ -1,5 +1,5 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.16..3.20)
 project(Kaguya)
 
 include(cmake/FindLua.cmake)
