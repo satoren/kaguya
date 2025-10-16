@@ -1,6 +1,7 @@
 #include "kaguya/kaguya.hpp"
 #include <limits>
 #include "test_util.hpp"
+#include <limits>
 
 KAGUYA_TEST_GROUP_START(test_01_primitive)
 
